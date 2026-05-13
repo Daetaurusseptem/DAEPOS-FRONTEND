@@ -49,9 +49,12 @@
   width: 100%;
 }
 
-.logo i {
+.logo i, .brand-logo {
   font-size: 1.8rem;
   color: var(--primary);
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .sidebar-container.collapsed .logo span {
