@@ -1,0 +1,42 @@
+.categories-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.search-section {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-header h5 {
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.search-input-group {
+  max-width: 500px;
+}
+
+.category-name {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}

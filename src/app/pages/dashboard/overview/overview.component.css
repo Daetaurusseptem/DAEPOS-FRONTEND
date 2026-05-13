@@ -1,0 +1,9 @@
+/* overview.component.css */
+.overview-container {
+    padding: 20px;
+  }
+  
+  .stats-cards .card {
+    margin-bottom: 20px;
+    /* Añade más estilos según tu diseño */
+  }

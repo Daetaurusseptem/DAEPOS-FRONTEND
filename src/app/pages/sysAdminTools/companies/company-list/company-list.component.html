@@ -1,0 +1,74 @@
+<div class="main-container">
+  <!-- Búsqueda de Empresas -->
+  <div class="search-container">
+    <div class="search-header">
+      <div class="search-title">
+        <h5>Búsqueda de Empresas</h5>
+      </div>
+      <a class="create-company-link" routerLink="new" role="button">
+        <i class="bi bi-plus-lg"></i> Crear Empresa
+      </a>
+    </div>
+    <form class="search-form">
+      <div class="search-input">
+        <input type="text" id="busquedaEmpresa" aria-describedby="busquedaHelp" #terminoEmpresa placeholder="Buscar...">
+      </div>
+    </form>
+  </div>
+  
+  <!-- Empresas Registradas -->
+  <div class="companies-container">
+    <div class="companies-header">
+      <div class="companies-title">
+        <h2>Empresas Registradas</h2>
+      </div>
+    </div>
+    <div class="companies-list">
+      <table class="companies-table">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Dirección</th>
+            <th>Estado</th>
+            <th>Herramientas</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="empresas">
+        <tr *ngFor="let company of empresas; index as i">
+            <td class="img-cell">
+                <img [src]="company.img" alt="Avatar de usuario" (click)="abrirModal(company)">
+                <i class="edit-icon bi bi-pencil-fill" (click)="abrirModal(company)"></i>
+            </td>
+            <td>{{ company.name }}</td>
+            <td>{{ company.tel }}</td>
+            <td>{{ company.email }}</td>
+            <td>{{ company.address }}</td>
+            <td>
+              <ng-container *ngIf="getLatestSubscription(company) as latestSubscription">
+                {{ latestSubscription.state }}
+              </ng-container>
+              <ng-container *ngIf="!getLatestSubscription(company)">
+                Sin suscripciones
+              </ng-container>
+            </td>
+            <td class="action-cell">
+              <button class="btn-details" [routerLink]="['/dashboard/sysadmin/companies/details', company._id]">
+                <i class="bi bi-eye-fill"></i>Detalles
+              </button>
+              <button class="btn-edit" [routerLink]="['/dashboard/sysadmin/companies/edit', company._id]">
+                <i class="bi bi-pencil-fill"></i> Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="loading-spinner" *ngIf="!empresas">
+        <app-loading-data-spinner></app-loading-data-spinner>
+        <p>Cargando Registros</p>
+      </div>
+    </div>
+  </div>
+</div>

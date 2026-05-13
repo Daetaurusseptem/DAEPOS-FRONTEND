@@ -1,0 +1,72 @@
+<div class="row">
+  <div class="col-12 mx-auto text-center mb-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title text-center">
+          <h5>Búsqueda de Usuarios</h5>
+        </div>
+        <a name="" id="" class="btn btn-primary end" routerLink="new" role="button">
+          <i class="bi bi-plus-lg"></i> Crear Usuario
+        </a>
+      </div>
+      <form>
+        <div class="m-5">
+          <input type="text" class="form-control" id="busquedaEmpresa" aria-describedby="busquedaHelp" #terminoEmpresa>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="col-12 mx-auto text-center">
+    <div class="card">
+      <div class="card-title p-4 start">
+      
+        <h2>Lista de Usuarios Registrados</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>img</th>
+                <th>Nombre</th>
+                <th>Nombre de Usuario</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td  class="text-center">
+                  <img *ngIf="user.img=='no-image'" src="../../../../../assets/img/no-img.webp"
+                          alt="Avatar de usuario"
+                          class="avatar pointer"
+                          (click)="abrirModal(user)">
+                  <img *ngIf="user.img!='no-image'" [src]="user.img"
+                          alt="Avatar de usuario"
+                          class="avatar pointer"
+                          (click)="abrirModal(user)">
+  
+                </td>
+                <td>{{ user.name || 'No Especificado' }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                  <button class="btn btn-primary btn-sm me-2 d-inline"
+                    [routerLink]="['/dashboard/sysadmin/users/edit',user._id]">
+                    <i class="bi bi-pencil-fill"></i>
+                  </button>
+                  <button  *ngIf="user.role =='admin'||'usuario'" (click)="eliminarUsuario(user._id!)" class="btn btn-danger btn-sm d-inline">
+                      <i class="bi bi-trash3-fill"></i>
+
+                    </button>
+                </td>
+                
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

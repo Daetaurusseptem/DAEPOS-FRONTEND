@@ -1,0 +1,19 @@
+<div class="container mt-4">
+    <h2>Seleccionar Plan de Suscripción</h2>
+    <div class="row">
+        <div class="col-md-4" *ngFor="let product of products">
+            <div class="card">
+                <img [src]="product.images[0]" class="card-img-top" alt="Imagen del Plan">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description }}</p>
+                    <p class="card-text">{{ product.default_price }}</p>
+                    <ul class="list-unstyled">
+                        <li *ngFor="let feature of product.features">{{ feature.name }}</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" (click)="selectProduct(product)">Seleccionar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

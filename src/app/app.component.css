@@ -1,0 +1,16 @@
+.fullscreen-prompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    z-index: 9999;
+  }
+  .fullscreen-prompt button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }

@@ -1,0 +1,230 @@
+/* Design System - POS Professional */
+:root {
+  --primary: #4361ee;
+  --primary-hover: #3a56d4;
+  --secondary: #7209b7;
+  --success: #2ec4b6;
+  --danger: #e63946;
+  --warning: #ff9f1c;
+  --dark: #1a1c23;
+  --light: #f8f9fa;
+  --bg-main: #f0f2f5;
+  --card-bg: #ffffff;
+  --text-main: #1e293b; /* Más oscuro para mejor lectura */
+  --text-muted: #64748b; /* Gris medio para descripciones */
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~@ng-select/ng-select/themes/default.theme.css";
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Global Smoothness */
+.smooth-transition {
+  transition: var(--transition);
+}
+
+/* Premium Card Overrides */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1.25rem !important;
+}
+
+/* Premium Buttons */
+.btn {
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(67, 97, 238, 0.25);
+}
+
+/* Custom Utilities */
+.text-muted { color: var(--text-muted) !important; }
+.pointer { cursor: pointer; }
+.oculto { display: none !important; }
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+/* Scroller Moderno */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Tablas Premium Globales - Forzado */
+.content-area .table {
+  --bs-table-bg: transparent !important;
+  --bs-table-border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+  vertical-align: middle !important;
+  border-collapse: separate !important;
+  border-spacing: 0 10px !important;
+  background-color: transparent !important;
+}
+
+.content-area .table thead th {
+  border: none !important;
+  text-transform: uppercase !important;
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.2px !important;
+  color: var(--text-muted) !important;
+  padding: 1rem 1.25rem !important;
+  background-color: transparent !important;
+}
+
+.content-area .table tbody tr {
+  background-color: var(--card-bg) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+  transition: var(--transition) !important;
+}
+
+.content-area .table tbody tr:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+  background-color: #fafafa !important;
+}
+
+.content-area .table td {
+  padding: 1rem 1.25rem !important;
+  border: none !important;
+  background-color: transparent !important;
+  font-size: 0.9rem;
+}
+
+.btn-light.btn-sm {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.btn-light.btn-sm:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-light.btn-sm:hover i {
+  color: #fff !important;
+  transition: none;
+}
+
+.btn-light.btn-sm i {
+  font-size: 1rem;
+}
+
+/* Ajustes para Badges en Tablas */
+.badge {
+  padding: 0.5em 0.8em;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+/* PREMIUM PAGINATION */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0;
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.pagination {
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.page-item {
+  border: none !important;
+}
+
+.page-link {
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 14px !important;
+  color: var(--text-muted) !important;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  box-shadow: none !important;
+}
+
+.page-link:hover {
+  background-color: #f1f5f9 !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px);
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25) !important;
+}
+
+.page-item.disabled .page-link {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent !important;
+}

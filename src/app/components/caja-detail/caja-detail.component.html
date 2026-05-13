@@ -1,0 +1,141 @@
+<app-back-button></app-back-button>
+
+<div class="container mt-5">
+  <div class="card shadow-lg">
+    <div class="card-header bg-dark text-white">
+      <h2 class="mb-0"><i class="bi bi-box-seam"></i> Detalles de Caja</h2>
+    </div>
+    <div class="card-body">
+      <div *ngIf="caja">
+        <!-- Usuario -->
+        <div class="mb-3">
+          <i class="bi bi-person-fill"></i> <strong>Usuario:</strong> {{ caja.user.name }}
+        </div>
+        
+        <!-- Fecha de Apertura con Hora -->
+        <div class="mb-3">
+          <i class="bi bi-clock-history"></i> 
+          <strong>Fecha de Apertura:</strong> 
+          {{ caja.startDate | date: 'fullDate' }} - {{ caja.startDate | date: 'shortTime' }}
+        </div>
+        
+        <!-- Fecha de Cierre con Hora (solo si la caja está cerrada) -->
+        <div class="mb-3" *ngIf="caja.closed">
+          <i class="bi bi-clock-fill"></i> 
+          <strong>Fecha de Cierre:</strong> 
+          {{ caja.endDate | date: 'fullDate' }} - {{ caja.endDate | date: 'shortTime' }}
+        </div>
+        
+        <!-- Estado de la Caja -->
+        <div class="mb-3">
+          <i class="bi bi-info-circle-fill"></i> 
+          <strong>Estado:</strong> 
+          <span [ngClass]="{'text-success': !caja.closed, 'text-danger': caja.closed}">
+            {{ caja.closed ? 'Cerrada' : 'Abierta' }}
+          </span>
+        </div>
+        
+        <!-- Monto Inicial -->
+        <div class="mb-3">
+          <i class="bi bi-currency-dollar"></i> 
+          <strong>Monto Inicial:</strong> 
+          {{ caja.initialAmount | currency }}
+        </div>
+        
+        <!-- Monto Final (solo si la caja está cerrada) -->
+        <div class="mb-3" *ngIf="caja.closed">
+          <i class="bi bi-wallet2"></i> 
+          <strong>Monto Final:</strong> 
+          {{ caja.finalAmount | currency }}
+        </div>
+
+        <!-- Ventas -->
+        <div class="mb-3">
+          <i class="bi bi-cart-check-fill"></i> <strong>Ventas:</strong>
+          <ng-container *ngIf="caja.sales && caja.sales.length > 0; else noSales">
+            <table class="table table-hover table-bordered mt-3">
+              <thead class="table-dark">
+                <tr>
+                  <th><i class="bi bi-upc-scan"></i> Venta ID</th>
+                  <th><i class="bi bi-calendar-event"></i> Fecha</th>
+                  <th><i class="bi bi-currency-dollar"></i> Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let sale of caja.sales">
+                  <td>{{ sale._id }}</td>
+                  <td>{{ sale.date | date: 'short' }}</td>
+                  <td>{{ sale.total | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+          <ng-template #noSales>
+            <p class="text-muted">No se registraron ventas en esta caja.</p>
+          </ng-template>
+        </div>
+
+        <!-- Productos Vendidos por Venta -->
+        <div class="mt-4" *ngIf="caja.sales && caja.sales.length > 0">
+          <div *ngFor="let sale of caja.sales">
+            <i class="bi bi-basket-fill"></i> <strong>Productos Vendidos (Venta ID: {{ sale._id }}):</strong>
+            <ng-container *ngIf="sale.productsSold && sale.productsSold.length > 0; else noProducts">
+              <table class="table table-bordered mt-2">
+                <thead class="table-light">
+                  <tr>
+                    <th><i class="bi bi-box"></i> Producto</th>
+                    <th><i class="bi bi-123"></i> Cantidad</th>
+                    <th><i class="bi bi-currency-exchange"></i> Subtotal</th>
+                    <th><i class="bi bi-pencil-square"></i> Modificaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let product of sale.productsSold">
+                    <td>{{ product.product.name }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>{{ product.subtotal | currency }}</td>
+                    <td>
+                      <ul *ngIf="product.modifications.length > 0">
+                        <li *ngFor="let mod of product.modifications">
+                          {{ mod.name }} (+{{ mod.extraPrice | currency }})
+                        </li>
+                      </ul>
+                      <span *ngIf="product.modifications.length === 0">Sin modificaciones</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </ng-container>
+          </div>
+          <ng-template #noProducts>
+            <p class="text-muted">No se registraron productos vendidos en esta venta.</p>
+          </ng-template>
+        </div>
+
+        <!-- Totales -->
+        <div class="mb-3 mt-4">
+          <i class="bi bi-calculator"></i> <strong>Subtotal Ventas:</strong> {{ subtotalVentas | currency }}
+        </div>
+        <div class="mb-3">
+          <i class="bi bi-cash-stack"></i> <strong>Total en Caja:</strong> {{ totalEnCaja | currency }}
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-between mt-4">
+          <button class="btn btn-outline-primary" (click)="generarPDF()">
+            <i class="bi bi-file-earmark-pdf-fill"></i> Generar PDF
+          </button>
+          <button class="btn btn-outline-secondary" (click)="imprimirTicket()">
+            <i class="bi bi-printer-fill"></i> Imprimir Ticket
+          </button>
+        </div>
+      </div>
+      <div *ngIf="!caja">
+        <div class="text-center">
+          <i class="bi bi-hourglass-split"></i>
+          <p class="mt-3">Cargando detalles de caja...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

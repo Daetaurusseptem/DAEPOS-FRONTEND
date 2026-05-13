@@ -1,0 +1,252 @@
+<div class="container-fluid bg-light">
+  <div class="container ">
+    <button (click)="navigateBackHome()" class="btn btn-dark mt-3">
+      <i class="bi bi-house-door-fill"></i> Volver a Inicio
+    </button>
+  </div>
+
+  <div class="container mb-5">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-center flex-wrap">
+          <button 
+            *ngFor="let category of categories" 
+            (click)="selectCategory(category._id)" 
+            [ngClass]="{'btn-outline-dark': category._id !== selectedCategory, 'btn-dark text-white': category._id === selectedCategory}"
+            class="btn m-2">
+            {{ category.name }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      
+      <!-- Scrollable Catalog Section -->
+      <div class="col-xl-8 col-lg-7">
+
+        <form [formGroup]="searchForm" class="d-flex justify-content-center py-3" (keyup)="searchItems()">
+          <div class="input-group w-75">
+            <input class="form-control" type="search" placeholder="Buscar productos" aria-label="Buscar" formControlName="search">
+          </div>
+        </form>
+
+        <div *ngIf="!selectedCategory && !search" class="alert alert-warning text-center">
+          Por favor, selecciona una categoría o escribe un término de búsqueda para comenzar.
+        </div>
+
+        <div *ngIf="items.length === 0 && (selectedCategory || search)" class="alert alert-info text-center">
+          No se encontraron productos para los filtros proporcionados.
+        </div>
+
+        <div *ngIf="items.length > 0" class="scroll-box">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            <div *ngFor="let item of items" class="col">
+              <div class="card h-100 border-0 shadow-sm">
+                <img [src]="item.product.img" class="card-img-top" alt="{{ item.product.name }}">
+                <div class="card-body text-center">
+                  <h5 class="card-title">{{ item.product.name }}</h5>
+                  <p class="card-text fw-bold">{{ item.price | currency }}</p>
+
+                  <!-- Quantity and Add to Cart Section -->
+                  <div class="input-group justify-content-center align-items-center mb-3 quantity-input-group">
+                    <button class="btn btn-dark text-white btn-quantity" (click)="decrementQuantity(item)">
+                      <i class="bi bi-dash"></i>
+                    </button>
+                    <input type="number" class="form-control text-center quantity-input" [(ngModel)]="item.quantity" min="1" placeholder="0" aria-label="Cantidad">
+                    <button class="btn btn-dark text-white btn-quantity" (click)="incrementQuantity(item)">
+                      <i class="bi bi-plus"></i>
+                    </button>
+                  </div>
+
+                  <!-- Add to Cart Button -->
+                  <button (click)="addToCart(item)" class="btn btn-outline-dark w-100 mb-2">
+                    <i class="bi bi-cart-plus"></i> Añadir
+                  </button>
+
+                  <!-- Load Modifications Button -->
+                  <button (click)="loadModifications(item)" class="btn btn-outline-dark w-100">
+                    <i class="bi bi-sliders"></i> Variaciones
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav aria-label="Navegación de páginas" class="mt-5">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link bg-dark text-white border-dark pointer" 
+                   (click)="goToPage(currentPage - 1)" 
+                   aria-label="Anterior">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <li *ngFor="let page of [].constructor(totalPages); let i = index" 
+                  class="page-item pointer" 
+                  [ngClass]="{'active': currentPage === (i + 1)}">
+                <a class="page-link pointer" 
+                   [ngClass]="{'bg-dark text-white border-dark': currentPage !== (i + 1), 'btn-dark text-white': currentPage === (i + 1)}" 
+                   (click)="goToPage(i + 1)">
+                  {{ i + 1 }}
+                </a>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <a class="page-link bg-dark text-white border-dark pointer" 
+                   (click)="goToPage(currentPage + 1)" 
+                   aria-label="Siguiente">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+
+      <!-- Sidebar Section for Selected Items -->
+      <div class="col-xl-4 col-lg-5">
+        <!-- Selected Item Modifications -->
+        <div class="card shadow-lg p-2 mb-4" *ngIf="selectedItem">
+          <div class="card-header bg-dark text-white">
+            <h4 class="mb-0"><i class="bi bi-list"></i> Porciones e Extras {{ selectedItem.name.toUpperCase() }} </h4>
+          </div>
+          <div class="card-body">
+            <!-- Modifications Tabs and Content -->
+            <ul class="nav nav-tabs" id="modificationTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="exclusive-tab" data-bs-toggle="tab" data-bs-target="#exclusive"
+                        type="button" role="tab" aria-controls="exclusive" aria-selected="true">Porciones</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="non-exclusive-tab" data-bs-toggle="tab" data-bs-target="#non-exclusive"
+                        type="button" role="tab" aria-controls="non-exclusive" aria-selected="false">Extras</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="modificationTabsContent">
+              <!-- Exclusive Modifications -->
+              <div class="tab-pane fade show active" id="exclusive" role="tabpanel" aria-labelledby="exclusive-tab">
+                <ul class="list-group mt-3">
+                  <li *ngFor="let modification of availableExclusiveModifications"
+                      class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ modification.name }} ({{ modification.extraPrice | currency }})
+                    <button (click)="addExclusiveModification(modification)" 
+                            [disabled]="selectedExclusiveModification && selectedExclusiveModification._id === modification._id" 
+                            class="btn btn-outline-dark btn-sm btn-modify">
+                      <i class="bi bi-plus"></i>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <!-- Non-Exclusive Modifications -->
+              <div class="tab-pane fade" id="non-exclusive" role="tabpanel" aria-labelledby="non-exclusive-tab">
+                <ul class="list-group mt-3">
+                  <li *ngFor="let modification of availableNonExclusiveModifications"
+                      class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ modification.name }} ({{ modification.extraPrice | currency }})
+                    <button (click)="addNonExclusiveModification(modification)" class="btn btn-outline-dark btn-sm btn-modify">
+                      <i class="bi bi-plus"></i>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Increment/Decrement Quantity Section -->
+            <div class="input-group mt-3 justify-content-center align-items-center quantity-input-group">
+              <button class="btn btn-dark text-white btn-quantity" (click)="decrementQuantityModSelected()">
+                <i class="bi bi-dash"></i>
+              </button>
+              <input type="number" class="form-control text-center quantity-input" [(ngModel)]="selectedQuantity" min="1"
+                     placeholder="Cantidad" aria-label="Cantidad">
+              <button class="btn btn-dark text-white btn-quantity" (click)="incrementQuantityModSelected()">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+
+            <button (click)="addToCartWithModifications()" class="btn btn-dark text-white w-100 mt-3">
+              <i class="bi bi-cart-plus"></i> Añadir al Carrito
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected Modifications -->
+        <div class="card shadow-lg p-2 mb-4" *ngIf="selectedItem">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-check-square"></i> Variaciones Seleccionadas</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li *ngIf="selectedExclusiveModification"
+                class="list-group-item d-flex justify-content-between align-items-center">
+                {{ selectedExclusiveModification.name }} ({{ selectedExclusiveModification.extraPrice | currency }})
+                <button (click)="removeExclusiveModification()" class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </li>
+              <li *ngFor="let modification of selectedNonExclusiveModifications"
+                class="list-group-item d-flex justify-content-between align-items-center">
+                {{ modification.name }} ({{ modification.extraPrice | currency }})
+                <button (click)="removeNonExclusiveModification(modification)" class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Shopping Cart -->
+        <div class="card shadow-lg p-2">
+          <div class="card-header bg-dark text-white">
+            <h4 class="mb-0"><i class="bi bi-cart3"></i> Tu Carrito</h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cant.</th>
+                  <th>Variaciones</th>
+                  <th>Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of cart">
+                  <td>{{ item.item.product.name }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>
+                    <span *ngIf="item.exclusiveModification">Excluyente: {{ item.exclusiveModification.name }} ({{
+                      item.exclusiveModification.extraPrice | currency }})</span>
+                    <ul *ngIf="item.nonExclusiveModifications.length > 0">
+                      <li *ngFor="let modification of item.nonExclusiveModifications">
+                        {{ modification.name }} ({{ modification.extraPrice | currency }})
+                      </li>
+                    </ul>
+                  </td>
+                  <td>{{ item.total | currency }}</td>
+                  <td>
+                    <button (click)="removeFromCart(item)" class="btn btn-danger btn-sm">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="table-active">
+                  <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                  <td colspan="2"><strong>{{ total | currency }}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <div class="card-footer">
+            <button (click)="checkout()" class="btn btn-dark btn-lg w-100">
+              <i class="bi bi-credit-card"></i> Pagar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div class="container mt-4">
+    <h2>Gestionar Impresoras</h2>
+    <form [formGroup]="printersForm" (ngSubmit)="addPrinter()">
+      <div class="mb-3">
+        <label for="name" class="form-label">Nombre de la Impresora</label>
+        <input type="text" class="form-control" id="name" formControlName="name">
+      </div>
+      <div class="mb-3">
+        <label for="paperSize" class="form-label">Tamaño del Papel</label>
+        <select class="form-select" id="paperSize" formControlName="paperSize">
+          <option value="58mm">58mm</option>
+          <option value="76mm">76mm</option>
+          <option value="80mm">80mm</option>
+          <option value="110mm">110mm</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="type" class="form-label">Tipo de Impresora</label>
+        <select class="form-select" id="type" formControlName="type">
+          <option value="ticket">Ticket</option>
+          <option value="comanda">Comanda</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="!printersForm.valid">Agregar Impresora</button>
+    </form>
+  
+    <h3 class="mt-4">Lista de Impresoras</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Tamaño de Papel</th>
+          <th>Tipo</th>
+          <th>Predeterminada</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let printer of printers; let i = index">
+          <td>{{ printer.name }}</td>
+          <td>{{ printer.paperSize }}</td>
+          <td>{{ printer.type }}</td>
+          <td>{{ printer.default ? 'Sí' : 'No' }}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" (click)="setDefaultPrinter(printer.name, printer.type)">Establecer como predeterminada</button>
+            <button class="btn btn-danger btn-sm" (click)="deletePrinter(i)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

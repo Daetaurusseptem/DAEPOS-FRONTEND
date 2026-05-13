@@ -1,0 +1,43 @@
+<div class="main-container">
+    <div class="form-container card shadow">
+      <div class="form-header bg-primary text-white">
+        <div class="form-title">
+          <h2>Editar Usuario</h2>
+        </div>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="userForm" (ngSubmit)="updateUser()" class="form">
+          <!-- Nombre Completo del Usuario -->
+          <div class="mb-3">
+            <label for="name" class="form-label">Nombre Completo</label>
+            <input type="text" id="name" formControlName="name" class="form-control" placeholder="Introduce el nombre completo del usuario">
+          </div>
+  
+          <!-- Nombre de Usuario -->
+          <div class="mb-3">
+            <label for="username" class="form-label">Nombre de Usuario</label>
+            <input type="text" id="username" formControlName="username" class="form-control" placeholder="Introduce el nombre de usuario">
+          </div>
+          
+          <!-- Correo Electrónico -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input type="email" id="email" formControlName="email" class="form-control" placeholder="Introduce el correo electrónico">
+          </div>
+  
+          <div *ngIf="userForm.invalid" class="alert alert-danger">
+            <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0">Nombre inválido</p>
+            <p *ngIf="campoNoValidoDatosUsuario('username')" class="mb-0">Nombre de usuario inválido</p>
+            <p *ngIf="campoNoValidoDatosUsuario('role')" class="mb-0">Role inválido</p>
+          </div>
+  
+          <!-- Botón para guardar los cambios -->
+          <div class="d-flex justify-content-between">
+            <app-back-button></app-back-button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

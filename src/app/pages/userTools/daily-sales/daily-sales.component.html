@@ -1,0 +1,166 @@
+<div class="container mt-5">
+  <app-back-button></app-back-button>
+
+  <div *ngIf="openCashRegisterWithSales; else noSales">
+    <div class="card shadow-lg border-0">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+        <h2 class="mb-0 fs-4">
+          <i class="bi bi-door-open-fill me-2"></i> Turno Actual
+        </h2>
+        <span class="badge bg-success">Abierto</span>
+      </div>
+      <div class="card-body bg-light">
+        <!-- Alerta de Límite de Efectivo -->
+        <div *ngIf="openCashRegisterWithSales.expectedAmount > 5000" class="alert alert-danger d-flex align-items-center mb-4 shadow-sm animate__animated animate__pulse animate__infinite">
+          <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+          <div>
+            <strong>¡ATENCIÓN SEGURIDAD!</strong> El efectivo en caja supera el límite permitido. Realice un retiro de seguridad.
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="p-3 bg-white rounded shadow-sm border-start border-4 border-primary">
+              <p class="mb-1 text-muted"><i class="bi bi-person-circle"></i> Cajero</p>
+              <h5 class="fw-bold">{{ usuario }}</h5>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 bg-white rounded shadow-sm border-start border-4 border-info">
+              <p class="mb-1 text-muted"><i class="bi bi-cpu"></i> Caja Física</p>
+              <h5 class="fw-bold">{{ openCashRegisterWithSales.physicalRegister?.name || 'No asignada' }}</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4 text-center">
+          <div class="col-sm-4">
+            <div class="card bg-white border-0 shadow-sm">
+              <div class="card-body">
+                <p class="text-muted small mb-1 uppercase">Fondo Inicial</p>
+                <h4 class="text-primary fw-bold">{{ openCashRegisterWithSales.initialAmount | currency }}</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="card bg-white border-0 shadow-sm">
+              <div class="card-body">
+                <p class="text-muted small mb-1 uppercase">Esperado en Caja</p>
+                <h4 class="text-dark fw-bold">{{ openCashRegisterWithSales.expectedAmount | currency }}</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="card bg-white border-0 shadow-sm">
+              <div class="card-body">
+                <p class="text-muted small mb-1 uppercase">Gastos / Retiros</p>
+                <h4 class="text-danger fw-bold">- {{ totalExpenses | currency }}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ventas Asociadas -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="fs-5 mb-0"><i class="bi bi-cart-check-fill me-2"></i> Ventas del Turno</h3>
+          <div class="d-flex gap-2">
+          <button (click)="addExpenseUI()" class="btn btn-warning btn-sm">
+            <i class="bi bi-shield-lock me-1"></i> Retirar Efectivo
+          </button>
+          <button (click)="generarPDF()" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-printer me-1"></i> Corte X (Parcial)
+          </button>
+        </div>
+        </div>
+
+        <div *ngIf="openCashRegisterWithSales.sales.length > 0; else noSalesYet" class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Hora</th>
+                <th>Monto</th>
+                <th>Pago</th>
+                <th class="text-center">Detalle</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let sale of openCashRegisterWithSales.sales">
+                <td>{{ sale.date | date:'shortTime' }}</td>
+                <td class="fw-bold">{{ sale.total | currency }}</td>
+                <td>
+                  <span class="badge rounded-pill" [ngClass]="sale.paymentMethod === 'cash' ? 'bg-secondary' : 'bg-info text-dark'">
+                    {{ sale.paymentMethod | titlecase }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <button class="btn btn-light btn-sm border" (click)="getReceipt(sale._id)">
+                    <i class="bi bi-receipt text-primary"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <ng-template #noSalesYet>
+          <div class="text-center p-5 bg-white rounded border border-dashed">
+            <i class="bi bi-inbox text-muted display-4"></i>
+            <p class="text-muted mt-2">Aún no hay ventas registradas en este turno.</p>
+          </div>
+        </ng-template>
+        <!-- Historial de Salidas (Gastos/Retiros) -->
+        <div class="mt-5 mb-3">
+          <h3 class="fs-5 mb-0 text-danger"><i class="bi bi-cash-stack me-2"></i> Historial de Salidas de Efectivo</h3>
+        </div>
+
+        <div *ngIf="openCashRegisterWithSales.expenses.length > 0; else noExpensesYet" class="table-responsive">
+          <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th>Motivo</th>
+                <th class="text-end">Monto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let exp of openCashRegisterWithSales.expenses">
+                <td>{{ exp.timestamp | date:'shortTime' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="exp.type === 'withdrawal' ? 'bg-danger' : 'bg-warning text-dark'">
+                    {{ exp.type === 'withdrawal' ? 'Retiro Seguridad' : 'Gasto Operación' }}
+                  </span>
+                </td>
+                <td class="text-muted small">{{ exp.reason }}</td>
+                <td class="text-end fw-bold text-danger">- {{ exp.amount | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ng-template #noExpensesYet>
+          <div class="text-center p-3 bg-white rounded border border-dashed mb-4">
+            <p class="text-muted small mb-0">No se han registrado salidas de efectivo en este turno.</p>
+          </div>
+        </ng-template>
+
+        <div class="mt-5 pt-3 border-top d-grid gap-2">
+          <button (click)="closeShift()" class="btn btn-danger btn-lg py-3 shadow-sm fw-bold">
+            <i class="bi bi-lock-fill me-2"></i> FINALIZAR TURNO (CORTE Z)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noSales>
+    <div class="text-center p-5 mt-4">
+      <i class="bi bi-exclamation-octagon text-warning display-1"></i>
+      <h2 class="mt-3">No hay turno activo</h2>
+      <p class="text-muted">Debes abrir una caja para comenzar a registrar ventas.</p>
+      <button class="btn btn-primary mt-3" routerLink="/dashboard/user">
+        Ir a Apertura de Caja
+      </button>
+    </div>
+  </ng-template>
+</div>

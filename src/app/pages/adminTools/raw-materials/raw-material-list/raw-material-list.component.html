@@ -1,0 +1,39 @@
+<div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0 bi bi-list"> Lista de Materia Prima / Ingredientes</h2>
+        <button class="btn btn-light" (click)="createRawMaterial()">Crear Material</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Nombre</th>
+                <th>Stock</th>
+                <th>Medida</th>
+                <th>Proveedor</th>
+                <th>Fecha Recepción</th>
+                <th>Fecha Expiración</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let material of rawMaterials">
+                <td>{{ material.name }}</td>
+                <td>{{ material.stock }}</td>
+                <td>{{ material.measurement }}</td>
+                <td>{{ material.supplier }}</td>
+                <td>{{ material.receivedDate | date }}</td>
+                <td>{{ material.expirationDate ? (material.expirationDate | date) : 'N/A' }}</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary me-2" (click)="editRawMaterial(material._id!)">Editar</button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteRawMaterial(material._id!)">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>

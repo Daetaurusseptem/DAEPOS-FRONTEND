@@ -1,0 +1,67 @@
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Editar Producto</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <img *ngIf="!product.img" src="../../../../../assets/img/no-img.webp" alt="Avatar de usuario" (click)="abrirModal(product,'productos')" class="img-fluid rounded" style="max-width: 200px; cursor: pointer;">
+          <img *ngIf="product.img" [src]="product.img" alt="Avatar de usuario" (click)="abrirModal(product,'productos')" class="img-fluid rounded" style="max-width: 200px; cursor: pointer;">
+        </div>
+        <div class="col-md-8">
+          <form [formGroup]="productForm" (ngSubmit)="updateProduct()">
+            <div class="mb-3">
+              <label for="name" class="form-label">Nombre del producto</label>
+              <input type="text" class="form-control" id="name" formControlName="name">
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción</label>
+              <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="marca" class="form-label">Marca</label>
+              <input type="text" class="form-control" id="marca" formControlName="marca">
+            </div>
+            <div class="mb-3">
+              <label for="supplier" class="form-label">Proveedor</label>
+              <select class="form-select" id="supplier" formControlName="supplier">
+                <option value="" disabled>Seleccione un proveedor</option>
+                <option *ngFor="let supplier of suppliers" [value]="supplier._id">{{ supplier.name }}</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="categories" class="form-label">Categoría</label>
+              <ng-select [items]="Categories" bindLabel="name" bindValue="_id" formControlName="categories" [multiple]="true">
+              </ng-select>
+            </div>
+            <div class="mb-3">
+              <label for="isComposite" class="form-label">¿Es un producto compuesto?</label>
+              <select class="form-select" id="isComposite" formControlName="isComposite" (change)="onIsCompositeChange($event)">
+                <option [value]="false">No</option>
+                <option [value]="true">Sí</option>
+              </select>
+            </div>
+            <div class="mb-3" *ngIf="isComposite">
+              <label for="recipe" class="form-label">Receta</label>
+              <select class="form-select" id="recipe" formControlName="recipe">
+                <option value="" disabled>Seleccione una receta</option>
+                <option *ngFor="let recipe of recipes" [value]="recipe._id">{{ recipe.name }}</option>
+              </select>
+            </div>
+            <div *ngIf="productForm.invalid" class="alert alert-danger">
+              <p *ngIf="campoNoValido('name')" class="mb-0">Nombre inválido</p>
+              <p *ngIf="campoNoValido('description')" class="mb-0">Descripción inválida</p>
+              <p *ngIf="campoNoValido('marca')" class="mb-0">Marca inválida</p>
+              <p *ngIf="campoNoValido('supplier')" class="mb-0">Proveedor inválido</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <app-back-button></app-back-button>
+              <button type="submit" class="btn btn-primary" [disabled]="!productForm.valid">Guardar Cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

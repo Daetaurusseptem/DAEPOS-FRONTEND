@@ -1,0 +1,34 @@
+.scroll-box {
+    max-height: 600px;  /* Ajusta este valor según tu diseño */
+    overflow-y: auto;
+    padding-right: 15px;  /* Para asegurar que el contenido no quede oculto por el scroll */
+  }
+  
+  .scroll-box::-webkit-scrollbar {
+    width: 16px;  /* Scrollbar más ancho */
+  }
+  
+  .scroll-box::-webkit-scrollbar-thumb {
+    background-color: #6c757d;  /* Color de la barra */
+    border-radius: 10px;  /* Bordes redondeados */
+  }
+  .quantity-input-group {
+    display: flex;
+    width: 100%;
+    max-width: 200px; /* Ajusta el tamaño según necesites */
+  }
+  
+  .btn-quantity {
+    width: 40px; /* Para asegurar que los botones sean de tamaño consistente */
+    height: 40px; /* Para mantener un tamaño uniforme */
+    font-size: 1.2em; /* Tamaño del ícono */
+  }
+  
+  .quantity-input {
+    flex: 1;
+    height: 40px; /* Para asegurar que esté alineado con los botones */
+    text-align: center;
+  }
+  
+
+  

@@ -1,0 +1,123 @@
+/* Estilo General */
+.all {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #e6f1ff, #f2f5fa);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Contenedor del Login */
+.login-container {
+  max-width: 400px;
+  width: 100%;
+  background: #ffffff;
+  padding: 50px 40px;
+  border-radius: 12px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+}
+
+.login-section {
+  text-align: center;
+}
+
+.icon-container {
+  margin-bottom: 25px;
+}
+
+.pos-icon {
+  width: 50px;
+  height: 50px;
+  fill: #444;
+}
+
+/* Estilo del Título y Descripción */
+.login-title {
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 700;
+  font-size: 26px;
+}
+
+.login-description {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Estilo del Formulario */
+.form-container {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+label {
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  border-color: #555;
+  outline: none;
+}
+
+.error-message {
+  color: #d9534f;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Estilo del Botón de Acceso */
+.login-button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  background-color: #333;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-button:disabled {
+  background-color: #b0b0b0;
+  cursor: not-allowed;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+/* Links de la sección de login */
+.login-links {
+  margin-top: 25px;
+}
+
+.login-links a {
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.login-links a:hover {
+  color: #555;
+}

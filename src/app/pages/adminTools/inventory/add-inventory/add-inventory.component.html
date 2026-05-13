@@ -1,0 +1,113 @@
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Nuevo Item</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="inventoryForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="name" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" formControlName="name" id="name" placeholder="Ingrese el nombre del item">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="barCode" class="form-label">Código de barras <small>(Opcional)</small>:</label>
+            <input type="text" class="form-control" formControlName="barCode" id="barCode" placeholder="Ingrese el código">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="product" class="form-label">Producto Asociado:</label>
+          <input type="text" class="form-control" id="product" (input)="onSearchProduct($event)" [value]="selectedProduct?.name || ''" placeholder="Buscar producto">
+          <ul class="list-group mt-2" *ngIf="filteredProducts.length > 0">
+            <li class="list-group-item list-group-item-action" *ngFor="let product of filteredProducts" (click)="onSelectProduct(product)">
+              {{ product.name }}
+            </li>
+          </ul>
+          <!-- Hidden input to bind the selected product ID to the form -->
+          <input type="hidden" formControlName="product">
+          <div *ngIf="inventoryForm.get('product')?.invalid && inventoryForm.get('product')?.touched" class="text-danger mt-1">
+            <small>Debe seleccionar un producto.</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="stock" class="form-label">Stock:</label>
+            <input type="number" class="form-control" formControlName="stock" id="stock" min="0" placeholder="Cantidad en stock">
+            <div *ngIf="inventoryForm.get('stock')?.invalid && inventoryForm.get('stock')?.touched" class="text-danger">
+              <small>El valor debe ser mayor o igual a 0.</small>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="costPrice" class="form-label">Precio Costo:</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" formControlName="costPrice" id="costPrice" min="0" placeholder="0.00">
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="sellingPrice" class="form-label">Precio Venta:</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" formControlName="sellingPrice" id="sellingPrice" min="0" placeholder="0.00">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="measurement" class="form-label">Medida:</label>
+            <select class="form-select" id="measurement" formControlName="measurement">
+              <option value="unit">Unidad</option>
+              <option value="kg">Kilogramo (kg)</option>
+              <option value="lts">Litros (l)</option>
+              <option value="grms">Gramos (g)</option>
+              <option value="ml">Mililitros (ml)</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="receivedDate" class="form-label">Fecha de Recepción:</label>
+            <input type="date" class="form-control" formControlName="receivedDate" id="receivedDate">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="expirationDate" class="form-label">Fecha de Expiración:</label>
+            <input type="date" class="form-control" formControlName="expirationDate" id="expirationDate">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Modificaciones:</label>
+          <div formArrayName="modifications" *ngFor="let modification of modifications.controls; let i = index">
+            <div [formGroupName]="i" class="border p-2 mb-2">
+              <div class="row">
+                <div class="col-md-4">
+                  <label for="modificationName" class="form-label">Nombre de la modificación:</label>
+                  <input type="text" class="form-control" formControlName="name" placeholder="Ingrese el nombre">
+                </div>
+                <div class="col-md-3">
+                  <label for="extraPrice" class="form-label">Precio extra:</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" formControlName="extraPrice" min="0" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label for="isExclusive" class="form-label">¿Es excluyente?</label>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" formControlName="isExclusive" id="isExclusive-{{i}}">
+                    <label class="form-check-label" for="isExclusive-{{i}}">Sí</label>
+                  </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button type="button" class="btn btn-danger w-100" (click)="removeModification(i)">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary mt-2" (click)="addModification()">Agregar modificación</button>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+          <app-back-button></app-back-button>
+          <button type="submit" class="btn btn-primary" [disabled]="!inventoryForm.valid">Crear Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

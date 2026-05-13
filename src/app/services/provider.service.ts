@@ -1,0 +1,47 @@
+import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
+import { InventoryResponse } from 'src/app/interfaces/InventoryResponse.interface';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from './auth.service';
+import { Category, Supplier } from '../interfaces/models.interface';
+const urlSuppliers = `${environment.apiUrl}/suppliers`
+@Injectable({
+  providedIn: 'root'
+})
+export class SupplierService {
+
+  constructor(
+                private http:HttpClient,
+                private authService:AuthService,
+                ) { }
+  getSuppliers() {
+    return this.http.get<InventoryResponse>(`${urlSuppliers}`,
+    this.authService.headers 
+    );
+  };
+  getSupplier(idSupplier:String) {
+    return this.http.get<InventoryResponse>(`${urlSuppliers}/${idSupplier}`,
+    this.authService.headers 
+    );
+  };
+  
+  getCompanySuppliers(id:string) {
+    
+    return this.http.get<InventoryResponse>(`${urlSuppliers}/company/${id}`, this.authService.headers);
+  }
+
+ 
+  deleteSupplier(id:string){
+    return this.http.delete<InventoryResponse>(`${urlSuppliers}/${id}`, this.authService.headers);
+  }
+  
+  updateSupplier(id:string, formData:any) {
+    console.log(formData);
+    return this.http.put<InventoryResponse>(`${urlSuppliers}/${id}`, formData, this.authService.headers );
+  };
+
+  createSupplier(supplier:any, companyId:string){
+
+    return this.http.post<InventoryResponse>(`${urlSuppliers}/${companyId}`, supplier, this.authService.headers);
+  };
+}

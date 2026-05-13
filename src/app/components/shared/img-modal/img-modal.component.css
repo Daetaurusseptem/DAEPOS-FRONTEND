@@ -1,0 +1,61 @@
+.fondo-modal-imagen {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  left: 0;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background: #fff;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.5rem;
+}
+
+.modal-title {
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.img-avatar {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 4px solid var(--bg-main);
+  margin-bottom: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem 2rem;
+  background: var(--bg-main);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 10px;
+}
+
+/* Input de archivo estilizado */
+input[type="file"] {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}

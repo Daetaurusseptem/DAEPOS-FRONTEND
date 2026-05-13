@@ -1,0 +1,35 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+          <i class="bi bi-clipboard2-data ms-2 fs-4"></i>
+          <h2 class="mb-0">Editar Receta</h2>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="name" class="form-label">Nombre de la Receta</label>
+              <input type="text" class="form-control" id="name" formControlName="name" required placeholder="Introduce el nombre de la receta">
+              <div *ngIf="recipeForm.get('name')?.invalid && recipeForm.get('name')?.touched" class="text-danger">
+                El nombre es requerido.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción</label>
+              <input type="text" class="form-control" id="description" formControlName="description" required placeholder="Describe brevemente la receta">
+              <div *ngIf="recipeForm.get('description')?.invalid && recipeForm.get('description')?.touched" class="text-danger">
+                La descripción es requerida.
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <app-back-button></app-back-button>
+              <button type="submit" class="btn btn-primary" [disabled]="recipeForm.invalid">Actualizar Receta</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

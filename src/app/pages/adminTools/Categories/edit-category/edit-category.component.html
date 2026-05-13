@@ -1,0 +1,29 @@
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Editar Categoría</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="categoryForm" (ngSubmit)="actualizarCategory()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre de categoría</label>
+          <input type="text" class="form-control" id="name" formControlName="name" placeholder="Introduce el nombre de la categoría">
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Descripción</label>
+          <textarea class="form-control" id="description" formControlName="description" rows="3" placeholder="Describe la categoría"></textarea>
+        </div>
+        <div *ngIf="categoryForm.invalid" class="alert alert-danger">
+          <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0">Nombre inválido</p>
+          <p *ngIf="campoNoValidoDatosUsuario('description')" class="mb-0">Descripción inválida</p>
+          <p *ngIf="campoNoValidoDatosUsuario('username')" class="mb-0">Nombre de usuario inválido</p>
+          <p *ngIf="campoNoValidoDatosUsuario('role')" class="mb-0">Role inválido</p>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <app-back-button></app-back-button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

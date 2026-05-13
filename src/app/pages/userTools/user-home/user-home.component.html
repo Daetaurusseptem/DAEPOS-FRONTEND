@@ -1,0 +1,49 @@
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Bienvenido, Usuario</h2>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <button 
+        [disabled]="isOpenCashRegister" 
+        class="btn btn-dark w-100 pointer" 
+        (click)="openCashRegister()">
+        <i class="bi bi-box-arrow-in-down"></i> Abrir Caja <span class="badge bg-secondary">A</span>
+      </button>
+    </div>
+    <div class="col-md-6 mb-3">
+      <button 
+        [disabled]="!isOpenCashRegister" 
+        class="btn btn-dark w-100 pointer" 
+        (click)="performSale()">
+        <i class="bi bi-cart-plus"></i> Realizar Venta <span class="badge bg-secondary">S</span>
+      </button>
+    </div>
+    <div class="col-md-6 mb-3">
+      <button 
+        [disabled]="!isOpenCashRegister" 
+        class="btn btn-dark w-100 pointer" 
+        (click)="closeCashRegister()">
+        <i class="bi bi-box-arrow-right"></i> Cerrar Caja <span class="badge bg-secondary">G</span>
+      </button>
+    </div>
+    <div class="col-md-6 mb-3">
+      <button 
+        class="btn btn-dark w-100 pointer" 
+        (click)="viewDailySales()">
+        <i class="bi bi-calendar-week"></i> Ver Ventas Diarias <span class="badge bg-secondary">D</span>
+      </button>
+    </div>
+    
+    <div class="col-12 mt-4">
+      <button class="btn btn-danger w-100 pointer" (click)="logout()">
+        <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isOpenCashRegister" class="alert alert-info mt-4 text-center">
+    <i class="bi bi-info-circle"></i> Caja Abierta
+  </div>
+  <div *ngIf="!isOpenCashRegister" class="alert alert-warning mt-4 text-center">
+    <i class="bi bi-exclamation-triangle"></i> No hay ninguna caja abierta actualmente.
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div *ngIf="!company&&!subscription" class="card">
+    <app-loading-data-spinner></app-loading-data-spinner>
+</div>
+<div class="container mt-4">
+    <h2>Agregar Nueva Suscripción</h2>
+    <form (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+            <label for="monthInput" class="form-label">Mes</label>
+            <input type="date" class="form-control" id="monthInput" [(ngModel)]="subscription.month" name="month" required>
+        </div>
+        <div class="mb-3">
+            <label for="cutOffDateInput" class="form-label">Fecha de Corte</label>
+            <input type="date" class="form-control" id="cutOffDateInput" [(ngModel)]="subscription.cutOffDate" name="cutOffDate" required>
+        </div>
+        <div class="mb-3">
+            <label for="stateSelect" class="form-label">Estado</label>
+            <select class="form-select" id="stateSelect" [(ngModel)]="subscription.state" name="state" required>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+                <option value="Pendiente">Pendiente</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="amountPaidInput" class="form-label">Monto Pagado</label>
+            <input type="number" class="form-control" id="amountPaidInput" [(ngModel)]="subscription.amountPaid" name="amountPaid" required>
+        </div>
+        <div class="mb-3">
+            <label for="payMethodInput" class="form-label">Método de Pago</label>
+            <input type="text" class="form-control" id="payMethodInput" [(ngModel)]="subscription.Paymethod" name="payMethod" required>
+        </div>
+        <div class="mb-3">
+            <label for="payReferenceInput" class="form-label">Referencia de Pago</label>
+            <input type="text" class="form-control" id="payReferenceInput" [(ngModel)]="subscription.payReference" name="payReference" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar Suscripción</button>
+    </form>
+</div>

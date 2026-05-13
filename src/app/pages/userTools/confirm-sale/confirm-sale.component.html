@@ -1,0 +1,107 @@
+<div class="container">
+  <app-back-button class="m-2"></app-back-button>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="start">Confirmar Venta</h3>
+    </div>
+
+    <div class="card-body">
+      <h5>Productos en la venta:</h5>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Variaciones</th>
+            <th>Precio Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of sale.productsSold">
+            <td>{{ product.productName }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>
+              <ul *ngIf="product.modifications && product.modifications.length > 0">
+                <li *ngFor="let mod of product.modifications">
+                  {{ mod.name }} ({{ mod.extraPrice | currency }})
+                </li>
+              </ul>
+            </td>
+            <td>
+              {{
+                (product.unitPrice + getModificationsTotalPrice(product.modifications)) * product.quantity
+                | currency
+              }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="mt-3">
+        <h5>Total: <strong>{{ totalAmount | currency }}</strong></h5>
+      </div>
+      
+      <form [formGroup]="confirmSaleForm" (ngSubmit)="confirmSale()">
+        <div class="mb-3">
+          <label for="paymentMethod" class="form-label">Método de Pago</label>
+          <select id="paymentMethod" class="form-select" formControlName="paymentMethod">
+            <option value="cash">Efectivo</option>
+            <option value="credit">Tarjeta</option>
+          </select>
+        </div>
+        
+        <div class="mb-3" *ngIf="paymentMethod!.value === 'cash'">
+          <label for="receivedAmount" class="form-label">Cantidad Recibida</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="text" id="receivedAmount" class="form-control" formControlName="receivedAmount" 
+                   (click)="openKeyboard('receivedAmount', true)" readonly>
+          </div>
+          <div *ngIf="receivedAmount!.invalid && (receivedAmount!.dirty || receivedAmount!.touched)" class="text-danger">
+            <small *ngIf="receivedAmount!.errors?.['required']">Este campo es requerido.</small>
+            <small *ngIf="receivedAmount!.errors?.['min']">La cantidad debe ser mayor a 0.</small>
+            <small *ngIf="receivedAmount!.errors?.['pattern']">Formato inválido.</small>
+            <small *ngIf="receivedAmount!.errors?.['insufficientAmount']">La cantidad es insuficiente.</small>
+          </div>
+        </div>
+        
+        <div class="mb-3" *ngIf="paymentMethod!.value === 'credit'">
+          <label for="paymentReference" class="form-label">Referencia de Pago</label>
+          <input type="text" id="paymentReference" class="form-control" formControlName="paymentReference"
+                 (click)="openKeyboard('paymentReference', false)" readonly>
+          <div *ngIf="paymentReference!.invalid && (paymentReference!.dirty || paymentReference!.touched)" class="text-danger">
+            <small *ngIf="paymentReference!.errors?.['required']">Este campo es requerido.</small>
+          </div>
+        </div>
+        
+        <div class="mb-3" *ngIf="paymentMethod!.value === 'cash'">
+          <label for="change" class="form-label">Cambio</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="text" id="change" class="form-control" formControlName="change" readonly>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+          <button [disabled]="!confirmSaleForm.valid" type="submit" class="btn btn-primary">
+            Confirmar Venta
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="generarComanda()">
+            Imprimir Comanda
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<dialog #keyboardDialog class="keyboard-dialog" (click)="onBackdropClick($event)">
+  <div class="keyboard-dialog-content card p-3">
+    <app-alphanumeric-keyboard 
+      [value]="currentInputValue" 
+      [numericOnly]="isNumeric"
+      (valueChange)="onKeyboardInput($event)"
+      (confirm)="closeKeyboard()">
+    </app-alphanumeric-keyboard>
+  </div>
+</dialog>

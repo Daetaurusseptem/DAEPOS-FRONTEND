@@ -1,0 +1,19 @@
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Altura del footer */
+    height: 60px;
+    line-height: 60px!important; /* Vertically center the text there */
+  }
+  @media (max-width: 767.98px) { /* Bootstrap breakpoint para dispositivos pequeños */
+    .footer {
+      line-height: 28px!important; 
+    }
+  }
+
+  .footer {
+    width: 100%;
+    position: relative;
+    margin-top: -1px; 
+  }

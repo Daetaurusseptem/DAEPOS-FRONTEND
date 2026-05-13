@@ -1,0 +1,92 @@
+<div class="container mt-5 p-4 bg-light rounded shadow-lg">
+  <app-back-button></app-back-button>
+
+  <!-- Título de la Página -->
+  <div class="text-center mb-4">
+    <h2 class="text-dark">
+      <i class="bi bi-cash-coin"></i> Cerrar Caja
+    </h2>
+  </div>
+
+  <!-- Resumen de Ventas -->
+  <div *ngIf="cashRegister">
+    <div class="card mb-4">
+      <div class="card-header bg-dark text-white text-center">
+        <h4 class="mb-0">
+          <i class="bi bi-file-earmark-bar-graph-fill"></i> Resumen de Ventas
+        </h4>
+      </div>
+      <div class="card-body p-4">
+        <ul class="list-group mb-3 shadow-sm">
+          <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+            <span class="fw-bold"><i class="bi bi-wallet2"></i> Fondo Inicial (+)</span>
+            <span class="text-dark">{{ cashRegister.initialAmount | currency }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-cash-stack"></i> Ventas en Efectivo (+)</span>
+            <span class="text-success">{{ cashSales | currency }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-dash-circle text-danger"></i> Gastos / Retiros (–)</span>
+            <span class="text-danger">{{ totalExpenses | currency }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center border-top border-2 border-dark bg-warning bg-opacity-10">
+            <span class="fw-bold fs-5 text-dark"><i class="bi bi-calculator-fill"></i> TOTAL ESPERADO EN CAJA</span>
+            <span class="fs-5 fw-bold text-dark">{{ cashRegister.expectedAmount | currency }}</span>
+          </li>
+        </ul>
+
+        <hr class="my-4">
+        
+        <p class="text-muted small mb-2"><i class="bi bi-info-circle"></i> Otros métodos de pago (informativo):</p>
+        <ul class="list-group list-group-flush mb-3 small">
+          <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+            <span>Ventas con Crédito:</span>
+            <span>{{ creditSales | currency }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+            <span>Ventas con Débito:</span>
+            <span>{{ debitSales | currency }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Formulario para Cerrar Caja -->
+    <form [formGroup]="closeCashRegisterForm" (ngSubmit)="closeCashRegister()" class="bg-white p-4 rounded shadow-sm">
+      <div class="text-center mb-4">
+        <h4 class="text-dark">
+          <i class="bi bi-pencil-square"></i> Datos de Cierre
+        </h4>
+      </div>
+
+      <div class="mb-4">
+        <label for="finalAmount" class="form-label fw-bold text-dark"><i class="bi bi-currency-dollar"></i> Dinero en Caja al Cerrar</label>
+        <input 
+          type="number" 
+          id="finalAmount" 
+          formControlName="finalAmount" 
+          class="form-control form-control-lg"
+          min="0"
+          placeholder="Ingrese el monto final en caja">
+      </div>
+
+      <div class="mb-4">
+        <label for="notes" class="form-label fw-bold text-dark"><i class="bi bi-card-text"></i> Notas</label>
+        <textarea 
+          id="notes" 
+          formControlName="notes" 
+          class="form-control form-control-lg" 
+          rows="3" 
+          placeholder="Ingrese cualquier observación relevante"></textarea>
+      </div>
+
+      <!-- Botón Cerrar Caja -->
+      <div class="text-center">
+        <button type="submit" class="btn btn-dark btn-lg px-5">
+          <i class="bi bi-box-arrow-down"></i> Cerrar Caja
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

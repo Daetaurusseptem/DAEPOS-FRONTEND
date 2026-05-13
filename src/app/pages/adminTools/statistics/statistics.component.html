@@ -1,0 +1,86 @@
+<div class="card shadow">
+  <div class="card-body">
+    <div class="container-fluid py-4">
+      <!-- Encabezado -->
+      <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+          <h2 class="card-title text-primary">Dashboard de Ventas e Inventario</h2>
+        </div>
+        <div class="col-md-6">
+          <div class="btn-toolbar justify-content-md-end" role="toolbar" aria-label="Navegación y acciones">
+            <div class="btn-group me-2 mb-2" role="group" aria-label="Acciones">
+              <button class="btn btn-success" (click)="downloadExcel()">
+                <i class="bi bi-file-earmark-excel"></i> Generar Informe
+              </button>
+            </div>
+            <div class="btn-group mb-2" role="group" aria-label="Cambiar vista">
+              <button class="btn btn-outline-secondary" (click)="toggleView()">
+                {{ isProductView ? 'Ver Ingredientes' : 'Ver Productos' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de búsqueda -->
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
+        <div class="row g-3">
+          <div class="col-sm-6 col-md-3">
+            <label for="year" class="form-label">Año:</label>
+            <input type="number" formControlName="year" class="form-control" id="year" placeholder="Ingrese el año">
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <label for="week" class="form-label">Semana:</label>
+            <input type="number" formControlName="week" class="form-control" id="week" placeholder="Ingrese la semana">
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <div class="btn-group me-2" role="group" aria-label="Navegación" *ngIf="isProductView">
+              <button class="btn btn-outline-primary" (click)="prevWeek()">
+                <i class="bi bi-chevron-left"></i> Semana Anterior
+              </button>
+              <button class="btn btn-outline-primary" (click)="nextWeek()">
+                Semana Siguiente <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Tabla de resultados -->
+      <div class="table-responsive">
+        <table class="table table-hover table-striped">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">{{ isProductView ? 'Producto' : 'Ingrediente' }}</th>
+              <th scope="col">{{ isProductView ? 'Cantidad Vendida' : 'Stock Total' }}</th>
+              <th scope="col" *ngIf="!isProductView">Valor Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of isProductView ? topSellingProducts : ingredientsStatistics; let i = index">
+              <th scope="row">{{ i + 1 }}</th>
+              <td>{{ isProductView ? (item.product?.name || 'Desconocido') : (item.name || item._id) }}</td>
+              <td>{{ isProductView ? (item.totalQuantity | number) : (item.totalStock | number) }}</td>
+              <td *ngIf="!isProductView">{{ item.totalValue | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Gráfico solo para productos -->
+      <div class="mt-4" *ngIf="isProductView">
+        <canvas baseChart 
+                [data]="barChartData" 
+                [labels]="barChartLabels" 
+                [options]="barChartOptions"
+                [legend]="barChartLegend"
+                class="w-100">
+        </canvas>
+      </div>
+    </div>
+  </div>
+</div>

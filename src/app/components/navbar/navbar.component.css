@@ -1,0 +1,73 @@
+/* navbar.component.css */
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin 0.25s ease-out;
+  }
+  
+  #sidebar-wrapper .list-group {
+    width: 15rem;
+  }
+  
+  /* Mostrar la barra lateral cuando está expandida */
+  #sidebarMenu.collapsing {
+    margin-left: 0;
+  }
+  
+  #sidebarMenu.show {
+    margin-left: 0;
+  }
+  
+  /* Siempre muestra el sidebar en pantallas grandes */
+@media (min-width: 992px) {
+  #sidebarMenu {
+    visibility: visible;
+    transform: translateX(0);
+  }
+  .offcanvas-backdrop {
+    display: none;
+  }
+}
+
+/* Opcional: Ajusta el padding del cuerpo cuando el sidebar esté visible */
+body {
+  padding-left: 250px; /* Ajusta este valor al ancho de tu sidebar */
+}
+
+@media (max-width: 991px) {
+  body {
+    padding-left: 0;
+  }
+}
+/* Estilos para el sidebar en pantallas grandes */
+@media (min-width: 992px) {
+  #sidebarMenu {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  #sidebarMenu.show {
+    transform: translateX(0);
+  }
+}
+
+/* Estilos para el sidebar en pantallas grandes */
+@media (min-width: 992px) {
+  #sidebarMenu {
+    visibility: visible;
+    transform: translateX(0);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 250px; /* O el ancho que prefieras */
+    overflow-y: auto; /* Para hacer scrollable el sidebar si es necesario */
+    transition: transform 0.3s ease-in-out;
+  }
+  body.with-sidebar {
+    padding-left: 250px; /* Asegúrate de que esto coincida con el ancho del sidebar */
+  }
+  #sidebarMenu.hidden {
+    transform: translateX(-100%);
+  }
+}
+

@@ -1,0 +1,27 @@
+<app-back-button></app-back-button>
+<div class="container mt-5">
+  <div class="card shadow-lg">
+    <div class="card-header bg-dark text-white">
+      <h2 class="mb-0"><i class="bi bi-calendar-event-fill"></i> Cajas Abiertas el {{ fecha | date }}</h2>
+    </div>
+    <div class="card-body">
+      <div *ngIf="cajas.length > 0">
+        <ul class="list-group">
+          <li *ngFor="let caja of cajas" class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="bi bi-box-seam text-dark me-2"></i>
+              <strong>Caja ID: {{ caja._id }}</strong>
+            </div>
+            <button class="btn btn-dark btn-sm pointer" (click)="navigateToCajaDetalle(caja._id)">
+              <i class="bi bi-eye"></i> Ver Detalle
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div *ngIf="cajas.length === 0" class="text-center mt-4">
+        <i class="bi bi-exclamation-circle text-warning"></i>
+        <p class="mt-2">No hay cajas abiertas en esta fecha.</p>
+      </div>
+    </div>
+  </div>
+</div>

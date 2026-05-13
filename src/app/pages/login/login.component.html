@@ -1,0 +1,42 @@
+<div class="all">
+  <div class="login-container">
+    <div class="login-section">
+      <!-- Ícono Moderno -->
+      <div class="icon-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="pos-icon">
+          <circle cx="12" cy="12" r="10" fill="#555" />
+          <rect x="8" y="8" width="8" height="8" rx="2" fill="#fff"/>
+        </svg>
+      </div>
+
+      <h2 class="login-title">Iniciar Sesión</h2>
+      <p class="login-description">Ingresa tus credenciales para acceder al sistema de ventas.</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-container">
+        <div class="form-group">
+          <label for="username">Nombre de Usuario</label>
+          <input type="text" id="username" formControlName="username" class="form-input" placeholder="Ingresa tu usuario">
+          <div class="error-message" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+            <span *ngIf="loginForm.get('username')?.hasError('required')">El nombre de usuario es <strong>requerido</strong></span>
+            <span *ngIf="loginForm.get('username')?.hasError('minlength')">Debe tener al menos 3 caracteres</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" formControlName="password" class="form-input" placeholder="Ingresa tu contraseña">
+          <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <span *ngIf="loginForm.get('password')?.hasError('required')">La contraseña es <strong>requerida</strong></span>
+            <span *ngIf="loginForm.get('password')?.hasError('minlength')">Debe tener al menos 6 caracteres</span>
+          </div>
+        </div>
+
+        <button type="submit" class="login-button" [disabled]="!loginForm.valid">Acceder</button>
+      </form>
+          
+      <div class="login-links">
+        <a href="#">¿Olvidaste tu contraseña?</a>
+      </div>
+    </div>
+  </div>
+</div>

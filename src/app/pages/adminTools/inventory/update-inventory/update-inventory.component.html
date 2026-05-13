@@ -1,0 +1,106 @@
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Editar Inventario</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="inventoryForm" (ngSubmit)="updateInventory()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="name" class="form-label">Nombre del Item</label>
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Introduce el nombre del item">
+            <div *ngIf="inventoryForm.get('name')?.invalid && inventoryForm.get('name')?.touched" class="text-danger">
+              <small>El nombre es obligatorio.</small>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="barCode" class="form-label">Código de Barras</label>
+            <input type="text" class="form-control" id="barCode" formControlName="barCode" placeholder="Código de barras">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="stock" class="form-label">Stock</label>
+            <input type="number" class="form-control" id="stock" formControlName="stock" min="0" placeholder="Stock">
+            <div *ngIf="inventoryForm.get('stock')?.invalid && inventoryForm.get('stock')?.touched" class="text-danger">
+              <small>El stock debe ser mayor o igual a 0.</small>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="costPrice" class="form-label">Precio Costo</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" id="costPrice" formControlName="costPrice" min="0">
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="sellingPrice" class="form-label">Precio Venta</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" id="sellingPrice" formControlName="sellingPrice" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="measurement" class="form-label">Medida</label>
+            <select class="form-select" id="measurement" formControlName="measurement">
+              <option value="unit">Unidad</option>
+              <option value="kg">Kilogramo (kg)</option>
+              <option value="lts">Litros (l)</option>
+              <option value="grms">Gramos (g)</option>
+              <option value="ml">Mililitros (ml)</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="receivedDate" class="form-label">Fecha de Recepción</label>
+            <input type="date" class="form-control" id="receivedDate" formControlName="receivedDate">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="expirationDate" class="form-label">Fecha de Expiración</label>
+            <input type="date" class="form-control" id="expirationDate" formControlName="expirationDate">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <h5>Modificaciones</h5>
+          <button type="button" class="btn btn-secondary mb-3" (click)="addModification()">Agregar Modificación</button>
+          <div formArrayName="modifications">
+            <div *ngFor="let modification of modifications.controls; let i = index" [formGroupName]="i" class="border p-3 mb-3">
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="modName{{i}}" class="form-label">Nombre de la Modificación</label>
+                  <input type="text" class="form-control" id="modName{{i}}" formControlName="name" placeholder="Nombre">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="modPrice{{i}}" class="form-label">Precio Extra</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" id="modPrice{{i}}" formControlName="extraPrice" min="0">
+                  </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="modExclusive{{i}}" class="form-label">¿Es Exclusivo?</label>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="modExclusive{{i}}" formControlName="isExclusive">
+                    <label class="form-check-label" for="modExclusive{{i}}">Sí</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button type="button" class="btn btn-danger" (click)="removeModification(i)">Eliminar Modificación</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <app-back-button></app-back-button>
+          <button type="submit" class="btn btn-primary" [disabled]="inventoryForm.invalid">Actualizar Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

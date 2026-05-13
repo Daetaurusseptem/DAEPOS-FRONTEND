@@ -1,0 +1,13 @@
+/* Estilos personalizados para el componente recipe-list */
+.container {
+    max-width: 1000px;
+  }
+  
+  .card-header {
+    font-size: 1.25rem;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  

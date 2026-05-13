@@ -1,0 +1,43 @@
+<div class="sidebar-container" [class.collapsed]="isCollapsed">
+  
+  <!-- Logo y Título -->
+  <div class="sidebar-header">
+    <a class="logo" title="DaePoint">
+      <i class="bi bi-cpu-fill"></i>
+      <span *ngIf="!isCollapsed">DaePoint</span>
+    </a>
+    <button class="toggle-btn" (click)="toggleSidebar()" [title]="isCollapsed ? 'Expandir' : 'Colapsar'">
+      <i class="bi bi-list"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section" *ngFor="let menuItem of menuItems">
+      <!-- Título Informativo (Solo visible si NO está colapsado) -->
+      <div class="sidebar-section-title" *ngIf="!isCollapsed">
+        {{menuItem.title}}
+      </div>
+      
+      <!-- Separador visual si está colapsado -->
+      <div class="sidebar-separator" *ngIf="isCollapsed"></div>
+
+      <ul class="sidebar-list">
+        <li *ngFor="let item of menuItem.submenu">
+          <a [routerLink]="item.url" routerLinkActive="active" class="sidebar-link" [title]="item.title">
+            <i [class]="item.icon"></i>
+            <span class="ms-2" *ngIf="!isCollapsed">{{item.title}}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Logout al final -->
+  <div class="logOut mt-auto">
+    <a role="button" (click)="logOut()" title="Logout">
+      <i class="bi bi-power"></i>
+      <span *ngIf="!isCollapsed">LOGOUT</span>
+    </a>
+  </div>
+  
+</div>

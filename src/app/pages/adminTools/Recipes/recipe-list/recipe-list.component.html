@@ -1,0 +1,31 @@
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h2 class="mb-0 bi bi-list">Lista de Recetas</h2>
+      <button class="btn btn-light" (click)="createRecipe()">Crear Receta</button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Nombre</th>
+              <th>Descripcion</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let recipe of recipes">
+              <td>{{ recipe.name }}</td>
+              <td>{{ recipe.description }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-2" (click)="editRecipe(recipe._id)">Editar</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteRecipe(recipe._id)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

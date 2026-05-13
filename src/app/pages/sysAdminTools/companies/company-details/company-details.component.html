@@ -1,0 +1,295 @@
+<div *ngIf="!company && !admin" class="card">
+  <app-loading-data-spinner></app-loading-data-spinner>
+</div>
+<app-spinner *ngIf="!company && !admin"></app-spinner>
+
+<div *ngIf="company && admin" class="container mt-4">
+  <!-- Card de presentacion -->
+  <div class="company-card mb-4">
+    <div class="company-image">
+      <img [src]="company.img!" alt="Imagen de la Empresa" *ngIf="company.img!">
+    </div>
+    <div class="company-details">
+      <div class="company-header d-flex justify-content-between align-items-center">
+        <h2 class="company-name">{{ company.name }}</h2>
+        <button class="btn btn-outline-secondary edit-button">
+          <i class="bi bi-pencil-fill"></i>
+        </button>
+      </div>
+      <p class="company-description">{{ company.description }}</p>
+      <div class="company-info-group">
+        <h4 class="info-group-title">Información de contacto</h4>
+        <ul class="company-info list-unstyled">
+          <li><strong><i class="bi bi-house-door-fill"></i> Dirección:</strong> {{ company.address }}</li>
+          <li><strong><i class="bi bi-telephone-fill"></i> Teléfono:</strong> {{ company.tel }}</li>
+          <li><strong><i class="bi bi-at"></i> Email:</strong> {{ company.email }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <tabs-menu [default]="tabSelected" [items]="tabsArray" (tabSelectedOutput)="changeTab($event)"></tabs-menu>
+
+  <!-- USUARIOS -->
+  <div *ngIf="tabSelected == 'usuarios'" class="row">
+    <div class="col-12 mb-2">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Búsqueda de Usuarios</h5>
+          <a class="btn btn-primary" routerLink="/dashboard/sysadmin/users/new" role="button">
+            <i class="bi bi-plus-lg"></i> Crear Usuario
+          </a>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="mb-3">
+              <input type="text" class="form-control" id="busquedaEmpresa" aria-describedby="busquedaHelp" #terminoEmpresa placeholder="Buscar usuario">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Lista de Usuarios Registrados</h2>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Imagen</th>
+                  <th>Nombre</th>
+                  <th>Nombre de Usuario</th>
+                  <th>Rol</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of users">
+                  <td class="text-center">
+                    <img *ngIf="user.img == 'no-image'" src="../../../../../assets/img/no-img.webp" alt="Avatar de usuario" class="avatar pointer" (click)="abrirModal(user, 'usuarios')">
+                    <img *ngIf="user.img != 'no-image'" [src]="user.img!" alt="Avatar de usuario" class="avatar pointer" (click)="abrirModal(user, 'usuarios')">
+                  </td>
+                  <td>{{ user.name || 'No Especificado' }}</td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.role }}</td>
+                  <td>
+                    <button class="btn btn-primary btn-sm me-2" [routerLink]="['/dashboard/sysadmin/users/edit', user._id]">
+                      <i class="bi bi-pencil-fill"></i> Editar
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                      <i class="bi bi-trash3-fill"></i> Eliminar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="card bg-primary text-light" *ngIf="!users">
+              <app-loading-data-spinner class="mb-2"></app-loading-data-spinner>
+              <p>Cargando Registros</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div *ngIf="tabSelected == 'productos'" class="row">
+    <products-list></products-list>
+  </div>
+
+  <!-- INVENTARIO -->
+  <div *ngIf="tabSelected == 'inventario'" class="row">
+    <h2 class="mb-4">Lista de Items</h2>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Precio Venta</th>
+            <th>Precio Costo</th>
+            <th>Stock</th>
+            <th>Fecha Recepción</th>
+            <th>Fecha Expiración</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items">
+            <td>
+              <img *ngIf="item.product && asProduct(item.product).img" [src]="asProduct(item.product).img" class="img-thumbnail" alt="{{ item.name }}" style="max-width: 100px;">
+              <img *ngIf="!item.product || !asProduct(item.product).img" src="../../../../../assets/img/no-img.webp" class="img-thumbnail" alt="No image" style="max-width: 100px;">
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.sellingPrice | currency }}</td>
+            <td>{{ item.costPrice | currency }}</td>
+            <td>{{ item.stock }}</td>
+            <td>{{ item.receivedDate | date }}</td>
+            <td>{{ item.expirationDate ? (item.expirationDate | date) : 'N/A' }}</td>
+            <td>
+              <a class="btn btn-primary btn-sm" (click)="editItem()"><i class="bi bi-pencil-fill"></i> Editar</a>
+              <a class="btn btn-danger btn-sm" (click)="deleteItem(item._id)"><i class="bi bi-trash3-fill"></i> Eliminar</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
+  </div>
+
+  <!-- CATEGORIAS -->
+  <div *ngIf="tabSelected == 'categorias'" class="row">
+    <div class="col-12 mb-2">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Búsqueda de Categorías</h5>
+          <a class="btn btn-primary" [routerLink]="['/dashboard/sysadmin/categories/new/', company._id]" role="sysadmin">
+            <i class="bi bi-plus-lg"></i> Crear Categoría
+          </a>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="mb-3">
+              <input type="text" class="form-control" id="busquedaEmpresa" aria-describedby="busquedaHelp" #terminoCategoria placeholder="Buscar categoría">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Lista de Categorías</h2>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let category of categories">
+                  <td>{{ category.name || 'No Especificado' }}</td>
+                  <td>{{ category.description }}</td>
+                  <td>
+                    <button class="btn btn-primary btn-sm me-2" [routerLink]="['/dashboard/sysadmin/edit-category/', category._id]">
+                      <i class="bi bi-pencil-fill"></i> Editar
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                      <i class="bi bi-trash3-fill"></i> Eliminar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="card bg-primary text-light" *ngIf="!categories">
+              <app-loading-data-spinner class="mb-2"></app-loading-data-spinner>
+              <p>Cargando Registros</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROVEEDORES -->
+  <div *ngIf="tabSelected == 'proveedores'" class="row">
+    <div class="col-12 mb-2">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Búsqueda de Proveedores</h5>
+          <a class="btn btn-primary" routerLink="/dashboard/sysadmin/suppliers/new/{{ company._id }}" role="button">
+            <i class="bi bi-plus-lg"></i> Crear Proveedor
+          </a>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="mb-3">
+              <input type="text" class="form-control" id="busquedaEmpresa" aria-describedby="busquedaHelp" #terminoEmpresa placeholder="Buscar proveedor">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Lista de Proveedores Registrados</h2>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Número</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let supplier of suppliers">
+                  <td>{{ supplier.name || 'No Especificado' }}</td>
+                  <td>{{ (supplier.description || 'No Especificado') | slice:0:49 }}</td>
+                  <td>{{ supplier.contactInfo.phone }}</td>
+                  <td>
+                    <button class="btn btn-primary btn-sm me-2" [routerLink]="['/dashboard/sysadmin/suppliers/edit', supplier._id]">
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                      <i class="bi bi-trash3-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="card bg-primary text-light" *ngIf="!suppliers">
+              <app-loading-data-spinner class="mb-2"></app-loading-data-spinner>
+              <p>Cargando Registros</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUSCRIPCIONES -->
+  <div *ngIf="tabSelected == 'suscripciones'" class="row">
+    <div class="col-12 mb-2">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">Historial de Suscripciones</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="company.SuscriptionsHistory && company.SuscriptionsHistory.length; else noSubscriptions">
+            <div *ngFor="let subscription of company.SuscriptionsHistory" class="card mt-2">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">{{ subscription.month }}</h6>
+                <p class="card-text"><strong>Estado:</strong> {{ subscription.state }}</p>
+                <p class="card-text"><strong>Monto Pagado:</strong> {{ subscription.amountPaid | currency }}</p>
+                <p class="card-text"><strong>Método de Pago:</strong> {{ subscription.Paymethod }}</p>
+                <p class="card-text"><strong>Referencia de Pago:</strong> {{ subscription.payReference }}</p>
+              </div>
+            </div>
+          </div>
+          <ng-template #noSubscriptions>
+            <div class="card mt-2">
+              <div class="card-body">
+                <p class="card-text">Sin suscripciones.</p>
+                <a routerLink="/dashboard/sysadmin/companies/subscriptions/select" class="btn btn-primary">Agregar Plan de Suscripción</a>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

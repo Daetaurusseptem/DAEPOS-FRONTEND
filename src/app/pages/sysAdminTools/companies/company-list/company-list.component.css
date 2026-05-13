@@ -1,0 +1,214 @@
+.main-container {
+    width: 150vh;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Busqueda */
+.search-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.search-header {
+    background-color: #cdcdcd;
+    color: rgb(124, 125, 126);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-title h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.create-company-link {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.create-company-link:hover {
+    background-color: #218838;
+}
+
+.create-company-link i {
+    margin-right: 8px;
+}
+
+.search-form {
+    padding: 20px;
+}
+
+.search-input input {
+    width: 100%;
+    border: 1px solid #ced4da;
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Empresas */
+.companies-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.companies-header {
+    background-color: #cdcdcd;
+    color: rgb(124, 125, 126);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.companies-title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.companies-list {
+    padding: 20px;
+}
+
+.companies-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.companies-table th,
+.companies-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.companies-table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.companies-table tr {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.img-cell {
+    position: relative;
+}
+
+.img-cell img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgb(15, 15, 16);
+    transition: transform 0.3s;
+}
+
+.img-cell:hover img {
+    transform: scale(1.05);
+}
+
+.img-cell .edit-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 5px;
+}
+
+.img-cell:hover .edit-icon {
+    opacity: 1;
+    width: 85px;
+    height: 85px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    cursor: pointer;
+}
+
+
+
+.action-cell {
+    text-align: center;
+}
+
+.btn-details,
+.btn-edit,
+.btn-delete {
+    background-color: transparent;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    margin-top: 5px;
+}
+
+.btn-details i,
+.btn-edit i,
+.btn-delete i {
+    font-size: 16px;
+}
+
+.btn-details {
+    color: #007bff;
+}
+
+.btn-details:hover {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+.btn-edit {
+    color: #ffc107;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
+    color: #fff;
+}
+
+.btn-delete {
+    color: #dc3545;
+}
+
+.btn-delete:hover {
+    background-color: #bd2130;
+    color: #fff;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 30px;
+}

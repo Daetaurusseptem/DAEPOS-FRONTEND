@@ -1,0 +1,14 @@
+<div class="layout-wrapper">
+    <app-dashboard-sidebar></app-dashboard-sidebar>
+
+    <div class="layout-content" [class.collapsed]="isCollapsed">
+        <!-- Quitamos el navbar que está chocando -->
+        <main class="content-area animate__animated animate__fadeIn">
+            <app-spinner></app-spinner>
+            <router-outlet></router-outlet>
+        </main>
+        <app-footer></app-footer>
+    </div>
+</div>
+
+<modal-img></modal-img>
