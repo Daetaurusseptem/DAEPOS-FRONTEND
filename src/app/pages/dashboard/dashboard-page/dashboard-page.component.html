@@ -75,7 +75,7 @@
   <!-- CONTENIDO PARA OTROS ROLES (ADMIN / USER) -->
   <ng-container *ngIf="role !== 'sysadmin'">
     <div class="welcome-section">
-      <h2>¡Bienvenido, {{ currentUser?.name || 'Usuario' }}!</h2>
+      <h2>¡Bienvenido, {{ currentUser.name || 'Usuario' }}!</h2>
       <p>Gestione su negocio de forma eficiente con DaePoint.</p>
     </div>
     

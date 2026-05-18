@@ -44,4 +44,21 @@ export class SupplierService {
 
     return this.http.post<InventoryResponse>(`${urlSuppliers}/${companyId}`, supplier, this.authService.headers);
   };
+
+  // Endpoints para reabastecimientos programados
+  createRestockSchedule(restockData: any) {
+    return this.http.post<InventoryResponse>(`${urlSuppliers}/restock/schedule`, restockData, this.authService.headers);
+  }
+
+  getCompanyRestocks(companyId: string) {
+    return this.http.get<InventoryResponse>(`${urlSuppliers}/restock/company/${companyId}`, this.authService.headers);
+  }
+
+  updateRestockStatus(id: string, statusData: { status: string, expectedDate?: string, itemsSummary?: string, notes?: string }) {
+    return this.http.put<InventoryResponse>(`${urlSuppliers}/restock/${id}`, statusData, this.authService.headers);
+  }
+
+  deleteRestock(id: string) {
+    return this.http.delete<InventoryResponse>(`${urlSuppliers}/restock/${id}`, this.authService.headers);
+  }
 }

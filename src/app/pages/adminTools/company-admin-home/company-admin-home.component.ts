@@ -1,17 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Category, Product, Supplier, User, Company, Recipe, InventoryItem } from 'src/app/interfaces/models.interface';
+import { Company, DashboardSummary, Branch } from 'src/app/interfaces/models.interface';
 import { CompanyService } from 'src/app/services/company.service';
 import { UsersService } from 'src/app/services/users.service';
 import { map } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth.service';
 import { UsuarioModel } from 'src/app/models/usuario.model';
-import { CategoryService } from 'src/app/services/category.service';
-import { ProductService } from 'src/app/services/product.service';
-import { InventoryService } from 'src/app/services/inventory.service';
-import { ModalService } from 'src/app/services/modal.service';
+import { StatisticsService } from 'src/app/services/statistics.service';
+import { BranchService } from 'src/app/services/branch.service';
 import { SupplierService } from 'src/app/services/provider.service';
-import { TabSelectedService } from 'src/app/service/tab-selected.service';
 
 @Component({
   selector: 'app-company-admin-home',
@@ -19,132 +15,115 @@ import { TabSelectedService } from 'src/app/service/tab-selected.service';
   styleUrls: ['./company-admin-home.component.css']
 })
 export class CompanyAdminHomeComponent implements OnInit {
-  items: InventoryItem[] = [];
-  categories: Category[] = [];
-  suppliers: Supplier[] = [];
-  products: Product[] = [];
-  users: User[] = [];
-  recipes: Recipe[] = [];
-
-  tabSelected: 'usuarios' | 'productos' | 'suscripciones' | 'proveedores' | 'categorias' | 'items' | 'recetas' | 'estadisticas' | 'inventario' = localStorage.getItem('tabSelected') as any;
-  tabsArray = [
-    { name: 'usuarios', icon: 'bi bi-people-fill' },
-    { name: 'productos', icon: 'bi bi-bag-fill' },
-    { name: 'inventario', icon: 'bi bi-box-fill' },
-    { name: 'categorias', icon: 'bi bi-bag-fill' },
-    { name: 'proveedores', icon: 'bi bi-file-earmark-person' },
-    { name: 'estadisticas', icon: 'bi bi-bar-chart-fill' },
-  ];
-
   company!: Company;
   admin!: UsuarioModel;
-  id: string = '';
+  branches: Branch[] = [];
+  upcomingRestocks: any[] = [];
+  summary: DashboardSummary = {
+    totalSalesToday: 0,
+    transactionsToday: 0,
+    lowStockCount: 0,
+    activeRegisters: 0,
+    recentSales: []
+  };
+  isLoading: boolean = true;
 
   constructor(
-    private companyService: CompanyService,
     private userService: UsersService,
-    private inventoryService: InventoryService,
-    private categoryService: CategoryService,
-    private suppliersService: SupplierService,
-    private productService: ProductService,
     private authService: AuthService,
-    private modalService: ModalService,
-    private tabSelectedService: TabSelectedService
+    private statisticsService: StatisticsService,
+    private branchService: BranchService,
+    private supplierService: SupplierService
   ) { }
 
   ngOnInit(): void {
-    if (localStorage.getItem('tabSelected') == null) {
-      this.tabSelected = 'usuarios';
-    }
     this.admin = this.authService.usuario;
-    this.changeTab(this.tabSelected);
-    this.getUsers();
-    this.getAdminCompany(this.admin.id);
+    
+    // Si ya tenemos la compañía en el authService, la usamos directamente
+    if (this.authService.company) {
+      this.company = this.authService.company;
+      this.getBranches(this.company._id!);
+      this.loadUpcomingRestocks();
+    } else if (this.authService.role === 'companyAdmin') {
+      // Solo intentamos buscar la compañía por adminId si el rol es companyAdmin
+      this.getAdminCompany(this.admin.id);
+    }
+    
+    this.loadDashboardSummary();
+  }
+
+  getBranches(companyId: string) {
+    this.branchService.getBranchesByCompany(companyId).subscribe({
+      next: (resp) => {
+        if (resp.ok) {
+          this.branches = resp.branches;
+        }
+      }
+    });
   }
 
   getAdminCompany(id: string) {
     return this.userService.getCompanyAdmin(id)
       .pipe(map(item => item.company))
-      .subscribe(company => {
-        this.company = company!;
+      .subscribe({
+        next: (company) => {
+          this.company = company!;
+          if (this.company?._id) {
+            this.getBranches(this.company._id);
+            this.loadUpcomingRestocks();
+          }
+        },
+        error: (err) => {
+          console.error('Error al cargar la empresa del administrador:', err);
+        }
       });
   }
 
-  getCategories() {
+  loadDashboardSummary() {
     const companyId = this.authService.companyId || this.authService.company?._id;
     if (!companyId) return;
-    this.categoryService.getCompanyCategories(companyId)
-      .pipe(map(i => i.categories || []))
-      .subscribe(categories => {
-        this.categories = categories;
-      });
+
+    this.isLoading = true;
+    this.statisticsService.getDashboardSummary(companyId).subscribe({
+      next: (resp) => {
+        if (resp.ok) {
+          this.summary = resp.summary;
+        }
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
-  getSuppliers() {
-    const companyId = this.authService.companyId || this.authService.company?._id;
+  getGreeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Buenos días';
+    if (hour < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+
+  loadUpcomingRestocks() {
+    const companyId = this.authService.companyId || this.authService.company?._id || this.company?._id;
     if (!companyId) return;
-    this.suppliersService.getCompanySuppliers(companyId)
-      .pipe(map(i => i.suppliers || []))
-      .subscribe(suppliers => {
-        this.suppliers = suppliers;
-      });
-  }
 
-  getUsers() {
-    this.userService.getAllNonAdminUsersOfCompany(this.authService.usuario.id)
-      .pipe(map(item => item.users || []))
-      .subscribe(users => {
-        this.users = users;
-      });
-  }
+    this.supplierService.getCompanyRestocks(companyId).subscribe({
+      next: (resp: any) => {
+        if (resp.ok) {
+          const allRestocks: any[] = resp.restocks || [];
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
 
-  getProducts(idEmpresa: string) {
-    this.productService.getCompanyProducts(idEmpresa)
-      .pipe(map(item => item.products || []))
-      .subscribe(products => {
-        this.products = products;
-      });
-  }
-
-  getInventoryCompany(id: string) {
-    this.inventoryService.getInventory(id)
-      .pipe(map(item => item.items || []))
-      .subscribe(items => {
-        this.items = items;
-      });
-  }
-
-  changeTab(tab: 'usuarios' | 'productos' | 'items' | 'suscripciones' | 'proveedores' | 'categorias' | 'inventario' | 'recetas' | 'estadisticas') {
-    const companyId = this.authService.companyId || this.authService.company?._id || '';
-    switch (tab) {
-      case 'usuarios':
-        this.tabSelectedService.updateTabSelected(tab);
-        this.getUsers();
-        break;
-      case 'productos':
-        this.tabSelectedService.updateTabSelected(tab);
-        this.getProducts(companyId);
-        break;
-      case 'inventario':
-        this.tabSelectedService.updateTabSelected(tab);
-        this.getInventoryCompany(companyId);
-        break;
-      case 'proveedores':
-        this.tabSelectedService.updateTabSelected(tab);
-        this.getSuppliers();
-        break;
-      case 'categorias':
-        this.tabSelectedService.updateTabSelected(tab);
-        this.getCategories();
-        break;
-      default:
-        break;
-    }
-    this.tabSelected = tab;
-  }
-
-  abrirModal(element: Company | User, tipo: 'empresas' | 'usuarios' | 'productos') {
-    const { _id } = element;
-    this.modalService.abrirModal(element.img, tipo, _id!);
+          this.upcomingRestocks = allRestocks.filter(r => {
+            if (r.status !== 'pending') return false;
+            const expDate = new Date(r.expectedDate);
+            const diffTime = expDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays >= -1 && diffDays <= 3;
+          });
+        }
+      }
+    });
   }
 }

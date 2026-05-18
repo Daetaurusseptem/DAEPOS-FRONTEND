@@ -4,9 +4,14 @@
     <div class="search-card bg-white p-4 rounded-3 border shadow-sm">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0">Búsqueda de Productos</h5>
-            <button class="btn btn-primary" (click)="crearProducto()">
-                <i class="bi bi-plus-lg me-2"></i> Crear Producto
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary" (click)="openBulkImport()">
+                    <i class="fi fi-rr-download me-2"></i> Importar CSV
+                </button>
+                <button class="btn btn-primary" (click)="crearProducto()">
+                    <i class="bi bi-plus-lg me-2"></i> Crear Producto
+                </button>
+            </div>
         </div>
         <div class="input-group">
             <span class="input-group-text bg-white border-end-0">
@@ -50,3 +55,9 @@
         </div>
     </div>
 </div>
+
+<app-bulk-import 
+    *ngIf="showBulkImport" 
+    [companyId]="companyId" 
+    (importClosed)="handleBulkImportClose($event)">
+</app-bulk-import>

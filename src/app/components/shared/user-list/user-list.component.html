@@ -9,7 +9,7 @@
             </button>
         </div>
         
-        <div class="search-input-group">
+        <div class="search-input-group d-flex gap-3">
             <div class="input-group">
                 <span class="input-group-text bg-white border-end-0">
                     <i class="bi bi-search text-muted"></i>
@@ -21,6 +21,18 @@
                        (keyup)="onSearch()"
                        name="searchTerm">
             </div>
+
+            <!-- Filtro por Sucursal (Solo para el Company Admin / Dueño) -->
+            <div class="branch-filter" *ngIf="userRole === 'companyAdmin'">
+                <select class="form-select" 
+                        [(ngModel)]="selectedBranchId" 
+                        (change)="onSearch()"
+                        name="selectedBranchId">
+                    <option value="">Todas las sucursales</option>
+                    <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+                    <option value="corporativo">Solo Corporativo (Sin sucursal)</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -30,9 +42,34 @@
             <h4 class="mb-0 fw-bold text-main">
                 Lista de 
                 <span *ngIf="userRole == 'admin'">Usuarios</span> 
+                <span *ngIf="userRole == 'companyAdmin'">Colaboradores</span> 
                 <span *ngIf="userRole == 'sysadmin'">Administradores</span>
                 <small class="text-muted ms-2" *ngIf="company">({{ company.name }})</small>
             </h4>
+        </div>
+
+        <!-- Selector de Pestañas de Rol (Solo para el Company Admin / Dueño) -->
+        <div class="role-tabs-container mb-4" *ngIf="userRole === 'companyAdmin'">
+            <div class="d-flex gap-2 border-bottom pb-2">
+                <button type="button" 
+                        class="tab-item-btn" 
+                        [class.active]="selectedRole === ''" 
+                        (click)="selectRoleTab('')">
+                    Todo el Personal
+                </button>
+                <button type="button" 
+                        class="tab-item-btn" 
+                        [class.active]="selectedRole === 'admin'" 
+                        (click)="selectRoleTab('admin')">
+                    Gerentes de Sucursal
+                </button>
+                <button type="button" 
+                        class="tab-item-btn" 
+                        [class.active]="selectedRole === 'user'" 
+                        (click)="selectRoleTab('user')">
+                    Cajeros y Operativos
+                </button>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -43,6 +80,7 @@
                         <th>Nombre Completo</th>
                         <th>Usuario</th>
                         <th>Rol</th>
+                        <th>Sucursal</th>
                         <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
@@ -68,8 +106,17 @@
                             <span class="badge" [ngClass]="{
                                 'bg-primary-subtle text-primary': user.role === 'admin',
                                 'bg-success-subtle text-success': user.role === 'user',
-                                'bg-warning-subtle text-warning': user.role === 'sysadmin'
+                                'bg-warning-subtle text-warning': user.role === 'sysadmin',
+                                'bg-dark-subtle text-dark': user.role === 'companyAdmin'
                             }">{{ user.role }}</span>
+                        </td>
+                        <td>
+                            <span class="text-muted small" *ngIf="user.branch">
+                                {{ $any(user.branch).name || 'Global' }}
+                            </span>
+                            <span class="text-muted small" *ngIf="!user.branch">
+                                Corporativo
+                            </span>
                         </td>
                         <td>
                             <div class="actions-cell">

@@ -31,6 +31,7 @@ export class NewsaleComponent {
   selectedNonExclusiveModifications: any[] = [];
   selectedQuantity: number = 1;
   selectedItem: any | null = null;
+  posMode: 'retail' | 'hospitality' = 'retail'; // Nuevo: Modo de interfaz
 
   constructor(
     private fb: FormBuilder,
@@ -48,6 +49,11 @@ export class NewsaleComponent {
   }
 
   ngOnInit(): void {
+    // Initialize POS mode from company settings
+    if (this.authService.company && this.authService.company.saleType) {
+      this.posMode = this.authService.company.saleType;
+    }
+
     this.searchForm = this.fb.group({
       search: ['']
     });
@@ -93,6 +99,16 @@ export class NewsaleComponent {
     this.search = this.searchForm.get('search')?.value;
     this.selectedCategory = '';
     this.loadItems();
+  }
+
+  handleSearchEnter(event: Event): void {
+    if (this.posMode === 'retail' && this.items.length === 1) {
+      event.preventDefault();
+      this.addToCart(this.items[0]);
+      this.searchForm.reset();
+      this.search = '';
+      this.loadItems();
+    }
   }
 
   selectCategory(category: string): void {
@@ -301,6 +317,14 @@ export class NewsaleComponent {
 
   navigateBackHome(): void {
     this.router.navigate(['/dashboard/user']);
+  }
+
+  setPosMode(mode: 'retail' | 'hospitality'): void {
+    this.posMode = mode;
+    // En modo retail, podríamos querer resetear filtros para ver todo más compacto
+    if (mode === 'retail') {
+      this.selectedItem = null;
+    }
   }
 
 }

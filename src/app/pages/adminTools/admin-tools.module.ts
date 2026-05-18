@@ -29,6 +29,12 @@ import { CreateRawMaterialComponent } from './raw-materials/create-raw-material/
 import { EditRawMaterialComponent } from './raw-materials/edit-raw-material/edit-raw-material.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { ManagePrintersComponent } from './manage-printers/manage-printers.component';
+import { BranchListComponent } from './branches/branch-list/branch-list.component';
+import { BranchFormComponent } from './branches/branch-form/branch-form.component';
+import { BranchAdminHomeComponent } from './branch-admin-home/branch-admin-home.component';
+import { CreateStockTransferComponent } from './inventory/transfers/create-transfer/create-transfer.component';
+import { StockTransferListComponent } from './inventory/transfers/transfer-list/stock-transfer-list.component';
+import { SupplierDetailsComponent } from './Suppliers/supplier-details/supplier-details.component';
 
 @NgModule({
   declarations: [
@@ -53,15 +59,23 @@ import { ManagePrintersComponent } from './manage-printers/manage-printers.compo
     CreateRawMaterialComponent,
     EditRawMaterialComponent,
     StatisticsComponent,
-    ManagePrintersComponent
+    ManagePrintersComponent,
+    BranchListComponent,
+    BranchFormComponent,
+    BranchAdminHomeComponent,
+    CreateStockTransferComponent,
+    StockTransferListComponent,
+    SupplierDetailsComponent
   ],
   exports: [
     InventoryStockListComponent,
     ProductsListComponent,
     CategoriesListComponent,
     SuppliersListComponent,
+    SupplierDetailsComponent,
     UpdateInventoryComponent,
-    StatisticsComponent
+    StatisticsComponent,
+    BranchAdminHomeComponent
   ],
   imports: [
     CommonModule,

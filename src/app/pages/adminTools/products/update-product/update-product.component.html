@@ -6,58 +6,145 @@
     <div class="card-body">
       <div class="row">
         <div class="col-md-4 text-center">
-          <img *ngIf="!product.img" src="../../../../../assets/img/no-img.webp" alt="Avatar de usuario" (click)="abrirModal(product,'productos')" class="img-fluid rounded" style="max-width: 200px; cursor: pointer;">
-          <img *ngIf="product.img" [src]="product.img" alt="Avatar de usuario" (click)="abrirModal(product,'productos')" class="img-fluid rounded" style="max-width: 200px; cursor: pointer;">
+          <div class="image-wrapper p-3 border rounded-4 bg-light mb-3">
+            <img *ngIf="!product.img" src="assets/img/product_placeholder.png" alt="Sin imagen" (click)="abrirModal(product,'productos')" class="img-fluid cursor-pointer" style="max-height: 200px;">
+            <img *ngIf="product.img" [src]="product.img" alt="Imagen del producto" (click)="abrirModal(product,'productos')" class="img-fluid rounded cursor-pointer" style="max-height: 200px;">
+          </div>
+          <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-4" (click)="abrirModal(product,'productos')">
+            <i class="bi bi-camera me-2"></i>Cambiar Imagen
+          </button>
         </div>
         <div class="col-md-8">
+          <!-- Navegación por Pestañas -->
+          <ul class="nav nav-tabs mb-4 border-0">
+            <li class="nav-item">
+              <a class="nav-link cursor-pointer px-0 me-4" [class.active]="activeTab === 'catalog'" (click)="setTab('catalog')">
+                Información General
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link cursor-pointer px-0" [class.active]="activeTab === 'inventory'" (click)="setTab('inventory')">
+                Inventario y Precios
+              </a>
+            </li>
+          </ul>
+
           <form [formGroup]="productForm" (ngSubmit)="updateProduct()">
-            <div class="mb-3">
-              <label for="name" class="form-label">Nombre del producto</label>
-              <input type="text" class="form-control" id="name" formControlName="name">
+            
+            <!-- PESTAÑA: CATÁLOGO -->
+            <div *ngIf="activeTab === 'catalog'" class="animate__animated animate__fadeIn">
+              <div class="mb-3">
+                <label for="name" class="form-label">Nombre del producto</label>
+                <input type="text" class="form-control rounded-3" id="name" formControlName="name">
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control rounded-3" id="description" formControlName="description" rows="3"></textarea>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="brand" class="form-label">Marca</label>
+                  <input type="text" class="form-control rounded-3" id="brand" formControlName="brand">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="supplier" class="form-label">Proveedor</label>
+                  <select class="form-select rounded-3" id="supplier" formControlName="supplier">
+                    <option value="" disabled>Seleccione un proveedor</option>
+                    <option *ngFor="let supplier of suppliers" [value]="supplier._id">{{ supplier.name }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="categories" class="form-label">Categorías</label>
+                <ng-select [items]="Categories" bindLabel="name" bindValue="_id" formControlName="categories" [multiple]="true" class="rounded-3">
+                </ng-select>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="isComposite" class="form-label">¿Es un producto compuesto? <i class="bi bi-lock-fill ms-1 small text-muted" title="Inmutable"></i></label>
+                  <select class="form-select rounded-3 bg-light" id="isComposite" formControlName="isComposite">
+                    <option [value]="false">No</option>
+                    <option [value]="true">Sí</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3" *ngIf="isComposite">
+                  <label for="recipe" class="form-label">Receta vinculada <i class="bi bi-lock-fill ms-1 small text-muted" title="Inmutable"></i></label>
+                  <select class="form-select rounded-3 bg-light" id="recipe" formControlName="recipe">
+                    <option value="" disabled>Seleccione una receta</option>
+                    <option *ngFor="let recipe of recipes" [value]="recipe._id">{{ recipe.name }}</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="description" class="form-label">Descripción</label>
-              <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+
+            <!-- PESTAÑA: INVENTARIO -->
+            <div *ngIf="activeTab === 'inventory'" class="animate__animated animate__fadeIn">
+              <div class="row align-items-end">
+                <div class="col-md-8 mb-3">
+                  <label for="barCode" class="form-label">Código de Barras</label>
+                  <input type="text" class="form-control rounded-3" id="barCode" formControlName="barCode">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="stock" class="form-label d-flex justify-content-between">
+                    Stock Actual <i class="bi bi-lock-fill small text-muted" title="Inmutable (Ajustar vía movimientos)"></i>
+                  </label>
+                  <input type="number" class="form-control rounded-3 fw-bold bg-light" id="stock" formControlName="stock">
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="costPrice" class="form-label">Precio de Costo</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">$</span>
+                    <input type="number" class="form-control border-start-0 ps-0" id="costPrice" formControlName="costPrice">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="sellingPrice" class="form-label">Precio de Venta</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-dark fw-bold">$</span>
+                    <input type="number" class="form-control border-start-0 ps-0 fw-bold" id="sellingPrice" formControlName="sellingPrice">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="unitOfMeasure" class="form-label">Unidad de Medida</label>
+                  <select class="form-select rounded-3" formControlName="unitOfMeasure" id="unitOfMeasure">
+                    <option value="unit">Pieza (unit)</option>
+                    <option value="kg">Kilogramo (kg)</option>
+                    <option value="l">Litro (l)</option>
+                    <option value="pack">Paquete (pack)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="bg-light p-3 rounded-3 mt-3">
+                <p class="text-muted small mb-3 fw-bold text-uppercase letter-spacing-1">Fechas de Control</p>
+                <div class="row">
+                  <div class="col-md-6 mb-0">
+                    <label for="receivedDate" class="form-label small">Fecha de Recepción</label>
+                    <input type="date" class="form-control form-control-sm border-0 bg-white" id="receivedDate" formControlName="receivedDate">
+                  </div>
+                  <div class="col-md-6 mb-0">
+                    <label for="expirationDate" class="form-label small">Fecha de Expiración</label>
+                    <input type="date" class="form-control form-control-sm border-0 bg-white" id="expirationDate" formControlName="expirationDate">
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="marca" class="form-label">Marca</label>
-              <input type="text" class="form-control" id="marca" formControlName="marca">
+
+            <div *ngIf="productForm.invalid && productForm.touched" class="alert alert-danger mt-3 py-2 small border-0 shadow-sm">
+              <i class="bi bi-exclamation-triangle me-2"></i> Verifica los campos requeridos.
             </div>
-            <div class="mb-3">
-              <label for="supplier" class="form-label">Proveedor</label>
-              <select class="form-select" id="supplier" formControlName="supplier">
-                <option value="" disabled>Seleccione un proveedor</option>
-                <option *ngFor="let supplier of suppliers" [value]="supplier._id">{{ supplier.name }}</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="categories" class="form-label">Categoría</label>
-              <ng-select [items]="Categories" bindLabel="name" bindValue="_id" formControlName="categories" [multiple]="true">
-              </ng-select>
-            </div>
-            <div class="mb-3">
-              <label for="isComposite" class="form-label">¿Es un producto compuesto?</label>
-              <select class="form-select" id="isComposite" formControlName="isComposite" (change)="onIsCompositeChange($event)">
-                <option [value]="false">No</option>
-                <option [value]="true">Sí</option>
-              </select>
-            </div>
-            <div class="mb-3" *ngIf="isComposite">
-              <label for="recipe" class="form-label">Receta</label>
-              <select class="form-select" id="recipe" formControlName="recipe">
-                <option value="" disabled>Seleccione una receta</option>
-                <option *ngFor="let recipe of recipes" [value]="recipe._id">{{ recipe.name }}</option>
-              </select>
-            </div>
-            <div *ngIf="productForm.invalid" class="alert alert-danger">
-              <p *ngIf="campoNoValido('name')" class="mb-0">Nombre inválido</p>
-              <p *ngIf="campoNoValido('description')" class="mb-0">Descripción inválida</p>
-              <p *ngIf="campoNoValido('marca')" class="mb-0">Marca inválida</p>
-              <p *ngIf="campoNoValido('supplier')" class="mb-0">Proveedor inválido</p>
-            </div>
-            <div class="d-flex justify-content-between">
+
+            <div class="d-flex justify-content-between mt-5 pt-3 border-top">
               <app-back-button></app-back-button>
-              <button type="submit" class="btn btn-primary" [disabled]="!productForm.valid">Guardar Cambios</button>
+              <button type="submit" class="btn btn-dark rounded-pill px-5 shadow-sm" [disabled]="!productForm.valid">
+                Guardar Cambios
+              </button>
             </div>
           </form>
         </div>

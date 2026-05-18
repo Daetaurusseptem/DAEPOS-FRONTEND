@@ -27,11 +27,16 @@ export class AddInventoryComponent implements OnInit {
     private inventoryService: InventoryService,
     private authService: AuthService,
     private router: Router
-  ) {
-    this.companyId = this.authService.companyId || this.authService.company?._id || '';
-  }
+  ) { }
 
   ngOnInit(): void {
+    this.companyId = this.authService.companyId || this.authService.company?._id || '';
+    
+    if (!this.companyId) {
+      this.router.navigateByUrl('/dashboard');
+      return;
+    }
+
     this.inventoryForm = this.fb.group({
       name: ['', Validators.required],
       barCode: [''],
@@ -82,7 +87,7 @@ export class AddInventoryComponent implements OnInit {
       }).then((result) => {
         if (result.isConfirmed) {
           this.inventoryService.createInventoryItem(newItem).subscribe({
-            next: (resp) => {
+            next: (resp: any) => {
               if (resp.ok) {
                 Swal.fire('¡Registro Guardado!', '', 'success');
                 this.router.navigateByUrl('/dashboard/admin/inventory');
@@ -90,7 +95,7 @@ export class AddInventoryComponent implements OnInit {
                 Swal.fire('Error', resp.msg || 'Hubo un problema al guardar el registro', 'error');
               }
             },
-            error: (error) => {
+            error: (error: any) => {
               console.error('Error al crear item de inventario', error);
               Swal.fire('Error', 'Hubo un error inesperado', 'error');
             }
@@ -102,8 +107,8 @@ export class AddInventoryComponent implements OnInit {
 
   loadInitialProducts(): void {
     this.productService.searchProductCompany('', 1, 10, this.companyId)
-      .pipe(map(response => response.products))
-      .subscribe(products => {
+      .pipe(map((response: any) => response.products))
+      .subscribe((products: any) => {
         this.products = products || [];
         this.filteredProducts = products || [];
       });
@@ -113,8 +118,8 @@ export class AddInventoryComponent implements OnInit {
     const searchTerm = event.target.value.toLowerCase();
     if (searchTerm) {
       this.productService.searchProductCompany(searchTerm, 1, 10, this.companyId)
-        .pipe(map(response => response.products))
-        .subscribe(products => {
+        .pipe(map((response: any) => response.products))
+        .subscribe((products: any) => {
           this.filteredProducts = products || [];
         });
     } else {

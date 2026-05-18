@@ -24,7 +24,14 @@
                     </div>
                 </td>
                 <td>
-                    <div class="product-name">{{ item?.name }}</div>
+                    <div class="product-name d-flex align-items-center gap-2">
+                        {{ item?.name }}
+                        <span class="badge rounded-pill bg-warning text-dark border border-warning-subtle small fw-semibold px-2 py-0.5" 
+                              *ngIf="item?.status === 'pending_verification'" 
+                              style="font-size: 0.7rem;">
+                          Por Verificar
+                        </span>
+                    </div>
                 </td>
                 <td>
                     <span class="product-brand">{{ item?.brand || 'Sin marca' }}</span>

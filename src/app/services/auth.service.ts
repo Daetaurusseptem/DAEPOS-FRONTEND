@@ -20,6 +20,7 @@ export class AuthService {
   usuario!: UsuarioModel;
   company!: Company;
   companyId!: string;
+  branch?: any;
 
 
   constructor(
@@ -49,13 +50,14 @@ export class AuthService {
           console.log(resp);
           this.idUsuario = resp.uid
           const { name, username, img = '', role, email, _id } = resp.usuario;
-          if (role == 'user') {
-            const company = resp.usuario.companyId;
-            this.companyId = company
-          } else if (role == 'admin') {
-            this.companyId = resp.company._id;
-          }else if (role == 'sysAdmin') {
-            
+          
+          this.company = resp.company;
+          this.branch = resp.branch;
+
+          if (role == 'companyAdmin') {
+            this.companyId = resp.company?._id;
+          } else if (role == 'admin' || role == 'user') {
+            this.companyId = resp.company?._id;
           }
           
           console.log('COMPAÑYYYYYY', this.companyId);

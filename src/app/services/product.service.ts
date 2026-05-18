@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Category, Product } from '../interfaces/models.interface';
+import { of } from 'rxjs';
 
 const urlProducts = `${environment.apiUrl}/products`
 
@@ -28,6 +29,9 @@ export class ProductService {
   };
 
   searchProductCompany(search: string = '', page: number = 1, limit: number = 5, companyId: string) {
+    if (!companyId || companyId === 'undefined') {
+      return of({ ok: true, items: [], products: [], totalItems: 0, totalPages: 0 } as any);
+    }
     const params = {
       search,
       page: page.toString(),
@@ -56,7 +60,10 @@ export class ProductService {
   };
 
   createProduct(empresaId: string, product: FormData) {
-
     return this.http.post<InventoryResponse>(`${urlProducts}/${empresaId}`, product, this.authService.headers);
   };
+
+  bulkUploadProducts(companyId: string, payload: any) {
+    return this.http.post<any>(`${urlProducts}/bulk/${companyId}`, payload, this.authService.headers);
+  }
 }

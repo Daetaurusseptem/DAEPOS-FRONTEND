@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { InventoryItem, Product } from 'src/app/interfaces/models.interface';
+import { Branch, InventoryItem, Product, UserRole } from 'src/app/interfaces/models.interface';
 import { InventoryService } from 'src/app/services/inventory.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { BranchService } from 'src/app/services/branch.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -18,22 +19,48 @@ export class InventoryStockListComponent implements OnInit {
   totalPages: number = 0;
   searchTerm: string = '';
   visiblePages: number[] = [];
+  branches: Branch[] = [];
+  selectedBranchId: string = '';
+  userRole!: UserRole;
 
   constructor(
     private inventoryService: InventoryService,
     private authService: AuthService,
+    private branchService: BranchService,
     private router: Router,
   ) { }
 
   ngOnInit(): void {
+    this.userRole = this.authService.role;
     this.loadItems();
+    if (this.userRole === 'companyAdmin' || this.userRole === 'admin') {
+      this.getBranches();
+    }
+  }
+
+  getBranches() {
+    const companyId = this.authService.companyId || this.authService.company?._id;
+    if (!companyId) return;
+
+    this.branchService.getBranchesByCompany(companyId).subscribe({
+      next: (resp) => {
+        if (resp.ok) {
+          this.branches = resp.branches;
+        }
+      }
+    });
   }
 
   loadItems(): void {
     const companyId = this.authService.companyId || this.authService.company?._id;
     if (!companyId) return;
 
-    this.inventoryService.getInventory(companyId, this.searchTerm, 'product').subscribe({
+    let branchId = this.selectedBranchId;
+    if (!branchId && this.userRole === 'admin') {
+       branchId = this.authService.branch?._id || this.authService.branch;
+    }
+
+    this.inventoryService.getInventory(companyId, this.searchTerm, 'product', branchId).subscribe({
       next: (data) => {
         this.items = data.items || [];
         this.totalItems = data.totalItems as number || 0; 

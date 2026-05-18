@@ -1,0 +1,134 @@
+:root {
+  --geist-success-bg: #e6fffa;
+  --geist-success-text: #0d9488;
+  --geist-warning-bg: #fffbeb;
+  --geist-warning-text: #d97706;
+  --geist-info-bg: #eff6ff;
+  --geist-info-text: #2563eb;
+  --geist-danger-bg: #fef2f2;
+  --geist-danger-text: #dc2626;
+}
+
+.supplier-details-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.contact-link {
+  transition: all 0.2s ease;
+}
+
+.contact-link:hover {
+  background-color: #e5e5e5 !important;
+  color: #000000 !important;
+  transform: translateY(-1px);
+}
+
+/* Stat KPIs */
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+  border-color: #000000 !important;
+  transform: translateY(-2px);
+}
+
+/* Custom Minimalist Tabs */
+.tab-btn {
+  color: #666;
+  border-bottom: 2px solid transparent !important;
+  padding-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.tab-btn:hover {
+  color: #000;
+}
+
+.tab-btn.active {
+  color: #000;
+  border-bottom: 2px solid #000 !important;
+}
+
+/* Soft Badges */
+.bg-success-soft {
+  background-color: #e6fffa !important;
+  color: #0d9488 !important;
+}
+
+.bg-warning-soft {
+  background-color: #fffbeb !important;
+  color: #d97706 !important;
+}
+
+.bg-info-soft {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+.bg-danger-soft {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+.price-mono {
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+  letter-spacing: -0.03em;
+}
+
+/* High Fidelity Modals */
+.custom-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1.5rem;
+}
+
+.custom-modal-card {
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Inspect Checklist styling */
+.inspect-list {
+  background: #fdfdfd;
+}
+
+.inspect-item {
+  transition: background-color 0.2s ease;
+}
+
+.inspect-item:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.form-check-input:checked {
+  background-color: #000;
+  border-color: #000;
+}
+
+.transition-all {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}

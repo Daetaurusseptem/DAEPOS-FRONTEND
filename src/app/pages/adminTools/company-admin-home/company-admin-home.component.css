@@ -1,70 +1,172 @@
-.company-card {
-  display: flex;
-  flex-wrap: wrap;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  max-width: 800px;
+:root {
+  --geist-success-bg: #e6fffa;
+  --geist-success-text: #059669;
+  --geist-warning-bg: #fffbeb;
+  --geist-warning-text: #d97706;
+  --geist-info-bg: #eff6ff;
+  --geist-info-text: #2563eb;
+  --geist-ghost-bg: #f3f4f6;
+}
+
+.dashboard-wrapper {
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 1rem;
 }
 
-.company-image {
-  flex: 0 0 300px;
-  max-width: 300px;
-}
-
-.company-image img {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-}
-
-.company-details {
-  flex: 1;
-  padding: 20px;
-}
-
-.company-header {
+/* Stat Cards */
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid #eaeaea;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  gap: 1.25rem;
+  transition: all 0.2s ease;
+  height: 100%;
 }
 
-.company-name {
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--geist-ghost-bg);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.kpi-sales .stat-icon { background: var(--geist-success-bg); color: var(--geist-success-text); }
+.kpi-stock.warning .stat-icon { background: var(--geist-warning-bg); color: var(--geist-warning-text); }
+.kpi-registers .stat-icon { background: var(--geist-info-bg); color: var(--geist-info-text); }
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
   margin: 0;
-  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.stat-trend {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Table Enhancements */
+.bg-success-soft { background-color: var(--geist-success-bg); }
+.bg-warning-soft { background-color: var(--geist-warning-bg); }
+.bg-ghost { background-color: var(--geist-ghost-bg); }
+
+.price-mono {
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+  letter-spacing: -0.03em;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
   font-weight: bold;
 }
 
-.edit-button {
-  background-color: transparent;
-  border: none;
-  color: #6c757d;
-  font-size: 18px;
-  cursor: pointer;
+.btn-ghost-dark {
+  color: #444;
+  background: transparent;
 }
 
-.company-description {
-  margin-bottom: 20px;
-  color: #6c757d;
-  line-height: 1.5;
+.btn-ghost-dark:hover {
+  background: var(--geist-ghost-bg);
 }
 
-.company-info {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* Loading state */
+.loading-overlay {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.company-info li {
-  margin-bottom: 5px;
-  line-height: 1.5;
+/* Animations */
+.animate__animated {
+  --animate-duration: 0.5s;
 }
 
-.company-info li i {
-  margin-right: 5px;
-  color: #6c757d;
+@media (max-width: 768px) {
+  .dashboard-header {
+    text-align: center;
+  }
+  .dashboard-header .d-flex {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .stat-card {
+    padding: 1rem;
+  }
 }
 
+.branch-card {
+  background: white;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.02);
+  border-color: #000000 !important;
+  transform: translateY(-2px);
+}
+
+.transition-all {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-success-soft {
+  background-color: #e6fffa !important;
+  color: #0d9488 !important;
+}
+
+/* Acciones Rápidas Premium Geist Theme */
+.premium-quick-btn {
+  background-color: transparent !important;
+  color: #171717 !important;
+  border: 1px solid #e5e5e5 !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease-in-out !important;
+  text-align: left !important;
+}
+
+.premium-quick-btn:hover {
+  background-color: #f5f5f5 !important;
+  border-color: #d4d4d4 !important;
+  color: #000000 !important;
+  transform: translateX(4px);
+}
+
+.premium-quick-primary-btn {
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.premium-quick-primary-btn:hover {
+  background-color: #1a1a1a !important;
+  transform: translateX(4px);
+}

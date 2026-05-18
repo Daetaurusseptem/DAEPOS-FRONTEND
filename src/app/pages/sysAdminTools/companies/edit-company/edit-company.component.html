@@ -33,6 +33,14 @@
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" formControlName="email">
               </div>
+
+              <div class="mb-3">
+                <label for="saleType" class="form-label">Tipo de Venta (Flujo POS)</label>
+                <select class="form-select" id="saleType" formControlName="saleType" required>
+                  <option value="retail">Retail (Escáner/Compacto)</option>
+                  <option value="hospitality">Hospitality (Touch/Categorías)</option>
+                </select>
+              </div>
               <div *ngIf="companyForm.invalid" class="card-body alert alert-danger">
                 <p *ngIf="campoNoValidoDatosUsuario('name')" class="text-danger">Nombre invalido</p>
                 <p *ngIf="campoNoValidoDatosUsuario('description')" class="text-danger">Descripción invalida</p>

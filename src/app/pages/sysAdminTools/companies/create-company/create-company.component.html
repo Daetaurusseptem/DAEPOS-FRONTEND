@@ -49,6 +49,14 @@
           <input type="email" class="form-control" id="email" [(ngModel)]="empresa.email" name="email" required>
         </div>
     
+        <div class="mb-3">
+          <label for="saleType" class="form-label">Tipo de Venta (Flujo POS)</label>
+          <select class="form-select" id="saleType" [(ngModel)]="empresa.saleType" name="saleType" required>
+            <option value="retail">Retail (Escáner/Compacto)</option>
+            <option value="hospitality">Hospitality (Touch/Categorías)</option>
+          </select>
+        </div>
+    
         <!-- Botón para crear la empresa -->
         <button type="submit" class="btn btn-primary" (click)="createCompany(companyForm)" [disabled]="!companyForm.form.valid">Crear Empresa</button>
       </form>

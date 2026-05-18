@@ -45,7 +45,7 @@ export class ProductsListComponent implements OnInit {
 
   getProducts(idEmpresa: string, page: number = 1): void {
     this.productService.searchProductCompany('', page, this.limit, idEmpresa)
-      .subscribe(response => {
+      .subscribe((response: any) => {
         this.products = response.products!;
         this.totalPages = response.totalPages!;
         this.currentPage = page;
@@ -60,7 +60,7 @@ export class ProductsListComponent implements OnInit {
     } else {
       // Llamamos al servicio de búsqueda
       this.productService.searchProductCompany(term, 1, this.limit, this.companyId)
-        .subscribe(response => {
+        .subscribe((response: any) => {
           this.products = response.products!;
           this.totalPages = response.totalPages!;
           this.currentPage = 1;
@@ -102,7 +102,7 @@ export class ProductsListComponent implements OnInit {
             this.products = this.products.filter(product => product._id !== id);
             Swal.fire('Eliminado', 'El producto ha sido eliminado correctamente.', 'success');
           },
-          error => {
+          (error: any) => {
             console.error('Error al eliminar producto', error);
             Swal.fire('Error', 'Hubo un problema al eliminar el producto.', 'error');
           }
@@ -139,5 +139,18 @@ export class ProductsListComponent implements OnInit {
       pages.push(i);
     }
     this.visiblePages = pages;
+  }
+
+  showBulkImport = false;
+
+  openBulkImport() {
+    this.showBulkImport = true;
+  }
+
+  handleBulkImportClose(success: boolean) {
+    this.showBulkImport = false;
+    if (success) {
+      this.getProducts(this.companyId, 1);
+    }
   }
 }

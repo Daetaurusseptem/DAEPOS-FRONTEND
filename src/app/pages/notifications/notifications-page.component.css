@@ -1,0 +1,103 @@
+.notifications-page-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Filtros */
+.filter-tab-btn {
+  font-size: 0.82rem;
+  transition: all 0.2s ease;
+}
+
+.filter-tab-btn.active {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+.filter-tab-btn.active .badge {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+.filter-tab-btn:hover:not(.active) {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Filas de notificación */
+.notif-row {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notif-row:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Notificación no leída */
+.unread-row {
+  background-color: rgba(0, 114, 245, 0.015) !important;
+  border-left: 3px solid #000 !important;
+}
+
+.unread-row:hover {
+  background-color: rgba(0, 114, 245, 0.025) !important;
+}
+
+/* Fondos para iconos */
+.bg-info-soft {
+  background-color: rgba(0, 114, 245, 0.08) !important;
+}
+.bg-success-soft {
+  background-color: rgba(23, 201, 100, 0.08) !important;
+}
+.bg-warning-soft {
+  background-color: rgba(245, 165, 36, 0.08) !important;
+}
+.bg-danger-soft {
+  background-color: rgba(243, 18, 96, 0.08) !important;
+}
+
+.fs-9 {
+  font-size: 0.65rem !important;
+}
+
+.fs-9.fw-bold {
+  vertical-align: middle;
+}
+
+/* Botón rápido */
+.small-btn {
+  font-size: 0.72rem;
+  padding: 4px 12px;
+}
+
+.message-text-full {
+  line-height: 1.5;
+  color: #4a4a4a !important;
+  font-size: 0.85rem;
+}
+
+/* Efecto hover en link de acción */
+.action-link-btn {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.notif-row:hover .action-link-btn {
+  color: #000 !important;
+  transform: translateX(3px);
+}
+
+.action-link-btn i {
+  transition: transform 0.2s ease;
+}
+
+.notif-row:hover .action-link-btn i {
+  transform: translateX(2px);
+}
+
+.empty-icon-circle {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}

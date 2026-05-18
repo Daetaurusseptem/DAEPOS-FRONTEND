@@ -1,0 +1,440 @@
+<div class="supplier-details-wrapper p-4 animate__animated animate__fadeIn" *ngIf="supplier">
+  
+  <!-- Volver Atrás y Cabecera -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <button class="btn btn-outline-dark btn-sm rounded-pill px-3 border-light-subtle d-flex align-items-center gap-1 bg-white" routerLink="/dashboard/admin/suppliers">
+      <i class="bi bi-arrow-left"></i> Volver a Proveedores
+    </button>
+    <span class="text-muted small">ID Proveedor: <code class="price-mono text-dark">{{ supplier._id | slice:0:8 }}...</code></span>
+  </div>
+
+  <!-- Perfil Principal Card -->
+  <div class="card border border-light-subtle shadow-sm rounded-4 bg-white mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex flex-column flex-md-row gap-4 align-items-md-center">
+        <!-- Avatar Circular -->
+        <div class="avatar-circle bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-3 shadow" style="width: 80px; height: 80px; flex-shrink: 0;">
+          {{ getSupplierInitials() }}
+        </div>
+        
+        <!-- Info Principal -->
+        <div class="flex-grow-1">
+          <h2 class="fw-bold mb-1 text-dark tracking-tight">{{ supplier.name }}</h2>
+          <p class="text-muted mb-3 fs-6">{{ supplier.description || 'Sin descripción detallada del proveedor.' }}</p>
+          
+          <!-- Enlaces Rápidos de Contacto -->
+          <div class="d-flex flex-wrap gap-3">
+            <a href="tel:{{ supplier.contactInfo.phone }}" class="contact-link px-3 py-1.5 rounded-3 bg-light text-secondary border border-light-subtle text-decoration-none small d-flex align-items-center gap-1.5 transition-all">
+              <i class="bi bi-telephone-fill text-muted"></i> {{ supplier.contactInfo.phone }}
+            </a>
+            <a href="mailto:{{ supplier.contactInfo.email }}" class="contact-link px-3 py-1.5 rounded-3 bg-light text-secondary border border-light-subtle text-decoration-none small d-flex align-items-center gap-1.5 transition-all">
+              <i class="bi bi-envelope-fill text-muted"></i> {{ supplier.contactInfo.email }}
+            </a>
+            <span class="px-3 py-1.5 rounded-3 bg-light text-secondary border border-light-subtle small d-flex align-items-center gap-1.5">
+              <i class="bi bi-geo-alt-fill text-muted"></i> {{ supplier.contactInfo.address }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fila de KPIs Financieros y Operativos -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border border-light-subtle shadow-sm rounded-4 bg-white h-100 transition-all hover-shadow">
+        <div class="card-body p-4">
+          <span class="stat-label">Catálogo Suministrado</span>
+          <h3 class="stat-value price-mono mt-2 mb-0">{{ catalogCount }} <span class="fs-6 fw-normal text-muted">items</span></h3>
+          <span class="text-muted small mt-1 d-block">Productos vinculados en el catálogo</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border border-light-subtle shadow-sm rounded-4 bg-white h-100 transition-all hover-shadow">
+        <div class="card-body p-4">
+          <span class="stat-label">Stock en Almacén</span>
+          <h3 class="stat-value price-mono mt-2 mb-0">{{ totalStock }} <span class="fs-6 fw-normal text-muted">piezas</span></h3>
+          <span class="text-muted small mt-1 d-block">Inventario físico total acumulado</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border border-light-subtle shadow-sm rounded-4 bg-white h-100 transition-all hover-shadow">
+        <div class="card-body p-4">
+          <span class="stat-label">Capital Total Invertido</span>
+          <h3 class="stat-value price-mono mt-2 mb-0 text-dark">${{ totalInvestment | number:'1.2-2' }}</h3>
+          <span class="text-muted small mt-1 d-block">Valor de compra activo de este stock</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selector de Pestañas Estilo Geist -->
+  <div class="tabs-container mb-4">
+    <div class="d-flex border-bottom border-light-subtle">
+      <button class="tab-btn py-3 px-4 border-0 bg-transparent fw-semibold position-relative transition-all"
+              [class.active]="activeTab === 'catalog'"
+              (click)="selectTab('catalog')">
+        Catálogo de Productos
+      </button>
+      <button class="tab-btn py-3 px-4 border-0 bg-transparent fw-semibold position-relative transition-all"
+              [class.active]="activeTab === 'stock'"
+              (click)="selectTab('stock')">
+        Inventario Activo por Sede
+      </button>
+      <button class="tab-btn py-3 px-4 border-0 bg-transparent fw-semibold position-relative transition-all"
+              [class.active]="activeTab === 'deliveries'"
+              (click)="selectTab('deliveries')">
+        Agenda de Entregas y Alertas
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenido de las Pestañas -->
+  <div class="tab-content bg-white border border-light-subtle rounded-4 p-4 shadow-sm">
+    
+    <!-- Tab 1: Catálogo de Productos -->
+    <div *ngIf="activeTab === 'catalog'">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Catálogo de Productos Suministrados</h5>
+        <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5" routerLink="/dashboard/admin/product/new">
+          <i class="bi bi-plus-circle me-1"></i> Agregar Producto
+        </button>
+      </div>
+
+      <div *ngIf="suppliedProducts.length === 0" class="text-center py-5 text-muted opacity-50">
+        <i class="bi bi-journal-x display-4 d-block mb-3"></i>
+        <p>No se encontraron productos registrados para este proveedor.</p>
+      </div>
+
+      <div class="table-responsive" *ngIf="suppliedProducts.length > 0">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Marca</th>
+              <th>Tipo</th>
+              <th class="text-end">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of suppliedProducts">
+              <td>
+                <div class="fw-semibold text-dark">{{ p.name }}</div>
+              </td>
+              <td>{{ p.brand }}</td>
+              <td>
+                <span class="badge rounded-2 bg-light text-secondary border border-light-subtle px-2 py-1 small">
+                  {{ p.isComposite ? 'Compuesto' : 'Simple' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <span class="badge rounded-pill px-2.5 py-1.5 small fw-semibold"
+                      [class.bg-success-soft]="p.status !== 'pending_verification'"
+                      [class.text-success]="p.status !== 'pending_verification'"
+                      [class.bg-warning-soft]="p.status === 'pending_verification'"
+                      [class.text-warning]="p.status === 'pending_verification'">
+                  {{ p.status === 'pending_verification' ? 'Por Verificar' : 'Verificado / Activo' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 2: Inventario Activo por Sede -->
+    <div *ngIf="activeTab === 'stock'">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Existencias Físicas en Almacén</h5>
+        <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5" routerLink="/dashboard/admin/inventory/new">
+          <i class="bi bi-plus-circle me-1"></i> Registrar Entrada de Stock
+        </button>
+      </div>
+
+      <div *ngIf="suppliedInventory.length === 0" class="text-center py-5 text-muted opacity-50">
+        <i class="bi bi-box display-4 d-block mb-3"></i>
+        <p>Aún no hay stock activo registrado de este proveedor en el inventario.</p>
+      </div>
+
+      <div class="table-responsive" *ngIf="suppliedInventory.length > 0">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Artículo</th>
+              <th>Sucursal</th>
+              <th class="text-center">Stock</th>
+              <th class="text-end">Precio Costo</th>
+              <th class="text-end">Precio Venta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of suppliedInventory">
+              <td>
+                <div class="fw-semibold text-dark">{{ item.name }}</div>
+                <small class="text-muted price-mono">{{ item.barCode || 'Sin código' }}</small>
+              </td>
+              <td>
+                <span class="badge rounded-2 bg-light text-secondary border border-light-subtle px-2 py-1 small">
+                  <i class="bi bi-shop me-1 text-muted"></i> {{ item.branch?.name || 'Sucursal Centro' }}
+                </span>
+              </td>
+              <td class="text-center price-mono fw-bold text-dark">
+                {{ item.stock }} <span class="small text-muted fw-normal">{{ item.measurement }}</span>
+              </td>
+              <td class="text-end price-mono text-secondary">${{ item.costPrice | number:'1.2-2' }}</td>
+              <td class="text-end price-mono text-dark fw-semibold">${{ item.sellingPrice || 0 | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: Agenda de Entregas y Alertas -->
+    <div *ngIf="activeTab === 'deliveries'">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h5 class="fw-bold mb-0">Cronograma de Reabastecimientos</h5>
+          <small class="text-muted">Visualiza cuándo llegarán pedidos de este proveedor</small>
+        </div>
+        <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5" (click)="openScheduleModal()">
+          <i class="bi bi-calendar-plus me-1"></i> Agendar Reabastecimiento
+        </button>
+      </div>
+
+      <div *ngIf="restocks.length === 0" class="text-center py-5 text-muted opacity-50">
+        <i class="bi bi-calendar2-x display-4 d-block mb-3"></i>
+        <p>No hay entregas programadas programadas.</p>
+        <button class="btn btn-outline-dark btn-sm rounded-pill mt-2" (click)="openScheduleModal()">Programar primera entrega</button>
+      </div>
+
+      <div class="table-responsive" *ngIf="restocks.length > 0">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Fecha Programada</th>
+              <th>Sucursal Destino</th>
+              <th>¿Qué mercancía llega?</th>
+              <th>Período / Recurrencia</th>
+              <th class="text-center">Estatus</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of restocks" class="animate__animated animate__fadeIn">
+              <td class="price-mono fw-semibold text-dark">
+                <i class="bi bi-calendar-event me-1 text-muted"></i> {{ r.expectedDate | date:'dd/MM/yyyy' }}
+              </td>
+              <td>
+                <span class="badge rounded-2 bg-light text-secondary border border-light-subtle px-2.5 py-1.5 small">
+                  <i class="bi bi-shop me-1 text-muted"></i> {{ r.branch?.name || 'Sede Centro' }}
+                </span>
+              </td>
+              <td class="fw-medium text-secondary">
+                {{ r.itemsSummary }}
+              </td>
+              <td>
+                <span class="badge rounded-pill px-3 py-1.5 small d-inline-flex align-items-center gap-1 fw-medium"
+                      [class.bg-info-soft]="r.isRecurring"
+                      [class.text-info]="r.isRecurring"
+                      [class.bg-light]="!r.isRecurring"
+                      [class.text-secondary]="!r.isRecurring">
+                  <i class="bi bi-arrow-repeat" *ngIf="r.isRecurring"></i>
+                  {{ r.isRecurring ? getRecurrenceLabel(r.recurrence) : 'Única vez' }}
+                </span>
+              </td>
+              <td class="text-center">
+                <span class="badge rounded-pill px-2.5 py-1.5 small fw-semibold"
+                      [class.bg-warning-soft]="r.status === 'pending'"
+                      [class.text-warning]="r.status === 'pending'"
+                      [class.bg-success-soft]="r.status === 'completed'"
+                      [class.text-success]="r.status === 'completed'"
+                      [class.bg-danger-soft]="r.status === 'cancelled'"
+                      [class.text-danger]="r.status === 'cancelled'">
+                  {{ r.status === 'pending' ? 'Pendiente' : (r.status === 'completed' ? 'Completado' : 'Cancelado') }}
+                </span>
+              </td>
+              <td class="text-end">
+                <div class="d-flex gap-2 justify-content-end">
+                  <!-- Solo visible para usuarios con permiso verify_restock -->
+                  <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5 text-white border-0 fw-semibold" 
+                          *ngIf="r.status === 'pending' && canVerifyRestock" 
+                          (click)="openInspectModal(r)"
+                          style="background-color: #000 !important;">
+                    <i class="bi bi-shield-check me-1"></i> Recibir
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm border-light-subtle rounded-3 p-2 d-flex align-items-center justify-content-center" 
+                          *ngIf="r.status === 'pending'" 
+                          (click)="deleteRestock(r._id)">
+                    <i class="bi bi-trash3-fill"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Agendar Reabastecimiento -->
+  <div class="custom-modal-backdrop" *ngIf="showScheduleModal">
+    <div class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__fadeInDown animate__faster" style="max-width: 500px; width: 100%;">
+      <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Agendar Reabastecimiento</h5>
+        <button class="btn-close" (click)="closeScheduleModal()"></button>
+      </div>
+      <div class="card-body p-4">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Sucursal Destino *</label>
+          <select class="form-select" [(ngModel)]="newRestock.branch">
+            <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Fecha Prometida de Entrega *</label>
+          <input type="date" class="form-control" [(ngModel)]="newRestock.expectedDate">
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label fw-semibold mb-0">Productos a Recibir *</label>
+            <button class="btn btn-outline-dark btn-xs rounded-pill px-2 py-0.5" style="font-size: 0.75rem;" (click)="addRestockItemRow()">
+              <i class="bi bi-plus-circle"></i> Agregar Artículo
+            </button>
+          </div>
+          
+          <div class="d-flex flex-column gap-2 mb-2" style="max-height: 200px; overflow-y: auto; padding-right: 4px;">
+            <div *ngFor="let item of restockItemsList; let idx = index" class="d-flex gap-2 align-items-center animate__animated animate__fadeIn">
+              <select class="form-select form-select-sm flex-grow-1" [(ngModel)]="item.productId" (change)="onRestockItemProductChange(idx)">
+                <option value="">-- Seleccionar Producto --</option>
+                <option *ngFor="let prod of suppliedProducts" [value]="prod._id">{{ prod.name }} ({{ prod.brand }})</option>
+              </select>
+              
+              <input type="number" class="form-control form-control-sm" style="width: 80px;" placeholder="Cant" [(ngModel)]="item.quantity" min="1">
+              
+              <button class="btn btn-outline-danger btn-sm border-0" (click)="removeRestockItemRow(idx)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <button class="btn btn-link btn-sm text-dark p-0 d-flex align-items-center gap-1 text-decoration-none mt-2" (click)="openQuickProductModalInSchedule()">
+            <i class="bi bi-plus-circle-fill"></i> ¿Llega un producto nuevo no registrado? Créalo aquí
+          </button>
+        </div>
+
+        <!-- Recurrencia -->
+        <div class="card border border-light-subtle rounded-3 p-3 bg-light-subtle mb-3">
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="recurringSwitch" [(ngModel)]="newRestock.isRecurring">
+            <label class="form-check-label fw-semibold" for="recurringSwitch">¿Es una entrega periódica / recurrente?</label>
+          </div>
+          <div class="mb-2" *ngIf="newRestock.isRecurring">
+            <label class="form-label small fw-semibold text-secondary">Frecuencia de Repetición</label>
+            <select class="form-select form-select-sm" [(ngModel)]="newRestock.recurrence">
+              <option value="daily">Diaria</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Notas Adicionales</label>
+          <textarea class="form-control" rows="2" placeholder="Notas de la entrega..." [(ngModel)]="newRestock.notes"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end mt-4">
+          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeScheduleModal()">Cancelar</button>
+          <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="saveRestockSchedule()">Agendar Entrega</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Recibir e Inspeccionar Entrega (verify_restock) -->
+  <div class="custom-modal-backdrop" *ngIf="showInspectModal && selectedRestockForInspect">
+    <div class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__fadeInDown animate__faster" style="max-width: 600px; width: 100%;">
+      <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="fw-bold mb-0">Verificación e Inspección Física</h5>
+          <small class="text-muted">Registrando arribo a: <strong>{{ selectedRestockForInspect.branch?.name || 'Sucursal Centro' }}</strong></small>
+        </div>
+        <button class="btn-close" (click)="closeInspectModal()"></button>
+      </div>
+      <div class="card-body p-4">
+        
+        <div class="alert alert-light border border-light-subtle d-flex align-items-start gap-2 mb-3">
+          <i class="bi bi-info-circle text-primary fs-5 mt-0.5"></i>
+          <small class="text-muted">
+            Inspecciona la mercancía que llega del camión de reparto. Si un producto es nuevo o no está catalogado por el dueño, regístralo al vuelo con el botón de abajo.
+          </small>
+        </div>
+
+        <!-- Checklist de Productos -->
+        <h6 class="fw-bold text-dark mb-3">Productos en el Envío:</h6>
+        <div class="inspect-list border border-light-subtle rounded-3 overflow-hidden mb-3">
+          <div *ngFor="let it of inspectedItems; let i = index" class="inspect-item d-flex align-items-center justify-content-between p-3 border-bottom border-light-subtle bg-white">
+            <div class="form-check d-flex align-items-center gap-2">
+              <input class="form-check-input" type="checkbox" id="check-{{i}}" [(ngModel)]="it.verified">
+              <label class="form-check-label fw-semibold text-dark fs-6" for="check-{{i}}">
+                {{ it.name }}
+              </label>
+            </div>
+            <span class="badge bg-light text-dark border border-light-subtle price-mono fw-bold px-3 py-1.5 rounded-2">
+              Cant: {{ it.quantity }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Registro al Vuelo -->
+        <button class="btn btn-outline-dark btn-sm rounded-pill w-100 py-2 border-light-subtle d-flex align-items-center justify-content-center gap-1.5 mb-4" (click)="openQuickProductModalInInspect()">
+          <i class="bi bi-plus-circle-fill text-muted"></i> Registrar Producto no Catalogado al Vuelo
+        </button>
+
+        <div class="d-flex gap-2 justify-content-end">
+          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeInspectModal()">Cancelar</button>
+          <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="completeInspection()">Completar Recepción</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SECUNDARIO: Registro Rápido al Vuelo ( pending_verification ) -->
+  <div class="custom-modal-backdrop" style="z-index: 2100;" *ngIf="showQuickProductModal">
+    <div class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__zoomIn animate__faster" style="max-width: 450px; width: 100%;">
+      <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Registro Rápido de Producto</h5>
+        <button class="btn-close" (click)="closeQuickProductModal()"></button>
+      </div>
+      <div class="card-body p-4">
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Nombre del Producto *</label>
+          <input type="text" class="form-control" placeholder="Ej: Café Orgánico Chiapas" [(ngModel)]="quickProduct.name">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Marca *</label>
+          <input type="text" class="form-control" placeholder="Ej: Nescafé" [(ngModel)]="quickProduct.brand">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Categoría *</label>
+          <select class="form-select" [(ngModel)]="quickProduct.category">
+            <option *ngFor="let cat of categories" [value]="cat._id">{{ cat.name }}</option>
+          </select>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end mt-4">
+          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeQuickProductModal()">Cancelar</button>
+          <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="saveQuickProduct()">Registrar y Vincular</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -19,12 +19,34 @@ import Swal from 'sweetalert2';
 })
 export class UpdateProductComponent implements OnInit {
   product!: Product;
+  inventoryItem: any; 
   id: string = '';
   Categories: Category[] = [];
   suppliers: Supplier[] = [];
   recipes: Recipe[] = [];
   empresas!: Company[];
   isComposite: boolean = false;
+  activeTab: 'catalog' | 'inventory' = 'catalog';
+  productPlaceholder = 'assets/img/product_placeholder.png'; // Definiremos esto en el HTML
+
+  productForm: FormGroup = this.fb.group({
+    // Catálogo
+    categories: [[], Validators.required],
+    name: ['', Validators.required],
+    description: [''],
+    brand: ['', Validators.required],
+    supplier: ['', Validators.required],
+    isComposite: [false, Validators.required],
+    recipe: [''],
+    // Inventario
+    barCode: [''],
+    stock: [0, [Validators.required, Validators.min(0)]],
+    costPrice: [0, [Validators.required, Validators.min(0)]],
+    sellingPrice: [0, [Validators.required, Validators.min(0)]],
+    unitOfMeasure: ['unit', Validators.required],
+    expirationDate: [''],
+    receivedDate: [''],
+  });
 
   constructor(
     private companyService: CompanyService,
@@ -37,133 +59,83 @@ export class UpdateProductComponent implements OnInit {
     private supplierService: SupplierService,
     private recipeService: RecipesService,
     private modalService: ModalService
-  ) {
-    if (this.authService.role == 'admin') {
-      this.activatedRoute.params.subscribe((params) => {
-        this.id = params['id'];
-        this.getProduct(this.id);
-        this.loadCategories();
-        this.loadSuppliers();
-        this.loadRecipes();
-      });
-    } else if (this.authService.role == 'sysadmin') {
-      this.activatedRoute.params.subscribe((params) => {
-        this.id = params['id'];
-        this.productService
-          .getProduct(this.id)
-          .pipe(
-            map((item) => {
-              return item.product;
-            })
-          )
-          .subscribe((product) => {
-            this.product = product!;
-            this.isComposite = this.product.isComposite;
-            this.loadCategories();
-            this.loadSuppliers();
-            this.loadRecipes();
-            this.productForm.setValue({
-              categories: this.product.categories!,
-              name: this.product.name,
-              description: this.product.description,
-              brand: this.product.brand,
-              supplier: this.product.supplier,
-              isComposite: this.product.isComposite,
-              recipe: this.product.recipe || '',
-            });
-          });
-      });
-    }
-  }
-
-  productForm: FormGroup = this.fb.group({
-    categories: [[], Validators.required],
-    name: ['', Validators.required],
-    description: ['', Validators.required],
-    brand: ['', Validators.required],
-    supplier: ['', Validators.required],
-    isComposite: [false, Validators.required],
-    recipe: [''],
-  });
+  ) {}
 
   ngOnInit(): void {
-    this.companyService
-      .getCompanies()
-      .pipe(
-        map((item) => {
-          return item.companies;
-        })
-      )
-      .subscribe((empresas) => {
-        this.empresas = empresas!;
-      });
+    this.activatedRoute.params.subscribe((params) => {
+      this.id = params['id'];
+      this.loadProductData();
+      this.loadCategories();
+      this.loadSuppliers();
+      this.loadRecipes();
+    });
+
+    this.loadCompanies();
+  }
+
+  loadCompanies() {
+    this.companyService.getCompanies()
+      .pipe(map(res => res.companies))
+      .subscribe(empresas => this.empresas = empresas!);
   }
 
   loadCategories() {
-    this.categoryService
-      .getCompanyCategories(this.authService.companyId)
-      .pipe(
-        map((item) => {
-          return item.categories;
-        })
-      )
-      .subscribe((categories) => {
-        this.Categories = categories!;
-      });
+    this.categoryService.getCompanyCategories(this.authService.companyId)
+      .pipe(map(res => res.categories))
+      .subscribe(categories => this.Categories = categories!);
   }
 
   loadSuppliers() {
-    this.supplierService
-      .getCompanySuppliers(this.authService.companyId)
-      .pipe(
-        map((item) => {
-          console.log(item);
-          return item.suppliers;
-        })
-      ) 
-      .subscribe((suppliers) => {
-        
-        this.suppliers = suppliers!;
-      });
+    this.supplierService.getCompanySuppliers(this.authService.companyId)
+      .pipe(map(res => res.suppliers))
+      .subscribe(suppliers => this.suppliers = suppliers!);
   }
 
   loadRecipes() {
-    this.recipeService
-      .getCompanyRecipes(this.authService.companyId)
-      .pipe(
-        map((item) => {
-          return item.recipes;
-        })
-      )
-      .subscribe((recipes) => {
-        this.recipes = recipes!;
-      });
+    this.recipeService.getCompanyRecipes(this.authService.companyId)
+      .pipe(map(res => res.recipes))
+      .subscribe(recipes => this.recipes = recipes!);
   }
 
-  getProduct(id: string) {
-    return this.productService
-      .getProduct(id)
-      .pipe(
-        map((item) => {
-          return item.product;
-        })
-      )
-      .subscribe((product) => {
-        this.product = product!;
+  loadProductData() {
+    this.productService.getProduct(this.id).subscribe({
+      next: (res: any) => {
+        if (!res.product) return;
+        this.product = res.product;
+        this.inventoryItem = res.inventoryItem;
         this.isComposite = this.product.isComposite;
-        console.log(product);
-        this.productForm.setValue({
-          categories: this.product.categories!,
+
+        // Poblar formulario con datos combinados
+        this.productForm.patchValue({
+          categories: this.product.categories?.map((c: any) => typeof c === 'object' ? c._id : c) || [],
           name: this.product.name,
           description: this.product.description,
           brand: this.product.brand,
-          supplier: this.product.supplier._id,
+          supplier: typeof this.product.supplier === 'object' ? this.product.supplier._id : this.product.supplier,
           isComposite: this.product.isComposite,
-          recipe: this.product.recipe || null,
+          recipe: this.product.recipe || '',
+          // Datos de Inventario
+          barCode: this.inventoryItem?.barCode || '',
+          stock: this.inventoryItem?.stock || 0,
+          costPrice: this.inventoryItem?.costPrice || 0,
+          sellingPrice: this.inventoryItem?.sellingPrice || 0,
+          unitOfMeasure: this.inventoryItem?.unitOfMeasure || 'unit',
+          expirationDate: this.inventoryItem?.expirationDate ? this.inventoryItem.expirationDate.split('T')[0] : '',
+          receivedDate: this.inventoryItem?.receivedDate ? this.inventoryItem.receivedDate.split('T')[0] : '',
         });
-      });
+
+        // Bloquear campos inmutables
+        this.productForm.get('isComposite')?.disable();
+        this.productForm.get('recipe')?.disable();
+        this.productForm.get('stock')?.disable(); // El stock no se edita directamente
+      },
+      error: (err: any) => console.error('Error loading product', err)
+    });
   }
 
+  setTab(tab: 'catalog' | 'inventory') {
+    this.activeTab = tab;
+  }
   onIsCompositeChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value === 'true';
     this.isComposite = value;
@@ -186,8 +158,8 @@ export class UpdateProductComponent implements OnInit {
         if (result.isConfirmed) {
           this.productService
             .updateProduct(this.product._id!, this.productForm.value)
-            .subscribe(
-              (response) => {
+            .subscribe({
+              next: (response: any) => {
                 Swal.fire(
                   '¡Actualizado!',
                   'El producto ha sido actualizado correctamente.',
@@ -199,7 +171,7 @@ export class UpdateProductComponent implements OnInit {
                   this.router.navigateByUrl(`/dashboard/sysadmin/companies`);
                 }
               },
-              (error) => {
+              error: (error: any) => {
                 console.error('Error al actualizar producto', error);
                 Swal.fire(
                   '¡Error!',
@@ -207,7 +179,7 @@ export class UpdateProductComponent implements OnInit {
                   'error'
                 );
               }
-            );
+            });
         }
       });
     }

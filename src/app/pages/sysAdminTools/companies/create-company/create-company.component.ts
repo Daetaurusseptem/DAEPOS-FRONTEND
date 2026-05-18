@@ -26,7 +26,8 @@ export class CreateCompanyComponent implements OnInit {
     tel: '',
     email: '',
     createdAt: new Date(), 
-    SuscriptionsHistory: [] 
+    SuscriptionsHistory: [],
+    saleType: 'retail'
   };
 
   constructor(

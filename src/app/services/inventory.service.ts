@@ -18,16 +18,20 @@ export class InventoryService {
     private authService: AuthService,
   ) { }
 
-  getInventory(companyId: string, search: string = '', type: 'all' | 'product' | 'raw_material' = 'all'): Observable<InventoryResponse> {
-    const params = { search, type };
+  getInventory(companyId: string, search: string = '', type: 'all' | 'product' | 'raw_material' = 'all', branchId?: string): Observable<InventoryResponse> {
+    const params: any = { search, type };
+    if (branchId) params.branchId = branchId;
+    
     return this.http.get<InventoryResponse>(`${urlBase}/company/${companyId}`, { 
       params,
       ...this.authService.headers
     });
   }
 
-  getInventoryByCategory(category: string, search: string = '', page: number = 1, limit: number = 10, companyId?: string): Observable<InventoryResponse> {
-    const params = { category, search, page: page.toString(), limit: limit.toString() };
+  getInventoryByCategory(category: string, search: string = '', page: number = 1, limit: number = 10, companyId?: string, branchId?: string): Observable<InventoryResponse> {
+    const params: any = { category, search, page: page.toString(), limit: limit.toString() };
+    if (branchId) params.branchId = branchId;
+
     const cid = companyId || this.authService.companyId;
     return this.http.get<InventoryResponse>(`${urlBase}/by-category/${cid}`, { 
       params,
@@ -53,5 +57,9 @@ export class InventoryService {
 
   processSale(saleData: any): Observable<InventoryResponse> {
     return this.http.post<InventoryResponse>(`${urlBase}/process-sale`, saleData, this.authService.headers);
+  }
+
+  getStockByProductAndBranch(productId: string, branchId: string, companyId: string): Observable<any> {
+    return this.http.get(`${urlBase}/stock/${companyId}/${branchId}/${productId}`, this.authService.headers);
   }
 }

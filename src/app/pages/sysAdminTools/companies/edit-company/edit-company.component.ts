@@ -23,7 +23,8 @@ companyForm:FormGroup = this.fb.group({
   description: ['',Validators.required],
   address: ['',Validators.required],
   tel: ['',Validators.required],
-  email: ['',Validators.required]
+  email: ['',Validators.required],
+  saleType: ['', Validators.required]
 }
 );
 
@@ -55,8 +56,8 @@ companyForm:FormGroup = this.fb.group({
                       description:this.company.description,
                       address:this.company.address,
                       tel:this.company.tel,
-                      email:this.company.email
-
+                      email:this.company.email,
+                      saleType: this.company.saleType
                     })
                   })
                   

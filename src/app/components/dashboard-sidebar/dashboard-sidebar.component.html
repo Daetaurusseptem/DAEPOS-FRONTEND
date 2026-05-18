@@ -3,9 +3,15 @@
   <!-- Logo y Título -->
   <div class="sidebar-header">
     <a class="logo" title="DaePoint">
-      <img src="assets/svg/DAEPOS_LOGO.svg" alt="DaePoint Logo" class="brand-logo">
-      <span *ngIf="!isCollapsed">DaePoint</span>
+      <img [src]="isCollapsed ? 'assets/svg/DAEPOS_LOGO_solo.svg' : 'assets/svg/DAEPOS_LOGO_WITH_TEXT.svg'" 
+           alt="DaePoint Logo" 
+           class="brand-logo"
+           [class.with-text]="!isCollapsed">
     </a>
+  </div>
+
+  <!-- Botón de Toggle separado -->
+  <div class="toggle-container">
     <button class="toggle-btn" (click)="toggleSidebar()" [title]="isCollapsed ? 'Expandir' : 'Colapsar'">
       <i class="bi bi-list"></i>
     </button>

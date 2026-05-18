@@ -40,4 +40,12 @@ export class StatisticsService {
 
     return this.http.get<any>(`${this.baseUrl}/ingredients-statistics`, { params });
   }
+
+  getDashboardSummary(companyId: string, branchId?: string): Observable<any> {
+    let params = new HttpParams().set('companyId', companyId);
+    if (branchId) {
+      params = params.set('branchId', branchId);
+    }
+    return this.http.get<any>(`${this.baseUrl}/summary`, { params });
+  }
 }

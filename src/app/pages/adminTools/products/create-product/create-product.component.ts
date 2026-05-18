@@ -55,7 +55,13 @@ export class CreateProductComponent implements OnInit {
       supplier: ['', Validators.required],
       categories: [[], Validators.required],
       isComposite: [false, Validators.required],
-      recipe: ['']
+      recipe: [''],
+      // Campos de Inventario Unificados
+      barCode: [''],
+      stock: [0, [Validators.required, Validators.min(0)]],
+      costPrice: [0, [Validators.required, Validators.min(0)]],
+      sellingPrice: [0, [Validators.required, Validators.min(0)]],
+      unitOfMeasure: ['unit', Validators.required]
     });
 
     this.loadCategories();
@@ -74,7 +80,7 @@ export class CreateProductComponent implements OnInit {
   loadCategories() {
     this.categoryService.getCompanyCategories(this.companyId)
       .pipe(map(item => item.categories))
-      .subscribe(categories => {
+      .subscribe((categories: any) => {
         this.Categories = categories!;
       });
   }
@@ -82,7 +88,7 @@ export class CreateProductComponent implements OnInit {
   loadSuppliers() {
     this.supplierService.getCompanySuppliers(this.companyId)
       .pipe(map(item => item.suppliers))
-      .subscribe(suppliers => {
+      .subscribe((suppliers: any) => {
         this.suppliers = suppliers!;
       });
   }
@@ -90,7 +96,7 @@ export class CreateProductComponent implements OnInit {
   loadRecipes() {
     this.recipeService.getCompanyRecipes(this.companyId)
       .pipe(map(item => item.recipes))
-      .subscribe(recipes => {
+      .subscribe((recipes: any) => {
         this.recipes = recipes!;
       });
   }
@@ -118,8 +124,8 @@ export class CreateProductComponent implements OnInit {
           if (!this.isComposite || !formValue.recipe) {
             delete formValue.recipe;
           }
-          this.productService.createProduct(this.authService.companyId!, formValue).subscribe(
-            r => {
+          this.productService.createProduct(this.companyId, formValue).subscribe({
+            next: (r: any) => {
               if (r.ok) {
                 Swal.fire('Registro Guardado', '', 'success');
                 this.router.navigate(['/dashboard/admin/products']);
@@ -127,11 +133,11 @@ export class CreateProductComponent implements OnInit {
                 Swal.fire('Registro No Guardado', '', 'error');
               }
             },
-            error => {
+            error: (error: any) => {
               console.error('Error al crear producto', error);
               Swal.fire('Error', 'Hubo un problema al crear el producto', 'error');
             }
-          );
+          });
         }
       });
     }

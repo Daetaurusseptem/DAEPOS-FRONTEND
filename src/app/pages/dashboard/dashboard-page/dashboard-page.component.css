@@ -52,15 +52,18 @@
   font-size: 1.5rem;
 }
 
-.icon-blue { background: rgba(67, 97, 238, 0.1); color: var(--primary); }
-.icon-purple { background: rgba(114, 9, 183, 0.1); color: var(--secondary); }
-.icon-green { background: rgba(76, 201, 240, 0.1); color: var(--success); }
+.icon-blue, .icon-purple, .icon-green { 
+  background: var(--bg-ghost); 
+  color: var(--text-main); 
+  border: 1px solid var(--border-color);
+}
 
 .stat-info .number {
   display: block;
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
 .stat-info .label {
@@ -101,8 +104,8 @@
 }
 
 .action-card:hover {
-  border-color: var(--primary);
-  background-color: rgba(67, 97, 238, 0.02);
+  border-color: var(--text-main);
+  background-color: var(--bg-ghost);
 }
 
 .action-header {
@@ -115,7 +118,7 @@
 
 .action-header i {
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--text-main);
 }
 
 .action-card p {
@@ -128,7 +131,7 @@
 .btn-action {
   margin-top: auto;
   align-self: flex-start;
-  color: var(--primary);
+  color: var(--text-main);
   font-weight: 600;
   font-size: 0.85rem;
   display: flex;

@@ -1,131 +1,187 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { User } from 'src/app/interfaces/models.interface';
+import { User, Branch, UserRole } from 'src/app/interfaces/models.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { UsersService } from 'src/app/services/users.service';
+import { BranchService } from 'src/app/services/branch.service';
 import Swal from 'sweetalert2';
-
-// Importar otros servicios o módulos según sea necesario
-const pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-const control = new FormControl('bad@', Validators.email);
 
 @Component({
   selector: 'app-user-edit',
   templateUrl: './edit-user.component.html',
   styleUrls: ['./edit-user.component.css']
 })
-export class UserEditComponent {
-
+export class UserEditComponent implements OnInit {
   user!: User;
   id: string = '';
+  userRole!: UserRole;
+  companyId!: string;
+  branches: Branch[] = [];
 
-
+  availablePermissions = [
+    { id: 'inventory_management', name: 'Gestión de Inventario' },
+    { id: 'sales_reports', name: 'Ver Reportes de Ventas' },
+    { id: 'customer_management', name: 'Gestión de Clientes' }
+  ];
 
   userForm: FormGroup = this.fb.group({
-    name: ['', Validators.required], // Inicializa con un string vacío o datos existentes
+    name: ['', Validators.required],
     username: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]]
-    
-  }
-  );
+    email: ['', [Validators.required, Validators.email]],
+    password: [''], // Opcional, solo si desea cambiarla
+    role: ['user', Validators.required],
+    branch: ['']
+  });
 
   constructor(
     private userService: UsersService,
     private activatedRoute: ActivatedRoute,
     private authService: AuthService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private branchService: BranchService
   ) {
+    this.userRole = this.authService.role;
+    this.companyId = this.authService.companyId || '';
+  }
+
+  ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
       this.id = params['id'];
       this.getUser(this.id);
-    })
+    });
+
+    if (this.userRole === 'companyAdmin' || this.userRole === 'sysadmin') {
+      this.loadBranches();
+    }
+  }
+
+  loadBranches() {
+    // Si es sysadmin, es posible que necesitemos la compañía del usuario a editar.
+    // Para simplificar, cargamos las sucursales cuando sepamos la compañía del usuario.
+    if (this.companyId) {
+      this.branchService.getBranchesByCompany(this.companyId).subscribe({
+        next: (resp: any) => {
+          if (resp.ok) {
+            this.branches = resp.branches;
+          }
+        }
+      });
+    }
+  }
+
+  loadBranchesForCompany(compId: string) {
+    this.branchService.getBranchesByCompany(compId).subscribe({
+      next: (resp: any) => {
+        if (resp.ok) {
+          this.branches = resp.branches;
+        }
+      }
+    });
   }
 
   getUser(id: string) {
-    console.log(this.authService.usuario);
-    if(this.authService.usuario.role == 'admin'){
-      return this.userService.getUserByIdAdminCompany(id)
-        .pipe(
-          map(item => {
-            console.log(item);
-            return item.user
-          })
-        )
-        .subscribe(user => {
-          console.log(user);
-          
-          this.user = user!;
-          this.userForm.setValue({
-            name: this.user.name,
-            username: this.user.username,
-            email: this.user.email
-  
-          })
-        })
+    const userOb$ = this.userRole === 'admin' 
+      ? this.userService.getUserByIdAdminCompany(id) 
+      : this.userService.getUserById(id);
 
-    }
-    return this.userService.getUserById(id)
-      .pipe(
-        map(item => {
-          console.log(item);
-          return item.user
-        })
-      )
-      .subscribe(user => {
-        console.log(user);
-        
+    userOb$.pipe(
+      map(item => item.user)
+    ).subscribe({
+      next: (user) => {
         this.user = user!;
-        this.userForm.setValue({
+        
+        // Si no tiene permisos definidos, inicializar vacío
+        if (!this.user.permissions) {
+          this.user.permissions = [];
+        }
+
+        // Si es sysadmin, podemos cargar las sucursales de la compañía del usuario que estamos editando
+        if (this.userRole === 'sysadmin' && this.user.companyId) {
+          this.loadBranchesForCompany(this.user.companyId);
+        }
+
+        // Extraer id de sucursal si viene poblada como objeto
+        const branchId = this.user.branch 
+          ? (typeof this.user.branch === 'object' ? (this.user.branch as any)._id : this.user.branch) 
+          : '';
+
+        this.userForm.patchValue({
           name: this.user.name,
           username: this.user.username,
-          email: this.user.email
-
-        })
-      })
-
+          email: this.user.email,
+          role: this.user.role || 'user',
+          branch: branchId
+        });
+      },
+      error: (err) => {
+        console.error('Error al cargar el usuario:', err);
+        Swal.fire('Error', 'No se pudo cargar el usuario', 'error');
+      }
+    });
   }
 
+  togglePermission(permId: string) {
+    if (!this.user.permissions) {
+      this.user.permissions = [];
+    }
+    const idx = this.user.permissions.indexOf(permId);
+    if (idx === -1) {
+      this.user.permissions.push(permId);
+    } else {
+      this.user.permissions.splice(idx, 1);
+    }
+  }
 
   updateUser() {
     if (this.userForm.valid) {
-      console.log('Usuario actualizada:', this.userForm.value);
-      // Aquí iría el código para enviar los datos actualizados a un servicio o backend
+      const formValue = { ...this.userForm.value };
+      
+      // Si la contraseña está vacía, no la enviamos para no sobreescribirla
+      if (!formValue.password || formValue.password.trim() === '') {
+        delete formValue.password;
+      }
 
+      const payload = {
+        ...formValue,
+        permissions: this.user.permissions || []
+      };
 
       Swal.fire({
-        title: 'estas seguro?',
+        title: '¿Estás seguro?',
+        text: 'Se actualizarán los datos del usuario.',
         icon: 'question',
         showCancelButton: true,
-        cancelButtonColor: '#F176B7'
-      })
-        .then(resp => {
-    
-
-          if (resp.isConfirmed) {
-            this.userService.updateUser(this.user._id!, this.userForm.value)
-              .subscribe(r => {
-                if (this.authService.usuario.role === 'sysadmin') {
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, guardar',
+        cancelButtonText: 'Cancelar'
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.userService.updateUser(this.user._id!, payload).subscribe({
+            next: () => {
+              Swal.fire('Guardado', 'El usuario ha sido actualizado correctamente.', 'success').then(() => {
+                if (this.userRole === 'sysadmin') {
                   this.router.navigateByUrl('/dashboard/sysadmin/users');
-                } else if (this.authService.usuario.role === 'admin') {
-                  this.router.navigateByUrl(`/dashboard/admin/users/edit/${this.id}`);
+                } else {
+                  this.router.navigateByUrl('/dashboard/admin/users');
                 }
-                
-              })
-          }
-        })
-        .catch(r => { return })
-
+              });
+            },
+            error: (err) => {
+              console.error('Error al actualizar el usuario:', err);
+              Swal.fire('Error', err.error?.msg || 'Hubo un problema al actualizar el usuario.', 'error');
+            }
+          });
+        }
+      });
     }
   }
 
   campoNoValidoDatosUsuario(campo: string): boolean {
-    if (this.userForm.get(campo)?.invalid) {
-      return true;
-    } else {
-      return false;
-    }
+    const control = this.userForm.get(campo);
+    return control ? control.invalid && control.touched : false;
   }
 }

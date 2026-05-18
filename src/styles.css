@@ -1,24 +1,31 @@
-/* Design System - POS Professional */
 :root {
-  --primary: #4361ee;
-  --primary-hover: #3a56d4;
-  --secondary: #7209b7;
-  --success: #2ec4b6;
-  --danger: #e63946;
+  /* Colors - Achromatic Scale */
+  --primary: #000000;
+  --primary-hover: #1a1a1a;
+  --secondary: #737373;
+  --success: #10c22b;
+  --danger: #c22b10;
   --warning: #ff9f1c;
-  --dark: #1a1c23;
-  --light: #f8f9fa;
-  --bg-main: #f0f2f5;
+  --dark: #0a0a0a;
+  --light: #ffffff;
+  
+  --bg-main: #ffffff; /* Canvas White */
+  --bg-ghost: #f2f2f2; /* Ghost Gray */
   --card-bg: #ffffff;
-  --text-main: #1e293b; /* Más oscuro para mejor lectura */
-  --text-muted: #64748b; /* Gris medio para descripciones */
-  --border-color: #e2e8f0;
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --text-main: #0a0a0a; /* Rich Black */
+  --text-muted: #737373; /* Midtone Gray */
+  --border-color: #e5e5e5; /* Subtle Ash */
+  
+  /* Radii */
+  --radius-sm: 10px;    /* buttons/inputs */
+  --radius-md: 14px;    /* cards */
+  --radius-lg: 9999px;  /* pill */
+  
+  /* Shadows - Minimalist */
+  --shadow-sm: 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
+  
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');

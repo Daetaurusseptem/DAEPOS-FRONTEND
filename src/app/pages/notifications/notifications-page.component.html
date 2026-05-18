@@ -1,0 +1,133 @@
+<div class="notifications-page-container container py-4 animate__animated animate__fadeIn">
+  
+  <!-- Encabezado de la página -->
+  <header class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1 text-dark">Bandeja de Notificaciones</h1>
+      <p class="text-muted mb-0">Revisa las alertas, reabastecimientos programados y tareas críticas del sistema.</p>
+    </div>
+    
+    <div class="d-flex align-items-center gap-2">
+      <!-- Botón refrescar -->
+      <button class="btn btn-outline-dark btn-sm rounded-pill px-3 py-2 border-light-subtle d-flex align-items-center gap-1.5 shadow-sm"
+              (click)="loadNotifications()">
+        <i class="bi bi-arrow-clockwise"></i> Refrescar
+      </button>
+      
+      <!-- Botón marcar todo como leído -->
+      <button class="btn btn-dark btn-sm rounded-pill px-4 py-2 border-0 shadow-sm d-flex align-items-center gap-1.5"
+              *ngIf="unreadCount > 0"
+              style="background-color: #000 !important;"
+              (click)="markAllAsRead()">
+        <i class="bi bi-check-all text-white-50"></i> Marcar todas como leídas
+      </button>
+    </div>
+  </header>
+
+  <!-- Filtros / Pestañas estilo Stark -->
+  <div class="card border border-light-subtle shadow-sm rounded-4 bg-white mb-4">
+    <div class="card-header bg-white border-0 px-4 py-3 d-flex justify-content-between align-items-center">
+      <div class="d-flex gap-2">
+        <button class="filter-tab-btn px-3 py-2 border-0 bg-transparent rounded-pill small fw-semibold text-secondary transition-all"
+                [class.active]="activeFilter === 'all'"
+                (click)="setFilter('all')">
+          Todas las notificaciones
+          <span class="badge bg-light text-dark border border-light-subtle ms-1.5 px-2 py-0.5 rounded-pill fs-9 fw-bold">
+            {{ notifications.length }}
+          </span>
+        </button>
+        <button class="filter-tab-btn px-3 py-2 border-0 bg-transparent rounded-pill small fw-semibold text-secondary transition-all position-relative"
+                [class.active]="activeFilter === 'unread'"
+                (click)="setFilter('unread')">
+          Sin leer
+          <span class="badge bg-dark text-white ms-1.5 px-2 py-0.5 rounded-pill fs-9 fw-bold" *ngIf="unreadCount > 0">
+            {{ unreadCount }}
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinner de Carga -->
+  <div class="text-center py-5" *ngIf="isLoading">
+    <app-loading-data-spinner></app-loading-data-spinner>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div *ngIf="!isLoading">
+    
+    <!-- Estado Vacío -->
+    <div class="card border border-light-subtle shadow-sm rounded-4 bg-white text-center py-5 px-4" 
+         *ngIf="getFilteredNotifications().length === 0">
+      <div class="py-4">
+        <div class="empty-icon-circle bg-light text-muted d-flex align-items-center justify-content-center rounded-circle mx-auto mb-3"
+             style="width: 64px; height: 64px;">
+          <i class="bi bi-bell-slash fs-3"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-1">Bandeja de entrada limpia</h5>
+        <p class="text-muted small mb-0">No tienes ninguna notificación pendiente en este filtro.</p>
+      </div>
+    </div>
+
+    <!-- Lista de Notificaciones -->
+    <div class="d-flex flex-column gap-3" *ngIf="getFilteredNotifications().length > 0">
+      <div *ngFor="let notif of getFilteredNotifications()"
+           class="card border border-light-subtle shadow-sm rounded-4 bg-white notif-row transition-all position-relative overflow-hidden cursor-pointer"
+           [class.unread-row]="!notif.isRead"
+           (click)="handleNotificationClick(notif)">
+        
+        <div class="card-body p-4 d-flex align-items-start gap-4">
+          <!-- Icono Badge -->
+          <div class="icon-circle d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 shadow-sm"
+               [class.bg-info-soft]="notif.type === 'info'"
+               [class.text-info]="notif.type === 'info'"
+               [class.bg-success-soft]="notif.type === 'success'"
+               [class.text-success]="notif.type === 'success'"
+               [class.bg-warning-soft]="notif.type === 'warning'"
+               [class.text-warning]="notif.type === 'warning'"
+               [class.bg-danger-soft]="notif.type === 'error'"
+               [class.text-danger]="notif.type === 'error'"
+               style="width: 44px; height: 44px;">
+            <i class="bi fs-5" 
+               [class.bi-info-circle-fill]="notif.type === 'info'"
+               [class.bi-check-circle-fill]="notif.type === 'success'"
+               [class.bi-exclamation-triangle-fill]="notif.type === 'warning'"
+               [class.bi-x-circle-fill]="notif.type === 'error'"></i>
+          </div>
+
+          <!-- Contenido -->
+          <div class="flex-grow-1 min-w-0">
+            <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between gap-2 mb-1.5">
+              <h5 class="fw-bold mb-0 text-dark fs-6 d-flex align-items-center gap-2">
+                {{ notif.title }}
+                <span class="badge bg-dark text-white rounded-pill px-2 py-0.5 fs-9 fw-bold" *ngIf="!notif.isRead">
+                  NUEVO
+                </span>
+              </h5>
+              <span class="text-muted small font-monospace">{{ notif.createdAt | date:'medium' }}</span>
+            </div>
+            
+            <p class="text-secondary small mb-3 message-text-full">{{ notif.message }}</p>
+            
+            <div class="d-flex align-items-center justify-content-between">
+              <!-- Enlace Accionable -->
+              <span class="action-link-btn d-flex align-items-center gap-1 small fw-bold text-dark" *ngIf="notif.link">
+                Ir a la acción <i class="bi bi-arrow-right small"></i>
+              </span>
+              
+              <!-- Botón rápido para marcar como leído individualmente -->
+              <button class="btn btn-outline-dark btn-xs rounded-pill px-3 py-1 border-light-subtle text-secondary small-btn ms-auto"
+                      *ngIf="!notif.isRead"
+                      (click)="markAsRead(notif, $event)">
+                Marcar como leída
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

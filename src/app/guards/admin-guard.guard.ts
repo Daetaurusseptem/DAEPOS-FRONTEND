@@ -16,7 +16,7 @@ canActivate(
 route: ActivatedRouteSnapshot,
 state: RouterStateSnapshot):  boolean  {
   console.log(this.authService.role);
-    if (this.authService.role === 'admin' || this.authService.role === 'sysadmin') {
+    if (this.authService.role === 'admin' || this.authService.role === 'sysadmin' || this.authService.role === 'companyAdmin') {
       return true;
     } else if (this.authService.role === 'user') {
       this.router.navigateByUrl('/dashboard');

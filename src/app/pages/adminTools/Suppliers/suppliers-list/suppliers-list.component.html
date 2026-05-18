@@ -42,7 +42,7 @@
                             <div class="supplier-name">{{ supplier.name || 'No Especificado' }}</div>
                         </td>
                         <td class="text-muted small">
-                            {{ supplier.description || 'Sin descripción' | slice:0:80 }}{{ (supplier.description?.length || 0) > 80 ? '...' : '' }}
+                            {{ supplier.description || 'Sin descripción' | slice:0:80 }}{{ (supplier.description.length || 0) > 80 ? '...' : '' }}
                         </td>
                         <td>
                             <span class="phone-badge">
@@ -52,6 +52,11 @@
                         </td>
                         <td>
                             <div class="actions-cell">
+                                <button class="btn btn-light btn-sm text-dark me-1" 
+                                        [routerLink]="['/dashboard/admin/suppliers/details', supplier._id]"
+                                        title="Ver Ficha">
+                                    <i class="bi bi-eye-fill text-secondary"></i>
+                                </button>
                                 <button class="btn btn-light btn-sm" 
                                         [routerLink]="['/dashboard/admin/suppliers/edit', supplier._id]"
                                         title="Editar">

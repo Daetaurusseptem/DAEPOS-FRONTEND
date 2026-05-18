@@ -38,8 +38,14 @@ export class UsersService {
     return this.http.get<InventoryResponse>(`${urlApiUsers}/company/admin/${id}`, this.authService.headers);
   }
 
-  getAllNonAdminUsersOfCompany(adminId: string, page: number = 1, limit: number = 10, search: string = ''): Observable<any> {
-    const url = `${urlApiUsers}/company/${adminId}?page=${page}&limit=${limit}&search=${search}`;
+  getAllNonAdminUsersOfCompany(adminId: string, page: number = 1, limit: number = 10, search: string = '', branchId: string = '', role: string = ''): Observable<any> {
+    let url = `${urlApiUsers}/company/${adminId}?page=${page}&limit=${limit}&search=${search}`;
+    if (branchId) {
+      url += `&branchId=${branchId}`;
+    }
+    if (role) {
+      url += `&role=${role}`;
+    }
     return this.http.get<any>(url, this.authService.headers);
   }
   getAllUsersOfCompany(userId:string) {

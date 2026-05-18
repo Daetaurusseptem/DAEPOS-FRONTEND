@@ -23,6 +23,7 @@ import { CreateProductComponent } from './adminTools/products/create-product/cre
 import { CreateSupplierComponent } from './adminTools/Suppliers/create-supplier/create-supplier.component';
 import { UpdateProductComponent } from './adminTools/products/update-product/update-product.component';
 import { UpdateSuppliersComponent } from './adminTools/Suppliers/update-suppliers/update-suppliers.component';
+import { SupplierDetailsComponent } from './adminTools/Suppliers/supplier-details/supplier-details.component';
 import { CreateCompanyCategoryComponent } from './adminTools/Categories/create-company-catregory/create-company-category.component';
 import { AddInventoryComponent } from './adminTools/inventory/add-inventory/add-inventory.component';
 import { OpenCashRegisterComponent } from './userTools/open-cash-register/open-cash-register.component';
@@ -38,6 +39,8 @@ import { CashRegisterComponent } from './userTools/cash-register/cash-register.c
 import { ConfirmSaleComponent } from './userTools/confirm-sale/confirm-sale.component';
 import { SuccessSaleComponent } from './userTools/success-sale/success-sale.component';
 import { CloseCashRegisterComponent } from './userTools/close-cash-register/close-cash-register.component';
+import { CreateStockTransferComponent } from './adminTools/inventory/transfers/create-transfer/create-transfer.component';
+import { StockTransferListComponent } from './adminTools/inventory/transfers/transfer-list/stock-transfer-list.component';
 import { DailySalesComponent } from './userTools/daily-sales/daily-sales.component';
 import { EditCategoryComponent } from './adminTools/Categories/edit-category/edit-category.component';
 import { InventoryAvailableComponent } from './userTools/inventory-available/inventory-available.component';
@@ -54,6 +57,10 @@ import { ManagePrintersComponent } from './adminTools/manage-printers/manage-pri
 import { UserCajasComponent } from '../components/user-cajas/user-cajas.component';
 import { FechaCajasComponent } from '../components/fecha-cajas/fecha-cajas.component';
 import { CajaDetailComponent } from '../components/caja-detail/caja-detail.component';
+import { BranchListComponent } from './adminTools/branches/branch-list/branch-list.component';
+import { BranchFormComponent } from './adminTools/branches/branch-form/branch-form.component';
+import { BranchAdminHomeComponent } from './adminTools/branch-admin-home/branch-admin-home.component';
+import { NotificationsPageComponent } from './notifications/notifications-page.component';
 
 const routes: Routes = [
   {
@@ -64,6 +71,7 @@ const routes: Routes = [
       { path: '', component: DashboardPageComponent, canActivate: [RoleGuard] },
       { path: 'overview', component: OverviewComponent },
       { path: 'reports', component: ReportsComponent },
+      { path: 'notifications', component: NotificationsPageComponent },
       //SYSADMIN
       { path: 'sysadmin/users', canActivate: [SysAdminGuard], component: UserListComponent },
       { path: 'sysadmin/users/edit/:id', canActivate: [SysAdminGuard], component: UserEditComponent },
@@ -98,6 +106,7 @@ const routes: Routes = [
       { path: 'admin/suppliers', canActivate: [AdminGuard], component: SuppliersListComponent },
       { path: 'admin/suppliers/new/:id', canActivate: [AdminGuard], component: CreateSupplierComponent },
       { path: 'admin/suppliers/edit/:id', canActivate: [AdminGuard], component: UpdateSuppliersComponent },
+      { path: 'admin/suppliers/details/:id', canActivate: [AdminGuard], component: SupplierDetailsComponent },
       { path: 'admin/categories', canActivate: [AdminGuard], component: CategoriesListComponent },
       { path: 'admin/edit-category/:id', canActivate: [AdminGuard], component: EditCategoryComponent },
       { path: 'admin/categories/new/:id', canActivate: [AdminGuard], component: CreateCompanyCategoryComponent },
@@ -105,6 +114,8 @@ const routes: Routes = [
       { path: 'admin/items', canActivate: [AdminGuard], component: InventoryStockListComponent },
       { path: 'admin/inventory/new', canActivate: [AdminGuard], component: AddInventoryComponent },
       { path: 'admin/inventory/update/:id', canActivate: [AdminGuard], component: UpdateInventoryComponent },
+      { path: 'admin/inventory/transfers/new', canActivate: [AdminGuard], component: CreateStockTransferComponent },
+      { path: 'admin/inventory/transfers', canActivate: [AdminGuard], component: StockTransferListComponent },
       { path: 'admin/recipes', canActivate: [AdminGuard], component: RecipeListComponent },
       { path: 'admin/recipes/new', canActivate: [AdminGuard], component: CreateRecipeComponent },
       { path: 'admin/recipes/edit/:id', canActivate: [AdminGuard], component: EditRecipeComponent },
@@ -114,6 +125,11 @@ const routes: Routes = [
       { path: 'admin/raw-materials/edit/:id', component: EditRawMaterialComponent },
       { path: 'admin/statistics', component: StatisticsComponent },
       { path: 'admin/manage-printers', component: ManagePrintersComponent },
+      { path: 'admin/branches', canActivate: [AdminGuard], component: BranchListComponent },
+      { path: 'admin/branches/new', canActivate: [AdminGuard], component: BranchFormComponent },
+      { path: 'admin/branches/:id', canActivate: [AdminGuard], component: BranchAdminHomeComponent },
+      { path: 'admin/branches/edit/:id', canActivate: [AdminGuard], component: BranchFormComponent },
+      { path: 'branch', canActivate: [AdminGuard], component: BranchAdminHomeComponent },
       //USER
       { path: 'user', canActivate: [userGuard], component: UserHomeComponent },
       { path: 'user/new-sale', component: NewsaleComponent, canActivate: [AuthGuardGuard, userGuard] },

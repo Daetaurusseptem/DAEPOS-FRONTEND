@@ -1,0 +1,103 @@
+
+<div class="modal-overlay">
+  <div class="modal-content animate__animated animate__fadeInDown">
+    <div class="modal-header">
+      <h2>Importación Masiva CSV</h2>
+      <button class="close-btn" (click)="closeModal()">
+        <i class="fi fi-rr-cross"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Opciones -->
+      <div class="options-bar">
+        <div class="toggle-group">
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="autoCreateCategories">
+            <span class="slider round"></span>
+          </label>
+          <span class="toggle-label">Auto-crear categorías</span>
+        </div>
+
+        <div class="supplier-selector" *ngIf="suppliers.length > 0">
+          <label>Proveedor:</label>
+          <select [(ngModel)]="supplierId" class="geist-select">
+            <option *ngFor="let s of suppliers" [value]="s._id">{{ s.name }}</option>
+          </select>
+        </div>
+
+        <button class="ghost-btn" (click)="downloadTemplate()">
+          <i class="fi fi-rr-download"></i> Plantilla
+        </button>
+      </div>
+
+      <!-- Dropzone -->
+      <div *ngIf="parsedData.length === 0" 
+           class="dropzone" 
+           [class.dragover]="isDragging"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave($event)"
+           (drop)="onDrop($event)">
+        
+        <i class="fi fi-rr-document"></i>
+        <h3>Arrastra tu archivo CSV aquí</h3>
+        <p>o selecciona un archivo desde tu computadora</p>
+        
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept=".csv" style="display: none;">
+        <button class="primary-btn outline" (click)="fileInput.click()">Seleccionar Archivo</button>
+      </div>
+
+      <!-- Errores -->
+      <div class="error-alert" *ngIf="errors.length > 0">
+        <h4><i class="fi fi-rr-exclamation"></i> Errores encontrados:</h4>
+        <ul>
+          <li *ngFor="let err of errors.slice(0, 5)">{{ err }}</li>
+        </ul>
+        <span class="error-more" *ngIf="errors.length > 5">...y {{ errors.length - 5 }} errores más.</span>
+      </div>
+
+      <!-- Preview Table -->
+      <div class="preview-container" *ngIf="parsedData.length > 0">
+        <div class="preview-header">
+          <h3>Vista Previa ({{ parsedData.length }} productos)</h3>
+          <button class="ghost-btn small" (click)="parsedData = []; errors = []">Cancelar</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="geist-table">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Costo</th>
+                <th>Precio</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of parsedData.slice(0, 100)">
+                <td><span class="badge outline">{{ item.barCode }}</span></td>
+                <td class="fw-500">{{ item.name }}</td>
+                <td><span class="badge neutral">{{ item.categoryName || 'N/A' }}</span></td>
+                <td>${{ item.costPrice }}</td>
+                <td>${{ item.sellingPrice }}</td>
+                <td>{{ item.stock }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="preview-note" *ngIf="parsedData.length > 100">Mostrando solo los primeros 100 registros.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="ghost-btn" (click)="closeModal()" [disabled]="isProcessing">Cancelar</button>
+      <button class="primary-btn" 
+              (click)="uploadData()" 
+              [disabled]="parsedData.length === 0 || errors.length > 0 || isProcessing || !supplierId">
+        <span *ngIf="!isProcessing">Subir Inventario</span>
+        <span *ngIf="isProcessing"><i class="fi fi-rr-spinner-alt spin"></i> Procesando...</span>
+      </button>
+    </div>
+  </div>
+</div>

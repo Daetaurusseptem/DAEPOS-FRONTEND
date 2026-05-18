@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { Category, Product, Supplier, User, Company, InventoryItem } from 'src/app/interfaces/models.interface';
+import { Category, Product, Supplier, User, Company, InventoryItem, UserRole } from 'src/app/interfaces/models.interface';
 import { CompanyService } from 'src/app/services/company.service';
 import { UsersService } from 'src/app/services/users.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -30,7 +30,7 @@ export class CompanyDetailsComponent implements OnInit {
   totalItems: number = 0;
   currentPage: number = 1;
   adminId: string = '';
-  userRole!: 'admin' | 'sysadmin' | 'user';
+  userRole!: UserRole;
 
   itemsPerPage: number = 10;
   searchTerm: string = '';

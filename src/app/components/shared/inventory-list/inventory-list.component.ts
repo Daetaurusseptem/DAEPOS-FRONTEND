@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
-import { Product } from 'src/app/interfaces/models.interface';
+import { Product, UserRole } from 'src/app/interfaces/models.interface';
 import { ProductService } from 'src/app/services/product.service';
 import Swal from 'sweetalert2';
 
@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 export class InventoryListComponent implements OnInit {
 
   @Input() items: Product[] = [];
-  userRole!: 'admin' | 'sysadmin' | 'user';
+  userRole!: UserRole;
 
   constructor(
     private authService: AuthService,

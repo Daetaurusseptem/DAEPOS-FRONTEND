@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { SpinnerService } from '../services/spinner.service';
 import { SidebarService } from '../services/sidebar.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-pages',
@@ -10,11 +11,13 @@ import { SidebarService } from '../services/sidebar.service';
 })
 export class PagesComponent {
   isCollapsed: boolean = true;
+  currentDate: Date = new Date();
 
   constructor(
     private router: Router, 
     private spinnerService: SpinnerService,
-    private sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    public authService: AuthService
   ) {
     this.sidebarService.isCollapsed$.subscribe(collapsed => {
       this.isCollapsed = collapsed;

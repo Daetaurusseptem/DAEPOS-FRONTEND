@@ -1,70 +1,97 @@
+/* Estilos premium minimalistas basados en DESIGN.md */
+
 .main-container {
-    width: 150vh;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
 }
 
 .form-container {
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    margin-bottom: 30px;
+  width: 100%;
+  max-width: 600px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5 !important; /* Subtle Ash */
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.03) !important;
+  transition: all 0.3s ease;
 }
 
 .form-header {
-    background-color: #cdcdcd;
-    color: rgb(124, 125, 126);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: #000000 !important; /* Deep Black */
+  border-bottom: 1px solid #e5e5e5;
 }
 
-.form-title h2 {
-    font-size: 22px;
-    font-weight: 600;
-    margin: 0;
-    text-transform: uppercase;
+.form-title {
+  letter-spacing: -0.025em;
+  font-family: 'Geist', 'Inter', sans-serif;
 }
 
-.form-group {
-    padding: 20px;
+.premium-input, 
+.premium-select {
+  border-radius: 10px !important; /* Radius from DESIGN.md */
+  border: 1px solid #e5e5e5 !important; /* Subtle Ash */
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+  color: #0a0a0a !important; /* Rich Black */
+  background-color: #ffffff !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.form-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
+.premium-input:focus, 
+.premium-select:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
+  outline: none;
 }
 
-.form-input, .form-select {
-    width: 100%;
-    border: 1px solid #ced4da;
-    padding: 10px 14px;
-    border-radius: 4px;
-    font-size: 16px;
+.premium-input::placeholder {
+  color: #a1a1a1 !important;
+  font-size: 13px;
 }
 
-.form-button {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background-color 0.3s;
-    font-weight: 500;
-    cursor: pointer;
-    display: block;
-    margin: 20px auto;
-    text-align: center;
+.premium-switch {
+  width: 2.8em !important;
+  height: 1.5em !important;
+  cursor: pointer;
 }
 
-.form-button:hover {
-    background-color: #218838;
+.premium-switch:checked {
+  background-color: #000000 !important; /* Deep Black */
+  border-color: #000000 !important;
+}
+
+.premium-action-btn {
+  background-color: #000000 !important; /* Deep Black */
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  border: none !important;
+  font-size: 13px !important;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.premium-action-btn:hover {
+  background-color: #171717 !important;
+  transform: translateY(-1px);
+}
+
+.premium-action-btn:disabled {
+  background-color: #eaeaea !important;
+  color: #a1a1a1 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Clases auxiliares para spacing */
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+
+.tracking-tight {
+  letter-spacing: -0.025em;
+}
+
+.bg-light-subtle {
+  background-color: #f9f9f9 !important;
 }

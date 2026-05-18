@@ -1,4 +1,4 @@
-import { Company } from "../interfaces/models.interface";
+import { Company, UserRole } from "../interfaces/models.interface";
 
 export class UsuarioModel {
 
@@ -6,10 +6,11 @@ export class UsuarioModel {
         public id: string,
         public username: string,
         public name: string,
-        public role: 'user'|'admin'|'sysadmin',
+        public role: UserRole,
         public email: string,
         public img?: string,
         public password?: string,
-        public company?:Company
+        public company?:Company,
+        public permissions?: string[]
     ) {}
   }

@@ -21,14 +21,39 @@
             <label for="password" class="form-label">Contraseña</label>
             <input type="password" class="form-control" id="password" [(ngModel)]="user.password" name="password" required placeholder="Introduce la contraseña">
           </div>
-          <div class="mb-3" *ngIf="this.userRole=='sysadmin'">
+          <!-- Selector de Sucursal (Solo para Company Admin) -->
+          <div class="mb-3" *ngIf="userRole === 'companyAdmin'">
+            <label for="branch" class="form-label">Sucursal</label>
+            <select class="form-select" id="branch" [(ngModel)]="user.branch" name="branch" required>
+              <option value="" disabled selected>Selecciona una sucursal</option>
+              <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+            </select>
+          </div>
+
+          <!-- Selector de Rol (Para SysAdmin y Company Admin) -->
+          <div class="mb-3" *ngIf="userRole === 'sysadmin' || userRole === 'companyAdmin'">
             <label for="role" class="form-label">Rol</label>
             <select class="form-select" id="role" [(ngModel)]="user.role" name="role" required>
               <option value="" disabled selected>Selecciona un rol</option>
-              <option value="admin">Admin</option>
-              <option value="user">Usuario</option>
+              <option value="admin" *ngIf="userRole === 'sysadmin' || userRole === 'companyAdmin'">Administrador / Gerente</option>
+              <option value="user">Usuario / Cajero</option>
+              <option value="companyAdmin" *ngIf="userRole === 'sysadmin'">Dueño de Empresa</option>
             </select>
           </div>
+          <!-- Permisos Adicionales -->
+          <div class="mb-3">
+            <label class="form-label d-block fw-bold">Permisos Especiales</label>
+            <div class="form-check form-check-inline" *ngFor="let perm of availablePermissions">
+              <input class="form-check-input" type="checkbox" 
+                     [id]="perm.id" 
+                     [checked]="user.permissions?.includes(perm.id)"
+                     (change)="togglePermission(perm.id)">
+              <label class="form-check-label" [for]="perm.id">
+                {{ perm.name }}
+              </label>
+            </div>
+          </div>
+
           <div class="d-flex justify-content-between">
             <app-back-button></app-back-button>
             <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid">Crear Usuario</button>

@@ -2,6 +2,8 @@
 
 import { Provider } from "@angular/core";
 
+export type UserRole = 'admin' | 'user' | 'sysadmin' | 'companyAdmin';
+
 // User Interface
 export interface User {
   uid?: string;
@@ -11,9 +13,11 @@ export interface User {
   username: string;
   password: string;
   name?: string;
-  role: 'admin' | 'user' | 'sysadmin';
+  role: UserRole;
+  branch?: string | any;
   lastLogin?: Date;
   img?: string;
+  permissions?: string[];
 }
 
 export interface PaymentBreakdown {
@@ -46,6 +50,7 @@ export interface Company {
   email: string;
   createdAt: Date;
   SuscriptionsHistory: Suscription[];
+  saleType: 'retail' | 'hospitality';
 }
 
 export interface Suscription {
@@ -95,12 +100,14 @@ export interface Product {
   brand?: string;
   isComposite: boolean;
   recipe?: string;
+  status?: 'active' | 'pending_verification';
 }
 
 export interface InventoryItem {
   _id?: string;
   name: string;
   company: string;
+  branch?: string | any;
   supplier: string | Supplier;
   stock: number;
   costPrice: number;
@@ -152,4 +159,25 @@ export interface Recipe {
   description: string;
   company: string;
   rawMaterials: RecipeRawMaterial[];
+}
+
+export interface DashboardSummary {
+  totalSalesToday: number;
+  transactionsToday: number;
+  lowStockCount: number;
+  activeRegisters: number;
+  recentSales: Sale[];
+}
+
+export interface Branch {
+    _id?: string;
+    company: string | Company;
+    name: string;
+    address: string;
+    tel?: string;
+    email?: string;
+    manager?: string | User;
+    saleType?: 'retail' | 'hospitality';
+    createdAt?: Date;
+    isActive?: boolean;
 }

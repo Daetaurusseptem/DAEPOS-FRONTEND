@@ -1,0 +1,91 @@
+<div class="container-fluid p-4 animate__animated animate__fadeIn">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="h3 fw-bold mb-0">Historial de Traspasos</h1>
+                    <p class="text-muted">Registro de todos los movimientos de stock entre sucursales</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary px-4" routerLink="/dashboard/admin/inventory/transfers/new">
+                        <i class="bi bi-plus-circle-fill me-2"></i> Nuevo Traspaso
+                    </button>
+                    <button class="btn btn-outline-secondary" routerLink="/dashboard/admin/inventory">
+                        <i class="bi bi-arrow-left me-2"></i> Volver
+                    </button>
+                </div>
+            </div>
+
+            <!-- List Card -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Fecha</th>
+                                <th>Producto</th>
+                                <th>Origen</th>
+                                <th>Destino</th>
+                                <th class="text-center">Cantidad</th>
+                                <th>Responsable</th>
+                                <th>Estado</th>
+                                <th class="pe-4">Notas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let t of transfers" class="align-middle">
+                                <td class="ps-4">
+                                    <div class="small fw-semibold">{{ t.createdAt | date:'medium' }}</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">{{ t.product?.name }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill">
+                                        <i class="bi bi-geo-alt me-1"></i> {{ t.fromBranch?.name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success rounded-pill">
+                                        <i class="bi bi-geo-alt-fill me-1"></i> {{ t.toBranch?.name }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="fw-bold fs-5 text-main">{{ t.quantity }}</span>
+                                </td>
+                                <td>
+                                    <div class="small">{{ t.createdBy?.name }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info">
+                                        {{ t.status | uppercase }}
+                                    </span>
+                                </td>
+                                <td class="pe-4">
+                                    <small class="text-muted">{{ t.notes || 'Sin notas' }}</small>
+                                </td>
+                            </tr>
+
+                            <!-- Empty State -->
+                            <tr *ngIf="!loading && transfers.length === 0">
+                                <td colspan="8" class="text-center py-5">
+                                    <i class="bi bi-arrow-left-right text-muted" style="font-size: 3rem;"></i>
+                                    <p class="mt-3 text-muted">No se han registrado traspasos todavía.</p>
+                                </td>
+                            </tr>
+
+                            <!-- Loading State -->
+                            <tr *ngIf="loading">
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <p class="mt-2 text-muted">Cargando historial...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

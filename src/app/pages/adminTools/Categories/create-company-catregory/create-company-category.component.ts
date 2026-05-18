@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Category } from 'src/app/interfaces/models.interface';
+import { Category, UserRole } from 'src/app/interfaces/models.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { CompanyService } from 'src/app/services/company.service';
@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 })
 export class CreateCompanyCategoryComponent {
 
-  userRole!: 'admin' | 'sysadmin' | 'user';
+  userRole!: UserRole;
   companies!: Category[];
   companyId!: string;
 

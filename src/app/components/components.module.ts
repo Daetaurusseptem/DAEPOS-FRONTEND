@@ -21,6 +21,8 @@ import { AlphanumericKeyboardComponent } from './shared/alphanumeric-keyboard/al
 import { UserCajasComponent } from './user-cajas/user-cajas.component';
 import { FechaCajasComponent } from './fecha-cajas/fecha-cajas.component';
 import { CajaDetailComponent } from './caja-detail/caja-detail.component';
+import { BulkImportComponent } from './shared/bulk-import/bulk-import.component';
+import { NotificationCenterComponent } from './notification-center/notification-center.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +40,9 @@ import { CajaDetailComponent } from './caja-detail/caja-detail.component';
     AlphanumericKeyboardComponent,
     UserCajasComponent,
     FechaCajasComponent,
-    CajaDetailComponent
+    CajaDetailComponent,
+    BulkImportComponent,
+    NotificationCenterComponent
   ],
   exports: [
     NavbarComponent,
@@ -52,7 +56,10 @@ import { CajaDetailComponent } from './caja-detail/caja-detail.component';
     InventoryListComponent,
     TabsMenuComponent,
     BackButtonComponent,
-    AlphanumericKeyboardComponent
+    AlphanumericKeyboardComponent,
+    BulkImportComponent,
+    FechaCajasComponent,
+    NotificationCenterComponent
   ],
   imports: [
     CommonModule,
@@ -65,3 +72,4 @@ import { CajaDetailComponent } from './caja-detail/caja-detail.component';
   ]
 })
 export class ComponentsModule { }
+

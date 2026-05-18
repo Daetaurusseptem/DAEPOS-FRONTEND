@@ -24,3 +24,11 @@
   max-width: 1600px;
   margin: 0 auto;
 }
+
+.top-header {
+  height: 56px;
+  background-color: #fff;
+  z-index: 999;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+}

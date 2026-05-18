@@ -1,0 +1,53 @@
+.dashboard-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
+}
+
+.bg-ghost { background-color: #f3f4f6; }
+.bg-primary-soft { background-color: #eff6ff; }
+.bg-info-soft { background-color: #e0f2fe; }
+.bg-warning-soft { background-color: #fef3c7; }
+
+.text-info { color: #0284c7 !important; }
+.text-warning { color: #d97706 !important; }
+
+.pointer { cursor: pointer; }
+
+.btn-ghost-dark {
+  color: #4b5563;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.btn-ghost-dark:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.btn-ghost-danger {
+  color: #ef4444;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.btn-ghost-danger:hover {
+  background: #fef2f2;
+}
+
+.form-check-input:checked {
+  background-color: #111827;
+  border-color: #111827;
+}
+
+table tr:hover {
+  background-color: #fafafa;
+}
+
+.rounded-4 { border-radius: 1rem !important; }

@@ -27,6 +27,7 @@ import { UserToolsModule } from './userTools/user-tools.module';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { DashboardPageComponent } from './dashboard/dashboard-page/dashboard-page.component';
+import { NotificationsPageComponent } from './notifications/notifications-page.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { DashboardPageComponent } from './dashboard/dashboard-page/dashboard-pag
     PageNotFoundComponent,
     PagesComponent,
     DashboardPageComponent,
+    NotificationsPageComponent
   ],
   imports: [
     CommonModule,
