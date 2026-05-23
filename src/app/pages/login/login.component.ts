@@ -34,6 +34,13 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  autofill(username: string) {
+    this.loginForm.setValue({
+      username: username,
+      password: 'admin123'
+    });
+  }
+
   onSubmit() {
 
     this.authService.borrarLocalStorage()

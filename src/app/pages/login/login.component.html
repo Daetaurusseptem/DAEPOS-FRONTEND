@@ -29,6 +29,22 @@
 
         <button type="submit" class="login-button" [disabled]="!loginForm.valid">Acceder</button>
       </form>
+      
+      <!-- Panel de Acceso Rápido Demo -->
+      <div class="demo-credentials-container">
+        <p class="demo-title">Acceso Rápido Demo</p>
+        <div class="demo-buttons-grid">
+          <button type="button" class="demo-btn" (click)="autofill('companyowner')">
+            [ DUEÑO ]
+          </button>
+          <button type="button" class="demo-btn" (click)="autofill('admin')">
+            [ GERENTE ]
+          </button>
+          <button type="button" class="demo-btn" (click)="autofill('cajero1')">
+            [ CAJERO ]
+          </button>
+        </div>
+      </div>
           
       <div class="login-links">
         <a href="#">¿Olvidaste tu contraseña?</a>
