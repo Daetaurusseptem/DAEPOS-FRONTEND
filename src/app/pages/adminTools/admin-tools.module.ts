@@ -35,6 +35,11 @@ import { BranchAdminHomeComponent } from './branch-admin-home/branch-admin-home.
 import { CreateStockTransferComponent } from './inventory/transfers/create-transfer/create-transfer.component';
 import { StockTransferListComponent } from './inventory/transfers/transfer-list/stock-transfer-list.component';
 import { SupplierDetailsComponent } from './Suppliers/supplier-details/supplier-details.component';
+import { CentralizedDeliveriesComponent } from './Suppliers/deliveries-hub/deliveries-hub.component';
+import { CustomersListComponent } from './customers/customers-list.component';
+import { PromotionsListComponent } from './promotions/promotions-list.component';
+import { LiveRegistersComponent } from './live-registers/live-registers.component';
+import { CajasHistorialComponent } from './cajas-historial/cajas-historial.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +70,12 @@ import { SupplierDetailsComponent } from './Suppliers/supplier-details/supplier-
     BranchAdminHomeComponent,
     CreateStockTransferComponent,
     StockTransferListComponent,
-    SupplierDetailsComponent
+    SupplierDetailsComponent,
+    CentralizedDeliveriesComponent,
+    CustomersListComponent,
+    PromotionsListComponent,
+    LiveRegistersComponent,
+    CajasHistorialComponent
   ],
   exports: [
     InventoryStockListComponent,
@@ -73,9 +83,14 @@ import { SupplierDetailsComponent } from './Suppliers/supplier-details/supplier-
     CategoriesListComponent,
     SuppliersListComponent,
     SupplierDetailsComponent,
+    CentralizedDeliveriesComponent,
     UpdateInventoryComponent,
     StatisticsComponent,
-    BranchAdminHomeComponent
+    BranchAdminHomeComponent,
+    CustomersListComponent,
+    PromotionsListComponent,
+    LiveRegistersComponent,
+    CajasHistorialComponent
   ],
   imports: [
     CommonModule,

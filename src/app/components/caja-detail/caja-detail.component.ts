@@ -14,6 +14,8 @@ export class CajaDetailComponent implements OnInit {
   caja!: any;
   subtotalVentas: number = 0;
   totalEnCaja: number = 0;
+  activeTab: 'balance' | 'sales' | 'expenses' = 'balance';
+  expandedSales: { [key: string]: boolean } = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -207,5 +209,14 @@ export class CajaDetailComponent implements OnInit {
       iframe.contentWindow!.focus();
       iframe.contentWindow!.print();
     };
+  }
+
+  toggleSaleExpand(saleId: string): void {
+    this.expandedSales[saleId] = !this.expandedSales[saleId];
+  }
+
+  getExpensesSum(expenses: any[] | undefined): number {
+    if (!expenses) return 0;
+    return expenses.reduce((sum, exp) => sum + exp.amount, 0);
   }
 }

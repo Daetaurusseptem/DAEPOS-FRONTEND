@@ -68,6 +68,62 @@
                 </div>
               </div>
 
+              <hr class="my-4 opacity-5">
+
+              <!-- MÓDULO DE LEALTAD / CLIENTE FRECUENTE -->
+              <div class="col-md-12" formGroupName="loyaltySettings">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-star-fill text-warning me-2"></i>Programa de Lealtad (Cliente Frecuente)</h5>
+                    <p class="small text-muted mb-0">Habilita y configura la acumulación y canje de puntos de forma local para esta sucursal.</p>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" formControlName="enabled" id="loyaltyEnabled">
+                    <label class="form-check-label small fw-bold text-muted" for="loyaltyEnabled">Activo</label>
+                  </div>
+                </div>
+
+                <div class="row g-3 animate__animated animate__fadeIn" *ngIf="branchForm.get('loyaltySettings.enabled')?.value">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Método de Identificación</label>
+                    <select formControlName="identifierType" class="form-select rounded-3">
+                      <option value="phone">Número Telefónico Celular</option>
+                      <option value="physical_card">Tarjeta Física de Puntos</option>
+                      <option value="both">Híbrido (Teléfono o Tarjeta)</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Tasa de Acumulación (Puntos por Compra)</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$10.00 cobrado =</span>
+                      <input type="number" formControlName="pointsEarnRate" class="form-control rounded-3" step="0.01" placeholder="Ej. 1.0">
+                      <span class="input-group-text">puntos ganados</span>
+                    </div>
+                    <p class="small text-muted mt-1 mb-0">Ej: 1 punto por cada $10.00 de compra.</p>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Tasa de Canje (Valor del Punto)</label>
+                    <div class="input-group">
+                      <span class="input-group-text">1 Punto =</span>
+                      <input type="number" formControlName="pointsRedeemRate" class="form-control rounded-3" step="0.001" placeholder="Ej. 0.1">
+                      <span class="input-group-text">Pesos ($ M.N.) de descuento</span>
+                    </div>
+                    <p class="small text-muted mt-1 mb-0">Ej: Cada punto equivale a $0.10 de descuento al cobro.</p>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Límite Máximo de Pago con Puntos</label>
+                    <div class="input-group">
+                      <input type="number" formControlName="maxRedemptionPercentage" class="form-control rounded-3" min="1" max="100" placeholder="Ej. 100">
+                      <span class="input-group-text">% del total del ticket</span>
+                    </div>
+                    <p class="small text-muted mt-1 mb-0">Porcentaje máximo de la venta que se puede pagar con puntos.</p>
+                  </div>
+                </div>
+              </div>
+
               <div class="col-md-12 mt-5">
                 <div class="d-flex justify-content-end gap-3">
                   <button type="button" routerLink="/dashboard/admin/branches" class="btn btn-light px-4 rounded-pill">Cancelar</button>

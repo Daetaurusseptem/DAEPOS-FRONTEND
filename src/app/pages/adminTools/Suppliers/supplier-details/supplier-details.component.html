@@ -377,17 +377,39 @@
         <!-- Checklist de Productos -->
         <h6 class="fw-bold text-dark mb-3">Productos en el Envío:</h6>
         <div class="inspect-list border border-light-subtle rounded-3 overflow-hidden mb-3">
-          <div *ngFor="let it of inspectedItems; let i = index" class="inspect-item d-flex align-items-center justify-content-between p-3 border-bottom border-light-subtle bg-white">
-            <div class="form-check d-flex align-items-center gap-2">
-              <input class="form-check-input" type="checkbox" id="check-{{i}}" [(ngModel)]="it.verified">
-              <label class="form-check-label fw-semibold text-dark fs-6" for="check-{{i}}">
-                {{ it.name }}
-              </label>
+          <div *ngFor="let it of inspectedItems; let i = index" class="inspect-item d-flex flex-column p-3 border-bottom border-light-subtle bg-white gap-2">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="form-check d-flex align-items-center gap-2">
+                <input class="form-check-input" type="checkbox" id="check-{{i}}" [(ngModel)]="it.verified">
+                <label class="form-check-label fw-semibold text-dark fs-6 animate__animated animate__fadeIn" for="check-{{i}}">
+                  {{ it.name }}
+                </label>
+              </div>
+              <span class="badge" [class.bg-success-soft]="it.verified" [class.text-success]="it.verified" [class.bg-light]="!it.verified" [class.text-secondary]="!it.verified">
+                {{ it.verified ? 'Recibido' : 'Omitido' }}
+              </span>
             </div>
-            <span class="badge bg-light text-dark border border-light-subtle price-mono fw-bold px-3 py-1.5 rounded-2">
-              Cant: {{ it.quantity }}
-            </span>
+            
+            <div class="d-flex gap-3 mt-1 animate__animated animate__fadeIn" *ngIf="it.verified">
+              <div class="flex-grow-1">
+                <label class="small fw-semibold text-secondary mb-1">Cant. Recibida Físicamente</label>
+                <input type="number" class="form-control form-control-sm price-mono" [(ngModel)]="it.quantity" min="1">
+              </div>
+              <div class="flex-grow-1">
+                <label class="small fw-semibold text-secondary mb-1">Costo Unitario Facturado ($)</label>
+                <input type="number" class="form-control form-control-sm price-mono" [(ngModel)]="it.costPrice" min="0" step="0.01">
+              </div>
+            </div>
           </div>
+        </div>
+
+        <!-- Opción de Pago desde Caja Chica -->
+        <div class="card border border-light-subtle rounded-3 p-3 bg-light-subtle mb-3">
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" id="payFromRegisterSwitch" [(ngModel)]="payFromRegister">
+            <label class="form-check-label fw-semibold" for="payFromRegisterSwitch">¿Pagar esta entrega desde Caja Chica (Turno Activo)?</label>
+          </div>
+          <small class="text-muted d-block mt-1">Si se marca, se restará el costo total real facturado de la caja activa de la sucursal.</small>
         </div>
 
         <!-- Registro al Vuelo -->

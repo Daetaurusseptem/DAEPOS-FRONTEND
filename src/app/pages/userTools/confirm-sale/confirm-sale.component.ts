@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ReceiptPrinterService } from 'src/app/services/receipt-printer.service';
+import { CustomerService } from 'src/app/services/customer.service';
+import { PromotionService } from 'src/app/services/promotion.service';
+import { BranchService } from 'src/app/services/branch.service';
 
 @Component({
   selector: 'app-confirm-sale',
@@ -24,13 +27,34 @@ export class ConfirmSaleComponent implements OnInit {
 
   empresa: string = 'CAFETERÍA CAFÉLOT'; // Nombre de la empresa
 
+  // CRM, Lealtad y Promociones
+  branchSettings: any = { enabled: false };
+  searchCustomerTerm: string = '';
+  searchResultsCustomers: any[] = [];
+  selectedCustomer: any = null;
+  redeemPointsChecked: boolean = false;
+  pointsDiscount: number = 0;
+  
+  couponCode: string = '';
+  appliedPromotion: any = null;
+  couponDiscount: number = 0;
+  
+  showQuickRegister: boolean = false;
+  registerForm!: FormGroup;
+  companyId: string = '';
+
   constructor(
     private fb: FormBuilder,
     private saleService: SalesService,
     private router: Router,
     private authService: AuthService,
-    private receiptPrinterService: ReceiptPrinterService
+    private receiptPrinterService: ReceiptPrinterService,
+    private customerService: CustomerService,
+    private promotionService: PromotionService,
+    private branchService: BranchService
   ) {
+    this.companyId = this.authService.companyId || (this.authService.company as any)?._id || '';
+
     // Intentar obtener la venta desde la navegación o desde el localStorage
     const navigation = this.router.getCurrentNavigation();
     this.sale = navigation?.extras.state?.['sale'] || this.getSaleFromLocalStorage();
@@ -50,6 +74,40 @@ export class ConfirmSaleComponent implements OnInit {
     // Almacenar la venta en localStorage si existe
     if (this.sale) {
       this.saveSaleToLocalStorage(this.sale);
+    }
+
+    // Inicializar el formulario de registro rápido de cliente
+    this.registerForm = this.fb.group({
+      name: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      cardNumber: [''],
+      rfc: ['']
+    });
+
+    // Cargar la configuración de lealtad de la sucursal actual
+    const branchId = this.authService.branch?._id || this.authService.branch;
+    if (branchId) {
+      this.branchService.getBranchById(branchId).subscribe(resp => {
+        if (resp.ok && resp.branch) {
+          this.branchSettings = resp.branch.loyaltySettings || {
+            enabled: true,
+            identifierType: 'phone',
+            pointsEarnRate: 10,
+            pointsRedeemRate: 0.10,
+            maxRedemptionPercentage: 100
+          };
+          
+          // Adaptar dinámicamente los validadores del registro in-situ según la sucursal
+          const phoneCtrl = this.registerForm.get('phone');
+          const cardCtrl = this.registerForm.get('cardNumber');
+          if (this.branchSettings.identifierType === 'physical_card') {
+            phoneCtrl?.clearValidators();
+            phoneCtrl?.updateValueAndValidity();
+            cardCtrl?.setValidators([Validators.required]);
+            cardCtrl?.updateValueAndValidity();
+          }
+        }
+      });
     }
 
     this.confirmSaleForm = this.fb.group({
@@ -72,8 +130,8 @@ export class ConfirmSaleComponent implements OnInit {
     });
 
     this.confirmSaleForm.get('receivedAmount')!.valueChanges.subscribe((value) => {
-      this.change = value - this.totalAmount;
-      this.confirmSaleForm.patchValue({ change: this.change });
+      this.change = Math.max(0, value - this.totalAmount);
+      this.confirmSaleForm.patchValue({ change: this.change }, { emitEvent: false });
     });
   }
 
@@ -97,6 +155,11 @@ export class ConfirmSaleComponent implements OnInit {
       paymentReference: this.confirmSaleForm.value.paymentReference,
       receivedAmount: this.confirmSaleForm.value.receivedAmount,
       change: this.change,
+      discount: this.sale.discount, // Enviar descuento computado
+      total: this.sale.total, // Enviar total original, el backend calcula el total neto cobrado
+      customerId: this.selectedCustomer ? this.selectedCustomer._id : undefined,
+      promotionId: this.appliedPromotion ? this.appliedPromotion._id : undefined,
+      pointsRedeemed: this.selectedCustomer && this.redeemPointsChecked ? Math.floor(this.pointsDiscount / (this.branchSettings.pointsRedeemRate || 0.10)) : 0,
       productsSold: this.sale.productsSold.map((product: any) => ({
         ...product,
         product: product.product // Incluir el ID del producto antes de enviar al backend
@@ -105,7 +168,7 @@ export class ConfirmSaleComponent implements OnInit {
 
     this.saleService.createSale(saleData).subscribe((response: any) => {
       console.log('Venta creada con éxito', response);
-      this.generarTicket(saleData);
+      this.generarTicket({ ...saleData, _id: response._id, date: response.date });
       this.generarComanda(); // Generar comanda para cocina
 
       // Limpiar localStorage después de confirmar la venta
@@ -129,6 +192,225 @@ export class ConfirmSaleComponent implements OnInit {
       }
     }, error => {
       console.error('Error al crear la venta', error);
+      import('sweetalert2').then((Swal) => {
+        Swal.default.fire({
+          icon: 'error',
+          title: 'Error de Cobro',
+          text: error.error?.message || 'Ocurrió un error al procesar el cobro.',
+          confirmButtonColor: '#d33'
+        });
+      });
+    });
+  }
+
+  // --- MÉTODOS DE CRM, CLIENTE FRECUENTE Y CUPONES ---
+
+  searchCustomer(term: string): void {
+    this.searchCustomerTerm = term;
+    if (!term || term.trim().length < 2) {
+      this.searchResultsCustomers = [];
+      return;
+    }
+
+    this.customerService.searchCustomers(this.companyId, term.trim()).subscribe(resp => {
+      if (resp.ok) {
+        this.searchResultsCustomers = resp.customers;
+      }
+    });
+  }
+
+  selectCustomer(customer: any): void {
+    this.selectedCustomer = customer;
+    this.searchResultsCustomers = [];
+    this.searchCustomerTerm = '';
+    this.redeemPointsChecked = false;
+    this.updateLoyaltyCalculations();
+  }
+
+  removeSelectedCustomer(): void {
+    this.selectedCustomer = null;
+    this.redeemPointsChecked = false;
+    this.pointsDiscount = 0;
+    this.recalculateTotals();
+  }
+
+  toggleRedeemPoints(event: any): void {
+    this.redeemPointsChecked = event.target.checked;
+    this.updateLoyaltyCalculations();
+  }
+
+  updateLoyaltyCalculations(): void {
+    this.recalculateTotals();
+  }
+
+  applyCoupon(): void {
+    if (!this.couponCode || this.couponCode.trim() === '') {
+      return;
+    }
+
+    const branchId = this.authService.branch?._id || this.authService.branch || '';
+
+    import('sweetalert2').then((Swal) => {
+      this.promotionService.validateDiscountCode(this.companyId, this.couponCode.trim(), this.sale.total, branchId).subscribe({
+        next: (resp) => {
+          if (resp.ok && resp.promotion) {
+            this.appliedPromotion = resp.promotion;
+            this.couponCode = '';
+            this.recalculateTotals();
+            Swal.default.fire({
+              icon: 'success',
+              title: 'Cupón Aplicado',
+              text: `Código ${resp.promotion.code} aplicado con éxito.`,
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.default.fire({
+            icon: 'error',
+            title: 'Cupón Inválido',
+            text: err.error?.message || 'El cupón ingresado no es válido.',
+            confirmButtonColor: '#d33'
+          });
+        }
+      });
+    });
+  }
+
+  removeCoupon(): void {
+    this.appliedPromotion = null;
+    this.couponDiscount = 0;
+    this.recalculateTotals();
+  }
+
+  recalculateTotals(): void {
+    // 1. Calcular Descuento por Cupón
+    let couponDisc = 0;
+    if (this.appliedPromotion) {
+      const targetCats = this.appliedPromotion.targetCategories || [];
+      
+      // Determinar si el producto coincide con las categorías del cupón
+      const matchesCategory = (prodSold: any) => {
+        if (!targetCats || targetCats.length === 0) {
+          return true;
+        }
+        const prodCategories = prodSold.categories || [];
+        return prodCategories.some((cat: any) => {
+          const catId = typeof cat === 'object' ? cat._id : cat;
+          return targetCats.some((tCatId: any) => {
+            const tId = typeof tCatId === 'object' ? tCatId._id : tCatId;
+            return tId.toString() === catId.toString();
+          });
+        });
+      };
+
+      // Calcular el subtotal elegible
+      let eligibleSubtotal = 0;
+      if (this.sale.productsSold && this.sale.productsSold.length > 0) {
+        this.sale.productsSold.forEach((prod: any) => {
+          if (matchesCategory(prod)) {
+            eligibleSubtotal += prod.subtotal || 0;
+          }
+        });
+      } else {
+        eligibleSubtotal = this.sale.total;
+      }
+
+      if (this.appliedPromotion.type === 'percentage') {
+        couponDisc = eligibleSubtotal * (this.appliedPromotion.value / 100);
+      } else {
+        couponDisc = Math.min(this.appliedPromotion.value, eligibleSubtotal);
+      }
+    }
+    this.couponDiscount = couponDisc;
+
+    // 2. Calcular Descuento por Puntos sobre el Neto Remanente
+    const netForLoyalty = Math.max(0, this.sale.total - this.couponDiscount);
+    if (this.selectedCustomer && this.redeemPointsChecked) {
+      const maxAllowedDiscount = netForLoyalty * ((this.branchSettings.maxRedemptionPercentage || 100) / 100);
+      const potentialDiscount = this.selectedCustomer.loyaltyPoints * (this.branchSettings.pointsRedeemRate || 0.10);
+      this.pointsDiscount = Math.min(potentialDiscount, maxAllowedDiscount);
+    } else {
+      this.pointsDiscount = 0;
+    }
+
+    // 3. Aplicar descuento total
+    this.sale.discount = this.couponDiscount + this.pointsDiscount;
+    this.totalAmount = Math.max(0, this.sale.total - this.sale.discount);
+
+    // 4. Actualizar formularios y cambio
+    if (this.confirmSaleForm) {
+      const receivedCtrl = this.confirmSaleForm.get('receivedAmount');
+      if (receivedCtrl) {
+        receivedCtrl.updateValueAndValidity();
+      }
+      
+      const receivedVal = receivedCtrl?.value || 0;
+      this.change = Math.max(0, receivedVal - this.totalAmount);
+      this.confirmSaleForm.patchValue({ change: this.change }, { emitEvent: false });
+    }
+  }
+
+  openQuickRegister(): void {
+    this.registerForm.reset({
+      name: '',
+      phone: '',
+      cardNumber: '',
+      rfc: ''
+    });
+    // Adaptar dinámicamente los validadores al abrir en caso de cambio de sucursal
+    const phoneCtrl = this.registerForm.get('phone');
+    const cardCtrl = this.registerForm.get('cardNumber');
+    if (this.branchSettings.identifierType === 'physical_card') {
+      phoneCtrl?.clearValidators();
+      cardCtrl?.setValidators([Validators.required]);
+    } else {
+      phoneCtrl?.setValidators([Validators.required, Validators.pattern(/^\d{10}$/)]);
+      cardCtrl?.clearValidators();
+    }
+    phoneCtrl?.updateValueAndValidity();
+    cardCtrl?.updateValueAndValidity();
+    this.showQuickRegister = true;
+  }
+
+  closeQuickRegister(): void {
+    this.showQuickRegister = false;
+  }
+
+  submitQuickRegister(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    import('sweetalert2').then((Swal) => {
+      this.customerService.createCustomer(this.registerForm.value, this.companyId).subscribe({
+        next: (resp) => {
+          if (resp.ok && resp.customer) {
+            this.selectedCustomer = resp.customer;
+            this.showQuickRegister = false;
+            this.recalculateTotals();
+            Swal.default.fire({
+              icon: 'success',
+              title: 'Cliente Registrado',
+              text: `${resp.customer.name} ha sido seleccionado para la compra.`,
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.default.fire({
+            icon: 'error',
+            title: 'Error al Registrar',
+            text: err.error?.message || 'No se pudo crear el cliente.',
+            confirmButtonColor: '#d33'
+          });
+        }
+      });
     });
   }
 

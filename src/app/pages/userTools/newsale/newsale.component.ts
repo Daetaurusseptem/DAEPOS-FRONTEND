@@ -282,6 +282,7 @@ export class NewsaleComponent {
         quantity: entry.quantity,
         unitPrice: entry.item.sellingPrice || entry.item.costPrice || 0,
         subtotal: entry.total,
+        categories: entry.item.product?.categories || [],
         modifications: [
           ...(entry.exclusiveModification ? [entry.exclusiveModification] : []),
           ...(entry.nonExclusiveModifications || [])

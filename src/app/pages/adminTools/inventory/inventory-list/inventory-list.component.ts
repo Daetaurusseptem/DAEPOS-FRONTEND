@@ -22,6 +22,7 @@ export class InventoryStockListComponent implements OnInit {
   branches: Branch[] = [];
   selectedBranchId: string = '';
   userRole!: UserRole;
+  itemType: 'product' | 'raw_material' = 'product';
 
   constructor(
     private inventoryService: InventoryService,
@@ -58,9 +59,9 @@ export class InventoryStockListComponent implements OnInit {
     let branchId = this.selectedBranchId;
     if (!branchId && this.userRole === 'admin') {
        branchId = this.authService.branch?._id || this.authService.branch;
-    }
+     }
 
-    this.inventoryService.getInventory(companyId, this.searchTerm, 'product', branchId).subscribe({
+    this.inventoryService.getInventory(companyId, this.searchTerm, this.itemType, branchId).subscribe({
       next: (data) => {
         this.items = data.items || [];
         this.totalItems = data.totalItems as number || 0; 
@@ -72,6 +73,12 @@ export class InventoryStockListComponent implements OnInit {
         console.error('Error al obtener items:', error);
       }
     });
+  }
+
+  setItemType(type: 'product' | 'raw_material'): void {
+    this.itemType = type;
+    this.currentPage = 1;
+    this.loadItems();
   }
 
   cambiarPagina(pagina: number): void {

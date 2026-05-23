@@ -59,4 +59,18 @@ export class CashRegisterService {
   getUserCashRegistersByDate(userId: string, startDate: string) {
     return this.http.get<any>(`${this.url}/user/${userId}/cajas/${startDate}`, this.authService.headers);
   }
+
+  // --- Monitoreo y Auditoría por Sucursal ---
+  getActiveRegistersByBranch(branchId: string) {
+    return this.http.get<any>(`${this.url}/active/branch/${branchId}`, this.authService.headers);
+  }
+
+  getCashRegistersHistory(branchId: string, filters: any = {}) {
+    let queryParams = '';
+    const keys = Object.keys(filters);
+    if (keys.length > 0) {
+      queryParams = '?' + keys.map(key => `${key}=${encodeURIComponent(filters[key])}`).join('&');
+    }
+    return this.http.get<any>(`${this.url}/history/branch/${branchId}${queryParams}`, this.authService.headers);
+  }
 }

@@ -18,12 +18,14 @@ import { AddSubscriptionComponent } from './sysAdminTools/companies/add-suscript
 import { SelectSubscriptionsComponent } from './sysAdminTools/subscriptions/select-subscriptions/select-subscriptions.component';
 import { CreateUserReComponent } from '../components/shared/create-user/create-user.component';
 import { UserListComponent } from '../components/shared/user-list/user-list.component';
+import { SysadminDashboardComponent } from './sysAdminTools/dashboard/sysadmin-dashboard.component';
 import { RoleGuard } from '../guards/role.guard';
 import { CreateProductComponent } from './adminTools/products/create-product/create-product.component';
 import { CreateSupplierComponent } from './adminTools/Suppliers/create-supplier/create-supplier.component';
 import { UpdateProductComponent } from './adminTools/products/update-product/update-product.component';
 import { UpdateSuppliersComponent } from './adminTools/Suppliers/update-suppliers/update-suppliers.component';
 import { SupplierDetailsComponent } from './adminTools/Suppliers/supplier-details/supplier-details.component';
+import { CentralizedDeliveriesComponent } from './adminTools/Suppliers/deliveries-hub/deliveries-hub.component';
 import { CreateCompanyCategoryComponent } from './adminTools/Categories/create-company-catregory/create-company-category.component';
 import { AddInventoryComponent } from './adminTools/inventory/add-inventory/add-inventory.component';
 import { OpenCashRegisterComponent } from './userTools/open-cash-register/open-cash-register.component';
@@ -61,6 +63,10 @@ import { BranchListComponent } from './adminTools/branches/branch-list/branch-li
 import { BranchFormComponent } from './adminTools/branches/branch-form/branch-form.component';
 import { BranchAdminHomeComponent } from './adminTools/branch-admin-home/branch-admin-home.component';
 import { NotificationsPageComponent } from './notifications/notifications-page.component';
+import { CustomersListComponent } from './adminTools/customers/customers-list.component';
+import { PromotionsListComponent } from './adminTools/promotions/promotions-list.component';
+import { LiveRegistersComponent } from './adminTools/live-registers/live-registers.component';
+import { CajasHistorialComponent } from './adminTools/cajas-historial/cajas-historial.component';
 
 const routes: Routes = [
   {
@@ -73,6 +79,7 @@ const routes: Routes = [
       { path: 'reports', component: ReportsComponent },
       { path: 'notifications', component: NotificationsPageComponent },
       //SYSADMIN
+      { path: 'sysadmin/dashboard', canActivate: [SysAdminGuard], component: SysadminDashboardComponent },
       { path: 'sysadmin/users', canActivate: [SysAdminGuard], component: UserListComponent },
       { path: 'sysadmin/users/edit/:id', canActivate: [SysAdminGuard], component: UserEditComponent },
       { path: 'sysadmin/users/new', canActivate: [SysAdminGuard], component: CreateUserReComponent },
@@ -104,6 +111,7 @@ const routes: Routes = [
       { path: 'admin/product/new', canActivate: [AdminGuard], component: CreateProductComponent },
       { path: 'admin/product/edit/:id', canActivate: [AdminGuard], component: UpdateProductComponent },
       { path: 'admin/suppliers', canActivate: [AdminGuard], component: SuppliersListComponent },
+      { path: 'admin/suppliers/deliveries', canActivate: [AdminGuard], component: CentralizedDeliveriesComponent },
       { path: 'admin/suppliers/new/:id', canActivate: [AdminGuard], component: CreateSupplierComponent },
       { path: 'admin/suppliers/edit/:id', canActivate: [AdminGuard], component: UpdateSuppliersComponent },
       { path: 'admin/suppliers/details/:id', canActivate: [AdminGuard], component: SupplierDetailsComponent },
@@ -130,6 +138,10 @@ const routes: Routes = [
       { path: 'admin/branches/:id', canActivate: [AdminGuard], component: BranchAdminHomeComponent },
       { path: 'admin/branches/edit/:id', canActivate: [AdminGuard], component: BranchFormComponent },
       { path: 'branch', canActivate: [AdminGuard], component: BranchAdminHomeComponent },
+      { path: 'admin/customers', canActivate: [AdminGuard], component: CustomersListComponent },
+      { path: 'admin/promotions', canActivate: [AdminGuard], component: PromotionsListComponent },
+      { path: 'admin/live-registers', canActivate: [AdminGuard], component: LiveRegistersComponent },
+      { path: 'admin/cajas-historial', canActivate: [AdminGuard], component: CajasHistorialComponent },
       //USER
       { path: 'user', canActivate: [userGuard], component: UserHomeComponent },
       { path: 'user/new-sale', component: NewsaleComponent, canActivate: [AuthGuardGuard, userGuard] },

@@ -2,6 +2,23 @@
     <app-dashboard-sidebar></app-dashboard-sidebar>
 
     <div class="layout-content" [class.collapsed]="isCollapsed">
+        <!-- Banner de soporte activo (Impersonación) -->
+        <div class="support-banner bg-dark text-white d-flex justify-content-between align-items-center px-4 py-2 border-bottom border-warning" 
+             *ngIf="sysadminService.isImpersonating()"
+             style="animation: slideDown 0.3s ease; border-bottom-width: 3px !important;">
+            <div class="d-flex align-items-center gap-2">
+                <span class="spinner-grow spinner-grow-sm text-warning" role="status" style="width: 10px; height: 10px;"></span>
+                <span class="fw-bold font-monospace tracking-wide" style="font-size: 0.75rem;">
+                    MODO SOPORTE ACTIVO &mdash; ASISTIENDO A: <span class="text-warning text-uppercase fw-bolder">{{ sysadminService.getImpersonatedCompanyName() }}</span>
+                </span>
+            </div>
+            <button class="btn btn-warning btn-sm fw-bold px-3 py-1 font-monospace d-flex align-items-center gap-1.5 shadow-sm" 
+                    style="font-size: 0.68rem; border-radius: 6px; color: #000; letter-spacing: 0.3px;" 
+                    (click)="exitImpersonation()">
+                <i class="bi bi-box-arrow-left"></i> SALIR DE SOPORTE
+            </button>
+        </div>
+
         <!-- Encabezado Superior Stark con Centro de Notificaciones y Fecha Cajas -->
         <header class="top-header d-flex justify-content-between align-items-center bg-white border-bottom px-4 py-2.5">
             <div class="d-flex align-items-center gap-3">
@@ -44,7 +61,7 @@
             </div>
         </header>
 
-        <main class="content-area animate__animated animate__fadeIn">
+        <main class="content-area">
             <app-spinner></app-spinner>
             <router-outlet></router-outlet>
         </main>

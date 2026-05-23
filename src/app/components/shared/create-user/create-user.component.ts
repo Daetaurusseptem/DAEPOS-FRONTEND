@@ -16,8 +16,8 @@ import Swal from 'sweetalert2';
 })
 export class CreateUserReComponent {
   userRole!: UserRole;
-  companies!: Company[];
-  companyId!: string;
+  companies: Company[] = [];
+  companyId: string = '';
   branches: Branch[] = [];
   
   user: User = {
@@ -70,10 +70,48 @@ export class CreateUserReComponent {
       this.getBranches();
     } else if (this.userRole === 'sysadmin') {
       this.user.role = 'admin';
-      this.companyId = ''; // Sysadmin no asigna companyId por defecto
+      this.companyId = ''; 
+      this.loadCompanies();
     } else {
       this.user.role = 'user';
       this.companyId = this.authService.companyId!;
+    }
+  }
+
+  loadCompanies() {
+    this.companiesService.getCompanies().subscribe({
+      next: (resp: any) => {
+        this.companies = resp.companies || [];
+      }
+    });
+  }
+
+  onCompanyChange() {
+    this.user.companyId = this.companyId;
+    this.user.branch = '';
+    this.branches = [];
+    if (this.companyId) {
+      this.branchService.getBranchesByCompany(this.companyId).subscribe({
+        next: (resp: any) => {
+          if (resp.ok) {
+            this.branches = resp.branches || [];
+          }
+        }
+      });
+    }
+  }
+
+  onRoleChange() {
+    // Limpiar campos según el rol seleccionado si somos sysadmin
+    if (this.userRole === 'sysadmin') {
+      if (this.user.role === 'sysadmin') {
+        this.companyId = '';
+        this.user.companyId = '';
+        this.user.branch = '';
+        this.branches = [];
+      } else {
+        this.onCompanyChange();
+      }
     }
   }
 
@@ -96,7 +134,15 @@ export class CreateUserReComponent {
       if (this.userRole !== 'sysadmin') {
         this.user.companyId = this.authService.companyId!;
       } else {
-        delete this.user.companyId;
+        if (this.user.role === 'sysadmin') {
+          delete this.user.companyId;
+          delete this.user.branch;
+        } else {
+          this.user.companyId = this.companyId;
+          if (this.user.role === 'companyAdmin') {
+            delete this.user.branch;
+          }
+        }
       }
   
       this.userService.createUser(this.user).subscribe({
@@ -115,7 +161,7 @@ export class CreateUserReComponent {
         error: (error: any) => {
           console.log(error);
           Swal.fire({
-            text: error.msg,
+            text: error.error?.msg || error.msg || 'Error al crear usuario',
             icon: 'error'
           });
         }

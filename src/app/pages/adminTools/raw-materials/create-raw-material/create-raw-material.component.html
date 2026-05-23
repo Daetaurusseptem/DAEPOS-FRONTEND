@@ -2,56 +2,33 @@
   <div class="card shadow">
     <div class="card-header bg-primary text-white d-flex align-items-center">
       <i class="bi bi-box-seam me-2 fs-4"></i>
-      <h2 class="mb-0">Crear Materia Prima</h2>
+      <h2 class="mb-0">Crear Insumo Maestro (Materia Prima)</h2>
     </div>
     <div class="card-body">
       <form (ngSubmit)="addRawMaterial()" #materialForm="ngForm">
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label for="name" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="name" [(ngModel)]="newMaterial.name" name="name" placeholder="Nombre del material" required>
+            <label for="name" class="form-label">Nombre del Insumo</label>
+            <input type="text" class="form-control" id="name" [(ngModel)]="newMaterial.name" name="name" placeholder="Ej: Harina de Trigo, Leche Entera" required>
           </div>
           <div class="col-md-6 mb-3">
-            <label for="stock" class="form-label">Cantidad (Stock)</label>
-            <input type="number" class="form-control" id="stock" [(ngModel)]="newMaterial.stock" name="stock" min="0" placeholder="Stock inicial" required>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="costPrice" class="form-label">Precio Costo (Proveedor)</label>
-            <input type="number" class="form-control" id="costPrice" [(ngModel)]="newMaterial.costPrice" name="costPrice" placeholder="Precio de compra" required>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="measurement" class="form-label">Unidad de Medida</label>
-            <select class="form-select" id="measurement" [(ngModel)]="newMaterial.measurement" name="measurement" required>
-              <option value="grms">Gramos (g)</option>
-              <option value="ml">Mililitros (ml)</option>
-              <option value="kg">Kilogramos (kg)</option>
-              <option value="lts">Litros (l)</option>
-              <option value="unidades">Unidades</option>
+            <label for="measurementUnit" class="form-label">Unidad de Medida Base (Almacenamiento)</label>
+            <select class="form-select" id="measurementUnit" [(ngModel)]="newMaterial.measurementUnit" name="measurementUnit" required>
+              <option value="g">Gramos (g) - Ideal para sólidos/harinas</option>
+              <option value="ml">Mililitros (ml) - Ideal para líquidos/bebidas</option>
+              <option value="unit">Unidades (unit) - Ideal para piezas individuales</option>
             </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="provider" class="form-label">Proveedor</label>
-            <select class="form-select" id="provider" [(ngModel)]="newMaterial.supplier" name="provider" required>
-              <option *ngFor="let supplier of suppliers" [value]="supplier._id">{{ supplier.name }}</option>
-            </select>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="receivedDate" class="form-label">Fecha de Recepción</label>
-            <input type="date" class="form-control" id="receivedDate" [(ngModel)]="newMaterial.receivedDate" name="receivedDate" required>
           </div>
         </div>
         <div class="mb-3">
-          <label for="expirationDate" class="form-label">Fecha de Expiración (Opcional)</label>
-          <input type="date" class="form-control" id="expirationDate" [(ngModel)]="newMaterial.expirationDate" name="expirationDate">
+          <label for="description" class="form-label">Descripción / Detalles</label>
+          <textarea class="form-control" id="description" rows="3" [(ngModel)]="newMaterial.description" name="description" placeholder="Añade detalles sobre el insumo o marca recomendada..."></textarea>
         </div>
+
         <div class="text-end mt-4">
           <div class="d-flex justify-content-between">
             <app-back-button></app-back-button>
-            <button type="submit" class="btn btn-primary px-4">Guardar Material</button>
+            <button type="submit" class="btn btn-primary px-4" [disabled]="materialForm.invalid">Guardar Insumo</button>
           </div>
         </div>
       </form>

@@ -72,7 +72,7 @@
             </div>
             <h5 class="fw-bold mb-0 text-dark">Gestión de Sucursales</h5>
           </div>
-          <button routerLink="/dashboard/admin/branches" class="btn btn-dark btn-sm rounded-pill px-4 py-2 fw-semibold fs-7 border-0" style="background-color: #000 !important;">
+          <button routerLink="/dashboard/admin/branches" *ngIf="role === 'companyAdmin'" class="btn btn-dark btn-sm rounded-pill px-4 py-2 fw-semibold fs-7 border-0" style="background-color: #000 !important;">
             Configurar Sucursales
           </button>
         </div>
@@ -81,7 +81,7 @@
           <div *ngIf="branches.length === 0" class="text-center py-5 opacity-50">
             <i class="bi bi-shop display-4 d-block mb-3"></i>
             <p class="text-muted">Aún no has registrado ninguna sucursal</p>
-            <button routerLink="/dashboard/admin/branches/new" class="btn btn-outline-dark btn-sm rounded-pill mt-2">Crear mi primera sucursal</button>
+            <button routerLink="/dashboard/admin/branches/new" *ngIf="role === 'companyAdmin'" class="btn btn-outline-dark btn-sm rounded-pill mt-2">Crear mi primera sucursal</button>
           </div>
           
           <div class="row g-3" *ngIf="branches.length > 0">
@@ -110,7 +110,7 @@
                   <button class="btn btn-dark btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0" style="background-color: #000 !important;" [routerLink]="['/dashboard/admin/branches', b._id]">
                     Ver Detalle
                   </button>
-                  <button class="btn btn-outline-dark btn-sm px-3 py-2 border-light-subtle" [routerLink]="['/dashboard/admin/branches/edit', b._id]">
+                  <button class="btn btn-outline-dark btn-sm px-3 py-2 border-light-subtle" *ngIf="role === 'companyAdmin'" [routerLink]="['/dashboard/admin/branches/edit', b._id]">
                     <i class="bi bi-pencil-fill text-muted"></i>
                   </button>
                 </div>
@@ -137,13 +137,19 @@
               <i class="bi bi-plus-circle me-2 text-muted fs-5 align-middle"></i> Nuevo Producto
             </button>
             <button routerLink="/dashboard/admin/inventory/new" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-quick-btn">
-              <i class="bi bi-box-arrow-in-down me-2 text-muted fs-5 align-middle"></i> Registrar Entrada
+              <i class="bi bi-box-arrow-in-down me-2 text-muted fs-5 align-middle"></i> Registrar Entrada Manual
+            </button>
+            <button routerLink="/dashboard/admin/suppliers/deliveries" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-quick-btn">
+              <i class="bi bi-truck me-2 text-muted fs-5 align-middle"></i> Recibir Mercancía (Proveedores)
             </button>
             <button routerLink="/dashboard/admin/users/new" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-quick-btn">
               <i class="bi bi-person-plus me-2 text-muted fs-5 align-middle"></i> Crear Usuario
             </button>
             <button routerLink="/dashboard/admin/statistics" class="btn btn-dark text-start p-3 rounded-3 mt-2 premium-quick-primary-btn border-0" style="background-color: #000 !important;">
               <i class="bi bi-bar-chart-line-fill me-2 text-white-50 fs-5 align-middle"></i> Ver Reportes Detallados
+            </button>
+            <button *ngIf="isDemoUser()" (click)="restoreDemoDatabase()" class="btn btn-outline-danger text-start p-3 rounded-3 border-danger-subtle mt-2 fw-semibold" style="background-color: #fef2f2; border-color: #fecaca; color: #dc2626;">
+              <i class="bi bi-arrow-counterclockwise me-2 fs-5 align-middle"></i> Restaurar Base de Datos (Demo)
             </button>
           </div>
         </div>

@@ -1,0 +1,191 @@
+/* CSS Monocromático de Alta Gama para SaaS Control Tower */
+
+.console-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-size: 1.85rem;
+  color: var(--text-main);
+}
+
+.console-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Pestañas de Navegación Monocromáticas */
+.nav-tabs-wrapper {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-tabs-custom {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-tabs-custom li {
+  padding: 12px 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+.nav-tabs-custom li:hover {
+  color: var(--text-main);
+}
+
+.nav-tabs-custom li.active {
+  color: var(--text-main);
+}
+
+.nav-tabs-custom li.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--primary);
+}
+
+/* Tarjetas de Métricas de la Torre de Control */
+.metric-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.metric-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.metric-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.metric-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.metric-footer {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* Live Pulse Animation */
+.live-pulse {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--success);
+  box-shadow: 0 0 0 0 rgba(16, 194, 43, 0.4);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 194, 43, 0.5);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 194, 43, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 194, 43, 0);
+  }
+}
+
+/* Tablas y filas del Live Feed */
+.activity-row {
+  transition: var(--transition);
+}
+
+.activity-row:hover {
+  background-color: var(--bg-ghost) !important;
+}
+
+/* Avatares e Imagen Corporativa */
+.company-avatar {
+  background-color: var(--primary) !important;
+  color: var(--light) !important;
+}
+
+/* Onboarding Setup Steps */
+h4 {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.form-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.form-control,
+.form-select {
+  border-radius: var(--radius-sm) !important;
+  padding: 10px 14px !important;
+  font-size: 0.88rem !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  background-color: var(--bg-main) !important;
+  transition: var(--transition) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04) !important;
+  outline: none;
+}
+
+/* Pre blocks de logs de error */
+.error-stack-container {
+  background-color: #0f141c !important;
+  border: 1px solid #1c2330 !important;
+  color: #e3e6eb !important;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+  font-size: 0.72rem !important;
+}
+
+.error-detail-row td {
+  border-bottom: 1px solid var(--border-color) !important;
+}

@@ -26,15 +26,28 @@ export interface PaymentBreakdown {
   debit: number;
 }
 
+export interface CashExpense {
+  amount: number;
+  reason: string;
+  type: 'withdrawal' | 'expense';
+  timestamp: Date | string;
+}
+
 export interface CashRegister {
   _id: string;
-  user: string | User;
-  startDate: Date;
-  endDate: Date;
+  user: any;
+  physicalRegister: any;
+  company: string;
+  branch: string | Branch;
+  startDate: Date | string;
+  endDate?: Date | string;
   initialAmount: number;
-  finalAmount: number;
+  expectedAmount: number;
+  actualAmount?: number;
+  difference?: number;
   payments: PaymentBreakdown;
-  sales: string[];
+  expenses: CashExpense[];
+  sales: string[] | any[];
   notes: string;
   closed: boolean;
 }
@@ -114,6 +127,7 @@ export interface InventoryItem {
   sellingPrice?: number;
   measurement: 'unit' | 'g' | 'ml' | 'kg' | 'l';
   product?: string | Product;
+  rawMaterial?: string | any;
   barCode?: string;
   receivedDate: Date | string;
   expirationDate?: Date | string;
@@ -148,8 +162,8 @@ export interface Sale {
 }
 
 // Recetas
-export interface RecipeRawMaterial {
-  rawMaterial: string;
+export interface RecipeIngredient {
+  ingredient: any; // ID o documento de RawMaterial
   quantity: number;
 }
 
@@ -158,7 +172,7 @@ export interface Recipe {
   name: string;
   description: string;
   company: string;
-  rawMaterials: RecipeRawMaterial[];
+  ingredients: RecipeIngredient[];
 }
 
 export interface DashboardSummary {
@@ -178,6 +192,45 @@ export interface Branch {
     email?: string;
     manager?: string | User;
     saleType?: 'retail' | 'hospitality';
+    loyaltySettings?: {
+        enabled: boolean;
+        identifierType: 'phone' | 'physical_card' | 'both';
+        pointsEarnRate: number;
+        pointsRedeemRate: number;
+        maxRedemptionPercentage: number;
+    };
     createdAt?: Date;
     isActive?: boolean;
+}
+
+export interface Customer {
+    _id?: string;
+    company: string;
+    name: string;
+    email?: string;
+    phone?: string;
+    cardNumber?: string;
+    loyaltyPoints: number;
+    tier: 'bronze' | 'silver' | 'gold';
+    totalSpent: number;
+    salesCount: number;
+    isActive: boolean;
+    createdAt?: Date;
+}
+
+export interface Promotion {
+    _id?: string;
+    company: string;
+    code: string;
+    description: string;
+    type: 'percentage' | 'fixed_amount';
+    value: number;
+    minPurchaseAmount: number;
+    startDate: Date | string;
+    endDate: Date | string;
+    isActive: boolean;
+    usageLimit?: number;
+    usageCount?: number;
+    targetBranches?: string[] | any[];
+    targetCategories?: string[] | any[];
 }

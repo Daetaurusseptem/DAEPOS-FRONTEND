@@ -1,5 +1,5 @@
 import { UsuarioModel } from 'src/app/models/usuario.model';
-import { company } from 'src/app/interfaces/models.interface';
+import { Company } from 'src/app/interfaces/models.interface';
 import { UsersService } from 'src/app/services/users.service';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, TitleStrategy, UrlTree } from '@angular/router';
@@ -12,11 +12,11 @@ import { AuthService } from '../services/auth.service';
   providedIn: 'root'
 })
 export class EmpresaPermisoGuard implements CanActivate {
-  empresas: company[] = [];
+  empresas: Company[] = [];
   empresasConPermiso: any[] = [];
   usuarioModel!: UsuarioModel;
   empresaId!: string;
-  empresa!: company;
+  empresa!: Company;
   
 
   constructor(

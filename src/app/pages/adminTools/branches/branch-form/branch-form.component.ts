@@ -47,7 +47,14 @@ export class BranchFormComponent implements OnInit {
       email: ['', [Validators.email]],
       manager: [''],
       saleType: ['retail', Validators.required],
-      isActive: [true]
+      isActive: [true],
+      loyaltySettings: this.fb.group({
+        enabled: [true],
+        identifierType: ['phone', Validators.required],
+        pointsEarnRate: [10, [Validators.required, Validators.min(0.01)]],
+        pointsRedeemRate: [0.10, [Validators.required, Validators.min(0.001)]],
+        maxRedemptionPercentage: [100, [Validators.required, Validators.min(1), Validators.max(100)]]
+      })
     });
   }
 
@@ -75,7 +82,14 @@ export class BranchFormComponent implements OnInit {
           email: branch.email,
           manager: branch.manager ? (typeof branch.manager === 'object' ? (branch.manager as any)._id : branch.manager) : '',
           saleType: branch.saleType,
-          isActive: branch.isActive
+          isActive: branch.isActive,
+          loyaltySettings: branch.loyaltySettings || {
+            enabled: true,
+            identifierType: 'phone',
+            pointsEarnRate: 10,
+            pointsRedeemRate: 0.10,
+            maxRedemptionPercentage: 100
+          }
         });
         this.isLoading = false;
       },

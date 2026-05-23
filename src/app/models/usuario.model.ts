@@ -11,6 +11,7 @@ export class UsuarioModel {
         public img?: string,
         public password?: string,
         public company?:Company,
-        public permissions?: string[]
+        public permissions?: string[],
+        public isDemo?: boolean
     ) {}
   }

@@ -1,0 +1,414 @@
+/* Caja Detail Page Premium light-mode Stylesheet */
+
+.caja-detail-container {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1f2937;
+  min-height: 80vh;
+}
+
+/* Glass Panels */
+.glass-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-detail-card {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Header Avatar circular */
+.user-avatar-lg img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.avatar-fallback-lg {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0070f3 0%, #7928ca 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.4rem;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Custom premium navigation tabs */
+.tabs-nav {
+  height: 52px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0 4px;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: #111827;
+}
+
+.tab-btn.active {
+  color: #0070f3;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #0070f3;
+  box-shadow: 0 -2px 10px rgba(0, 112, 243, 0.4);
+}
+
+/* Dual Card Layout expected vs counted */
+.expected-card {
+  background: rgba(25, 135, 84, 0.02);
+  border-color: rgba(25, 135, 84, 0.12) !important;
+}
+
+.expected-card h2 {
+  color: #198754 !important;
+}
+
+.counted-card {
+  background: #ffffff;
+  border: 1px solid #d1d5db !important;
+}
+
+.counted-card.perfect {
+  background: rgba(25, 135, 84, 0.02);
+  border-color: rgba(25, 135, 84, 0.15) !important;
+}
+
+.counted-card.perfect h2 {
+  color: #198754 !important;
+}
+
+.counted-card.deficit {
+  background: rgba(220, 53, 69, 0.02);
+  border-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+.counted-card.deficit h2 {
+  color: #dc3545 !important;
+}
+
+.counted-card.surplus {
+  background: rgba(245, 158, 11, 0.02);
+  border-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+.counted-card.surplus h2 {
+  color: #d97706 !important;
+}
+
+/* Payment breakdown progress bars */
+.payment-methods-card {
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  background-color: #f9fafb !important;
+}
+
+.progress-bar-bg {
+  background-color: #e5e7eb;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* Timeline/Bitacora css styles */
+.timeline {
+  position: relative;
+  padding-left: 20px;
+  margin-left: 8px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 1px;
+  height: 90%;
+  background-color: #e5e7eb;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -4px;
+  top: 20px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(220, 53, 69, 0.2);
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0 !important;
+}
+
+.timeline-content {
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.timeline-content p {
+  color: #1f2937 !important;
+}
+
+/* Monospace fonts alignment */
+.font-monospace {
+  font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  letter-spacing: -0.02em;
+}
+
+/* Badges Alignment */
+.bg-secondary-soft {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.bg-danger-soft {
+  background-color: rgba(220, 53, 69, 0.08);
+  color: #dc3545;
+}
+
+.bg-success-soft {
+  background-color: rgba(25, 135, 84, 0.08);
+  color: #198754;
+}
+
+.bg-warning-soft {
+  background-color: rgba(245, 158, 11, 0.08);
+  color: #d97706;
+}
+
+.bg-primary-soft {
+  background-color: rgba(0, 112, 243, 0.08);
+  color: #0070f3;
+}
+
+.live-bullet {
+  width: 6px;
+  height: 6px;
+  background-color: #0070f3;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px #0070f3;
+  animation: bullet-glow 2s infinite alternate;
+}
+
+@keyframes bullet-glow {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+
+.animate-pulse {
+  animation: warning-pulse 1.8s infinite alternate;
+}
+
+@keyframes warning-pulse {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+/* Custom Table stylings for sales */
+.custom-sales-table {
+  background-color: transparent !important;
+}
+
+.custom-sales-table th {
+  background-color: #f9fafb !important;
+  color: #4b5563 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  padding: 14px 20px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.custom-sales-table td {
+  padding: 14px 20px !important;
+  background-color: transparent !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  color: #1f2937 !important;
+  vertical-align: middle !important;
+  transition: background-color 0.15s ease;
+}
+
+.clickable-sale-row {
+  cursor: pointer;
+}
+
+.clickable-sale-row:hover td {
+  background-color: #f9fafb !important;
+}
+
+.clickable-sale-row.expanded td {
+  background-color: rgba(0, 112, 243, 0.03) !important;
+  border-bottom-color: transparent !important;
+}
+
+.max-products-preview {
+  display: inline-block;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Nested subtable inside row */
+.expanded-row-detail td {
+  padding: 0 !important;
+  background-color: #f9fafb !important;
+}
+
+.bg-dark-deep {
+  background-color: #f9fafb !important;
+}
+
+.border-indigo {
+  border-left-width: 3px !important;
+  border-left-style: solid !important;
+  border-left-color: #0070f3 !important;
+}
+
+.custom-nested-table {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.custom-nested-table th {
+  background-color: #f3f4f6 !important;
+  color: #4b5563 !important;
+  font-size: 0.65rem !important;
+  padding: 8px 12px !important;
+  border-bottom-color: #e5e7eb !important;
+}
+
+.custom-nested-table td {
+  padding: 8px 12px !important;
+  font-size: 0.775rem !important;
+  border-bottom-color: #f3f4f6 !important;
+  color: #1f2937 !important;
+}
+
+/* Button & control stylings */
+.btn-primary-soft {
+  background-color: rgba(0, 112, 243, 0.05);
+  color: #0070f3;
+  border: 1px solid rgba(0, 112, 243, 0.15);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-soft:hover {
+  background-color: rgba(0, 112, 243, 0.1);
+  color: #0056b3;
+  border-color: rgba(0, 112, 243, 0.25);
+}
+
+.btn-outline-light {
+  border-radius: 10px;
+  border-color: #d1d5db;
+  color: #4b5563;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-light:hover {
+  background-color: #f9fafb;
+  color: #111827;
+  border-color: #9ca3af;
+}
+
+.btn-ghost-light {
+  background: none;
+  border: none;
+  color: #4b5563;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-ghost-light:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #111827;
+}
+
+.bg-dark-soft {
+  background-color: #f9fafb;
+}
+
+.fs-7 {
+  font-size: 0.825rem;
+}
+
+.fs-7.5 {
+  font-size: 0.85rem;
+}
+
+.fs-8.5 {
+  font-size: 0.75rem;
+}
+
+.fs-9 {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.text-white {
+  color: #111827 !important;
+}
+.border-secondary-soft {
+  border-color: #e5e7eb !important;
+}
+.italic {
+  font-style: italic;
+}
+.detail-header span {
+  color: #4b5563 !important;
+}
+.detail-header .badge {
+  color: #4b5563 !important;
+}
+.timeline-content .text-white {
+  color: #111827 !important;
+}
+.expanded-content-panel h4 {
+  color: #111827 !important;
+}

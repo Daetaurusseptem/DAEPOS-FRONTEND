@@ -38,7 +38,10 @@ export class ProductService {
       limit: limit.toString(),
       companyId
     };
-    return this.http.get<InventoryResponse>(`${urlProducts}/search/${companyId}`, { params });
+    return this.http.get<InventoryResponse>(`${urlProducts}/search/${companyId}`, {
+      params,
+      ...this.authService.headers
+    });
   }
 
   getCompanyProducts(id: string) {

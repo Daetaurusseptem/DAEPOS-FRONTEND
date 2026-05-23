@@ -6,6 +6,9 @@ import { Product, InventoryItem } from 'src/app/interfaces/models.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { InventoryService } from 'src/app/services/inventory.service';
 import { ProductService } from 'src/app/services/product.service';
+import { RawMaterialsService } from 'src/app/services/raw-materials.service';
+import { BranchService } from 'src/app/services/branch.service';
+import { SupplierService } from 'src/app/services/provider.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -17,20 +20,41 @@ export class AddInventoryComponent implements OnInit {
 
   inventoryForm!: FormGroup;
   companyId!: string;
+  userRole!: string;
+  
+  // Products
   products: Product[] = [];
   filteredProducts: Product[] = [];
   selectedProduct: any;
+
+  // Raw Materials
+  rawMaterials: any[] = [];
+  filteredRawMaterials: any[] = [];
+  selectedRawMaterial: any;
+
+  // Branches
+  branches: any[] = [];
+
+  // Suppliers
+  suppliers: any[] = [];
+
+  // Selection toggle
+  itemType: 'product' | 'raw_material' = 'product';
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
     private inventoryService: InventoryService,
+    private rawMaterialsService: RawMaterialsService,
+    private branchService: BranchService,
+    private supplierService: SupplierService,
     private authService: AuthService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
     this.companyId = this.authService.companyId || this.authService.company?._id || '';
+    this.userRole = this.authService.role || '';
     
     if (!this.companyId) {
       this.router.navigateByUrl('/dashboard');
@@ -40,7 +64,10 @@ export class AddInventoryComponent implements OnInit {
     this.inventoryForm = this.fb.group({
       name: ['', Validators.required],
       barCode: [''],
-      product: ['', Validators.required],
+      product: [''],
+      rawMaterial: [''],
+      branch: ['', Validators.required],
+      supplier: [''],
       stock: [0, [Validators.required, Validators.min(0)]],
       costPrice: [0, [Validators.required, Validators.min(0)]],
       sellingPrice: [0, [Validators.required, Validators.min(0)]],
@@ -50,7 +77,21 @@ export class AddInventoryComponent implements OnInit {
       modifications: this.fb.array([])
     });
 
+    // Auto-fill branch for managers/users
+    if (this.userRole === 'admin' || this.userRole === 'user') {
+      const bId = this.authService.branch?._id || this.authService.branch || '';
+      this.inventoryForm.patchValue({ branch: bId });
+    }
+
     this.loadInitialProducts();
+    this.loadRawMaterials();
+    this.loadSuppliers();
+    
+    if (this.userRole === 'companyAdmin') {
+      this.loadBranches();
+    }
+    
+    this.setupFormValidators();
   }
 
   get modifications(): FormArray {
@@ -70,12 +111,60 @@ export class AddInventoryComponent implements OnInit {
     this.modifications.removeAt(index);
   }
 
+  setItemType(type: 'product' | 'raw_material'): void {
+    this.itemType = type;
+    this.setupFormValidators();
+    
+    // Clear selections
+    this.selectedProduct = null;
+    this.selectedRawMaterial = null;
+    this.inventoryForm.patchValue({
+      name: '',
+      product: '',
+      rawMaterial: '',
+      measurement: 'unit',
+      sellingPrice: 0
+    });
+    
+    // Clear formarray modifications
+    while (this.modifications.length !== 0) {
+      this.modifications.removeAt(0);
+    }
+  }
+
+  setupFormValidators(): void {
+    const productControl = this.inventoryForm.get('product');
+    const rawMaterialControl = this.inventoryForm.get('rawMaterial');
+    const sellingPriceControl = this.inventoryForm.get('sellingPrice');
+    
+    if (this.itemType === 'product') {
+      productControl?.setValidators([Validators.required]);
+      rawMaterialControl?.clearValidators();
+      sellingPriceControl?.setValidators([Validators.required, Validators.min(0)]);
+    } else {
+      rawMaterialControl?.setValidators([Validators.required]);
+      productControl?.clearValidators();
+      sellingPriceControl?.clearValidators();
+    }
+    
+    productControl?.updateValueAndValidity();
+    rawMaterialControl?.updateValueAndValidity();
+    sellingPriceControl?.updateValueAndValidity();
+  }
+
   onSubmit(): void {
     if (this.inventoryForm.valid) {
       const newItem: Partial<InventoryItem> = {
         ...this.inventoryForm.value,
         company: this.companyId
       };
+
+      // Si es materia prima, borrar explícitamente el campo producto
+      if (this.itemType === 'raw_material') {
+        delete (newItem as any).product;
+      } else {
+        delete (newItem as any).rawMaterial;
+      }
 
       Swal.fire({
         title: '¿Estás seguro?',
@@ -134,5 +223,54 @@ export class AddInventoryComponent implements OnInit {
       name: product.name 
     });
     this.filteredProducts = [];
+    
+    // Auto-select supplier if the product has one
+    if (product.supplier) {
+      this.inventoryForm.patchValue({ supplier: product.supplier });
+    }
+  }
+
+  loadRawMaterials(): void {
+    this.rawMaterialsService.getCompanyRawMaterials(this.companyId)
+      .pipe(map(resp => resp.rawMaterials || []))
+      .subscribe(items => {
+        this.rawMaterials = items;
+        this.filteredRawMaterials = items;
+      });
+  }
+
+  onSearchRawMaterial(event: any): void {
+    const searchTerm = event.target.value.toLowerCase();
+    if (searchTerm) {
+      this.filteredRawMaterials = this.rawMaterials.filter(rm => 
+        rm.name.toLowerCase().includes(searchTerm)
+      );
+    } else {
+      this.filteredRawMaterials = [...this.rawMaterials];
+    }
+  }
+
+  onSelectRawMaterial(rawMaterial: any): void {
+    this.selectedRawMaterial = rawMaterial;
+    this.inventoryForm.patchValue({ 
+      rawMaterial: rawMaterial._id,
+      name: rawMaterial.name,
+      measurement: rawMaterial.measurementUnit
+    });
+    this.filteredRawMaterials = [];
+  }
+
+  loadSuppliers(): void {
+    this.supplierService.getCompanySuppliers(this.companyId).subscribe(resp => {
+      this.suppliers = resp.items || [];
+    });
+  }
+
+  loadBranches(): void {
+    this.branchService.getBranchesByCompany(this.companyId).subscribe(resp => {
+      if (resp.ok) {
+        this.branches = resp.branches || [];
+      }
+    });
   }
 }

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "connor-pos-frontend": {
+    "daepoint-pos-frontend": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/connor-pos-frontend",
+            "outputPath": "dist/daepoint-pos-frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -72,10 +72,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "connor-pos-frontend:build:production"
+              "browserTarget": "daepoint-pos-frontend:build:production"
             },
             "development": {
-              "browserTarget": "connor-pos-frontend:build:development"
+              "browserTarget": "daepoint-pos-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "connor-pos-frontend:build"
+            "browserTarget": "daepoint-pos-frontend:build"
           }
         },
         "test": {

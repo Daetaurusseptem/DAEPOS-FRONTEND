@@ -38,6 +38,7 @@ export class SupplierDetailsComponent implements OnInit {
 
   // Permission & Role Check
   canVerifyRestock: boolean = false;
+  payFromRegister: boolean = true;
 
   // Modals visibility toggles
   showScheduleModal: boolean = false;
@@ -57,7 +58,7 @@ export class SupplierDetailsComponent implements OnInit {
 
   // Inspect Restock State
   selectedRestockForInspect: any = null;
-  inspectedItems: { name: string; quantity: number; costPrice: number; verified: boolean }[] = [];
+  inspectedItems: { productId?: string; type?: string; name: string; quantity: number; costPrice: number; verified: boolean }[] = [];
 
   // Quick Product Form Bindings
   quickProduct = {
@@ -265,7 +266,13 @@ export class SupplierDetailsComponent implements OnInit {
       ...this.newRestock,
       company: this.companyId,
       supplier: this.supplierId,
-      status: 'pending'
+      status: 'pending',
+      items: validItems.map(it => ({
+        type: 'Product',
+        itemRef: it.productId,
+        quantity: it.quantity,
+        costPrice: 0
+      }))
     };
 
     this.supplierService.createRestockSchedule(payload).subscribe({
@@ -284,28 +291,46 @@ export class SupplierDetailsComponent implements OnInit {
 
   openInspectModal(restock: any) {
     this.selectedRestockForInspect = restock;
-    // Parsear items programados para crear una checklist interactiva
-    const summary = restock.itemsSummary || '';
-    const items = summary.split(',').map((it: string) => {
-      const trimmed = it.trim();
-      const parts = trimmed.match(/^(\d+)\s+(.+)$/);
-      if (parts) {
+    this.payFromRegister = true;
+
+    if (restock.items && restock.items.length > 0) {
+      this.inspectedItems = restock.items.map((it: any) => {
+        const prodName = it.itemRef?.name || it.itemRef || 'Artículo';
         return {
-          name: parts[2],
-          quantity: parseInt(parts[1], 10),
+          productId: it.itemRef?._id || it.itemRef,
+          type: it.type || 'Product',
+          name: prodName,
+          quantity: it.quantity || 0,
+          costPrice: it.costPrice || 0,
+          verified: true
+        };
+      });
+    } else {
+      const summary = restock.itemsSummary || '';
+      this.inspectedItems = summary.split(',').map((it: string) => {
+        const trimmed = it.trim();
+        const parts = trimmed.match(/^(\d+)\s+(.+)$/);
+        if (parts) {
+          return {
+            productId: '',
+            type: 'Product',
+            name: parts[2],
+            quantity: parseInt(parts[1], 10),
+            costPrice: 0,
+            verified: false
+          };
+        }
+        return {
+          productId: '',
+          type: 'Product',
+          name: trimmed,
+          quantity: 1,
           costPrice: 0,
           verified: false
         };
-      }
-      return {
-        name: trimmed,
-        quantity: 1,
-        costPrice: 0,
-        verified: false
-      };
-    });
+      });
+    }
 
-    this.inspectedItems = items;
     this.showInspectModal = true;
   }
 
@@ -379,42 +404,49 @@ export class SupplierDetailsComponent implements OnInit {
   }
 
   completeInspection() {
-    // Validar que al menos un item esté verificado
-    const verifiedAny = this.inspectedItems.some(it => it.verified);
-    if (!verifiedAny) {
+    const verifiedItems = this.inspectedItems.filter(it => it.verified);
+    if (verifiedItems.length === 0) {
       Swal.fire('Atención', 'Debes verificar al menos un artículo para recibir la entrega', 'warning');
       return;
     }
 
     Swal.fire({
       title: '¿Confirmar Recepción?',
-      text: 'Se registrará el arribo y se marcará la entrega como COMPLETADA.',
+      text: 'Se registrará el arribo de la mercancía con las cantidades y costos ingresados.',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Completar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.supplierService.updateRestockStatus(this.selectedRestockForInspect._id, { status: 'completed' }).subscribe({
+        const payload = {
+          status: 'completed',
+          payFromRegister: this.payFromRegister,
+          items: verifiedItems.map(it => ({
+            type: it.type || 'Product',
+            itemRef: it.productId || undefined,
+            quantity: it.quantity,
+            costPrice: it.costPrice || 0
+          }))
+        };
+
+        this.supplierService.updateRestockStatus(this.selectedRestockForInspect._id, payload).subscribe({
           next: (resp: any) => {
             if (resp.ok) {
               Swal.fire({
                 title: '¡Entrega Recibida!',
-                text: 'La mercancía ha sido auditada. ¿Deseas ir ahora a registrar la entrada formal de estos artículos al inventario activo?',
+                text: 'La mercancía ha sido auditada e ingresada automáticamente al inventario activo.',
                 icon: 'success',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, ir a Inventario',
-                cancelButtonText: 'No, después'
-              }).then((choice) => {
+                confirmButtonText: 'Aceptar'
+              }).then(() => {
                 this.showInspectModal = false;
                 this.loadRestocks();
                 this.loadDataAndCalculateKPIs();
-
-                if (choice.isConfirmed) {
-                  this.router.navigateByUrl('/dashboard/admin/inventory/new');
-                }
               });
             }
+          },
+          error: (err) => {
+            Swal.fire('Error', err.error?.message || 'No se pudo completar la recepción', 'error');
           }
         });
       }

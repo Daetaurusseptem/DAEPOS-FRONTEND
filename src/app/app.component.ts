@@ -8,7 +8,7 @@ import { SpinnerService } from './services/spinner.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'connor-pos-frontend';
+  title = 'daepoint-pos';
 
   constructor(private router: Router, private spinnerService: SpinnerService) {
     this.router.events.subscribe((event: Event) => {

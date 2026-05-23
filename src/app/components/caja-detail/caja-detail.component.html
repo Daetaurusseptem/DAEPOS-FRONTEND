@@ -1,141 +1,302 @@
 <app-back-button></app-back-button>
 
-<div class="container mt-5">
-  <div class="card shadow-lg">
-    <div class="card-header bg-dark text-white">
-      <h2 class="mb-0"><i class="bi bi-box-seam"></i> Detalles de Caja</h2>
+<div class="caja-detail-container mt-4">
+  <div class="text-center py-5" *ngIf="!caja">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
     </div>
-    <div class="card-body">
-      <div *ngIf="caja">
-        <!-- Usuario -->
-        <div class="mb-3">
-          <i class="bi bi-person-fill"></i> <strong>Usuario:</strong> {{ caja.user.name }}
+    <p class="text-muted mt-3">Cargando detalles de arqueo...</p>
+  </div>
+
+  <div *ngIf="caja" class="glass-card main-detail-card overflow-hidden">
+    
+    <!-- Detail Card Header -->
+    <div class="detail-header p-4 border-bottom border-secondary-soft d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="user-avatar-lg">
+          <img *ngIf="caja.user?.img" [src]="caja.user?.img" alt="Avatar">
+          <div *ngIf="!caja.user?.img" class="avatar-fallback-lg">{{ (caja.user?.name || 'U').substring(0,1).toUpperCase() }}</div>
         </div>
-        
-        <!-- Fecha de Apertura con Hora -->
-        <div class="mb-3">
-          <i class="bi bi-clock-history"></i> 
-          <strong>Fecha de Apertura:</strong> 
-          {{ caja.startDate | date: 'fullDate' }} - {{ caja.startDate | date: 'shortTime' }}
-        </div>
-        
-        <!-- Fecha de Cierre con Hora (solo si la caja está cerrada) -->
-        <div class="mb-3" *ngIf="caja.closed">
-          <i class="bi bi-clock-fill"></i> 
-          <strong>Fecha de Cierre:</strong> 
-          {{ caja.endDate | date: 'fullDate' }} - {{ caja.endDate | date: 'shortTime' }}
-        </div>
-        
-        <!-- Estado de la Caja -->
-        <div class="mb-3">
-          <i class="bi bi-info-circle-fill"></i> 
-          <strong>Estado:</strong> 
-          <span [ngClass]="{'text-success': !caja.closed, 'text-danger': caja.closed}">
-            {{ caja.closed ? 'Cerrada' : 'Abierta' }}
+        <div>
+          <span class="text-muted-custom fs-8.5 d-block text-uppercase fw-semibold tracking-wider">Detalles de Turno / Arqueo</span>
+          <h1 class="h3 text-white mb-0">{{ caja.user?.name }}</h1>
+          <span class="badge bg-secondary-soft text-muted-custom mt-1">
+            <i class="bi bi-laptop"></i> {{ caja.physicalRegister?.name || 'Estación de Cobro' }}
           </span>
         </div>
-        
-        <!-- Monto Inicial -->
-        <div class="mb-3">
-          <i class="bi bi-currency-dollar"></i> 
-          <strong>Monto Inicial:</strong> 
-          {{ caja.initialAmount | currency }}
-        </div>
-        
-        <!-- Monto Final (solo si la caja está cerrada) -->
-        <div class="mb-3" *ngIf="caja.closed">
-          <i class="bi bi-wallet2"></i> 
-          <strong>Monto Final:</strong> 
-          {{ caja.finalAmount | currency }}
-        </div>
-
-        <!-- Ventas -->
-        <div class="mb-3">
-          <i class="bi bi-cart-check-fill"></i> <strong>Ventas:</strong>
-          <ng-container *ngIf="caja.sales && caja.sales.length > 0; else noSales">
-            <table class="table table-hover table-bordered mt-3">
-              <thead class="table-dark">
-                <tr>
-                  <th><i class="bi bi-upc-scan"></i> Venta ID</th>
-                  <th><i class="bi bi-calendar-event"></i> Fecha</th>
-                  <th><i class="bi bi-currency-dollar"></i> Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let sale of caja.sales">
-                  <td>{{ sale._id }}</td>
-                  <td>{{ sale.date | date: 'short' }}</td>
-                  <td>{{ sale.total | currency }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </ng-container>
-          <ng-template #noSales>
-            <p class="text-muted">No se registraron ventas en esta caja.</p>
-          </ng-template>
-        </div>
-
-        <!-- Productos Vendidos por Venta -->
-        <div class="mt-4" *ngIf="caja.sales && caja.sales.length > 0">
-          <div *ngFor="let sale of caja.sales">
-            <i class="bi bi-basket-fill"></i> <strong>Productos Vendidos (Venta ID: {{ sale._id }}):</strong>
-            <ng-container *ngIf="sale.productsSold && sale.productsSold.length > 0; else noProducts">
-              <table class="table table-bordered mt-2">
-                <thead class="table-light">
-                  <tr>
-                    <th><i class="bi bi-box"></i> Producto</th>
-                    <th><i class="bi bi-123"></i> Cantidad</th>
-                    <th><i class="bi bi-currency-exchange"></i> Subtotal</th>
-                    <th><i class="bi bi-pencil-square"></i> Modificaciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let product of sale.productsSold">
-                    <td>{{ product.product.name }}</td>
-                    <td>{{ product.quantity }}</td>
-                    <td>{{ product.subtotal | currency }}</td>
-                    <td>
-                      <ul *ngIf="product.modifications.length > 0">
-                        <li *ngFor="let mod of product.modifications">
-                          {{ mod.name }} (+{{ mod.extraPrice | currency }})
-                        </li>
-                      </ul>
-                      <span *ngIf="product.modifications.length === 0">Sin modificaciones</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </ng-container>
-          </div>
-          <ng-template #noProducts>
-            <p class="text-muted">No se registraron productos vendidos en esta venta.</p>
-          </ng-template>
-        </div>
-
-        <!-- Totales -->
-        <div class="mb-3 mt-4">
-          <i class="bi bi-calculator"></i> <strong>Subtotal Ventas:</strong> {{ subtotalVentas | currency }}
-        </div>
-        <div class="mb-3">
-          <i class="bi bi-cash-stack"></i> <strong>Total en Caja:</strong> {{ totalEnCaja | currency }}
-        </div>
-
-        <!-- Actions -->
-        <div class="d-flex justify-content-between mt-4">
-          <button class="btn btn-outline-primary" (click)="generarPDF()">
-            <i class="bi bi-file-earmark-pdf-fill"></i> Generar PDF
-          </button>
-          <button class="btn btn-outline-secondary" (click)="imprimirTicket()">
-            <i class="bi bi-printer-fill"></i> Imprimir Ticket
-          </button>
-        </div>
       </div>
-      <div *ngIf="!caja">
-        <div class="text-center">
-          <i class="bi bi-hourglass-split"></i>
-          <p class="mt-3">Cargando detalles de caja...</p>
+
+      <!-- Live / Closed State Badge -->
+      <div class="d-flex align-items-center gap-2">
+        <span *ngIf="!caja.closed" class="badge bg-primary-soft text-indigo border border-primary-soft p-2 fs-7 animate-pulse">
+          <span class="live-bullet me-1"></span> CERRANDO EN POS (EN CURSO)
+        </span>
+        
+        <div class="d-flex flex-column align-items-end" *ngIf="caja.closed">
+          <span class="badge bg-secondary-soft text-muted-custom p-2 fs-7" *ngIf="caja.difference === 0">
+            <i class="bi bi-check-circle-fill text-success me-1"></i> ARQUEO CUADRADO
+          </span>
+          <span class="badge bg-danger-soft text-danger p-2 fs-7" *ngIf="caja.difference !== undefined && caja.difference < 0">
+            <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> FALTANTE: {{ caja.difference | currency }}
+          </span>
+          <span class="badge bg-warning-soft text-warning p-2 fs-7" *ngIf="caja.difference !== undefined && caja.difference > 0">
+            <i class="bi bi-plus-circle-fill text-warning me-1"></i> SOBRANTE: +{{ caja.difference | currency }}
+          </span>
+          <span class="text-muted-custom fs-8.5 mt-1">Cerrado el {{ caja.endDate | date: 'short' }}</span>
         </div>
       </div>
     </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs-nav d-flex border-bottom border-secondary-soft bg-dark-soft px-4 gap-4">
+      <button class="tab-btn" [class.active]="activeTab === 'balance'" (click)="activeTab = 'balance'">
+        <i class="bi bi-pie-chart-fill"></i> Resumen de Arqueo
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'sales'" (click)="activeTab = 'sales'">
+        <i class="bi bi-cart-check-fill"></i> Ventas de Turno ({{ caja.sales?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'expenses'" (click)="activeTab = 'expenses'">
+        <i class="bi bi-journal-text"></i> Bitácora de Egresos ({{ caja.expenses?.length || 0 }})
+      </button>
+    </div>
+
+    <!-- Details Card Body -->
+    <div class="p-4">
+      
+      <!-- Tab 1: Balance, Arqueo & Payments distribution -->
+      <div *ngIf="activeTab === 'balance'">
+        <div class="row g-4 mb-4">
+          
+          <!-- Arqueo Comparison Dashboard -->
+          <div class="col-12 col-lg-7">
+            <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3">Balance del Turno</h3>
+            
+            <div class="row g-3">
+              <div class="col-6 col-md-4">
+                <div class="p-3 bg-dark-soft rounded border border-secondary-soft">
+                  <span class="text-muted-custom fs-8.5 d-block">Monto de Apertura</span>
+                  <strong class="text-white fs-5 font-monospace">{{ caja.initialAmount | currency }}</strong>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="p-3 bg-dark-soft rounded border border-secondary-soft">
+                  <span class="text-muted-custom fs-8.5 d-block">Egresos / Gastos</span>
+                  <strong class="text-danger fs-5 font-monospace">- {{ getExpensesSum(caja.expenses) | currency }}</strong>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="p-3 bg-dark-soft rounded border border-secondary-soft">
+                  <span class="text-muted-custom fs-8.5 d-block">Total en Ventas</span>
+                  <strong class="text-success fs-5 font-monospace">+ {{ subtotalVentas | currency }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Double-card expected vs counted -->
+            <div class="row g-3 mt-1">
+              <div class="col-12 col-md-6">
+                <div class="p-4 rounded expected-card border border-secondary-soft text-center">
+                  <span class="text-muted-custom fs-8.5 d-block mb-1">Efectivo Esperado (Teórico)</span>
+                  <h2 class="text-success font-monospace mb-0 fw-bold">{{ caja.expectedAmount | currency }}</h2>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="p-4 rounded counted-card border border-secondary-soft text-center" [class.perfect]="caja.difference === 0" [class.deficit]="caja.difference !== undefined && caja.difference < 0" [class.surplus]="caja.difference !== undefined && caja.difference > 0">
+                  <span class="text-muted-custom fs-8.5 d-block mb-1">Efectivo Declarado (Entregado)</span>
+                  <h2 class="text-white font-monospace mb-0 fw-bold" *ngIf="caja.closed">{{ caja.actualAmount | currency }}</h2>
+                  <h2 class="text-muted-custom font-monospace mb-0 fw-bold" *ngIf="!caja.closed">Activo</h2>
+                </div>
+              </div>
+            </div>
+
+            <!-- Arqueo Note -->
+            <div class="p-3 rounded bg-dark-soft border border-secondary-soft mt-3" *ngIf="caja.notes">
+              <span class="text-muted-custom fs-8.5 d-block fw-semibold mb-1">Notas / Observaciones del Cierre:</span>
+              <p class="text-white fs-7.5 mb-0 italic">&ldquo;{{ caja.notes }}&rdquo;</p>
+            </div>
+          </div>
+
+          <!-- Payment Methods Distributions -->
+          <div class="col-12 col-lg-5">
+            <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3">Distribución de Pagos</h3>
+            <div class="payment-methods-card p-4 rounded bg-dark-soft border border-secondary-soft">
+              
+              <!-- Cash -->
+              <div class="mb-3">
+                <div class="d-flex justify-content-between fs-7.5 mb-1">
+                  <span class="text-white"><i class="bi bi-cash text-success"></i> Efectivo</span>
+                  <strong class="text-white font-monospace">{{ caja.payments.cash | currency }}</strong>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill bg-success" 
+                       [style.width]="(subtotalVentas > 0 ? (caja.payments.cash / subtotalVentas * 100) : 0) + '%'"></div>
+                </div>
+              </div>
+
+              <!-- Credit Card -->
+              <div class="mb-3">
+                <div class="d-flex justify-content-between fs-7.5 mb-1">
+                  <span class="text-white"><i class="bi bi-credit-card-2-front text-info"></i> Tarjeta de Crédito</span>
+                  <strong class="text-white font-monospace">{{ caja.payments.credit | currency }}</strong>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill bg-info" 
+                       [style.width]="(subtotalVentas > 0 ? (caja.payments.credit / subtotalVentas * 100) : 0) + '%'"></div>
+                </div>
+              </div>
+
+              <!-- Debit Card -->
+              <div class="mb-2">
+                <div class="d-flex justify-content-between fs-7.5 mb-1">
+                  <span class="text-white"><i class="bi bi-credit-card text-primary"></i> Tarjeta de Débito</span>
+                  <strong class="text-white font-monospace">{{ caja.payments.debit | currency }}</strong>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill bg-primary" 
+                       [style.width]="(subtotalVentas > 0 ? (caja.payments.debit / subtotalVentas * 100) : 0) + '%'"></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- General Info Panel -->
+            <div class="p-3 mt-3 rounded bg-dark-soft border border-secondary-soft fs-7.5">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted-custom">Apertura</span>
+                <span class="text-white fw-medium">{{ caja.startDate | date: 'medium' }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-0" *ngIf="caja.closed">
+                <span class="text-muted-custom">Cierre</span>
+                <span class="text-white fw-medium">{{ caja.endDate | date: 'medium' }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab 2: Sales List -->
+      <div *ngIf="activeTab === 'sales'">
+        <div class="text-center py-4 bg-dark-soft rounded text-muted-custom border border-secondary-soft fs-7.5" *ngIf="!caja.sales || caja.sales.length === 0">
+          No se registraron ventas en esta sesión de caja.
+        </div>
+
+        <div class="table-responsive" *ngIf="caja.sales && caja.sales.length > 0">
+          <table class="table custom-sales-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" style="width: 250px;">Folio de Venta (ID)</th>
+                <th scope="col">Hora</th>
+                <th scope="col">Productos</th>
+                <th scope="col" class="text-end">Total Pagado</th>
+                <th scope="col" class="text-center">Artículos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let sale of caja.sales">
+                <!-- Main Sale Row -->
+                <tr (click)="toggleSaleExpand(sale._id)" class="clickable-sale-row" [class.expanded]="expandedSales[sale._id]">
+                  <td>
+                    <span class="text-white font-monospace fs-7.5">{{ sale._id }}</span>
+                  </td>
+                  <td>
+                    <span class="text-muted-custom fs-7.5">{{ sale.date | date: 'shortTime' }}</span>
+                  </td>
+                  <td>
+                    <span class="text-white fs-7.5 max-products-preview">
+                      {{ sale.productsSold ? (sale.productsSold[0]?.product?.name + (sale.productsSold.length > 1 ? ' y ' + (sale.productsSold.length - 1) + ' más' : '')) : 'Venta' }}
+                    </span>
+                  </td>
+                  <td class="text-end font-monospace text-success fs-7.5 fw-semibold">
+                    {{ sale.total | currency }}
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-ghost-light btn-sm rounded-circle px-2">
+                      <i class="bi" [class.bi-chevron-down]="!expandedSales[sale._id]" [class.bi-chevron-up]="expandedSales[sale._id]"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- Collapsible Products Row -->
+                <tr *ngIf="expandedSales[sale._id]" class="expanded-row-detail">
+                  <td colspan="5" class="p-3 bg-dark-deep border-start border-indigo">
+                    <div class="expanded-content-panel p-3 rounded bg-dark-soft border border-secondary-soft">
+                      <h4 class="h6 text-white text-uppercase tracking-wider fs-8.5 mb-3"><i class="bi bi-basket-fill text-indigo"></i> Desglose de Artículos Vendidos</h4>
+                      
+                      <div class="table-responsive">
+                        <table class="table table-sm table-dark custom-nested-table mb-0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Producto</th>
+                              <th scope="col" class="text-center">Cantidad</th>
+                              <th scope="col" class="text-end">Precio Unitario</th>
+                              <th scope="col">Modificaciones / Extras</th>
+                              <th scope="col" class="text-end">Subtotal</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let prod of sale.productsSold">
+                              <td><strong class="text-white fs-7.5">{{ prod.product?.name }}</strong></td>
+                              <td class="text-center font-monospace fs-7.5 text-white">{{ prod.quantity }}</td>
+                              <td class="text-end font-monospace fs-7.5 text-muted-custom">{{ prod.unitPrice | currency }}</td>
+                              <td>
+                                <ul class="mb-0 list-unstyled text-muted-custom fs-8.5" *ngIf="prod.modifications?.length > 0">
+                                  <li *ngFor="let mod of prod.modifications">
+                                    <span class="badge bg-secondary-soft text-muted-custom me-1">+{{ mod.name }}</span>
+                                    <strong class="text-white font-monospace">{{ mod.extraPrice | currency }}</strong>
+                                  </li>
+                                </ul>
+                                <span class="text-muted-custom fs-8.5" *ngIf="!prod.modifications || prod.modifications.length === 0">&mdash;</span>
+                              </td>
+                              <td class="text-end font-monospace text-success fs-7.5 fw-semibold">{{ prod.subtotal | currency }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 3: Expenses list -->
+      <div *ngIf="activeTab === 'expenses'">
+        <div class="text-center py-4 bg-dark-soft rounded text-muted-custom border border-secondary-soft fs-7.5" *ngIf="!caja.expenses || caja.expenses.length === 0">
+          No se registraron egresos ni retiros parciales de efectivo en este turno.
+        </div>
+
+        <div class="timeline" *ngIf="caja.expenses && caja.expenses.length > 0">
+          <div class="timeline-item d-flex gap-3 pb-3 position-relative" *ngFor="let exp of caja.expenses">
+            <div class="timeline-dot bg-danger"></div>
+            <div class="timeline-content bg-dark-soft p-3 rounded flex-grow-1 border border-secondary-soft">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="badge bg-danger-soft text-danger text-uppercase fs-9">
+                  {{ exp.type === 'withdrawal' ? 'Retiro Parcial' : 'Gasto' }}
+                </span>
+                <span class="text-muted-custom fs-8">{{ exp.timestamp | date: 'medium' }}</span>
+              </div>
+              <p class="text-white mb-1 fs-7">{{ exp.reason }}</p>
+              <strong class="text-danger fs-6">- {{ exp.amount | currency }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Detail Card Footer Actions -->
+    <div class="detail-footer bg-dark-soft border-top border-secondary-soft p-4 d-flex justify-content-between gap-3">
+      <button class="btn btn-outline-light px-4 py-2 fs-7" (click)="generarPDF()">
+        <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Exportar Informe PDF
+      </button>
+
+      <button class="btn btn-primary-soft px-4 py-2 fs-7" (click)="imprimirTicket()">
+        <i class="bi bi-printer-fill text-indigo me-1"></i> Imprimir Comprobante de Arqueo
+      </button>
+    </div>
+
   </div>
 </div>

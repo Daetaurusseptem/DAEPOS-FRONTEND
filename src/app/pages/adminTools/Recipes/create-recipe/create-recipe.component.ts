@@ -5,6 +5,7 @@ import { RecipesService } from 'src/app/services/recipes.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { InventoryItem, Recipe } from 'src/app/interfaces/models.interface';
 import { InventoryService } from 'src/app/services/inventory.service';
+import { RawMaterialsService, RawMaterial } from 'src/app/services/raw-materials.service';
 import { map } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -15,12 +16,12 @@ import Swal from 'sweetalert2';
 })
 export class CreateRecipeComponent implements OnInit {
   createRecipeForm!: FormGroup;
-  rawMaterials: InventoryItem[] = [];
+  rawMaterials: RawMaterial[] = [];
 
   constructor(
     private fb: FormBuilder,
     private recipeService: RecipesService,
-    private inventoryService: InventoryService,
+    private rawMaterialsService: RawMaterialsService,
     private authService: AuthService,
     private router: Router
   ) { }
@@ -39,8 +40,8 @@ export class CreateRecipeComponent implements OnInit {
     const companyId = this.authService.companyId || this.authService.company?._id;
     if (!companyId) return;
 
-    this.inventoryService.getInventory(companyId, '', 'raw_material')
-      .pipe(map(resp => resp.items || []))
+    this.rawMaterialsService.getCompanyRawMaterials(companyId)
+      .pipe(map(resp => resp.rawMaterials || []))
       .subscribe({
         next: (items) => {
           this.rawMaterials = items;
@@ -58,7 +59,7 @@ export class CreateRecipeComponent implements OnInit {
   addIngredient(): void {
     this.rawMaterialsArray.push(this.fb.group({
       rawMaterial: ['', Validators.required],
-      quantity: [0, [Validators.required, Validators.min(0)]]
+      quantity: [0, [Validators.required, Validators.min(0.0001)]]
     }));
   }
 
@@ -83,8 +84,16 @@ export class CreateRecipeComponent implements OnInit {
       cancelButtonText: 'No'
     }).then((result) => {
       if (result.isConfirmed) {
+        const formVal = this.createRecipeForm.value;
+        const formattedIngredients = (formVal.rawMaterials || []).map((rm: any) => ({
+          ingredient: rm.rawMaterial,
+          quantity: rm.quantity
+        }));
+
         const newRecipe = {
-          ...this.createRecipeForm.value,
+          name: formVal.name,
+          description: formVal.description,
+          ingredients: formattedIngredients,
           company: companyId
         };
         this.recipeService.createRecipe(newRecipe, companyId).subscribe({

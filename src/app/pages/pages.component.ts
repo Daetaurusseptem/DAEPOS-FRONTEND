@@ -3,6 +3,7 @@ import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStar
 import { SpinnerService } from '../services/spinner.service';
 import { SidebarService } from '../services/sidebar.service';
 import { AuthService } from '../services/auth.service';
+import { SysadminService } from '../services/sysadmin.service';
 
 @Component({
   selector: 'app-pages',
@@ -17,7 +18,8 @@ export class PagesComponent {
     private router: Router, 
     private spinnerService: SpinnerService,
     public sidebarService: SidebarService,
-    public authService: AuthService
+    public authService: AuthService,
+    public sysadminService: SysadminService
   ) {
     this.sidebarService.isCollapsed$.subscribe(collapsed => {
       this.isCollapsed = collapsed;
@@ -36,5 +38,9 @@ export class PagesComponent {
           break;
       }
     });
+  }
+
+  exitImpersonation() {
+    this.sysadminService.exitImpersonation();
   }
 }

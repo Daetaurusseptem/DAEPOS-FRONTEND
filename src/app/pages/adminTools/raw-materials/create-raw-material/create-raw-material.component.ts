@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { map } from 'rxjs';
-import { InventoryItem, Supplier } from 'src/app/interfaces/models.interface';
+import { RawMaterialsService, RawMaterial } from 'src/app/services/raw-materials.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { InventoryService } from 'src/app/services/inventory.service';
-import { SupplierService } from 'src/app/services/provider.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
@@ -13,64 +10,43 @@ import Swal from 'sweetalert2';
   styleUrls: ['./create-raw-material.component.css']
 })
 export class CreateRawMaterialComponent implements OnInit {
-  rawMaterials: InventoryItem[] = [];
-  suppliers: Supplier[] = [];
-
-  newMaterial: Partial<InventoryItem> = {
+  newMaterial: RawMaterial = {
     name: '',
-    stock: 0,
-    costPrice: 0,
-    measurement: 'kg',
-    receivedDate: new Date().toISOString().substring(0, 10),
-    company: ''
+    description: '',
+    measurementUnit: 'g'
   };
 
   constructor(
-    private inventoryService: InventoryService,
-    private supplierService: SupplierService,
+    private rawMaterialsService: RawMaterialsService,
     private authService: AuthService,
     private router: Router,
   ) { }
 
   ngOnInit() {
-    this.getSuppliers();
-  }
-
-  getSuppliers() {
-    const companyId = this.authService.companyId || this.authService.company?._id;
-    if (!companyId) return;
-
-    this.supplierService.getCompanySuppliers(companyId)
-      .pipe(map(resp => resp.suppliers || []))
-      .subscribe({
-        next: (data) => {
-          this.suppliers = data;
-        },
-        error: (err) => console.error('Error fetching suppliers:', err)
-      });
   }
 
   addRawMaterial() {
-    this.newMaterial.company = this.authService.companyId || this.authService.company?._id || '';
-    
+    const companyId = this.authService.companyId || this.authService.company?._id;
+    if (!companyId) return;
+
     Swal.fire({
       title: '¿Deseas añadir este material?',
-      text: 'Confirma la adición del nuevo material de inventario',
+      text: 'Confirma la adición del nuevo insumo maestro al catálogo',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, añadir',
       cancelButtonText: 'Cancelar'
     }).then(result => {
       if (result.isConfirmed) {
-        this.inventoryService.createInventoryItem(this.newMaterial)
+        this.rawMaterialsService.createRawMaterial(this.newMaterial, companyId)
           .subscribe({
             next: (resp) => {
               if (resp.ok) {
-                Swal.fire('¡Éxito!', 'Material añadido correctamente', 'success').then(() => {
+                Swal.fire('¡Éxito!', 'Insumo maestro añadido correctamente', 'success').then(() => {
                   this.router.navigate(['dashboard/admin/raw-materials']);
                 });
               } else {
-                Swal.fire('Error', resp.msg || 'No se pudo añadir el material', 'error');
+                Swal.fire('Error', resp.message || 'No se pudo añadir el material', 'error');
               }
             },
             error: (error) => {

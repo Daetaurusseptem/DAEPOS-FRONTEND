@@ -10,7 +10,7 @@ function createWindow() {
     },
   });
 
-  const indexPath = path.join(__dirname, 'dist/connor-pos-frontend/index.html');
+  const indexPath = path.join(__dirname, 'dist/daepoint-pos-frontend/index.html');
   console.log('Index path:', indexPath); // Agrega un log para verificar la ruta
   win.loadFile(indexPath)
     .catch(err => {

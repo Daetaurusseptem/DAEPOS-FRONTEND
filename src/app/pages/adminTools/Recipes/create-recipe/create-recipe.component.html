@@ -20,7 +20,7 @@
             <div class="col-md-5">
               <label [for]="'rawMaterial'+i" class="form-label">Ingrediente</label>
               <select [id]="'rawMaterial'+i" class="form-select" formControlName="rawMaterial">
-                <option *ngFor="let rawMaterial of rawMaterials" [value]="rawMaterial._id">{{ rawMaterial.name}} ({{rawMaterial.measurement}})</option>
+                <option *ngFor="let rawMaterial of rawMaterials" [value]="rawMaterial._id">{{ rawMaterial.name}} ({{rawMaterial.measurementUnit}})</option>
               </select>
             </div>
             <div class="col-md-4">

@@ -20,21 +20,20 @@ import { ComponentsModule } from 'src/app/components/components.module';
 import { AdminToolsModule } from '../adminTools/admin-tools.module';
 import { NgxPaginationModule } from 'ngx-pagination';
 
-
-
-
+// DASHBOARD & SaaS Control Tower
+import { SysadminDashboardComponent } from './dashboard/sysadmin-dashboard.component';
 
 @NgModule({
   declarations: [
     UserEditComponent,
-    
     CompanyListComponent,
     EditCompanyComponent,
     CreateCompanyComponent,
     CompanyDetailsComponent,
     AddSubscriptionComponent,
     SelectSubscriptionsComponent,
-    UserListComponent
+    UserListComponent,
+    SysadminDashboardComponent
   ],
   imports: [
     CommonModule,
@@ -44,8 +43,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
     NgSelectModule,
     ComponentsModule,
     AdminToolsModule,
-    NgxPaginationModule,
-    NgSelectModule
+    NgxPaginationModule
   ]
 })
 export class SysAdmintoolsModule { }

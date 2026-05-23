@@ -41,15 +41,13 @@ export class AuthService {
       );
   }
 
-
   validarToken(): Observable<boolean> {
-
     return this.http.get(`${urlAuth}/renew`, this.headers)
       .pipe(
         map((resp: any) => {
           console.log(resp);
           this.idUsuario = resp.uid
-          const { name, username, img = '', role, email, _id } = resp.usuario;
+          const { name, username, img = '', role, email, _id, isDemo = false } = resp.usuario;
           
           this.company = resp.company;
           this.branch = resp.branch;
@@ -62,7 +60,7 @@ export class AuthService {
           
           console.log('COMPAÑYYYYYY', this.companyId);
 
-          this.usuario = new UsuarioModel(_id, username, name, role, email, img);
+          this.usuario = new UsuarioModel(_id, username, name, role, email, img, undefined, undefined, resp.usuario.permissions || [], isDemo);
 
           this.guardarLocalStorage(resp.token, resp.menu)
           return true;
@@ -70,6 +68,10 @@ export class AuthService {
         catchError(error => of(false))
       );
 
+  }
+
+  demoReset(): Observable<any> {
+    return this.http.post(`${urlAuth}/demo-reset`, {}, this.headers);
   }
   get headers(): object {
     return {

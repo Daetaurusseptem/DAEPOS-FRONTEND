@@ -34,7 +34,7 @@
               <input type="number" class="form-control" id="costPrice" formControlName="costPrice" min="0">
             </div>
           </div>
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="!isRawMaterial()">
             <label for="sellingPrice" class="form-label">Precio Venta</label>
             <div class="input-group">
               <span class="input-group-text">$</span>
@@ -46,13 +46,16 @@
         <div class="row">
           <div class="col-md-4 mb-3">
             <label for="measurement" class="form-label">Medida</label>
-            <select class="form-select" id="measurement" formControlName="measurement">
+            <select class="form-select" id="measurement" formControlName="measurement" [attr.disabled]="isRawMaterial() ? true : null">
               <option value="unit">Unidad</option>
               <option value="kg">Kilogramo (kg)</option>
               <option value="lts">Litros (l)</option>
               <option value="grms">Gramos (g)</option>
               <option value="ml">Mililitros (ml)</option>
             </select>
+            <small class="text-muted d-block mt-1" *ngIf="isRawMaterial()">
+              * Bloqueado para coincidir con la base del insumo.
+            </small>
           </div>
           <div class="col-md-4 mb-3">
             <label for="receivedDate" class="form-label">Fecha de Recepción</label>
@@ -64,7 +67,7 @@
           </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" *ngIf="!isRawMaterial()">
           <h5>Modificaciones</h5>
           <button type="button" class="btn btn-secondary mb-3" (click)="addModification()">Agregar Modificación</button>
           <div formArrayName="modifications">

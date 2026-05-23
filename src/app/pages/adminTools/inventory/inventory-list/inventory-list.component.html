@@ -45,6 +45,20 @@
             </div>
         </div>
     </div>
+    <div class="d-flex gap-2 mb-4">
+        <button type="button" class="btn px-4 py-2 border rounded-pill d-flex align-items-center gap-2 transition" 
+                [ngClass]="itemType === 'product' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary'" 
+                (click)="setItemType('product')">
+            <i class="bi bi-box-seam fs-5"></i>
+            <span class="fw-semibold">Productos Vendibles</span>
+        </button>
+        <button type="button" class="btn px-4 py-2 border rounded-pill d-flex align-items-center gap-2 transition" 
+                [ngClass]="itemType === 'raw_material' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary'" 
+                (click)="setItemType('raw_material')">
+            <i class="bi bi-egg-fill fs-5"></i>
+            <span class="fw-semibold">Insumos (Materias Primas)</span>
+        </button>
+    </div>
 
     <!-- Lista de Stock -->
     <div class="list-section">
@@ -57,9 +71,9 @@
                 <thead>
                     <tr>
                         <th width="80">Imagen</th>
-                        <th>Producto</th>
+                        <th>{{ itemType === 'product' ? 'Producto' : 'Insumo Maestro' }}</th>
                         <th>Presentación</th>
-                        <th>Precio Venta</th>
+                        <th>{{ itemType === 'product' ? 'Precio Venta' : 'Costo Promedio' }}</th>
                         <th width="150">Stock Actual</th>
                         <th *ngIf="userRole === 'companyAdmin'">Sucursal</th>
                         <th>Última Entrada</th>
@@ -81,13 +95,15 @@
                         </td>
                         <td>
                             <div class="fw-bold">{{ item.name }}</div>
-                            <small class="text-muted" *ngIf="item.product">{{ asProduct(item.product).brand }}</small>
+                            <small class="text-muted" *ngIf="item.product && asProduct(item.product)">{{ asProduct(item.product).brand }}</small>
+                            <small class="badge bg-secondary text-white" *ngIf="itemType === 'raw_material'">Insumo Interno</small>
                         </td>
                         <td>
                             <span class="badge bg-light text-primary border">{{ item.measurement || 'Unidad' | uppercase }}</span>
                         </td>
                         <td>
-                            <div class="fw-bold text-success">{{ item.sellingPrice | currency }}</div>
+                            <div class="fw-bold text-success" *ngIf="itemType === 'product'">{{ item.sellingPrice | currency }}</div>
+                            <div class="fw-bold text-secondary" *ngIf="itemType === 'raw_material'">{{ item.costPrice | currency }} <small class="smallest text-muted">(Costo)</small></div>
                         </td>
                         <td>
                             <div class="stock-indicator">

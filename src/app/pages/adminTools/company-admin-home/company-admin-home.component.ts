@@ -8,6 +8,7 @@ import { UsuarioModel } from 'src/app/models/usuario.model';
 import { StatisticsService } from 'src/app/services/statistics.service';
 import { BranchService } from 'src/app/services/branch.service';
 import { SupplierService } from 'src/app/services/provider.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-company-admin-home',
@@ -19,6 +20,7 @@ export class CompanyAdminHomeComponent implements OnInit {
   admin!: UsuarioModel;
   branches: Branch[] = [];
   upcomingRestocks: any[] = [];
+  role: string = '';
   summary: DashboardSummary = {
     totalSalesToday: 0,
     transactionsToday: 0,
@@ -30,7 +32,7 @@ export class CompanyAdminHomeComponent implements OnInit {
 
   constructor(
     private userService: UsersService,
-    private authService: AuthService,
+    public authService: AuthService,
     private statisticsService: StatisticsService,
     private branchService: BranchService,
     private supplierService: SupplierService
@@ -38,6 +40,7 @@ export class CompanyAdminHomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.admin = this.authService.usuario;
+    this.role = this.authService.role || this.admin.role;
     
     // Si ya tenemos la compañía en el authService, la usamos directamente
     if (this.authService.company) {
@@ -56,7 +59,16 @@ export class CompanyAdminHomeComponent implements OnInit {
     this.branchService.getBranchesByCompany(companyId).subscribe({
       next: (resp) => {
         if (resp.ok) {
-          this.branches = resp.branches;
+          if (this.role === 'admin' || this.role === 'user') {
+            const userBranchId = this.authService.branch?._id || this.authService.branch;
+            if (userBranchId) {
+              this.branches = (resp.branches || []).filter((b: any) => b._id === userBranchId);
+            } else {
+              this.branches = [];
+            }
+          } else {
+            this.branches = resp.branches || [];
+          }
         }
       }
     });
@@ -83,8 +95,13 @@ export class CompanyAdminHomeComponent implements OnInit {
     const companyId = this.authService.companyId || this.authService.company?._id;
     if (!companyId) return;
 
+    let branchId: string | undefined = undefined;
+    if (this.role === 'admin' || this.role === 'user') {
+      branchId = this.authService.branch?._id || this.authService.branch;
+    }
+
     this.isLoading = true;
-    this.statisticsService.getDashboardSummary(companyId).subscribe({
+    this.statisticsService.getDashboardSummary(companyId, branchId).subscribe({
       next: (resp) => {
         if (resp.ok) {
           this.summary = resp.summary;
@@ -123,6 +140,47 @@ export class CompanyAdminHomeComponent implements OnInit {
             return diffDays >= -1 && diffDays <= 3;
           });
         }
+      }
+    });
+  }
+
+  isDemoUser(): boolean {
+    return !!(this.authService.usuario && this.authService.usuario.isDemo);
+  }
+
+  restoreDemoDatabase() {
+    Swal.fire({
+      title: '¿Restaurar Base de Datos?',
+      text: 'Se restablecerán todos los catálogos, sucursales y ventas de prueba al estado inicial original en segundos.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Restaurar',
+      cancelButtonColor: '#000',
+      confirmButtonColor: '#d33',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Restaurando...',
+          html: 'Re-generando datos de prueba limpios...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        this.authService.demoReset().subscribe({
+          next: () => {
+            Swal.close();
+            Swal.fire('¡Restauración Exitosa!', 'La base de datos del demo ha vuelto a su estado original.', 'success').then(() => {
+              window.location.reload();
+            });
+          },
+          error: (err) => {
+            Swal.close();
+            Swal.fire('Error', err.error?.msg || 'No se pudo completar la restauración', 'error');
+          }
+        });
       }
     });
   }

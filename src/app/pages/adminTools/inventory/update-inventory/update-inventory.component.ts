@@ -44,12 +44,22 @@ export class UpdateInventoryComponent implements OnInit {
     });
   }
 
+  isRawMaterial(): boolean {
+    return !!(this.inventoryItem && (this.inventoryItem.rawMaterial || !(this.inventoryItem as any).product));
+  }
+
   loadInventoryItem() {
     this.inventoryService.getInventoryItemById(this.inventoryId)
       .pipe(map(response => response.inventoryItem || response.item))
       .subscribe(item => {
         if (!item) return;
         this.inventoryItem = item;
+
+        if (this.isRawMaterial()) {
+          this.inventoryForm.get('sellingPrice')?.clearValidators();
+          this.inventoryForm.get('sellingPrice')?.updateValueAndValidity();
+        }
+
         const exp = item.expirationDate ? this.formatDate(item.expirationDate.toString()) : '';
         const rec = item.receivedDate ? this.formatDate(item.receivedDate.toString()) : '';
         this.inventoryForm.patchValue({
@@ -57,7 +67,7 @@ export class UpdateInventoryComponent implements OnInit {
           barCode: item.barCode || '',
           stock: item.stock,
           costPrice: item.costPrice,
-          sellingPrice: item.sellingPrice,
+          sellingPrice: item.sellingPrice || 0,
           measurement: item.measurement,
           expirationDate: exp,
           receivedDate: rec,

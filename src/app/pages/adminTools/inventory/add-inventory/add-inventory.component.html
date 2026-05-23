@@ -1,111 +1,274 @@
-<div class="container mt-4">
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white">
-      <h2 class="mb-0">Nuevo Item</h2>
+<div class="container mt-4 mb-5 animate__animated animate__fadeIn">
+  <div class="card border border-light-subtle shadow-sm rounded-4 bg-white overflow-hidden">
+    <!-- Header -->
+    <div class="card-header bg-dark text-white p-4 border-0 d-flex justify-content-between align-items-center" style="background-color: #000 !important;">
+      <div>
+        <h3 class="mb-1 fw-bold text-white d-flex align-items-center gap-2">
+          <i class="bi bi-box-arrow-in-down"></i> Nuevo Registro de Inventario
+        </h3>
+        <p class="text-white-50 small mb-0">Cargue manualmente existencias para productos o materias primas</p>
+      </div>
+      <span class="badge rounded-pill bg-light text-dark px-3 py-2 fw-bold text-uppercase fs-7">
+        {{ itemType === 'product' ? 'Producto Vendible' : 'Insumo Maestro' }}
+      </span>
     </div>
-    <div class="card-body">
+
+    <div class="card-body p-4 p-md-5">
+      <!-- Selector de Tipo de Item (Conmutador Premium) -->
+      <div class="row mb-5 justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+          <div class="d-inline-flex p-1 bg-light border rounded-pill shadow-sm">
+            <button type="button" 
+                    class="btn px-4 py-2 border-0 rounded-pill d-flex align-items-center gap-2 transition" 
+                    [ngClass]="itemType === 'product' ? 'btn-dark shadow' : 'btn-light text-secondary bg-transparent'" 
+                    (click)="setItemType('product')">
+              <i class="bi bi-box-seam fs-6"></i>
+              <span class="fw-semibold small">Producto de Venta</span>
+            </button>
+            <button type="button" 
+                    class="btn px-4 py-2 border-0 rounded-pill d-flex align-items-center gap-2 transition" 
+                    [ngClass]="itemType === 'raw_material' ? 'btn-dark shadow' : 'btn-light text-secondary bg-transparent'" 
+                    (click)="setItemType('raw_material')">
+              <i class="bi bi-egg-fill fs-6"></i>
+              <span class="fw-semibold small">Insumo / Materia Prima</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <form [formGroup]="inventoryForm" (ngSubmit)="onSubmit()">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="name" class="form-label">Nombre:</label>
-            <input type="text" class="form-control" formControlName="name" id="name" placeholder="Ingrese el nombre del item">
+        
+        <!-- Sección de Selección y Sucursal -->
+        <div class="row mb-4">
+          <!-- Sucursal Selector (Solo para Dueño) -->
+          <div class="col-md-6 mb-3" *ngIf="userRole === 'companyAdmin'">
+            <label for="branch" class="form-label fw-bold text-dark">Sucursal Destino:</label>
+            <select class="form-select border-light-subtle rounded-3 p-3" id="branch" formControlName="branch">
+              <option value="" disabled selected>Seleccione una sucursal</option>
+              <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+            </select>
+            <div *ngIf="inventoryForm.get('branch')?.invalid && inventoryForm.get('branch')?.touched" class="text-danger mt-1">
+              <small>Debe seleccionar la sucursal de destino.</small>
+            </div>
           </div>
+          
+          <!-- Proveedor Selector (Opcional) -->
           <div class="col-md-6 mb-3">
-            <label for="barCode" class="form-label">Código de barras <small>(Opcional)</small>:</label>
-            <input type="text" class="form-control" formControlName="barCode" id="barCode" placeholder="Ingrese el código">
+            <label for="supplier" class="form-label fw-bold text-dark">Proveedor:</label>
+            <select class="form-select border-light-subtle rounded-3 p-3" id="supplier" formControlName="supplier">
+              <option value="" selected>Seleccionar Proveedor (Opcional)</option>
+              <option *ngFor="let s of suppliers" [value]="s._id">{{ s.name }}</option>
+            </select>
           </div>
         </div>
-        <div class="mb-3">
-          <label for="product" class="form-label">Producto Asociado:</label>
-          <input type="text" class="form-control" id="product" (input)="onSearchProduct($event)" [value]="selectedProduct?.name || ''" placeholder="Buscar producto">
-          <ul class="list-group mt-2" *ngIf="filteredProducts.length > 0">
-            <li class="list-group-item list-group-item-action" *ngFor="let product of filteredProducts" (click)="onSelectProduct(product)">
-              {{ product.name }}
-            </li>
-          </ul>
-          <!-- Hidden input to bind the selected product ID to the form -->
-          <input type="hidden" formControlName="product">
-          <div *ngIf="inventoryForm.get('product')?.invalid && inventoryForm.get('product')?.touched" class="text-danger mt-1">
-            <small>Debe seleccionar un producto.</small>
+
+        <!-- Búsqueda del Elemento Maestro -->
+        <div class="card bg-light border border-light-subtle rounded-4 p-4 mb-4">
+          <!-- Búsqueda de PRODUCTO -->
+          <div *ngIf="itemType === 'product'">
+            <label for="product" class="form-label fw-bold text-dark fs-5 mb-2">
+              <i class="bi bi-search me-1"></i> Seleccionar Producto del Catálogo:
+            </label>
+            <input type="text" 
+                   class="form-control border-light-subtle rounded-3 p-3 bg-white" 
+                   id="product" 
+                   (input)="onSearchProduct($event)" 
+                   [value]="selectedProduct?.name || ''" 
+                   placeholder="Escriba para buscar un producto vendible...">
+            
+            <ul class="list-group mt-2 border-0 shadow-sm rounded-3 overflow-hidden" *ngIf="filteredProducts.length > 0">
+              <li class="list-group-item list-group-item-action p-3" 
+                  *ngFor="let product of filteredProducts" 
+                  (click)="onSelectProduct(product)">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bold text-dark">{{ product.name }}</span>
+                  <span class="badge bg-secondary-subtle text-secondary">{{ product.brand }}</span>
+                </div>
+              </li>
+            </ul>
+            <input type="hidden" formControlName="product">
+            <div *ngIf="inventoryForm.get('product')?.invalid && inventoryForm.get('product')?.touched" class="text-danger mt-1">
+              <small>Debe seleccionar un producto del catálogo.</small>
+            </div>
+          </div>
+
+          <!-- Búsqueda de INSUMO / MATERIA PRIMA -->
+          <div *ngIf="itemType === 'raw_material'">
+            <label for="rawMaterial" class="form-label fw-bold text-dark fs-5 mb-2">
+              <i class="bi bi-search me-1"></i> Seleccionar Insumo Maestro del Catálogo:
+            </label>
+            <input type="text" 
+                   class="form-control border-light-subtle rounded-3 p-3 bg-white" 
+                   id="rawMaterial" 
+                   (input)="onSearchRawMaterial($event)" 
+                   [value]="selectedRawMaterial?.name || ''" 
+                   placeholder="Escriba para buscar un insumo de cocina...">
+            
+            <ul class="list-group mt-2 border-0 shadow-sm rounded-3 overflow-hidden" *ngIf="filteredRawMaterials.length > 0">
+              <li class="list-group-item list-group-item-action p-3" 
+                  *ngFor="let rm of filteredRawMaterials" 
+                  (click)="onSelectRawMaterial(rm)">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bold text-dark">{{ rm.name }}</span>
+                  <span class="badge bg-info-subtle text-info-emphasis px-3 py-1 rounded-pill">{{ rm.measurementUnit }}</span>
+                </div>
+              </li>
+            </ul>
+            <input type="hidden" formControlName="rawMaterial">
+            <div *ngIf="inventoryForm.get('rawMaterial')?.invalid && inventoryForm.get('rawMaterial')?.touched" class="text-danger mt-1">
+              <small>Debe seleccionar un insumo maestro del catálogo.</small>
+            </div>
           </div>
         </div>
+
+        <!-- Campos Generales -->
         <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="name" class="form-label fw-bold text-dark">Nombre en Inventario:</label>
+            <input type="text" 
+                   class="form-control border-light-subtle rounded-3 p-3" 
+                   formControlName="name" 
+                   id="name" 
+                   placeholder="Nombre descriptivo del registro">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="barCode" class="form-label fw-bold text-dark">Código de Barras <small class="text-muted">(Opcional)</small>:</label>
+            <input type="text" 
+                   class="form-control border-light-subtle rounded-3 p-3" 
+                   formControlName="barCode" 
+                   id="barCode" 
+                   placeholder="Escanee o escriba el código">
+          </div>
+        </div>
+
+        <!-- Stock, Costo y Venta -->
+        <div class="row align-items-end">
           <div class="col-md-4 mb-3">
-            <label for="stock" class="form-label">Stock:</label>
-            <input type="number" class="form-control" formControlName="stock" id="stock" min="0" placeholder="Cantidad en stock">
-            <div *ngIf="inventoryForm.get('stock')?.invalid && inventoryForm.get('stock')?.touched" class="text-danger">
+            <label for="stock" class="form-label fw-bold text-dark">Cantidad (Stock):</label>
+            <input type="number" 
+                   class="form-control border-light-subtle rounded-3 p-3" 
+                   formControlName="stock" 
+                   id="stock" 
+                   min="0" 
+                   placeholder="0">
+            <div *ngIf="inventoryForm.get('stock')?.invalid && inventoryForm.get('stock')?.touched" class="text-danger mt-1">
               <small>El valor debe ser mayor o igual a 0.</small>
             </div>
           </div>
+          
           <div class="col-md-4 mb-3">
-            <label for="costPrice" class="form-label">Precio Costo:</label>
+            <label for="costPrice" class="form-label fw-bold text-dark">Precio de Costo:</label>
             <div class="input-group">
-              <span class="input-group-text">$</span>
-              <input type="number" class="form-control" formControlName="costPrice" id="costPrice" min="0" placeholder="0.00">
+              <span class="input-group-text bg-light border-end-0 rounded-start-3 px-3">$</span>
+              <input type="number" 
+                     class="form-control border-light-subtle rounded-end-3 p-3 border-start-0" 
+                     formControlName="costPrice" 
+                     id="costPrice" 
+                     min="0" 
+                     placeholder="0.00">
             </div>
           </div>
-          <div class="col-md-4 mb-3">
-            <label for="sellingPrice" class="form-label">Precio Venta:</label>
+          
+          <!-- Precio de Venta (Solo si es Producto) -->
+          <div class="col-md-4 mb-3" *ngIf="itemType === 'product'">
+            <label for="sellingPrice" class="form-label fw-bold text-dark">Precio de Venta:</label>
             <div class="input-group">
-              <span class="input-group-text">$</span>
-              <input type="number" class="form-control" formControlName="sellingPrice" id="sellingPrice" min="0" placeholder="0.00">
+              <span class="input-group-text bg-light border-end-0 rounded-start-3 px-3">$</span>
+              <input type="number" 
+                     class="form-control border-light-subtle rounded-end-3 p-3 border-start-0" 
+                     formControlName="sellingPrice" 
+                     id="sellingPrice" 
+                     min="0" 
+                     placeholder="0.00">
+            </div>
+            <div *ngIf="inventoryForm.get('sellingPrice')?.invalid && inventoryForm.get('sellingPrice')?.touched" class="text-danger mt-1">
+              <small>Precio de venta requerido.</small>
             </div>
           </div>
         </div>
+
+        <!-- Unidad de Medida y Fechas -->
         <div class="row">
           <div class="col-md-4 mb-3">
-            <label for="measurement" class="form-label">Medida:</label>
-            <select class="form-select" id="measurement" formControlName="measurement">
+            <label for="measurement" class="form-label fw-bold text-dark">Unidad de Medida:</label>
+            <!-- Si es insumo, se bloquea la unidad original del catálogo para evitar errores del cajero -->
+            <select class="form-select border-light-subtle rounded-3 p-3" 
+                    id="measurement" 
+                    formControlName="measurement"
+                    [attr.disabled]="itemType === 'raw_material' ? true : null">
               <option value="unit">Unidad</option>
               <option value="kg">Kilogramo (kg)</option>
               <option value="lts">Litros (l)</option>
               <option value="grms">Gramos (g)</option>
               <option value="ml">Mililitros (ml)</option>
             </select>
+            <small class="text-muted" *ngIf="itemType === 'raw_material'">
+              * La unidad se encuentra bloqueada para coincidir con la base del insumo.
+            </small>
           </div>
+          
           <div class="col-md-4 mb-3">
-            <label for="receivedDate" class="form-label">Fecha de Recepción:</label>
-            <input type="date" class="form-control" formControlName="receivedDate" id="receivedDate">
+            <label for="receivedDate" class="form-label fw-bold text-dark">Fecha de Recepción:</label>
+            <input type="date" 
+                   class="form-control border-light-subtle rounded-3 p-3" 
+                   formControlName="receivedDate" 
+                   id="receivedDate">
           </div>
+          
           <div class="col-md-4 mb-3">
-            <label for="expirationDate" class="form-label">Fecha de Expiración:</label>
-            <input type="date" class="form-control" formControlName="expirationDate" id="expirationDate">
+            <label for="expirationDate" class="form-label fw-bold text-dark">Fecha de Expiración:</label>
+            <input type="date" 
+                   class="form-control border-light-subtle rounded-3 p-3" 
+                   formControlName="expirationDate" 
+                   id="expirationDate">
           </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Modificaciones:</label>
+
+        <!-- Modificaciones / Extras (Solo si es Producto) -->
+        <div class="mb-4 mt-4" *ngIf="itemType === 'product'">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <label class="form-label fw-bold text-dark fs-5 mb-0">Modificaciones / Extras del Producto</label>
+            <button type="button" class="btn btn-dark btn-sm rounded-pill px-3" (click)="addModification()">
+              <i class="bi bi-plus-circle-fill"></i> Agregar Modificación
+            </button>
+          </div>
+
           <div formArrayName="modifications" *ngFor="let modification of modifications.controls; let i = index">
-            <div [formGroupName]="i" class="border p-2 mb-2">
-              <div class="row">
-                <div class="col-md-4">
-                  <label for="modificationName" class="form-label">Nombre de la modificación:</label>
-                  <input type="text" class="form-control" formControlName="name" placeholder="Ingrese el nombre">
+            <div [formGroupName]="i" class="card border border-light-subtle bg-light rounded-4 p-3 mb-3 animate__animated animate__fadeIn">
+              <div class="row align-items-center">
+                <div class="col-md-5 mb-2 mb-md-0">
+                  <label class="form-label fw-semibold text-secondary small">Nombre de la modificación:</label>
+                  <input type="text" class="form-control border-light-subtle rounded-3 p-2 bg-white" formControlName="name" placeholder="Ej: Extra Queso">
                 </div>
-                <div class="col-md-3">
-                  <label for="extraPrice" class="form-label">Precio extra:</label>
+                <div class="col-md-3 mb-2 mb-md-0">
+                  <label class="form-label fw-semibold text-secondary small">Precio extra:</label>
                   <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" class="form-control" formControlName="extraPrice" min="0" placeholder="0.00">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-3">$</span>
+                    <input type="number" class="form-control border-light-subtle rounded-end-3 p-2 border-start-0 bg-white" formControlName="extraPrice" min="0" placeholder="0.00">
                   </div>
                 </div>
-                <div class="col-md-3">
-                  <label for="isExclusive" class="form-label">¿Es excluyente?</label>
-                  <div class="form-check">
+                <div class="col-md-2 mb-2 mb-md-0 text-center">
+                  <label class="form-label fw-semibold text-secondary small d-block">¿Excluyente?</label>
+                  <div class="form-check form-switch d-inline-block">
                     <input type="checkbox" class="form-check-input" formControlName="isExclusive" id="isExclusive-{{i}}">
-                    <label class="form-check-label" for="isExclusive-{{i}}">Sí</label>
                   </div>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                  <button type="button" class="btn btn-danger w-100" (click)="removeModification(i)">Eliminar</button>
+                <div class="col-md-2 text-end">
+                  <button type="button" class="btn btn-outline-danger btn-sm border-0 rounded-circle" (click)="removeModification(i)" title="Eliminar">
+                    <i class="bi bi-trash-fill fs-5"></i>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-secondary mt-2" (click)="addModification()">Agregar modificación</button>
         </div>
-        <div class="d-flex justify-content-between mt-4">
+
+        <!-- Botones de Acción -->
+        <div class="d-flex justify-content-between mt-5 pt-3 border-top border-light-subtle">
           <app-back-button></app-back-button>
-          <button type="submit" class="btn btn-primary" [disabled]="!inventoryForm.valid">Crear Item</button>
+          <button type="submit" class="btn btn-dark px-5 py-3 rounded-pill fw-bold text-uppercase border-0 shadow-sm" [disabled]="!inventoryForm.valid" style="background-color: #000 !important;">
+            Registrar Item
+          </button>
         </div>
       </form>
     </div>

@@ -37,8 +37,190 @@
         </tbody>
       </table>
       
-      <div class="mt-3">
-        <h5>Total: <strong>{{ totalAmount | currency }}</strong></h5>
+      <!-- SECCIÓN DINÁMICA DE CLIENTE FRECUENTE Y CRM -->
+      <div class="card p-3 my-3 bg-light loyalty-container" *ngIf="branchSettings.enabled">
+        <h6 class="d-flex justify-content-between align-items-center mb-3">
+          <span><i class="fa fa-user-circle me-1 text-primary"></i> Cliente Frecuente</span>
+          <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" (click)="openQuickRegister()">
+            <i class="fa fa-plus-circle me-1"></i> Registrar in-situ
+          </button>
+        </h6>
+
+        <!-- Si no hay cliente seleccionado -->
+        <div *ngIf="!selectedCustomer" class="mb-2 position-relative">
+          <label class="form-label text-muted small mb-1">
+            <span *ngIf="branchSettings.identifierType === 'phone'">Buscar por Teléfono (10 dígitos)</span>
+            <span *ngIf="branchSettings.identifierType === 'physical_card'">Buscar/Escanear Número de Tarjeta</span>
+            <span *ngIf="branchSettings.identifierType === 'both'">Buscar por Teléfono o Número de Tarjeta</span>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa fa-search"></i></span>
+            <input type="text" 
+                   class="form-control form-control-sm search-input" 
+                   [placeholder]="branchSettings.identifierType === 'phone' ? 'Ej. 5512345678' : 'Escriba o escanee tarjeta...'" 
+                   [value]="searchCustomerTerm"
+                   (input)="searchCustomer($any($event.target).value)">
+          </div>
+
+          <!-- Resultados de búsqueda rápidos -->
+          <div class="search-results shadow border rounded bg-white mt-1 w-100 position-absolute z-3" *ngIf="searchResultsCustomers.length > 0">
+            <div class="list-group list-group-flush">
+              <button type="button" 
+                      class="list-group-item list-group-item-action py-2 d-flex justify-content-between align-items-center text-start"
+                      *ngFor="let customer of searchResultsCustomers"
+                      (click)="selectCustomer(customer)">
+                <div>
+                  <strong class="text-dark d-block">{{ customer.name }}</strong>
+                  <div class="text-muted small">
+                    <span *ngIf="customer.phone"><i class="fa fa-phone me-1"></i>{{ customer.phone }}</span>
+                    <span *ngIf="customer.cardNumber" class="ms-2"><i class="fa fa-credit-card me-1"></i>{{ customer.cardNumber }}</span>
+                  </div>
+                </div>
+                <span class="badge" [ngClass]="{
+                  'bg-warning text-dark': customer.tier === 'gold',
+                  'bg-secondary text-white': customer.tier === 'silver',
+                  'bg-dark text-white': customer.tier === 'bronze'
+                }">{{ customer.tier | uppercase }} ({{ customer.loyaltyPoints }} pts)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Si hay cliente seleccionado -->
+        <div *ngIf="selectedCustomer" class="selected-customer-pill p-2 rounded border border-success bg-white d-flex justify-content-between align-items-center">
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <strong class="text-success">{{ selectedCustomer.name }}</strong>
+              <span class="badge rounded-pill" [ngClass]="{
+                'bg-warning text-dark': selectedCustomer.tier === 'gold',
+                'bg-secondary text-white': selectedCustomer.tier === 'silver',
+                'bg-dark text-white': selectedCustomer.tier === 'bronze'
+              }">{{ selectedCustomer.tier | uppercase }}</span>
+            </div>
+            <div class="text-muted small d-flex gap-3 mt-1">
+              <span><i class="fa fa-star me-1 text-primary"></i><strong>{{ selectedCustomer.loyaltyPoints }} Puntos</strong></span>
+              <span>Saldo: <strong>{{ selectedCustomer.loyaltyPoints * (branchSettings.pointsRedeemRate || 0.1) | currency }}</strong></span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline-danger btn-sm rounded-circle py-1 px-2 border-0" (click)="removeSelectedCustomer()">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Checkbox para canjear puntos (solo si el cliente tiene puntos) -->
+        <div class="form-check form-switch mt-2" *ngIf="selectedCustomer && selectedCustomer.loyaltyPoints > 0">
+          <input class="form-check-input check-success" 
+                 type="checkbox" 
+                 id="redeemPoints" 
+                 [checked]="redeemPointsChecked"
+                 (change)="toggleRedeemPoints($event)">
+          <label class="form-check-label text-dark fw-medium small" for="redeemPoints">
+            Canjear puntos disponibles (Ahorra {{ selectedCustomer.loyaltyPoints * (branchSettings.pointsRedeemRate || 0.1) | currency }} M.N.)
+          </label>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DINÁMICA DE CUPONES / PROMOCIONES -->
+      <div class="card p-3 my-3 bg-light promo-container">
+        <h6 class="mb-3 text-dark"><i class="fa fa-tag me-1 text-primary"></i> Cupones y Promociones</h6>
+        
+        <!-- Si no hay cupón aplicado -->
+        <div *ngIf="!appliedPromotion" class="d-flex gap-2">
+          <input type="text" 
+                 class="form-control form-control-sm coupon-input text-uppercase fw-bold" 
+                 placeholder="Ej. HOT10" 
+                 [value]="couponCode"
+                 (input)="couponCode = $any($event.target).value"
+                 (keyup.enter)="applyCoupon()">
+          <button type="button" class="btn btn-primary btn-sm px-3 rounded-pill" (click)="applyCoupon()">
+            Aplicar
+          </button>
+        </div>
+
+        <!-- Si hay cupón aplicado -->
+        <div *ngIf="appliedPromotion" class="applied-coupon p-2 rounded border border-primary bg-white d-flex justify-content-between align-items-center">
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <strong class="text-primary"><i class="fa fa-check-circle me-1"></i>{{ appliedPromotion.code }}</strong>
+              <span class="badge bg-primary text-white">
+                {{ appliedPromotion.type === 'percentage' ? '-' + appliedPromotion.value + '%' : '-' + (appliedPromotion.value | currency) }}
+              </span>
+            </div>
+            <p class="text-muted mb-0 small mt-1">{{ appliedPromotion.description }}</p>
+          </div>
+          <button type="button" class="btn btn-outline-danger btn-sm rounded-circle py-1 px-2 border-0" (click)="removeCoupon()">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- DESGLOSE DETALLADO DE TOTALES -->
+      <div class="mt-3 card p-3 border-0 bg-light rounded mb-4">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted small">Subtotal:</span>
+          <span class="fw-medium">{{ sale.total | currency }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-1 text-danger small" *ngIf="couponDiscount > 0">
+          <span>Descuento Cupón:</span>
+          <span>-{{ couponDiscount | currency }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-1 text-danger small" *ngIf="pointsDiscount > 0">
+          <span>Descuento Puntos:</span>
+          <span>-{{ pointsDiscount | currency }}</span>
+        </div>
+        <hr class="my-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">Total a Cobrar:</h5>
+          <h4 class="mb-0 text-primary fw-bold"><strong>{{ totalAmount | currency }}</strong></h4>
+        </div>
+      </div>
+
+      <!-- DIALOG DE REGISTRO RÁPIDO DE CLIENTE IN-SITU -->
+      <div class="quick-register-backdrop z-3" *ngIf="showQuickRegister">
+        <div class="quick-register-card card shadow-lg p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <h5 class="mb-0 text-dark fw-bold"><i class="fa fa-user-plus me-2 text-primary"></i>Registro Rápido de Cliente</h5>
+            <button type="button" class="btn-close border-0 bg-transparent text-muted" (click)="closeQuickRegister()">
+              <i class="fa fa-times fa-lg"></i>
+            </button>
+          </div>
+          
+          <form [formGroup]="registerForm" (ngSubmit)="submitQuickRegister()">
+            <div class="mb-3">
+              <label for="regName" class="form-label small fw-semibold mb-1 text-muted">Nombre Completo *</label>
+              <input type="text" id="regName" class="form-control form-control-sm" formControlName="name" placeholder="Ej. Juan Pérez">
+              <div *ngIf="registerForm.get('name')!.invalid && registerForm.get('name')!.touched" class="text-danger small mt-1">
+                <small>El nombre es obligatorio.</small>
+              </div>
+            </div>
+
+            <div class="mb-3" *ngIf="branchSettings.identifierType === 'phone' || branchSettings.identifierType === 'both'">
+              <label for="regPhone" class="form-label small fw-semibold mb-1 text-muted">Teléfono celular *</label>
+              <input type="text" id="regPhone" class="form-control form-control-sm" formControlName="phone" placeholder="Ej. 10 dígitos">
+              <div *ngIf="registerForm.get('phone')!.invalid && registerForm.get('phone')!.touched" class="text-danger small mt-1">
+                <small>El celular a 10 dígitos es obligatorio.</small>
+              </div>
+            </div>
+
+            <div class="mb-3" *ngIf="branchSettings.identifierType === 'physical_card' || branchSettings.identifierType === 'both'">
+              <label for="regCard" class="form-label small fw-semibold mb-1 text-muted">Número de Tarjeta de Puntos *</label>
+              <input type="text" id="regCard" class="form-control form-control-sm" formControlName="cardNumber" placeholder="Escanee o digite...">
+              <div *ngIf="registerForm.get('cardNumber')!.invalid && registerForm.get('cardNumber')!.touched" class="text-danger small mt-1">
+                <small>El número de tarjeta es obligatorio para esta sucursal.</small>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="regRfc" class="form-label small fw-semibold mb-1 text-muted">RFC (Facturación)</label>
+              <input type="text" id="regRfc" class="form-control form-control-sm text-uppercase" formControlName="rfc" placeholder="Ej. XAXX010101000">
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
+              <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-pill" (click)="closeQuickRegister()">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill" [disabled]="registerForm.invalid">Registrar</button>
+            </div>
+          </form>
+        </div>
       </div>
       
       <form [formGroup]="confirmSaleForm" (ngSubmit)="confirmSale()">
