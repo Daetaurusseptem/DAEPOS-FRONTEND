@@ -117,8 +117,8 @@
                     <div *ngIf="!reg.user?.img" class="avatar-fallback-sm">{{ (reg.user?.name || 'U').substring(0,1).toUpperCase() }}</div>
                   </div>
                   <div>
-                    <strong class="text-white d-block fs-7.5">{{ reg.user?.name }}</strong>
-                    <span class="text-muted-custom fs-8.5">{{ reg.user?.email }}</span>
+                    <strong class="text-white d-block fs-7-5">{{ reg.user?.name }}</strong>
+                    <span class="text-muted-custom fs-8-5">{{ reg.user?.email }}</span>
                   </div>
                 </div>
               </td>
@@ -132,15 +132,15 @@
 
               <!-- Start Date -->
               <td class="vertical-center">
-                <span class="text-white fs-7.5 d-block">{{ reg.startDate | date: 'shortDate' }}</span>
-                <span class="text-muted-custom fs-8.5">{{ reg.startDate | date: 'shortTime' }}</span>
+                <span class="text-white fs-7-5 d-block">{{ reg.startDate | date: 'shortDate' }}</span>
+                <span class="text-muted-custom fs-8-5">{{ reg.startDate | date: 'shortTime' }}</span>
               </td>
 
               <!-- End Date / Duration -->
               <td class="vertical-center">
                 <span *ngIf="reg.closed">
-                  <span class="text-white fs-7.5 d-block">{{ reg.endDate | date: 'shortDate' }}</span>
-                  <span class="text-muted-custom fs-8.5">{{ reg.endDate | date: 'shortTime' }}</span>
+                  <span class="text-white fs-7-5 d-block">{{ reg.endDate | date: 'shortDate' }}</span>
+                  <span class="text-muted-custom fs-8-5">{{ reg.endDate | date: 'shortTime' }}</span>
                 </span>
                 <span *ngIf="!reg.closed" class="badge bg-success-soft text-success text-uppercase fs-9 animate-pulse">
                   <i class="bi bi-broadcast"></i> En Curso
@@ -148,20 +148,20 @@
               </td>
 
               <!-- Initial Amount -->
-              <td class="text-end vertical-center font-monospace text-muted-custom fs-7.5">
+              <td class="text-end vertical-center font-monospace text-muted-custom fs-7-5">
                 {{ reg.initialAmount | currency }}
               </td>
 
               <!-- Expected Amount -->
-              <td class="text-end vertical-center font-monospace text-white fs-7.5 fw-semibold">
+              <td class="text-end vertical-center font-monospace text-white fs-7-5 fw-semibold">
                 {{ reg.expectedAmount | currency }}
               </td>
 
               <!-- Actual Amount -->
-              <td class="text-end vertical-center font-monospace text-success fs-7.5 fw-semibold" *ngIf="reg.closed">
+              <td class="text-end vertical-center font-monospace text-success fs-7-5 fw-semibold" *ngIf="reg.closed">
                 {{ reg.actualAmount | currency }}
               </td>
-              <td class="text-end vertical-center text-muted-custom fs-7.5" *ngIf="!reg.closed">
+              <td class="text-end vertical-center text-muted-custom fs-7-5" *ngIf="!reg.closed">
                 &mdash;
               </td>
 
@@ -198,7 +198,7 @@
 
       <!-- Pagination Footer -->
       <div class="pagination-footer border-top border-secondary-soft p-3 d-flex justify-content-between align-items-center bg-dark-soft">
-        <span class="text-muted-custom fs-7.5">
+        <span class="text-muted-custom fs-7-5">
           Mostrando página <strong>{{ currentPage }}</strong> de {{ totalPages }} (Total: {{ totalRecords }} turnos)
         </span>
         
