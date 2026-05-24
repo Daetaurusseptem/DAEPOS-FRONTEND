@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Company, DashboardSummary, Branch } from 'src/app/interfaces/models.interface';
 import { CompanyService } from 'src/app/services/company.service';
 import { UsersService } from 'src/app/services/users.service';
@@ -35,12 +36,19 @@ export class CompanyAdminHomeComponent implements OnInit {
     public authService: AuthService,
     private statisticsService: StatisticsService,
     private branchService: BranchService,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.admin = this.authService.usuario;
     this.role = this.authService.role || this.admin.role;
+
+    // Control de Acceso: Esta pantalla corporativa solo debe ser accesible al dueño (companyAdmin) o sysadmin
+    if (this.role !== 'companyAdmin' && this.role !== 'sysadmin') {
+      this.router.navigate(['/dashboard/branch']);
+      return;
+    }
     
     // Si ya tenemos la compañía en el authService, la usamos directamente
     if (this.authService.company) {

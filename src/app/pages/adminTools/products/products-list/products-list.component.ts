@@ -33,7 +33,7 @@ export class ProductsListComponent implements OnInit {
       this.activatedRoute.params.subscribe(params => {
         this.companyId = params['id'];
       });
-    } else if (this.authService.usuario.role == 'admin') {
+    } else if (this.authService.usuario.role == 'admin' || this.authService.usuario.role == 'companyAdmin') {
       this.companyId = this.authService.companyId;
     }
   }
@@ -82,7 +82,7 @@ export class ProductsListComponent implements OnInit {
   crearProducto(): void {
     if (this.authService.usuario.role == 'sysadmin') {
       this.router.navigateByUrl(`/dashboard/sysadmin/product/new/${this.companyId}`);
-    } else if (this.authService.usuario.role == 'admin') {
+    } else if (this.authService.usuario.role == 'admin' || this.authService.usuario.role == 'companyAdmin') {
       this.router.navigateByUrl(`/dashboard/admin/product/new`);
     }
   }
@@ -114,7 +114,7 @@ export class ProductsListComponent implements OnInit {
   editarProducto(id: string): void {
     if (this.authService.usuario.role == 'sysadmin') {
       this.router.navigateByUrl(`/dashboard/sysadmin/product/edit/${id}/${this.companyId}`);
-    } else if (this.authService.usuario.role == 'admin') {
+    } else if (this.authService.usuario.role == 'admin' || this.authService.usuario.role == 'companyAdmin') {
       this.router.navigateByUrl(`/dashboard/admin/product/edit/${id}`);
     }
   }

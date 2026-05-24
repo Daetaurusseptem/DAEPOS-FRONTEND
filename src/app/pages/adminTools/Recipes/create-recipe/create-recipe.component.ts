@@ -3,9 +3,8 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RecipesService } from 'src/app/services/recipes.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { InventoryItem, Recipe } from 'src/app/interfaces/models.interface';
-import { InventoryService } from 'src/app/services/inventory.service';
 import { RawMaterialsService, RawMaterial } from 'src/app/services/raw-materials.service';
+import { InventoryService } from 'src/app/services/inventory.service';
 import { map } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -22,6 +21,7 @@ export class CreateRecipeComponent implements OnInit {
     private fb: FormBuilder,
     private recipeService: RecipesService,
     private rawMaterialsService: RawMaterialsService,
+    private inventoryService: InventoryService,
     private authService: AuthService,
     private router: Router
   ) { }
@@ -45,6 +45,19 @@ export class CreateRecipeComponent implements OnInit {
       .subscribe({
         next: (items) => {
           this.rawMaterials = items;
+          
+          // Map cost prices from branch inventory
+          this.inventoryService.getInventory(companyId, '', 'raw_material').subscribe({
+            next: (invResp: any) => {
+              const invItems = invResp.items || [];
+              this.rawMaterials.forEach(rm => {
+                const matched = invItems.find((inv: any) => inv.rawMaterial === rm._id || inv.rawMaterial?._id === rm._id);
+                if (matched) {
+                  rm.costPrice = matched.costPrice;
+                }
+              });
+            }
+          });
         },
         error: (err) => {
           console.error('Error fetching raw materials', err);
@@ -59,7 +72,7 @@ export class CreateRecipeComponent implements OnInit {
   addIngredient(): void {
     this.rawMaterialsArray.push(this.fb.group({
       rawMaterial: ['', Validators.required],
-      quantity: [0, [Validators.required, Validators.min(0.0001)]]
+      quantity: [null, [Validators.required, Validators.min(0.0001)]]
     }));
   }
 
@@ -67,8 +80,50 @@ export class CreateRecipeComponent implements OnInit {
     this.rawMaterialsArray.removeAt(index);
   }
 
+  isIngredientSelected(rawMaterialId: string | undefined, currentIndex: number): boolean {
+    if (!rawMaterialId) return false;
+    return this.rawMaterialsArray.controls.some((ctrl, i) => {
+      if (i === currentIndex) return false;
+      return ctrl.get('rawMaterial')?.value === rawMaterialId;
+    });
+  }
+
+  get recipeTotalCost(): number {
+    let total = 0;
+    this.rawMaterialsArray.controls.forEach(ctrl => {
+      const selectedId = ctrl.get('rawMaterial')?.value;
+      const quantity = ctrl.get('quantity')?.value || 0;
+      if (selectedId) {
+        const material = this.rawMaterials.find(m => m._id === selectedId);
+        if (material) {
+          total += quantity * (material.costPrice || 0);
+        }
+      }
+    });
+    return total;
+  }
+
+  getIngredientUnit(rawMaterialId: string): string {
+    if (!rawMaterialId) return 'u';
+    const material = this.rawMaterials.find(m => m._id === rawMaterialId);
+    return material ? (material.measurementUnit || 'u') : 'u';
+  }
+
   onSubmit(): void {
     if (this.createRecipeForm.invalid) {
+      return;
+    }
+
+    if (this.rawMaterialsArray.length === 0) {
+      Swal.fire('Error', 'La receta debe tener al menos un ingrediente/materia prima.', 'warning');
+      return;
+    }
+
+    // Double check duplicate values just in case
+    const selectedIds = this.rawMaterialsArray.value.map((rm: any) => rm.rawMaterial);
+    const uniqueIds = new Set(selectedIds);
+    if (selectedIds.length !== uniqueIds.size) {
+      Swal.fire('Error', 'No puedes agregar el mismo ingrediente más de una vez.', 'warning');
       return;
     }
 

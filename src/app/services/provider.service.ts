@@ -61,4 +61,13 @@ export class SupplierService {
   deleteRestock(id: string) {
     return this.http.delete<InventoryResponse>(`${urlSuppliers}/restock/${id}`, this.authService.headers);
   }
+
+  // --- ACUERDOS DE PRECIOS ---
+  createSupplierAgreement(companyId: string, agreementData: any) {
+    return this.http.post<InventoryResponse>(`${urlSuppliers}/agreement/${companyId}`, agreementData, this.authService.headers);
+  }
+
+  getSupplierAgreements(companyId: string, supplierId: string) {
+    return this.http.get<InventoryResponse>(`${urlSuppliers}/agreement/company/${companyId}?supplier=${supplierId}`, this.authService.headers);
+  }
 }

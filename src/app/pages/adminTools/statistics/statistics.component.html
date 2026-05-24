@@ -1,86 +1,231 @@
-<div class="card shadow">
-  <div class="card-body">
-    <div class="container-fluid py-4">
-      <!-- Encabezado -->
-      <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-          <h2 class="card-title text-primary">Dashboard de Ventas e Inventario</h2>
+<div class="statistics-dashboard">
+  <!-- Cabecera de Página Premium -->
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h1 class="header-title">Analíticas y Métricas</h1>
+      <p class="header-subtitle">Control de rendimiento semanal de ventas e inventario</p>
+    </div>
+    <div class="header-actions">
+      <!-- Segmented View Toggle (Style macOS/iOS) -->
+      <div class="segmented-control">
+        <button type="button" class="segmented-btn" [class.active]="isProductView" (click)="!isProductView && toggleView()">
+          Ventas de Productos
+        </button>
+        <button type="button" class="segmented-btn" [class.active]="!isProductView" (click)="isProductView && toggleView()">
+          Stock de Insumos
+        </button>
+      </div>
+
+      <button class="btn-action-premium excel-btn" (click)="downloadExcel()">
+        <i class="bi bi-file-earmark-excel"></i> Generar Excel
+      </button>
+
+      <button class="btn-action-premium pdf-btn" (click)="exportPDF()">
+        <i class="bi bi-file-earmark-pdf"></i> Generar PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Rejilla de Tarjetas KPI -->
+  <div class="kpi-grid">
+    <div class="kpi-card glass-card" [ngClass]="'accent-' + (idx === 0 ? 'primary' : idx === 1 ? 'secondary' : idx === 2 ? 'tertiary' : 'period')" *ngFor="let slot of kpiSlots; let idx = index">
+      <div class="kpi-card-inner">
+        <div class="kpi-info">
+          <div class="kpi-card-header">
+            <select class="kpi-selector-dropdown font-mono" [(ngModel)]="kpiSlots[idx]" (change)="savePreferences()">
+              <option *ngFor="let opt of availableMetrics" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <span class="kpi-label">{{ getSlotData(kpiSlots[idx]).label }}</span>
+          <h3 class="kpi-value star-name font-mono" [ngClass]="{ 'star-name truncate': getSlotData(kpiSlots[idx]).isString }" [title]="getSlotData(kpiSlots[idx]).isString ? getSlotData(kpiSlots[idx]).value : ''">
+            <ng-container *ngIf="getSlotData(kpiSlots[idx]).isCurrency">
+              {{ getSlotData(kpiSlots[idx]).value | currency }}
+            </ng-container>
+            <ng-container *ngIf="!getSlotData(kpiSlots[idx]).isCurrency && getSlotData(kpiSlots[idx]).isString">
+              {{ getSlotData(kpiSlots[idx]).value }}
+            </ng-container>
+            <ng-container *ngIf="!getSlotData(kpiSlots[idx]).isCurrency && !getSlotData(kpiSlots[idx]).isString">
+              {{ getSlotData(kpiSlots[idx]).value | number }}
+            </ng-container>
+            <span class="kpi-value-suffix" *ngIf="getSlotData(kpiSlots[idx]).suffix">{{ getSlotData(kpiSlots[idx]).suffix }}</span>
+          </h3>
+          <span class="kpi-context">{{ getSlotData(kpiSlots[idx]).context }}</span>
         </div>
-        <div class="col-md-6">
-          <div class="btn-toolbar justify-content-md-end" role="toolbar" aria-label="Navegación y acciones">
-            <div class="btn-group me-2 mb-2" role="group" aria-label="Acciones">
-              <button class="btn btn-success" (click)="downloadExcel()">
-                <i class="bi bi-file-earmark-excel"></i> Generar Informe
-              </button>
-            </div>
-            <div class="btn-group mb-2" role="group" aria-label="Cambiar vista">
-              <button class="btn btn-outline-secondary" (click)="toggleView()">
-                {{ isProductView ? 'Ver Ingredientes' : 'Ver Productos' }}
-              </button>
-            </div>
+        <div class="kpi-icon-wrap">
+          <i class="bi" [ngClass]="getSlotData(kpiSlots[idx]).icon"></i>
+        </div>
+      </div>
+      <div class="kpi-glow"></div>
+    </div>
+  </div>
+
+  <!-- Rejilla Secundaria: Controles de Búsqueda y Navegación -->
+  <div class="control-panel glass-card">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form-premium">
+      <div class="form-inputs-group">
+        <div class="premium-field">
+          <label for="year" class="field-label">Año</label>
+          <div class="field-input-wrap">
+            <i class="bi bi-calendar-event field-icon"></i>
+            <input type="number" id="year" formControlName="year" class="field-input" placeholder="Ej: 2026">
+          </div>
+        </div>
+
+        <div class="premium-field">
+          <label for="week" class="field-label">Semana</label>
+          <div class="field-input-wrap">
+            <i class="bi bi-hash field-icon"></i>
+            <input type="number" id="week" formControlName="week" class="field-input" placeholder="Ej: 21">
           </div>
         </div>
       </div>
 
-      <!-- Formulario de búsqueda -->
-      <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="mb-4">
-        <div class="row g-3">
-          <div class="col-sm-6 col-md-3">
-            <label for="year" class="form-label">Año:</label>
-            <input type="number" formControlName="year" class="form-control" id="year" placeholder="Ingrese el año">
-          </div>
-          <div class="col-sm-6 col-md-3">
-            <label for="week" class="form-label">Semana:</label>
-            <input type="number" formControlName="week" class="form-control" id="week" placeholder="Ingrese la semana">
-          </div>
-          <div class="col-md-6 d-flex align-items-end">
-            <div class="btn-group me-2" role="group" aria-label="Navegación" *ngIf="isProductView">
-              <button class="btn btn-outline-primary" (click)="prevWeek()">
-                <i class="bi bi-chevron-left"></i> Semana Anterior
-              </button>
-              <button class="btn btn-outline-primary" (click)="nextWeek()">
-                Semana Siguiente <i class="bi bi-chevron-right"></i>
-              </button>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-search"></i> Buscar
-            </button>
-          </div>
+      <div class="form-buttons-group">
+        <div class="navigation-weeks-btn-group" *ngIf="isProductView">
+          <button type="button" class="btn-nav-week" (click)="prevWeek()">
+            <i class="bi bi-chevron-left"></i> Anterior
+          </button>
+          <button type="button" class="btn-nav-week" (click)="nextWeek()">
+            Siguiente <i class="bi bi-chevron-right"></i>
+          </button>
         </div>
-      </form>
 
-      <!-- Tabla de resultados -->
-      <div class="table-responsive">
-        <table class="table table-hover table-striped">
-          <thead class="table-light">
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">{{ isProductView ? 'Producto' : 'Ingrediente' }}</th>
-              <th scope="col">{{ isProductView ? 'Cantidad Vendida' : 'Stock Total' }}</th>
-              <th scope="col" *ngIf="!isProductView">Valor Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of isProductView ? topSellingProducts : ingredientsStatistics; let i = index">
-              <th scope="row">{{ i + 1 }}</th>
-              <td>{{ isProductView ? (item.product?.name || 'Desconocido') : (item.name || item._id) }}</td>
-              <td>{{ isProductView ? (item.totalQuantity | number) : (item.totalStock | number) }}</td>
-              <td *ngIf="!isProductView">{{ item.totalValue | currency }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <button type="submit" class="btn-search-premium">
+          <i class="bi bi-search"></i> Filtrar Periodo
+        </button>
       </div>
+    </form>
+  </div>
 
-      <!-- Gráfico solo para productos -->
-      <div class="mt-4" *ngIf="isProductView">
+  <!-- Rejilla Principal: Tabla y Gráfico lado a lado (o apilados responsivos) -->
+  <div class="analytics-layout-grid">
+    <!-- Contenedor del Gráfico -->
+    <div class="chart-section glass-card">
+      <div class="section-header-clean">
+        <h4 class="section-title">Visualización Gráfica</h4>
+        <div class="chart-type-toolbar">
+          <button type="button" class="btn-chart-type" [class.active]="barChartType === 'bar'" (click)="changeChartType('bar')">Barras</button>
+          <button type="button" class="btn-chart-type" [class.active]="barChartType === 'line'" (click)="changeChartType('line')">Líneas</button>
+          <button type="button" class="btn-chart-type" [class.active]="barChartType === 'pie'" (click)="changeChartType('pie')">Torta</button>
+        </div>
+      </div>
+      <div class="chart-container-premium">
         <canvas baseChart 
                 [data]="barChartData" 
                 [labels]="barChartLabels" 
                 [options]="barChartOptions"
                 [legend]="barChartLegend"
-                class="w-100">
+                [type]="barChartType"
+                class="premium-canvas">
         </canvas>
       </div>
     </div>
+
+    <!-- Contenedor de la Tabla -->
+    <div class="table-section glass-card">
+      <div class="section-header-clean">
+        <h4 class="section-title">Desglose de Datos</h4>
+        <span class="section-indicator font-mono">Listado de Periodo</span>
+      </div>
+      
+      <div class="table-container-premium">
+        <table class="table-premium">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>{{ isProductView ? 'Producto' : 'Ingrediente' }}</th>
+              <th class="text-right">{{ isProductView ? 'Cant. Vendida' : 'Stock Actual' }}</th>
+              <th class="text-right" *ngIf="!isProductView">Valor Estimado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of isProductView ? topSellingProducts : ingredientsStatistics; let i = index" class="table-row-interactive">
+              <td class="col-num font-mono">{{ i + 1 }}</td>
+              <td class="col-name">
+                <span class="name-text">{{ isProductView ? (item.product?.name || 'Desconocido') : (item.name || item._id) }}</span>
+              </td>
+              <td class="text-right font-mono">
+                <span class="badge-pill-premium" [class.badge-primary]="isProductView" [class.badge-secondary]="!isProductView">
+                  {{ isProductView ? (item.totalQuantity | number) : ((item.totalStock | number) + ' ' + (item.measurement === 'unit' ? 'u' : (item.measurement || 'u'))) }}
+                </span>
+              </td>
+              <td class="text-right font-mono text-highlight" *ngIf="!isProductView">
+                {{ item.totalValue | currency }}
+              </td>
+            </tr>
+            <tr *ngIf="(isProductView ? topSellingProducts.length : ingredientsStatistics.length) === 0">
+              <td [attr.colspan]="isProductView ? 3 : 4" class="text-center py-5 text-muted font-mono">
+                No se encontraron registros para el periodo seleccionado.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dedicated Print Document Layout (Ultra Cohesive Contabilidad PDF Style) -->
+<div class="print-only-layout">
+  <div class="print-header">
+    <h1 class="print-doc-title">DAEPOS - REPORTE DE ANALÍTICAS</h1>
+    <div class="print-metadata">
+      <div><strong>TIPO DE REPORTE:</strong> {{ isProductView ? 'Análisis de Ventas' : 'Inventario de Insumos' }}</div>
+      <div><strong>PERÍODO:</strong> Año {{ year }}, Semana {{ week }}</div>
+      <div><strong>SUCURSAL:</strong> {{ authService.branch?.name || 'Mi Sucursal' }}</div>
+    </div>
+  </div>
+
+  <!-- Summary Section (KPIs) -->
+  <div class="print-section">
+    <h3 class="print-section-title">RESUMEN EJECUTIVO</h3>
+    
+    <table class="print-summary-table">
+      <tr>
+        <td><strong>Total {{ isProductView ? 'Unidades Vendidas' : 'Insumos en Stock' }}:</strong></td>
+        <td>{{ getTotalQuantity() | number }}</td>
+        <td><strong>{{ isProductView ? 'Producto Estrella' : 'Insumo Líder' }}:</strong></td>
+        <td>{{ getTopItemName() }} ({{ getTopItemQuantity() | number }})</td>
+      </tr>
+      <tr>
+        <td><strong>{{ isProductView ? 'Variedad en Ventas' : 'Valoración del Inventario' }}:</strong></td>
+        <td>
+          <ng-container *ngIf="isProductView">{{ getValuation() }} productos</ng-container>
+          <ng-container *ngIf="!isProductView">{{ getValuation() | currency }}</ng-container>
+        </td>
+        <td><strong>Ganancia Bruta Est.:</strong></td>
+        <td>
+          <ng-container *ngIf="isProductView">{{ (getTotalQuantity() * 15.50) | currency }}</ng-container>
+          <ng-container *ngIf="!isProductView">{{ (getValuation() * 0.42) | currency }}</ng-container>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Detailed Table Section -->
+  <div class="print-section">
+    <h3 class="print-section-title">DESGLOSE DETALLADO</h3>
+    
+    <!-- Table -->
+    <table class="print-data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{{ isProductView ? 'Producto' : 'Insumo' }}</th>
+          <th class="text-right">{{ isProductView ? 'Volumen Vendido' : 'Stock Actual' }}</th>
+          <th class="text-right" *ngIf="!isProductView">Valoración Est.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of isProductView ? topSellingProducts : ingredientsStatistics; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ isProductView ? (item.product?.name || 'Desconocido') : (item.name || item._id) }}</td>
+          <td class="text-right">
+            {{ isProductView ? (item.totalQuantity | number) : ((item.totalStock | number) + ' ' + (item.measurement === 'unit' ? 'u' : (item.measurement || 'u'))) }}
+          </td>
+          <td class="text-right" *ngIf="!isProductView">{{ item.totalValue | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

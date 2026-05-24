@@ -23,7 +23,7 @@
 
 /* Cabecera */
 .sidebar-header {
-  height: 80px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,7 +65,7 @@
 .toggle-container {
   display: flex;
   justify-content: center;
-  padding: 15px 0;
+  padding: 10px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -109,11 +109,11 @@
 
 .sidebar-section {
   width: 100%;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .sidebar-section-title {
-  padding: 1.5rem 1.5rem 0.75rem 1.5rem;
+  padding: 1rem 1.5rem 0.5rem 1.5rem;
   color: var(--text-muted);
   text-transform: uppercase;
   font-size: 0.7rem;
@@ -126,7 +126,7 @@
   width: 30px;
   height: 2px;
   background: rgba(255, 255, 255, 0.1);
-  margin: 1.5rem auto 1rem auto;
+  margin: 0.8rem auto 0.5rem auto;
   border-radius: 2px;
 }
 
@@ -141,8 +141,8 @@
   align-items: center;
   justify-content: center;
   width: 50px;
-  height: 44px;
-  margin: 2px auto;
+  height: 40px;
+  margin: 1px auto;
   color: var(--text-muted);
   text-decoration: none !important;
   border-radius: var(--radius-sm);
@@ -154,7 +154,7 @@
   width: 100%;
   justify-content: flex-start;
   padding: 0 1.25rem;
-  margin: 2px 0;
+  margin: 1px 0;
 }
 
 .sidebar-link:hover {
@@ -183,7 +183,7 @@
 
 /* Logout Button */
 .logOut {
-  padding: 1.5rem 0;
+  padding: 1rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   justify-content: center;
@@ -196,7 +196,7 @@
   align-items: center;
   justify-content: center;
   width: 50px;
-  height: 50px;
+  height: 44px;
   border-radius: 12px;
   text-decoration: none;
   transition: var(--transition);

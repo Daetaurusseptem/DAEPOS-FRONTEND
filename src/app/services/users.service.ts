@@ -65,12 +65,18 @@ export class UsersService {
 
 
   }
-  deleteuser(id:string){
-    return this.http.delete<InventoryResponse>(`${urlApiUsers}/${id}`, this.authService.headers);
+  deleteuser(id:string, reason: string = 'Desactivado por el administrador'){
+    return this.http.delete<InventoryResponse>(`${urlApiUsers}/${id}`, {
+      body: { reason },
+      ...this.authService.headers
+    });
   }
   
-  deleteuserByCompanyAdmin(id:string, companyId:string){
-    return this.http.delete<InventoryResponse>(`${urlApiUsers}/admin/${companyId}/${id}`, this.authService.headers);
+  deleteuserByCompanyAdmin(id:string, companyId:string, reason: string = 'Desactivado por el administrador'){
+    return this.http.delete<InventoryResponse>(`${urlApiUsers}/admin/${companyId}/${id}`, {
+      body: { reason },
+      ...this.authService.headers
+    });
   }
   
 

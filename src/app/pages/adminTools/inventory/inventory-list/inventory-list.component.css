@@ -86,3 +86,18 @@
   gap: 0.5rem;
   justify-content: flex-end;
 }
+
+.sortable-header {
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+.sortable-header:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+.sortable-header i {
+  transition: transform 0.2s ease;
+}
+.sortable-header:active i {
+  transform: scale(0.9);
+}

@@ -23,20 +23,28 @@ export class StatisticsService {
     return this.http.get<any>(`${this.baseUrl}/ingredients`);
   }
 
-  getTopSellingProductsByWeek(year: number, week: number, companyId: string): Observable<any> {
+  getTopSellingProductsByWeek(year: number, week: number, companyId: string, branchId?: string): Observable<any> {
     let params = new HttpParams()
       .set('year', year.toString())
       .set('week', week.toString())
       .set('companyId', companyId);
+
+    if (branchId) {
+      params = params.set('branchId', branchId);
+    }
 
     return this.http.get<any>(`${this.baseUrl}/top-selling-products`, { params });
   }
 
-  getIngredientsStatisticsByWeek(year: number, week: number, companyId: string): Observable<any> {
+  getIngredientsStatisticsByWeek(year: number, week: number, companyId: string, branchId?: string): Observable<any> {
     let params = new HttpParams()
       .set('year', year.toString())
       .set('week', week.toString())
       .set('companyId', companyId);
+
+    if (branchId) {
+      params = params.set('branchId', branchId);
+    }
 
     return this.http.get<any>(`${this.baseUrl}/ingredients-statistics`, { params });
   }

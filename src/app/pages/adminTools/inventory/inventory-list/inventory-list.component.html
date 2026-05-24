@@ -33,6 +33,17 @@
                        name="searchTerm">
             </div>
 
+            <!-- Filtro por Stock -->
+            <div class="stock-filter" style="min-width: 220px;">
+                <select class="form-select" 
+                        [(ngModel)]="stockFilter"
+                        name="stockFilter">
+                    <option value="all">🔍 Todos los Niveles</option>
+                    <option value="low">⚠️ Stock Bajo (&lt; 10)</option>
+                    <option value="normal">✅ Stock Suficiente (&gt;= 10)</option>
+                </select>
+            </div>
+
             <!-- Filtro por Sucursal (Solo para Dueño) -->
             <div class="branch-filter" *ngIf="userRole === 'companyAdmin'">
                 <select class="form-select" 
@@ -74,14 +85,23 @@
                         <th>{{ itemType === 'product' ? 'Producto' : 'Insumo Maestro' }}</th>
                         <th>Presentación</th>
                         <th>{{ itemType === 'product' ? 'Precio Venta' : 'Costo Promedio' }}</th>
-                        <th width="150">Stock Actual</th>
+                        <th width="180" class="sortable-header" (click)="toggleStockSort()" style="cursor: pointer; user-select: none;">
+                            Stock Actual
+                            <i class="bi" 
+                               [ngClass]="{
+                                 'bi-arrow-down-up text-muted': stockSortDirection === 'none',
+                                 'bi-sort-numeric-down text-primary': stockSortDirection === 'asc',
+                                 'bi-sort-numeric-up-alt text-primary': stockSortDirection === 'desc'
+                               }"
+                               style="font-size: 0.9rem; margin-left: 4px;"></i>
+                        </th>
                         <th *ngIf="userRole === 'companyAdmin'">Sucursal</th>
                         <th>Última Entrada</th>
                         <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
-                <tbody *ngIf="items && items.length > 0">
-                    <tr *ngFor="let item of items" class="animate__animated animate__fadeIn">
+                <tbody *ngIf="displayedItems && displayedItems.length > 0">
+                    <tr *ngFor="let item of displayedItems" class="animate__animated animate__fadeIn">
                         <td>
                             <div class="img-container">
                                 <img *ngIf="item.product && asProduct(item.product).img && asProduct(item.product).img !== 'no-image'" 
@@ -131,6 +151,9 @@
                         </td>
                         <td>
                             <div class="actions-cell">
+                                <button class="btn btn-light btn-sm text-success me-1" (click)="adjustStock(item)" title="Reabastecer Rápido">
+                                    <i class="bi bi-plus-circle-fill"></i>
+                                </button>
                                 <button class="btn btn-light btn-sm" [routerLink]="['/dashboard/admin/inventory/update', item._id]" title="Editar">
                                     <i class="bi bi-pencil-fill text-secondary"></i>
                                 </button>
@@ -144,9 +167,9 @@
             </table>
 
             <!-- Empty State / Loading -->
-            <div class="loading-container py-5 text-center" *ngIf="!items || items.length === 0">
-                <app-loading-data-spinner *ngIf="!items"></app-loading-data-spinner>
-                <div *ngIf="items && items.length === 0">
+            <div class="loading-container py-5 text-center" *ngIf="!displayedItems || displayedItems.length === 0">
+                <app-loading-data-spinner *ngIf="!displayedItems"></app-loading-data-spinner>
+                <div *ngIf="displayedItems && displayedItems.length === 0">
                     <i class="bi bi-archive text-muted" style="font-size: 3rem;"></i>
                     <p class="mt-3">No se encontraron registros de inventario.</p>
                 </div>

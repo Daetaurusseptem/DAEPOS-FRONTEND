@@ -79,58 +79,120 @@
 
             <!-- PESTAÑA: INVENTARIO -->
             <div *ngIf="activeTab === 'inventory'" class="animate__animated animate__fadeIn">
-              <div class="row align-items-end">
-                <div class="col-md-8 mb-3">
-                  <label for="barCode" class="form-label">Código de Barras</label>
-                  <input type="text" class="form-control rounded-3" id="barCode" formControlName="barCode">
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="stock" class="form-label d-flex justify-content-between">
-                    Stock Actual <i class="bi bi-lock-fill small text-muted" title="Inmutable (Ajustar vía movimientos)"></i>
-                  </label>
-                  <input type="number" class="form-control rounded-3 fw-bold bg-light" id="stock" formControlName="stock">
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="costPrice" class="form-label">Precio de Costo</label>
-                  <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">$</span>
-                    <input type="number" class="form-control border-start-0 ps-0" id="costPrice" formControlName="costPrice">
+              
+              <!-- MODO CORPORATIVO: COMPARTIDO DE TODAS LAS SUCURSALES (Para Dueño / Sysadmin) -->
+              <div *ngIf="isCompanyAdmin">
+                <div class="alert alert-info border-start border-info border-3 py-3 mb-4 rounded-3 d-flex align-items-center shadow-sm">
+                  <i class="bi bi-building-gear fs-4 me-3 text-info"></i>
+                  <div>
+                    <strong class="d-block mb-1">Vista de Control Corporativo (Multi-sucursal)</strong>
+                    <span class="small text-secondary">Estás visualizando las existencias y precios del catálogo unificado en cada una de tus sucursales activas.</span>
                   </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label for="sellingPrice" class="form-label">Precio de Venta</label>
-                  <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 text-dark fw-bold">$</span>
-                    <input type="number" class="form-control border-start-0 ps-0 fw-bold" id="sellingPrice" formControlName="sellingPrice">
+
+                <div class="table-responsive rounded-3 border border-light shadow-sm mb-4 bg-white">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                      <tr class="text-uppercase text-secondary font-mono small border-bottom border-light">
+                        <th class="ps-4 py-3">Sucursal</th>
+                        <th class="py-3">Código de Barras</th>
+                        <th class="py-3 text-center">Unidad de Medida</th>
+                        <th class="py-3 text-center">Stock Actual</th>
+                        <th class="py-3 text-end">Costo Promedio</th>
+                        <th class="pe-4 py-3 text-end">Precio de Venta</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of inventoryItems" class="border-bottom border-light-subtle">
+                        <td class="ps-4 fw-bold text-dark">
+                          <i class="bi bi-shop me-2 text-primary"></i> {{ item.branch?.name || 'Matriz / Desconocido' }}
+                        </td>
+                        <td>
+                          <code class="font-mono text-secondary small bg-light px-2 py-1 rounded">{{ item.barCode || 'N/A' }}</code>
+                        </td>
+                        <td class="text-center text-secondary small">
+                          <span class="badge bg-light text-dark border px-2 py-1 text-uppercase">
+                            {{ item.measurement === 'unit' ? 'Pieza' : item.measurement }}
+                          </span>
+                        </td>
+                        <td class="text-center fw-bold">
+                          <span [class]="item.stock > 10 ? 'text-success' : 'text-danger'">
+                            {{ item.stock }}
+                          </span>
+                        </td>
+                        <td class="text-end text-secondary font-mono font-semibold">
+                          {{ item.costPrice | currency }}
+                        </td>
+                        <td class="pe-4 text-end fw-bold text-success font-mono fs-5">
+                          {{ item.sellingPrice | currency }}
+                        </td>
+                      </tr>
+                      <tr *ngIf="inventoryItems.length === 0">
+                        <td colspan="6" class="text-center py-5 text-muted">
+                          <i class="bi bi-box-seam fs-2 d-block mb-2 text-secondary"></i>
+                          No se han registrado existencias de este producto en ninguna sucursal aún.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- MODO LOCAL: EDICIÓN DE SUCURSAL ESPECÍFICA (Para Gerentes o si no es Dueño) -->
+              <div *ngIf="!isCompanyAdmin">
+                <div class="row align-items-end">
+                  <div class="col-md-8 mb-3">
+                    <label for="barCode" class="form-label">Código de Barras</label>
+                    <input type="text" class="form-control rounded-3" id="barCode" formControlName="barCode">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="stock" class="form-label d-flex justify-content-between">
+                      Stock Actual <i class="bi bi-lock-fill small text-muted" title="Inmutable (Ajustar vía movimientos)"></i>
+                    </label>
+                    <input type="number" class="form-control rounded-3 fw-bold bg-light" id="stock" formControlName="stock">
                   </div>
                 </div>
-              </div>
 
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="unitOfMeasure" class="form-label">Unidad de Medida</label>
-                  <select class="form-select rounded-3" formControlName="unitOfMeasure" id="unitOfMeasure">
-                    <option value="unit">Pieza (unit)</option>
-                    <option value="kg">Kilogramo (kg)</option>
-                    <option value="l">Litro (l)</option>
-                    <option value="pack">Paquete (pack)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="bg-light p-3 rounded-3 mt-3">
-                <p class="text-muted small mb-3 fw-bold text-uppercase letter-spacing-1">Fechas de Control</p>
                 <div class="row">
-                  <div class="col-md-6 mb-0">
-                    <label for="receivedDate" class="form-label small">Fecha de Recepción</label>
-                    <input type="date" class="form-control form-control-sm border-0 bg-white" id="receivedDate" formControlName="receivedDate">
+                  <div class="col-md-6 mb-3">
+                    <label for="costPrice" class="form-label">Precio de Costo</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0">$</span>
+                      <input type="number" class="form-control border-start-0 ps-0" id="costPrice" formControlName="costPrice">
+                    </div>
                   </div>
-                  <div class="col-md-6 mb-0">
-                    <label for="expirationDate" class="form-label small">Fecha de Expiración</label>
-                    <input type="date" class="form-control form-control-sm border-0 bg-white" id="expirationDate" formControlName="expirationDate">
+                  <div class="col-md-6 mb-3">
+                    <label for="sellingPrice" class="form-label">Precio de Venta</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0 text-dark fw-bold">$</span>
+                      <input type="number" class="form-control border-start-0 ps-0 fw-bold" id="sellingPrice" formControlName="sellingPrice">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="unitOfMeasure" class="form-label">Unidad de Medida</label>
+                    <select class="form-select rounded-3" formControlName="unitOfMeasure" id="unitOfMeasure">
+                      <option value="unit">Pieza (unit)</option>
+                      <option value="kg">Kilogramo (kg)</option>
+                      <option value="l">Litro (l)</option>
+                      <option value="pack">Paquete (pack)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="bg-light p-3 rounded-3 mt-3">
+                  <p class="text-muted small mb-3 fw-bold text-uppercase letter-spacing-1">Fechas de Control</p>
+                  <div class="row">
+                    <div class="col-md-6 mb-0">
+                      <label for="receivedDate" class="form-label small">Fecha de Recepción</label>
+                      <input type="date" class="form-control form-control-sm border-0 bg-white" id="receivedDate" formControlName="receivedDate">
+                    </div>
+                    <div class="col-md-6 mb-0">
+                      <label for="expirationDate" class="form-label small">Fecha de Expiración</label>
+                      <input type="date" class="form-control form-control-sm border-0 bg-white" id="expirationDate" formControlName="expirationDate">
+                    </div>
                   </div>
                 </div>
               </div>

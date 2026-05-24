@@ -1,0 +1,235 @@
+/* Container Centered Layout with subtle premium gradient background */
+.open-register-wrapper {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--bg-ghost);
+}
+
+/* Glassmorphism Card Style */
+.open-register-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  padding: 2.5rem;
+  transition: var(--transition);
+}
+
+.open-register-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* User Avatar & Header style */
+.user-avatar-container {
+  font-size: 4rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.welcome-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.welcome-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+/* Badges Container */
+.info-badges-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.info-badge {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.role-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* Form Styles */
+.custom-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Select wrapper to style select dropdown */
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.custom-form-select {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.custom-form-select:hover {
+  border-color: var(--secondary);
+}
+
+.custom-form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+}
+
+.select-chevron {
+  position: absolute;
+  right: 16px;
+  pointer-events: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Spin animation for loader */
+.spin {
+  animation: spinAnimation 1.5s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spinAnimation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-registers-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Money Input Container */
+.input-money-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 16px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.custom-form-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: var(--transition);
+}
+
+.money-input {
+  padding-left: 32px !important;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.custom-form-input:hover {
+  border-color: var(--secondary);
+}
+
+.custom-form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Premium Dark Action Button */
+.btn-premium-action {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-premium-action:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-premium-action:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-premium-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Logout subtle link button */
+.btn-logout-link {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: var(--radius-sm);
+}
+
+.btn-logout-link:hover {
+  color: var(--danger);
+  background-color: rgba(194, 43, 16, 0.05);
+}

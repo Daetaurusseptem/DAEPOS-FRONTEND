@@ -1,1 +1,545 @@
-<p>reports works!</p>
+<div class="statistics-dashboard animate__animated animate__fadeIn">
+  <!-- Cabecera de Página Premium -->
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h1 class="header-title">Generación de Reportes</h1>
+      <p class="header-subtitle">Suite de auditoría y exportación analítica de sucursales</p>
+    </div>
+    <div class="header-actions">
+      <!-- Segmented View Toggle (Style macOS/iOS) for Report Type Selection -->
+      <div class="segmented-control">
+        <button type="button" class="segmented-btn" [class.active]="reportType === 'commercial'" (click)="setReportType('commercial')">
+          Comercial
+        </button>
+        <button type="button" class="segmented-btn" [class.active]="reportType === 'inventory'" (click)="setReportType('inventory')">
+          Inventario
+        </button>
+        <button type="button" class="segmented-btn" [class.active]="reportType === 'audit'" (click)="setReportType('audit')">
+          Auditoría
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rejilla de Tarjetas KPI (Executive Summary if toggled) -->
+  <div class="kpi-grid" *ngIf="includeSummary && !loading">
+    
+    <!-- Commercial Summary Cards -->
+    <ng-container *ngIf="reportType === 'commercial'">
+      <!-- Total Ingresos -->
+      <div class="kpi-card glass-card accent-primary">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Total Ingresos Est.</span>
+            <h3 class="kpi-value font-mono">{{ getCommercialRevenue() | currency }}</h3>
+            <span class="kpi-context">En la semana seleccionada</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-cash-coin"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+      
+      <!-- Costos Ventas -->
+      <div class="kpi-card glass-card accent-secondary" *ngIf="includeMargins">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Costo de Ventas Est.</span>
+            <h3 class="kpi-value font-mono">{{ getCommercialCost() | currency }}</h3>
+            <span class="kpi-context">En base a costo de insumos</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-tags-fill"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+
+      <!-- Ganancia Neta -->
+      <div class="kpi-card glass-card accent-tertiary" *ngIf="includeMargins">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Ganancia Neta Est.</span>
+            <h3 class="kpi-value font-mono">{{ (getCommercialRevenue() - getCommercialCost()) | currency }}</h3>
+            <span class="kpi-context">Margen bruto est. 48%</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-graph-up-arrow"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+
+      <!-- Ticket Promedio -->
+      <div class="kpi-card glass-card accent-period">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Ticket Promedio (AOV)</span>
+            <h3 class="kpi-value font-mono">{{ getAOV() | currency }}</h3>
+            <span class="kpi-context">Valor estimado de orden</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-receipt"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+    </ng-container>
+
+    <!-- Inventory Summary Cards -->
+    <ng-container *ngIf="reportType === 'inventory'">
+      <div class="kpi-card glass-card accent-primary">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Costo Activos Totales</span>
+            <h3 class="kpi-value font-mono">{{ getInventoryValue() | currency }}</h3>
+            <span class="kpi-context">Valoración total del capital</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-cash-coin"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+
+      <div class="kpi-card glass-card accent-secondary">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Total Insumos Activos</span>
+            <h3 class="kpi-value font-mono">{{ inventoryData.length | number }}</h3>
+            <span class="kpi-context">Artículos distintos registrados</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-box-seam"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+
+      <div class="kpi-card glass-card accent-tertiary" *ngIf="includeLowStock">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Insumos Stock Crítico</span>
+            <h3 class="kpi-value font-mono text-highlight-danger">{{ getLowStockCount() | number }}</h3>
+            <span class="kpi-context">Artículos bajo stock mínimo</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-exclamation-triangle"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+    </ng-container>
+
+    <!-- Audit Summary Cards -->
+    <ng-container *ngIf="reportType === 'audit'">
+      <div class="kpi-card glass-card accent-primary">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Total Cortes de Caja</span>
+            <h3 class="kpi-value font-mono">{{ auditData.length | number }}</h3>
+            <span class="kpi-context">Cierres auditados en bitácora</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-clock-history"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+
+      <div class="kpi-card glass-card accent-secondary">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Transacciones Totales</span>
+            <h3 class="kpi-value font-mono">{{ getAuditTotalSales() | number }}</h3>
+            <span class="kpi-context">Transacciones procesadas</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-receipt"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+
+      <div class="kpi-card glass-card accent-tertiary" *ngIf="includeDiscrepancies">
+        <div class="kpi-card-inner">
+          <div class="kpi-info">
+            <span class="kpi-label">Cierres con Diferencia</span>
+            <h3 class="kpi-value font-mono text-highlight-danger">{{ getAuditDiscrepancies() | number }}</h3>
+            <span class="kpi-context">Registros con descuadre</span>
+          </div>
+          <div class="kpi-icon-wrap"><i class="bi bi-exclamation-square"></i></div>
+        </div>
+        <div class="kpi-glow"></div>
+      </div>
+    </ng-container>
+
+  </div>
+
+  <!-- Rejilla Secundaria: Controles de Búsqueda y Navegación -->
+  <div class="control-panel glass-card">
+    <form [formGroup]="reportForm" (ngSubmit)="$event.preventDefault()" class="search-form-premium">
+      <div class="form-inputs-group">
+        <!-- Sucursal -->
+        <div class="premium-field" *ngIf="isCompanyAdmin && branches.length > 0">
+          <label class="field-label">Sucursal</label>
+          <div class="field-input-wrap">
+            <i class="bi bi-shop field-icon"></i>
+            <select formControlName="branchId" (change)="onBranchChange($event)" class="field-input select-premium-field">
+              <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Año -->
+        <div class="premium-field">
+          <label class="field-label">Año</label>
+          <div class="field-input-wrap">
+            <i class="bi bi-calendar-event field-icon"></i>
+            <select formControlName="year" (change)="fetchReportData()" class="field-input select-premium-field">
+              <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Semana -->
+        <div class="premium-field">
+          <label class="field-label">Semana</label>
+          <div class="field-input-wrap">
+            <i class="bi bi-hash field-icon"></i>
+            <select formControlName="week" (change)="fetchReportData()" class="field-input select-premium-field">
+              <option *ngFor="let w of availableWeeks" [value]="w">Semana {{ w }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuración Modular Inline de Secciones -->
+      <div class="modular-switches-inline">
+        <label class="checkbox-container-premium">
+          <input type="checkbox" [(ngModel)]="includeSummary" [ngModelOptions]="{standalone: true}">
+          <span class="checkmark-premium"></span>
+          Resumen KPI
+        </label>
+
+        <label class="checkbox-container-premium">
+          <input type="checkbox" [(ngModel)]="includeDetails" [ngModelOptions]="{standalone: true}">
+          <span class="checkmark-premium"></span>
+          Detalle de Filas
+        </label>
+
+        <label class="checkbox-container-premium" *ngIf="reportType === 'commercial'">
+          <input type="checkbox" [(ngModel)]="includeMargins" [ngModelOptions]="{standalone: true}">
+          <span class="checkmark-premium"></span>
+          Margen y Costos
+        </label>
+
+        <label class="checkbox-container-premium" *ngIf="reportType === 'inventory'">
+          <input type="checkbox" [(ngModel)]="includeLowStock" [ngModelOptions]="{standalone: true}">
+          <span class="checkmark-premium"></span>
+          Stock Crítico
+        </label>
+
+        <label class="checkbox-container-premium" *ngIf="reportType === 'audit'">
+          <input type="checkbox" [(ngModel)]="includeDiscrepancies" [ngModelOptions]="{standalone: true}">
+          <span class="checkmark-premium"></span>
+          Diferencias
+        </label>
+      </div>
+    </form>
+  </div>
+
+  <!-- Rejilla Principal: Vista Previa y Auditoría -->
+  <div class="analytics-layout-grid">
+    
+    <!-- Panel Izquierdo: Módulo de Validación y Firmas de Negocio -->
+    <div class="chart-section glass-card audit-verification-section">
+      <div class="section-header-clean">
+        <h4 class="section-title">Certificación y Validación</h4>
+        <span class="section-indicator text-success">Auditoría Activa</span>
+      </div>
+
+      <div class="audit-verification-body">
+        <div class="audit-meta-grid">
+          <div class="audit-meta-item">
+            <span class="meta-label">Operador Autorizado</span>
+            <span class="meta-value">{{ authService.usuario?.name }}</span>
+          </div>
+          <div class="audit-meta-item">
+            <span class="meta-label">Acceso del Usuario</span>
+            <span class="meta-value text-uppercase">{{ authService.usuario?.role }}</span>
+          </div>
+          <div class="audit-meta-item">
+            <span class="meta-label">Fecha y Hora</span>
+            <span class="meta-value">{{ currentDate | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="audit-meta-item">
+            <span class="meta-label">Código Transacción</span>
+            <span class="meta-value text-monospace">TX-{{ reportForm.value.year }}-W{{ reportForm.value.week }}</span>
+          </div>
+        </div>
+
+        <hr class="audit-separator">
+
+        <!-- Comentario / Notas de Gestión -->
+        <div class="audit-notes-field">
+          <label class="field-label">Anotaciones y Observaciones del Reporte</label>
+          <textarea [(ngModel)]="reportNotes" class="audit-textarea" placeholder="Escribe aquí observaciones sobre conciliación, análisis de mermas o comentarios para el PDF final..."></textarea>
+        </div>
+
+        <div class="print-signatures-preview">
+          <div class="signature-line-wrap">
+            <div class="signature-placeholder-line"></div>
+            <span class="signature-label">Firma Responsable</span>
+          </div>
+          <div class="signature-line-wrap">
+            <div class="signature-placeholder-line"></div>
+            <span class="signature-label">Firma Auditoría</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Derecho: Tabla de Desglose de Datos -->
+    <div class="table-section glass-card">
+      <div class="section-header-clean">
+        <h4 class="section-title">Previsualización de Datos</h4>
+        <div class="chart-type-toolbar">
+          <button class="btn-chart-type" (click)="printReport()" [disabled]="loading">Exportar PDF</button>
+          <button class="btn-chart-type active" (click)="generateExcel()" [disabled]="loading">Descargar Excel</button>
+        </div>
+      </div>
+
+      <div class="table-container-premium" *ngIf="includeDetails && !loading">
+        
+        <!-- Commercial Table -->
+        <table class="table-premium" *ngIf="reportType === 'commercial'">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>Producto</th>
+              <th class="text-right">Cantidad</th>
+              <th class="text-right" *ngIf="includeMargins">Ganancia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of commercialData; let i = index" class="table-row-interactive">
+              <td class="col-num font-mono">{{ i + 1 }}</td>
+              <td class="col-name">{{ item.product?.name || 'Desconocido' }}</td>
+              <td class="text-right font-mono">
+                <span class="badge-pill-premium badge-primary">{{ item.totalQuantity | number }}</span>
+              </td>
+              <td class="text-right font-mono text-highlight" *ngIf="includeMargins">
+                {{ (item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60))) | currency }}
+              </td>
+            </tr>
+            <tr *ngIf="commercialData.length === 0">
+              <td colspan="4" class="text-center py-5 text-muted font-mono">No hay registros de ventas.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Inventory Table -->
+        <table class="table-premium" *ngIf="reportType === 'inventory'">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>Insumo</th>
+              <th class="text-right">Stock</th>
+              <th class="text-right" *ngIf="includeLowStock">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of inventoryData; let i = index" class="table-row-interactive">
+              <td class="col-num font-mono">{{ i + 1 }}</td>
+              <td class="col-name">{{ item.name || item._id }}</td>
+              <td class="text-right font-mono">
+                <span class="badge-pill-premium badge-secondary">{{ item.totalStock | number }} {{ item.measurement === 'unit' ? 'u' : item.measurement }}</span>
+              </td>
+              <td class="text-right font-mono" *ngIf="includeLowStock">
+                <span [class.text-danger]="item.totalStock < 3000" [class.text-success]="item.totalStock >= 3000">
+                  {{ item.totalStock < 3000 ? 'Reorden' : 'Estable' }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="inventoryData.length === 0">
+              <td colspan="4" class="text-center py-5 text-muted font-mono">No hay insumos cargados.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Audit Table -->
+        <table class="table-premium" *ngIf="reportType === 'audit'">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>Cajero</th>
+              <th class="text-right">M. Real</th>
+              <th class="text-right" *ngIf="includeDiscrepancies">Diferencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of auditData; let i = index" class="table-row-interactive">
+              <td class="col-num font-mono">{{ i + 1 }}</td>
+              <td class="col-name">{{ item.user?.name || 'Cajero Demo' }}</td>
+              <td class="text-right font-mono text-highlight">{{ item.actualAmount | currency }}</td>
+              <td class="text-right font-mono" *ngIf="includeDiscrepancies"
+                  [class.text-danger]="(item.actualAmount - item.expectedAmount) !== 0"
+                  [class.text-success]="(item.actualAmount - item.expectedAmount) === 0">
+                {{ (item.actualAmount - item.expectedAmount) === 0 ? '0.00' : (item.actualAmount - item.expectedAmount | currency) }}
+              </td>
+            </tr>
+            <tr *ngIf="auditData.length === 0">
+              <td colspan="4" class="text-center py-5 text-muted font-mono">No hay registros de caja.</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="py-5 text-center text-muted" *ngIf="!includeDetails && !loading">
+        Detalle desactivado en la estructura modular
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Dedicated Print Document Layout (Ultra Cohesive Contabilidad PDF Style) -->
+<div class="print-only-layout">
+  <div class="print-header">
+    <h1 class="print-doc-title">DAEPOS - REPORTE ANALÍTICO</h1>
+    <div class="print-metadata">
+      <div><strong>TIPO DE REPORTE:</strong> {{ getReportTypeName() | uppercase }}</div>
+      <div><strong>PERÍODO:</strong> Año {{ reportForm.value.year }}, Semana {{ reportForm.value.week }}</div>
+      <div><strong>SUCURSAL:</strong> {{ getBranchName() }}</div>
+    </div>
+  </div>
+
+  <!-- Summary Section (KPIs) -->
+  <div class="print-section" *ngIf="includeSummary">
+    <h3 class="print-section-title">RESUMEN EJECUTIVO</h3>
+    
+    <!-- Commercial Summary -->
+    <table class="print-summary-table" *ngIf="reportType === 'commercial'">
+      <tr>
+        <td><strong>Total de Ingresos Est.:</strong></td>
+        <td>{{ getCommercialRevenue() | currency }}</td>
+        <td *ngIf="includeMargins"><strong>Total Costo de Ventas Est.:</strong></td>
+        <td *ngIf="includeMargins">{{ getCommercialCost() | currency }}</td>
+      </tr>
+      <tr>
+        <td *ngIf="includeMargins"><strong>Ganancia Neta Est.:</strong></td>
+        <td *ngIf="includeMargins">{{ (getCommercialRevenue() - getCommercialCost()) | currency }}</td>
+        <td><strong>Ticket Promedio (AOV):</strong></td>
+        <td>{{ getAOV() | currency }}</td>
+      </tr>
+    </table>
+
+    <!-- Inventory Summary -->
+    <table class="print-summary-table" *ngIf="reportType === 'inventory'">
+      <tr>
+        <td><strong>Costo Activos Totales:</strong></td>
+        <td>{{ getInventoryValue() | currency }}</td>
+        <td><strong>Total Insumos Activos:</strong></td>
+        <td>{{ inventoryData.length }} items</td>
+      </tr>
+      <tr *ngIf="includeLowStock">
+        <td><strong>Insumos Stock Crítico:</strong></td>
+        <td>{{ getLowStockCount() }}</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+
+    <!-- Audit Summary -->
+    <table class="print-summary-table" *ngIf="reportType === 'audit'">
+      <tr>
+        <td><strong>Total Cortes de Caja:</strong></td>
+        <td>{{ auditData.length }}</td>
+        <td><strong>Transacciones Totales:</strong></td>
+        <td>{{ getAuditTotalSales() }}</td>
+      </tr>
+      <tr *ngIf="includeDiscrepancies">
+        <td><strong>Cierres con Diferencia:</strong></td>
+        <td>{{ getAuditDiscrepancies() }}</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Detailed Table Section -->
+  <div class="print-section" *ngIf="includeDetails">
+    <h3 class="print-section-title">DESGLOSE DETALLADO</h3>
+    
+    <!-- Commercial Table -->
+    <table class="print-data-table" *ngIf="reportType === 'commercial'">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Producto</th>
+          <th class="text-right">Cantidad Vendida</th>
+          <th class="text-right" *ngIf="includeMargins">Costo Est.</th>
+          <th class="text-right" *ngIf="includeMargins">Ganancia Neta Est.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of commercialData; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.product?.name || 'Desconocido' }}</td>
+          <td class="text-right">{{ item.totalQuantity }}</td>
+          <td class="text-right" *ngIf="includeMargins">{{ (item.totalQuantity * (item.product?.costPrice || 60)) | currency }}</td>
+          <td class="text-right" *ngIf="includeMargins">{{ (item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60))) | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Inventory Table -->
+    <table class="print-data-table" *ngIf="reportType === 'inventory'">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Insumo</th>
+          <th class="text-right">Existencias</th>
+          <th class="text-right" *ngIf="includeLowStock">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of inventoryData; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.name || item._id }}</td>
+          <td class="text-right">{{ item.totalStock | number }} {{ item.measurement === 'unit' ? 'u' : item.measurement }}</td>
+          <td class="text-right" *ngIf="includeLowStock">{{ item.totalStock < 3000 ? 'ALERTA REORDEN' : 'ESTABLE' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Audit Table -->
+    <table class="print-data-table" *ngIf="reportType === 'audit'">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Cajero</th>
+          <th class="text-right">Monto Esperado</th>
+          <th class="text-right">Monto Real</th>
+          <th class="text-right" *ngIf="includeDiscrepancies">Diferencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of auditData; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.user?.name || 'Cajero Demo' }}</td>
+          <td class="text-right">{{ item.expectedAmount | currency }}</td>
+          <td class="text-right">{{ item.actualAmount | currency }}</td>
+          <td class="text-right" *ngIf="includeDiscrepancies">{{ (item.actualAmount - item.expectedAmount) | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Print Only Notes & Signature Section -->
+  <div class="print-section print-avoid-break" *ngIf="reportNotes">
+    <h3 class="print-section-title">OBSERVACIONES DEL AUDITOR</h3>
+    <div class="print-notes-box">
+      {{ reportNotes }}
+    </div>
+  </div>
+
+  <!-- Signatures for printed physical sheet -->
+  <div class="print-signatures-row">
+    <div class="print-signature-box">
+      <div class="print-sig-line"></div>
+      <div class="print-sig-label">RESPONSABLE DE SUCURSAL</div>
+    </div>
+    <div class="print-signature-box">
+      <div class="print-sig-line"></div>
+      <div class="print-sig-label">AUDITOR GENERAL</div>
+    </div>
+  </div>
+</div>

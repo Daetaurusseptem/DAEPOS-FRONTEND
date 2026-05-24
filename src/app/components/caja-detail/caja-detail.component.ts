@@ -64,7 +64,7 @@ export class CajaDetailComponent implements OnInit {
     doc.text(`Monto Inicial: ${this.caja.initialAmount.toFixed(2)} MXN`, marginX, currentY);
     currentY += 8;
     if (this.caja.closed) {
-      doc.text(`Monto Final: ${this.caja.finalAmount.toFixed(2)} MXN`, marginX, currentY);
+      doc.text(`Monto Final: ${(this.caja.actualAmount ?? 0).toFixed(2)} MXN`, marginX, currentY);
       currentY += 8;
     }
 
@@ -143,7 +143,7 @@ export class CajaDetailComponent implements OnInit {
     doc.text(`Monto Inicial: ${this.caja.initialAmount.toFixed(2)} MXN`, marginX, currentY);
     currentY += 8;
     if (this.caja.closed) {
-      doc.text(`Monto Final: ${this.caja.finalAmount.toFixed(2)} MXN`, marginX, currentY);
+      doc.text(`Monto Final: ${(this.caja.actualAmount ?? 0).toFixed(2)} MXN`, marginX, currentY);
       currentY += 8;
     }
 

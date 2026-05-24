@@ -11,9 +11,11 @@ import Swal from 'sweetalert2';
 })
 export class OpenCashRegisterComponent implements OnInit {
   initialAmount: number = 0;
-  showForm: boolean = false;
+  showForm: boolean = true;
   userId: string;
   companyId: string;
+  userName: string = '';
+  branchName: string = '';
   
   physicalRegisters: any[] = [];
   selectedPhysicalRegisterId: string = '';
@@ -26,6 +28,8 @@ export class OpenCashRegisterComponent implements OnInit {
   ) {
     this.userId = this.authService.usuario.id;
     this.companyId = this.authService.companyId;
+    this.userName = this.authService.usuario?.name || 'Cajero';
+    this.branchName = this.authService.branch?.name || 'Mi Sucursal';
   }
 
   ngOnInit(): void {
@@ -34,7 +38,8 @@ export class OpenCashRegisterComponent implements OnInit {
 
   loadPhysicalRegisters() {
     this.loadingRegisters = true;
-    this.cashRegisterService.getPhysicalRegisters(this.companyId).subscribe({
+    const branchId = this.authService.branch?._id || this.authService.branch || '';
+    this.cashRegisterService.getPhysicalRegisters(this.companyId, branchId).subscribe({
       next: (resp) => {
         this.physicalRegisters = resp.registers;
         this.loadingRegisters = false;

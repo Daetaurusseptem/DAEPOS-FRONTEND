@@ -24,7 +24,8 @@ export class InventoryListComponent implements OnInit {
   }
 
   getUserRole(): void {
-    this.userRole = this.authService.role;
+    const role = this.authService.role;
+    this.userRole = (role === 'companyAdmin') ? 'admin' : role;
   }
 
   eliminarProduct(productId: string | undefined) {

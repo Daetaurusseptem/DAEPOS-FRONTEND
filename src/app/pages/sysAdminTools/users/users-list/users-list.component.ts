@@ -36,38 +36,48 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   eliminarUsuario(id:string){
     Swal.fire({
-      title:'Esta Seguro?',
-      text:'Este proceso no se podrá deshacer',
-      icon:'warning',
-      showCancelButton:true,
-      cancelButtonColor:'#F56A52',
-      iconColor:'#F56A52',
-      allowEnterKey:false
-
+      title: '¿Desactivar Usuario?',
+      text: 'Por favor, escribe el motivo de la desactivación de esta cuenta:',
+      input: 'text',
+      inputPlaceholder: 'Ej: Inasistencia, renuncia, fin de contrato...',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Desactivar',
+      confirmButtonColor: '#0f172a',
+      cancelButtonText: 'Cancelar',
+      cancelButtonColor: '#d33',
+      preConfirm: (reason) => {
+        if (!reason || reason.trim() === '') {
+          Swal.showValidationMessage('Debes ingresar un motivo para la desactivación');
+          return false;
+        }
+        return reason;
+      }
     })
     .then(resp=>{
-      if(resp.isConfirmed){
-        this.userService.deleteuser(id)
+      if(resp.isConfirmed && resp.value){
+        const reason = resp.value;
+        this.userService.deleteuser(id, reason)
         .subscribe(resp=>{
           if(resp.ok==true){
             Swal.fire({
-              title:'Registro eliminado',
+              title: 'Usuario desactivado',
+              text: 'La cuenta ha sido deshabilitada con éxito.',
               icon:'success'
             })
           }else if(resp.ok==false){
             Swal.fire({
-              title:'El registro no pudo ser eliminado',
+              title: 'Error',
+              text: 'El usuario no pudo ser desactivado.',
               icon:'error'
             })
-
           }
-
           this.utilitiesService.redirectTo(`/dashboard/sysadmin/users`)
         }, err=>{
           Swal.fire({
-            title:'Registro no eliminado',
+            title: 'Error',
             icon:'error',
-            text:err.error.msg
+            text: err.error.msg || 'No se pudo desactivar el usuario.'
           })
         })
       }

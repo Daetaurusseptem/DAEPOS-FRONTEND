@@ -10,19 +10,24 @@ import { CashRegisterService } from 'src/app/services/cash-register.service';
 })
 export class UserHomeComponent {
   isOpenCashRegister: boolean = false;
+  userName: string = '';
+  branchName: string = '';
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private cashRegisterService: CashRegisterService
-  ) {}
+  ) {
+    this.userName = this.authService.usuario?.name || 'Cajero';
+    this.branchName = this.authService.branch?.name || 'Mi Sucursal';
+  }
 
   ngOnInit() {
     this.checkOpenCashRegister();
   }
 
   checkOpenCashRegister() {
-    const userId = this.authService.idUsuario;
+    const userId = this.authService.usuario?.id || this.authService.idUsuario;
     this.cashRegisterService.hasOpenCashRegister(userId).subscribe((hasOpen) => {
       this.isOpenCashRegister = hasOpen;
     });

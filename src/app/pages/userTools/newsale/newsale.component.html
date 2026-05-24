@@ -16,13 +16,13 @@
       </div>
 
       <!-- Search (Always on top) -->
-      <div class="bg-white p-3 border rounded-4 mb-4 shadow-sm">
+      <div class="search-wrapper-card p-2 mb-4">
         <form [formGroup]="searchForm" (keyup)="searchItems()">
           <div class="input-group">
-            <span class="input-group-text bg-transparent border-end-0 text-muted">
+            <span class="input-group-text bg-transparent border-0 text-muted">
               <i class="bi bi-search"></i>
             </span>
-            <input class="form-control border-start-0 ps-0" type="search" [placeholder]="posMode === 'retail' ? 'Escanea código de barras o busca...' : 'Buscar platillo...'" formControlName="search" (keydown.enter)="handleSearchEnter($event)">
+            <input class="form-control ps-0" type="search" [placeholder]="posMode === 'retail' ? 'Escanea código de barras o busca...' : 'Buscar platillo...'" formControlName="search" (keydown.enter)="handleSearchEnter($event)">
           </div>
         </form>
       </div>
@@ -64,7 +64,13 @@
               <div *ngFor="let item of items" class="animate__animated animate__fadeIn">
                 <div class="product-card h-100 d-flex flex-column" [class.compact]="posMode === 'retail'">
                   <div class="product-image-container" [style.height.px]="posMode === 'retail' ? 120 : 160">
-                    <img [src]="item.product?.img || 'assets/img/product_placeholder.png'" alt="Producto">
+                    <img *ngIf="item.product?.img && !item.product.img.includes('placeholder')" [src]="item.product.img" alt="Producto">
+                    <div *ngIf="!item.product?.img || item.product.img.includes('placeholder')" class="premium-placeholder-container">
+                      <div class="placeholder-icon">
+                        <i class="bi bi-box-seam"></i>
+                      </div>
+                      <span class="placeholder-brand">{{ item.product?.brand || 'DaePoint' }}</span>
+                    </div>
                   </div>
                   <div class="p-3 d-flex flex-column flex-grow-1">
                     <div class="mb-2">

@@ -18,8 +18,12 @@ export class CashRegisterService {
   ) { }
 
   // --- Physical Registers ---
-  getPhysicalRegisters(companyId: string) {
-    return this.http.get<any>(`${this.physicalUrl}/company/${companyId}`, this.authService.headers);
+  getPhysicalRegisters(companyId: string, branchId?: string) {
+    let url = `${this.physicalUrl}/company/${companyId}`;
+    if (branchId) {
+      url += `?branchId=${branchId}`;
+    }
+    return this.http.get<any>(url, this.authService.headers);
   }
 
   // --- Cash Register Sessions (Shifts) ---

@@ -1,44 +1,92 @@
 <div class="container mt-4">
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white d-flex align-items-center">
-      <i class="bi bi-egg me-2 fs-4"></i>
-      <h2 class="mb-0">Crear Receta</h2>
+  <div class="card shadow border-0 rounded-3">
+    <div class="card-header bg-dark text-white d-flex align-items-center py-3">
+      <i class="bi bi-egg-fried me-2 fs-3 text-success"></i>
+      <h2 class="mb-0 fs-4 fw-bold">Crear Receta</h2>
     </div>
-    <div class="card-body">
+    <div class="card-body p-4">
       <form [formGroup]="createRecipeForm" (ngSubmit)="onSubmit()">
-        <div class="mb-3">
-          <label for="name" class="form-label">Nombre de la Receta</label>
-          <input type="text" class="form-control" id="name" formControlName="name" placeholder="Introduce el nombre de la receta">
-        </div>
-        <div class="mb-3">
-          <label for="description" class="form-label">Descripción</label>
-          <textarea class="form-control" id="description" rows="3" formControlName="description" placeholder="Describe brevemente la receta"></textarea>
-        </div>
-        <div formArrayName="rawMaterials">
-          <h4 class="mb-3">Ingredientes (Materias Primas)</h4>
-          <div *ngFor="let material of rawMaterialsArray.controls; let i = index" [formGroupName]="i" class="row mb-3 align-items-end">
-            <div class="col-md-5">
-              <label [for]="'rawMaterial'+i" class="form-label">Ingrediente</label>
-              <select [id]="'rawMaterial'+i" class="form-select" formControlName="rawMaterial">
-                <option *ngFor="let rawMaterial of rawMaterials" [value]="rawMaterial._id">{{ rawMaterial.name}} ({{rawMaterial.measurementUnit}})</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label [for]="'quantity'+i" class="form-label">Cantidad</label>
-              <input type="number" [id]="'quantity'+i" class="form-control" formControlName="quantity" placeholder="Cantidad necesaria">
-            </div>
-            <div class="col-md-3">
-              <button type="button" class="btn btn-outline-danger" (click)="removeIngredient(i)">Eliminar</button>
-            </div>
+        <!-- Datos de Receta -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="name" class="form-label fw-semibold">Nombre de la Receta</label>
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Ej: Pizza de Pepperoni Mediana">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="description" class="form-label fw-semibold">Descripción</label>
+            <input type="text" class="form-control" id="description" formControlName="description" placeholder="Ej: Receta base para masa e ingredientes">
           </div>
         </div>
-        <div class="mb-3 d-flex justify-content-center">
-          <button type="button" class="btn btn-outline-primary" (click)="addIngredient()">Agregar Ingrediente</button>
+
+        <hr class="my-4">
+
+        <!-- Sección de Ingredientes -->
+        <div formArrayName="rawMaterials" class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0 fs-5 fw-bold text-dark"><i class="bi bi-list-check me-1 text-success"></i> Ingredientes de Receta</h4>
+            <button type="button" class="btn btn-outline-success btn-sm fw-semibold" (click)="addIngredient()">
+              <i class="bi bi-plus-lg me-1"></i> Agregar Ingrediente
+            </button>
+          </div>
+
+          <!-- Filas de FormArray -->
+          <div *ngFor="let material of rawMaterialsArray.controls; let i = index" [formGroupName]="i" class="row g-3 mb-3 align-items-end p-3 border rounded-3 bg-light position-relative">
+            <!-- Selector de Insumo -->
+            <div class="col-md-5">
+              <label [for]="'rawMaterial'+i" class="form-label fw-medium small text-muted">Materia Prima / Insumo</label>
+              <select [id]="'rawMaterial'+i" class="form-select" formControlName="rawMaterial">
+                <option value="" disabled selected>-- Selecciona un Insumo --</option>
+                <option 
+                  *ngFor="let rm of rawMaterials" 
+                  [value]="rm._id"
+                  [disabled]="isIngredientSelected(rm._id, i)"
+                >
+                  {{ rm.name }} ({{ rm.measurementUnit }})
+                </option>
+              </select>
+            </div>
+            
+            <!-- Cantidad Requerida -->
+            <div class="col-md-4">
+              <label [for]="'quantity'+i" class="form-label fw-medium small text-muted">Cantidad Necesaria</label>
+              <div class="input-group">
+                <input type="number" [id]="'quantity'+i" class="form-control" formControlName="quantity" placeholder="Cant.">
+                <span class="input-group-text bg-white text-secondary font-mono small">
+                  {{ getIngredientUnit(createRecipeForm.value.rawMaterials[i]?.rawMaterial) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Botón Eliminar Fila -->
+            <div class="col-md-3">
+              <button type="button" class="btn btn-outline-danger w-100 fw-semibold" (click)="removeIngredient(i)">
+                <i class="bi bi-trash3 me-1"></i> Eliminar
+              </button>
+            </div>
+          </div>
+
+          <!-- Si está vacío -->
+          <div *ngIf="rawMaterialsArray.length === 0" class="text-center py-4 border border-dashed rounded-3 text-muted">
+            <i class="bi bi-info-circle fs-4 d-block mb-1 text-secondary"></i>
+            No se han agregado ingredientes a esta receta aún.
+          </div>
         </div>
 
-        <div class="d-flex justify-content-between">
+        <!-- Fila de Costo Estimado Live -->
+        <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded-3 border-start border-success border-3" *ngIf="rawMaterialsArray.length > 0">
+          <span class="text-secondary fw-bold"><i class="bi bi-cash-coin me-1 text-success"></i> Costo Total Estimado de Producción (Sucursal)</span>
+          <span class="fs-4 fw-bold text-success font-mono">{{ recipeTotalCost | currency }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between pt-3 border-top">
           <app-back-button></app-back-button>
-          <button type="submit" class="btn btn-primary" [disabled]="createRecipeForm.invalid">Crear Receta</button>
+          <button 
+            type="submit" 
+            class="btn btn-success fw-bold px-4 py-2" 
+            [disabled]="createRecipeForm.invalid || rawMaterialsArray.length === 0"
+          >
+            <i class="bi bi-check-circle me-1"></i> Guardar Receta
+          </button>
         </div>
       </form>
     </div>

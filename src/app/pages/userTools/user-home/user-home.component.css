@@ -1,87 +1,243 @@
-body {
+/* Custom CSS for Cashier Home Dashboard */
+
+.cashier-home-wrapper {
+  padding: 1.5rem 0.5rem;
+}
+
+/* Dashboard Hero Header Banner */
+.cashier-hero {
+  background: var(--card-bg);
+  border-radius: var(--radius-md) !important;
+  padding: 2.25rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01), 0 1px 3px rgba(0, 0, 0, 0.01);
+}
+
+.system-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--secondary);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.cashier-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.75px;
+  margin-bottom: 0.35rem;
+}
+
+.cashier-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+/* Badges Container styling */
+.cashier-badges-container {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cashier-badge {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  display: inline-flex;
   align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  padding: 20px;
-  box-sizing: border-box;
 }
 
-.container {
-  width: 100%;
-  max-width: 960px;
+.status-active {
+  background: #dcfce7;
+  color: #15803d;
 }
 
-.btn-custom {
-  width: 100%;
-  margin: 10px 0;
-  padding: 15px;
-  border: unset;
-  border-radius: 15px;
-  color: #212121;
-  z-index: 1;
+.status-inactive {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-indicator {
+  font-size: 0.5rem;
+}
+
+/* Blink animation for status indicator */
+.blink {
+  animation: statusBlink 1.5s ease-in-out infinite;
+}
+
+@keyframes statusBlink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Logout Button */
+.btn-logout {
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.4rem;
+}
+
+/* Operational Cards Grid */
+.operation-card {
   position: relative;
-  font-weight: 700;
-  font-size: 17px;
-  box-shadow: 4px 8px 19px -3px rgba(0,0,0,0.27);
-  transition: all 250ms;
-  overflow: hidden;
-}
-
-.abrir { background: #daebf9; }
-.realizar { background: #dcf4e2; }
-.ventas { background: #e3edfd; }
-.items { background: #f5e0bf; }
-.cerrar { background: #e7c7b8; }
-.consuelo { background: #b879b3 ; }
-.cerrarSesion { 
-  background: #e7c7b8;
-  width: 100%;
-}
-
-.btn-custom::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
+  background: var(--card-bg);
+  border-radius: var(--radius-md) !important;
+  padding: 2rem;
   height: 100%;
-  width: 0;
-  border-radius: 15px;
-  z-index: -1;
-  transition: all 250ms;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.abrir::before { background-color: #787ff6; }
-.ventas::before { background-color: #4adede; }
-.realizar::before { background-color: #83d1ae; }
-.items::before { background-color: #f8d90f; }
-.cerrarSesion::before { background-color: #f67878; }
-.consuelo::before { background-color: #d241c6; }
-
-.btn-custom:hover {
-  color: #000000;
+.operation-card:hover:not(.disabled-action) {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
-.btn-custom:hover::before {
-  width: 100%;
+.primary-action:hover:not(.disabled-action) {
+  border-color: var(--primary);
+  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.08), 0 10px 15px -5px rgba(0, 0, 0, 0.03);
 }
 
-.caja {
-  margin: 20px 0;
-  width: 100%;
-  background-color: #d3e0eb;
-  color: #000000;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
-  font-family: Arial, sans-serif;
-  font-size: 16px;
+/* Shortcut tags */
+.shortcut-tag {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
 }
 
-@media (max-width: 768px) {
-  .btn-custom {
-    font-size: 14px;
-    padding: 10px;
-  }
+/* Icon containers */
+.operation-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.main-icon {
+  background: #f1f5f9;
+  color: var(--primary);
+  font-size: 1.75rem;
+  width: 56px;
+  height: 56px;
+}
+
+.open-icon {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.close-icon {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.history-icon {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.inventory-icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* Titles and description inside cards */
+.operation-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.3px;
+}
+
+.operation-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+/* Mini Action Badges */
+.badge-action-warning {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b45309;
+  background: #fffbeb;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.badge-action-ready {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #15803d;
+  background: #f0fdf4;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Disabled styling overlay style */
+.disabled-action {
+  opacity: 0.55;
+  cursor: not-allowed !important;
+  background: #fafafa;
+}
+
+.disabled-action .operation-icon-wrapper {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+/* Keyboard Shortcut Banner */
+.cashier-info-banner {
+  background: #f8fafc;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-icon-container {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.banner-text {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0;
 }

@@ -1,57 +1,87 @@
-<div class="container mt-4 text-white bg-dark p-4 rounded shadow">
-  <h2 class="mb-4"><i class="bi bi-cash-coin me-2"></i>Bienvenido</h2>
-  <div class="d-grid gap-2 mb-4">
-    <button class="btn btn-dark text-white border border-light" (click)="toggleForm()">
-      <i [class]="showForm ? 'bi bi-x-circle me-2' : 'bi bi-box-arrow-in-right me-2'"></i>
-      {{ showForm ? 'Cancelar' : 'Abrir Caja' }}
-    </button>
-    <button class="btn btn-outline-light" (click)="logout()">
-      <i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión
-    </button>
-  </div>
-
-  <div *ngIf="showForm" class="mt-4">
-    <h3><i class="bi bi-pencil-square me-2"></i>Configuración de Turno</h3>
-    <form (ngSubmit)="openCashRegister()" class="bg-secondary p-4 rounded shadow-sm">
+<div class="open-register-wrapper">
+  <div class="open-register-card shadow-lg border">
+    
+    <!-- Welcome Header -->
+    <div class="card-hero-header text-center">
+      <div class="user-avatar-container">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <h2 class="welcome-title">¡Hola, {{ userName }}!</h2>
+      <p class="welcome-subtitle">Para comenzar a realizar ventas, debes abrir un turno en caja física.</p>
       
-      <!-- Selección de Caja Física -->
-      <div class="mb-3">
-        <label for="physicalRegister" class="form-label text-white">Selecciona tu Caja Física</label>
-        <select 
-          id="physicalRegister" 
-          class="form-select bg-dark text-white border-secondary" 
-          [(ngModel)]="selectedPhysicalRegisterId" 
-          name="selectedPhysicalRegisterId" 
-          required>
-          <option value="" disabled>Selecciona una caja...</option>
-          <option *ngFor="let reg of physicalRegisters" [value]="reg._id">
-            {{ reg.name }} {{ reg.isActive ? '' : '(Inactiva)' }}
-          </option>
-        </select>
-        <div *ngIf="loadingRegisters" class="form-text text-light-50">
-          <small><i class="bi bi-arrow-repeat spin"></i> Cargando cajas disponibles...</small>
-        </div>
+      <!-- Badges -->
+      <div class="info-badges-container">
+        <span class="info-badge">
+          <i class="bi bi-shop me-1"></i> {{ branchName }}
+        </span>
+        <span class="info-badge role-badge">
+          <i class="bi bi-shield-check me-1"></i> Cajero
+        </span>
       </div>
-
-      <!-- Monto Inicial -->
-      <div class="mb-3">
-        <label for="initialAmount" class="form-label text-white">Monto Inicial en Efectivo</label>
-        <div class="input-group">
-          <span class="input-group-text bg-dark text-white border-secondary">$</span>
-          <input 
-            type="number" 
-            id="initialAmount" 
-            class="form-control bg-dark text-white border-secondary" 
-            [(ngModel)]="initialAmount" 
-            name="initialAmount" 
-            required 
-            min="0">
+    </div>
+    
+    <div class="card-form-body">
+      <form (ngSubmit)="openCashRegister()">
+        
+        <!-- Caja Física Select -->
+        <div class="custom-form-group mb-4">
+          <label for="physicalRegister" class="custom-form-label">
+            <i class="bi bi-pc-display me-2 text-muted"></i>Selecciona tu Caja Física
+          </label>
+          <div class="select-wrapper">
+            <select 
+              id="physicalRegister" 
+              class="custom-form-select" 
+              [(ngModel)]="selectedPhysicalRegisterId" 
+              name="selectedPhysicalRegisterId" 
+              required>
+              <option value="" disabled selected>Elige una caja disponible...</option>
+              <option *ngFor="let reg of physicalRegisters" [value]="reg._id">
+                {{ reg.name }}
+              </option>
+            </select>
+            <i class="bi bi-chevron-down select-chevron"></i>
+          </div>
+          <div *ngIf="loadingRegisters" class="loading-registers-text mt-2">
+            <i class="bi bi-arrow-repeat spin me-1"></i> Cargando cajas de la sucursal...
+          </div>
         </div>
-      </div>
 
-      <button type="submit" class="btn btn-light w-100 py-2 fw-bold" [disabled]="loadingRegisters || !selectedPhysicalRegisterId">
-        <i class="bi bi-box-arrow-in-right me-2"></i>Abrir Turno
+        <!-- Monto Inicial Input -->
+        <div class="custom-form-group mb-4">
+          <label for="initialAmount" class="custom-form-label">
+            <i class="bi bi-cash me-2 text-muted"></i>Monto Inicial en Efectivo (Fondo de Caja)
+          </label>
+          <div class="input-money-container">
+            <span class="currency-symbol">$</span>
+            <input 
+              type="number" 
+              id="initialAmount" 
+              class="custom-form-input money-input" 
+              [(ngModel)]="initialAmount" 
+              name="initialAmount" 
+              required 
+              min="0"
+              placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          class="btn-premium-action w-100 py-3" 
+          [disabled]="loadingRegisters || !selectedPhysicalRegisterId">
+          <i class="bi bi-play-circle-fill me-2"></i>Iniciar Turno en Caja
+        </button>
+      </form>
+    </div>
+
+    <!-- Card Footer / Logout -->
+    <div class="card-hero-footer text-center mt-4">
+      <button class="btn-logout-link" (click)="logout()">
+        <i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión Activa
       </button>
-    </form>
+    </div>
+
   </div>
 </div>

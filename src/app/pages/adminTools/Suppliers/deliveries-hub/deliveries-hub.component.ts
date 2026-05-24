@@ -4,7 +4,7 @@ import { BranchService } from 'src/app/services/branch.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ProductService } from 'src/app/services/product.service';
 import { CategoryService } from 'src/app/services/category.service';
-import { Branch, Supplier, Category } from 'src/app/interfaces/models.interface';
+import { Branch, Supplier, Category, Product } from 'src/app/interfaces/models.interface';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -21,6 +21,28 @@ export class CentralizedDeliveriesComponent implements OnInit {
   allRestocks: any[] = [];
   filteredRestocks: any[] = [];
 
+  // Autocomplete state
+  supplierFilterSearchText: string = '';
+  showFilterSupplierDropdown: boolean = false;
+  supplierModalSearchText: string = '';
+  showModalSupplierDropdown: boolean = false;
+
+  // New Restock Form State
+  showScheduleModal: boolean = false;
+  newRestock = {
+    branch: '',
+    supplier: '',
+    expectedDate: '',
+    itemsSummary: '',
+    isRecurring: false,
+    recurrence: 'none',
+    recurrenceDays: 0,
+    notes: ''
+  };
+  restockItemsList: { productId: string; productName: string; quantity: number }[] = [];
+  suppliedProducts: Product[] = [];
+  allCompanyProducts: Product[] = [];
+
   // Filters
   selectedBranch: string = '';
   selectedSupplier: string = '';
@@ -34,7 +56,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
   // Inspect Modal Bindings
   showInspectModal: boolean = false;
   selectedRestockForInspect: any = null;
-  inspectedItems: { productId?: string; type?: string; name: string; quantity: number; costPrice: number; verified: boolean }[] = [];
+  inspectedItems: { productId?: string; type?: string; name: string; quantity: number; costPrice: number; verified: boolean; agreedCost?: number | null; varianceNote?: string }[] = [];
   payFromRegister: boolean = true;
   canVerifyRestock: boolean = false;
 
@@ -72,6 +94,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
     this.loadSuppliers();
     this.loadCategories();
     this.loadAllRestocks();
+    this.loadAllCompanyProducts();
   }
 
   loadBranches() {
@@ -199,7 +222,9 @@ export class CentralizedDeliveriesComponent implements OnInit {
           name: prodName,
           quantity: it.quantity || 0,
           costPrice: it.costPrice || 0,
-          verified: true
+          verified: true,
+          agreedCost: null,
+          varianceNote: ''
         };
       });
     } else {
@@ -214,7 +239,9 @@ export class CentralizedDeliveriesComponent implements OnInit {
             name: parts[2],
             quantity: parseInt(parts[1], 10),
             costPrice: 0,
-            verified: false
+            verified: false,
+            agreedCost: null,
+            varianceNote: ''
           };
         }
         return {
@@ -223,10 +250,47 @@ export class CentralizedDeliveriesComponent implements OnInit {
           name: trimmed,
           quantity: 1,
           costPrice: 0,
-          verified: false
+          verified: false,
+          agreedCost: null,
+          varianceNote: ''
         };
       });
     }
+
+    // Cargar acuerdos de precios pactados vigentes para el proveedor de esta entrega
+    const sId = typeof restock.supplier === 'object' ? restock.supplier?._id : restock.supplier;
+    this.supplierService.getSupplierAgreements(this.companyId, sId).subscribe({
+      next: (resp: any) => {
+        const agreements = resp.agreements || [];
+        const bId = typeof restock.branch === 'object' ? restock.branch?._id : restock.branch;
+
+        this.inspectedItems.forEach((it: any) => {
+          if (!it.productId) return;
+
+          // 1. Acuerdo específico de sucursal
+          let agreement = agreements.find((ag: any) => {
+            const agProdId = typeof ag.product === 'object' ? ag.product?._id : ag.product;
+            const agBranchId = typeof ag.branch === 'object' ? ag.branch?._id : ag.branch;
+            return agProdId === it.productId && agBranchId === bId && ag.status === 'active';
+          });
+
+          // 2. Acuerdo general
+          if (!agreement) {
+            agreement = agreements.find((ag: any) => {
+              const agProdId = typeof ag.product === 'object' ? ag.product?._id : ag.product;
+              return agProdId === it.productId && !ag.branch && ag.status === 'active';
+            });
+          }
+
+          if (agreement) {
+            it.agreedCost = agreement.agreedCost;
+            if (!it.costPrice) {
+              it.costPrice = agreement.agreedCost;
+            }
+          }
+        });
+      }
+    });
 
     this.showInspectModal = true;
   }
@@ -289,10 +353,25 @@ export class CentralizedDeliveriesComponent implements OnInit {
     });
   }
 
+  hasPriceVariance(it: any): boolean {
+    return it.verified && it.agreedCost !== null && it.agreedCost !== undefined && it.costPrice > it.agreedCost;
+  }
+
+  isInspectionValid(): boolean {
+    const verifiedItems = this.inspectedItems.filter(it => it.verified);
+    if (verifiedItems.length === 0) return false;
+    return !verifiedItems.some(it => this.hasPriceVariance(it) && !it.varianceNote?.trim());
+  }
+
   completeInspection() {
     const verifiedItems = this.inspectedItems.filter(it => it.verified);
     if (verifiedItems.length === 0) {
       Swal.fire('Atención', 'Debes verificar al menos un artículo para recibir la entrega', 'warning');
+      return;
+    }
+
+    if (!this.isInspectionValid()) {
+      Swal.fire('Atención', 'Hay artículos con costos superiores al pactado. Por favor, ingresa la justificación (Nota de Desviación de Costo) en cada uno.', 'warning');
       return;
     }
 
@@ -312,7 +391,9 @@ export class CentralizedDeliveriesComponent implements OnInit {
             type: it.type || 'Product',
             itemRef: it.productId || undefined,
             quantity: it.quantity,
-            costPrice: it.costPrice || 0
+            costPrice: it.costPrice || 0,
+            agreedCost: it.agreedCost || undefined,
+            varianceNote: this.hasPriceVariance(it) ? it.varianceNote : undefined
           }))
         };
 
@@ -373,7 +454,143 @@ export class CentralizedDeliveriesComponent implements OnInit {
       this.selectedBranch = '';
     }
     this.selectedSupplier = '';
+    this.supplierFilterSearchText = '';
     this.selectedStatus = 'pending';
     this.applyFilters();
+  }
+
+  // --- NUEVAS FUNCIONALIDADES: Flujo Rápido de Agendamiento y Autocompletado ---
+
+  loadAllCompanyProducts() {
+    this.productService.searchProductCompany('', 1, 1000, this.companyId).subscribe({
+      next: (resp: any) => {
+        this.allCompanyProducts = resp.products || [];
+      }
+    });
+  }
+
+  get filteredSuppliersForFilter(): Supplier[] {
+    if (!this.supplierFilterSearchText) return this.suppliers;
+    return this.suppliers.filter(s => s.name.toLowerCase().includes(this.supplierFilterSearchText.toLowerCase()));
+  }
+
+  get filteredSuppliersForModal(): Supplier[] {
+    if (!this.supplierModalSearchText) return this.suppliers;
+    return this.suppliers.filter(s => s.name.toLowerCase().includes(this.supplierModalSearchText.toLowerCase()));
+  }
+
+  selectSupplierInFilter(supplier: Supplier | null) {
+    if (supplier) {
+      this.selectedSupplier = supplier._id || '';
+      this.supplierFilterSearchText = supplier.name;
+    } else {
+      this.selectedSupplier = '';
+      this.supplierFilterSearchText = '';
+    }
+    this.showFilterSupplierDropdown = false;
+    this.applyFilters();
+  }
+
+  openScheduleModal() {
+    this.newRestock = {
+      branch: this.branches[0]?._id || this.selectedBranch || '',
+      supplier: '',
+      expectedDate: new Date().toISOString().substring(0, 10),
+      itemsSummary: '',
+      isRecurring: false,
+      recurrence: 'none',
+      recurrenceDays: 0,
+      notes: ''
+    };
+    this.supplierModalSearchText = '';
+    this.restockItemsList = [{ productId: '', productName: '', quantity: 1 }];
+    this.suppliedProducts = [];
+    this.showScheduleModal = true;
+  }
+
+  closeScheduleModal() {
+    this.showScheduleModal = false;
+  }
+
+  addRestockItemRow() {
+    this.restockItemsList.push({ productId: '', productName: '', quantity: 1 });
+  }
+
+  removeRestockItemRow(idx: number) {
+    this.restockItemsList.splice(idx, 1);
+    if (this.restockItemsList.length === 0) {
+      this.addRestockItemRow();
+    }
+  }
+
+  onRestockItemProductChange(idx: number) {
+    const row = this.restockItemsList[idx];
+    const prod = this.suppliedProducts.find(p => p._id === row.productId);
+    if (prod) {
+      row.productName = prod.name || '';
+    }
+  }
+
+  onSupplierSelectedInModal(supplier: Supplier) {
+    this.newRestock.supplier = supplier._id || '';
+    this.supplierModalSearchText = supplier.name;
+    this.showModalSupplierDropdown = false;
+
+    // Filtrar los productos de la empresa suministrados por este proveedor
+    this.suppliedProducts = this.allCompanyProducts.filter(p => {
+      const sId = typeof p.supplier === 'object' ? (p.supplier as any)?._id : p.supplier;
+      return sId === supplier._id;
+    });
+
+    // Resetear lista de artículos al cambiar de proveedor
+    this.restockItemsList = [{ productId: '', productName: '', quantity: 1 }];
+  }
+
+  saveRestockSchedule() {
+    const validItems = this.restockItemsList.filter(it => it.productId && it.quantity > 0);
+    if (!this.newRestock.supplier) {
+      Swal.fire('Error', 'Por favor selecciona un proveedor', 'error');
+      return;
+    }
+    if (validItems.length === 0) {
+      Swal.fire('Error', 'Por favor selecciona al menos un producto e indica su cantidad', 'error');
+      return;
+    }
+    if (!this.newRestock.branch || !this.newRestock.expectedDate) {
+      Swal.fire('Error', 'Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+
+    // Formatear itemsSummary automáticamente
+    const summary = validItems
+      .map(row => `${row.quantity} ${row.productName}`)
+      .join(', ');
+    
+    this.newRestock.itemsSummary = summary;
+
+    const payload = {
+      ...this.newRestock,
+      company: this.companyId,
+      status: 'pending',
+      items: validItems.map(it => ({
+        type: 'Product',
+        itemRef: it.productId,
+        quantity: it.quantity,
+        costPrice: 0
+      }))
+    };
+
+    this.supplierService.createRestockSchedule(payload).subscribe({
+      next: (resp: any) => {
+        if (resp.ok) {
+          Swal.fire('¡Éxito!', 'Entrega programada agendada correctamente', 'success');
+          this.showScheduleModal = false;
+          this.loadAllRestocks();
+        }
+      },
+      error: () => {
+        Swal.fire('Error', 'Hubo un error al guardar el recordatorio', 'error');
+      }
+    });
   }
 }

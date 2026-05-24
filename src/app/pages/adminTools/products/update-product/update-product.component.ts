@@ -20,6 +20,8 @@ import Swal from 'sweetalert2';
 export class UpdateProductComponent implements OnInit {
   product!: Product;
   inventoryItem: any; 
+  inventoryItems: any[] = [];
+  isCompanyAdmin: boolean = false;
   id: string = '';
   Categories: Category[] = [];
   suppliers: Supplier[] = [];
@@ -59,7 +61,9 @@ export class UpdateProductComponent implements OnInit {
     private supplierService: SupplierService,
     private recipeService: RecipesService,
     private modalService: ModalService
-  ) {}
+  ) {
+    this.isCompanyAdmin = this.authService.role === 'companyAdmin' || this.authService.role === 'sysadmin';
+  }
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe((params) => {
@@ -103,6 +107,7 @@ export class UpdateProductComponent implements OnInit {
         if (!res.product) return;
         this.product = res.product;
         this.inventoryItem = res.inventoryItem;
+        this.inventoryItems = res.inventoryItems || [];
         this.isComposite = this.product.isComposite;
 
         // Poblar formulario con datos combinados
@@ -119,7 +124,7 @@ export class UpdateProductComponent implements OnInit {
           stock: this.inventoryItem?.stock || 0,
           costPrice: this.inventoryItem?.costPrice || 0,
           sellingPrice: this.inventoryItem?.sellingPrice || 0,
-          unitOfMeasure: this.inventoryItem?.unitOfMeasure || 'unit',
+          unitOfMeasure: this.inventoryItem?.measurement || 'unit',
           expirationDate: this.inventoryItem?.expirationDate ? this.inventoryItem.expirationDate.split('T')[0] : '',
           receivedDate: this.inventoryItem?.receivedDate ? this.inventoryItem.receivedDate.split('T')[0] : '',
         });
@@ -128,6 +133,15 @@ export class UpdateProductComponent implements OnInit {
         this.productForm.get('isComposite')?.disable();
         this.productForm.get('recipe')?.disable();
         this.productForm.get('stock')?.disable(); // El stock no se edita directamente
+
+        if (this.isCompanyAdmin) {
+          this.productForm.get('barCode')?.disable();
+          this.productForm.get('costPrice')?.disable();
+          this.productForm.get('sellingPrice')?.disable();
+          this.productForm.get('unitOfMeasure')?.disable();
+          this.productForm.get('expirationDate')?.disable();
+          this.productForm.get('receivedDate')?.disable();
+        }
       },
       error: (err: any) => console.error('Error loading product', err)
     });

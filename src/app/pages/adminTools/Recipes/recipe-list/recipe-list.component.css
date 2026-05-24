@@ -1,13 +1,87 @@
-/* Estilos personalizados para el componente recipe-list */
-.container {
-    max-width: 1000px;
-  }
-  
-  .card-header {
-    font-size: 1.25rem;
-  }
-  
-  .table-hover tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-  
+/* Recipe List Premium Overrides */
+.font-mono {
+  font-family: monospace !important;
+}
+
+.fs-7 {
+  font-size: 0.85rem !important;
+}
+
+.fs-8 {
+  font-size: 0.75rem !important;
+}
+
+.uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Glassmorphic Modal Backdrop */
+.recipe-detail-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Modal Card */
+.recipe-detail-modal-card {
+  width: 100%;
+  max-width: 620px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.modal-header-premium {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  opacity: 0.7;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px;
+}
+
+.btn-close-modal:hover {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+/* Scale button group overrides */
+.btn-group .btn-outline-secondary {
+  border-color: #dee2e6;
+  color: #495057;
+  font-size: 0.82rem;
+  padding: 8px 10px;
+}
+
+.btn-group .btn-outline-secondary:hover {
+  background: #f1f3f5;
+  color: #212529;
+}
+
+.btn-group .btn-outline-secondary.active {
+  background: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+
+.modal-footer-premium {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}

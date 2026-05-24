@@ -7,6 +7,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { InventoryService } from 'src/app/services/inventory.service';
 import { SalesService } from 'src/app/services/sales.service';
+import Swal from 'sweetalert2';
+import { CashRegisterService } from 'src/app/services/cash-register.service';
 
 @Component({
   selector: 'app-newsale',
@@ -40,6 +42,7 @@ export class NewsaleComponent {
     private saleService: SalesService,
     private authService: AuthService,
     private router: Router,
+    private cashRegisterService: CashRegisterService,
   ) {
     if (this.authService.role == 'user') {
       this.companyId = authService.companyId!;
@@ -49,6 +52,23 @@ export class NewsaleComponent {
   }
 
   ngOnInit(): void {
+    // Validar seguridad de caja abierta antes de cargar la pantalla de venta
+    const userId = this.authService.idUsuario;
+    this.cashRegisterService.hasOpenCashRegister(userId).subscribe((hasOpen) => {
+      if (!hasOpen) {
+        Swal.fire({
+          title: 'Caja Cerrada',
+          text: 'Debes abrir una caja de cobro para poder realizar ventas.',
+          icon: 'warning',
+          confirmButtonText: 'Ir a Inicio',
+          confirmButtonColor: '#0f172a',
+          allowOutsideClick: false
+        }).then(() => {
+          this.router.navigate(['/dashboard/user']);
+        });
+      }
+    });
+
     // Initialize POS mode from company settings
     if (this.authService.company && this.authService.company.saleType) {
       this.posMode = this.authService.company.saleType;

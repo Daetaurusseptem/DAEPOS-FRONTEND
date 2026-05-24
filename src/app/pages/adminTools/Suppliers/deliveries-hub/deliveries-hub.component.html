@@ -7,9 +7,14 @@
       <p class="text-muted mb-0">Monitorea y recibe de forma consolidada todos los reabastecimientos agendados de tus proveedores.</p>
     </div>
     
-    <button class="btn btn-outline-dark btn-sm rounded-pill px-3 bg-white" routerLink="/dashboard/admin/suppliers">
-      <i class="bi bi-truck me-1"></i> Fichas de Proveedores
-    </button>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-outline-dark btn-sm rounded-pill px-3 bg-white" routerLink="/dashboard/admin/suppliers">
+        <i class="bi bi-truck me-1"></i> Fichas de Proveedores
+      </button>
+      <button class="btn btn-dark btn-sm rounded-pill px-3 text-white border-0 fw-semibold" (click)="openScheduleModal()" style="background-color: #000 !important;">
+        <i class="bi bi-calendar-plus me-1"></i> Agendar Entrega
+      </button>
+    </div>
   </div>
 
   <!-- Fila de KPIs Logísticos -->
@@ -56,13 +61,36 @@
           </select>
         </div>
 
-        <!-- Filtrar por Proveedor -->
-        <div class="col-md-3">
+        <!-- Filtrar por Proveedor (Searchable Select) -->
+        <div class="col-md-3 position-relative">
           <label class="form-label small fw-semibold text-secondary mb-1">Proveedor</label>
-          <select class="form-select border-light-subtle rounded-3" [(ngModel)]="selectedSupplier" (change)="applyFilters()">
-            <option value="">Todos los proveedores</option>
-            <option *ngFor="let s of suppliers" [value]="s._id">{{ s.name }}</option>
-          </select>
+          <div class="autocomplete-container position-relative">
+            <input type="text" 
+                   class="form-control border-light-subtle rounded-3" 
+                   placeholder="🔍 Buscar proveedor..." 
+                   [(ngModel)]="supplierFilterSearchText" 
+                   (focus)="showFilterSupplierDropdown = true"
+                   (blur)="showFilterSupplierDropdown = false">
+            
+            <!-- Botón para limpiar selección rápida -->
+            <button class="btn-clear-select border-0 bg-transparent text-secondary position-absolute end-0 top-50 translate-middle-y me-2" 
+                    *ngIf="selectedSupplier" 
+                    (mousedown)="selectSupplierInFilter(null)"
+                    style="z-index: 10;">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+            
+            <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" 
+                style="max-height: 200px; display: block; z-index: 1050; position: absolute;" 
+                *ngIf="showFilterSupplierDropdown && filteredSuppliersForFilter.length > 0">
+              <li *ngFor="let s of filteredSuppliersForFilter" 
+                  (mousedown)="selectSupplierInFilter(s)">
+                <a class="dropdown-item py-2 fw-medium text-dark cursor-pointer" role="button">
+                  {{ s.name }}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- Filtrar por Estatus -->
@@ -193,6 +221,9 @@
                 <input class="form-check-input" type="checkbox" id="hub-check-{{i}}" [(ngModel)]="it.verified">
                 <label class="form-check-label fw-semibold text-dark fs-6 animate__animated animate__fadeIn" for="hub-check-{{i}}">
                   {{ it.name }}
+                  <span class="badge bg-light text-secondary border border-light-subtle ms-1 price-mono" style="font-size: 0.7rem;" *ngIf="it.agreedCost !== null && it.agreedCost !== undefined">
+                    Pactado: ${{ it.agreedCost | number:'1.2-2' }}
+                  </span>
                 </label>
               </div>
               <span class="badge" [class.bg-success-soft]="it.verified" [class.text-success]="it.verified" [class.bg-light]="!it.verified" [class.text-secondary]="!it.verified">
@@ -207,8 +238,26 @@
               </div>
               <div class="flex-grow-1">
                 <label class="small fw-semibold text-secondary mb-1">Costo Unitario Facturado ($)</label>
-                <input type="number" class="form-control form-control-sm price-mono" [(ngModel)]="it.costPrice" min="0" step="0.01">
+                <input type="number" 
+                       class="form-control form-control-sm price-mono" 
+                       [class.border-warning]="hasPriceVariance(it)"
+                       [class.bg-warning-soft]="hasPriceVariance(it)"
+                       [(ngModel)]="it.costPrice" 
+                       min="0" 
+                       step="0.01">
               </div>
+            </div>
+
+            <!-- Campo de Justificación de Desviación de Costo (Last-mile Override) -->
+            <div class="mt-2 px-1 animate__animated animate__fadeIn" *ngIf="hasPriceVariance(it)">
+              <div class="alert alert-warning-soft border border-warning-subtle py-1.5 px-3 rounded-2 text-warning-dark small mb-2 d-flex align-items-center gap-1.5">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Costo superior al pactado. Requiere nota de justificación.</span>
+              </div>
+              <input type="text" 
+                     class="form-control form-control-sm border-warning" 
+                     placeholder="Motivo del incremento (ej: flete extraordinario)..." 
+                     [(ngModel)]="it.varianceNote">
             </div>
           </div>
         </div>
@@ -230,6 +279,108 @@
         <div class="d-flex gap-2 justify-content-end">
           <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeInspectModal()">Cancelar</button>
           <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="completeInspection()">Completar Recepción</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Agendar Reabastecimiento -->
+  <div class="custom-modal-backdrop" *ngIf="showScheduleModal">
+    <div class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__fadeInDown animate__faster" style="max-width: 500px; width: 100%;">
+      <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Agendar Reabastecimiento</h5>
+        <button class="btn-close" (click)="closeScheduleModal()"></button>
+      </div>
+      <div class="card-body p-4">
+        <!-- Selector de Proveedor Autocompletable -->
+        <div class="mb-3 position-relative">
+          <label class="form-label fw-semibold">Proveedor *</label>
+          <div class="autocomplete-container position-relative">
+            <input type="text" 
+                   class="form-control" 
+                   placeholder="🔍 Buscar y seleccionar proveedor..." 
+                   [(ngModel)]="supplierModalSearchText" 
+                   (focus)="showModalSupplierDropdown = true"
+                   (blur)="showModalSupplierDropdown = false">
+            
+            <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" 
+                style="max-height: 180px; display: block; z-index: 1050; position: absolute;" 
+                *ngIf="showModalSupplierDropdown && filteredSuppliersForModal.length > 0">
+              <li *ngFor="let s of filteredSuppliersForModal" 
+                  (mousedown)="onSupplierSelectedInModal(s)">
+                <a class="dropdown-item py-2 fw-medium text-dark cursor-pointer" role="button">
+                  {{ s.name }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Sucursal Destino *</label>
+          <select class="form-select" [(ngModel)]="newRestock.branch" [disabled]="authService.role !== 'companyAdmin'">
+            <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Fecha Prometida de Entrega *</label>
+          <input type="date" class="form-control" [(ngModel)]="newRestock.expectedDate">
+        </div>
+
+        <!-- Constructor de artículos interactivo -->
+        <div class="mb-3" *ngIf="newRestock.supplier">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label fw-semibold mb-0">Productos a Recibir *</label>
+            <button class="btn btn-outline-dark btn-xs rounded-pill px-2 py-0.5" style="font-size: 0.75rem;" (click)="addRestockItemRow()">
+              <i class="bi bi-plus-circle"></i> Agregar Artículo
+            </button>
+          </div>
+          
+          <div class="d-flex flex-column gap-2 mb-2" style="max-height: 200px; overflow-y: auto; padding-right: 4px;">
+            <div *ngFor="let item of restockItemsList; let idx = index" class="d-flex gap-2 align-items-center animate__animated animate__fadeIn">
+              <select class="form-select form-select-sm flex-grow-1" [(ngModel)]="item.productId" (change)="onRestockItemProductChange(idx)">
+                <option value="">-- Seleccionar Producto --</option>
+                <option *ngFor="let prod of suppliedProducts" [value]="prod._id">{{ prod.name }} ({{ prod.brand }})</option>
+              </select>
+              
+              <input type="number" class="form-control form-control-sm" style="width: 80px;" placeholder="Cant" [(ngModel)]="item.quantity" min="1">
+              
+              <button class="btn btn-outline-danger btn-sm border-0" (click)="removeRestockItemRow(idx)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-light border border-light-subtle py-2 px-3 small text-muted mb-3" *ngIf="!newRestock.supplier">
+          <i class="bi bi-info-circle me-1 text-primary"></i> Selecciona un proveedor primero para detallar los productos a recibir.
+        </div>
+
+        <!-- Recurrencia -->
+        <div class="card border border-light-subtle rounded-3 p-3 bg-light-subtle mb-3">
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="recurringSwitch" [(ngModel)]="newRestock.isRecurring">
+            <label class="form-check-label fw-semibold" for="recurringSwitch">¿Es una entrega periódica / recurrente?</label>
+          </div>
+          <div class="mb-2" *ngIf="newRestock.isRecurring">
+            <label class="form-label small fw-semibold text-secondary">Frecuencia de Repetición</label>
+            <select class="form-select form-select-sm" [(ngModel)]="newRestock.recurrence">
+              <option value="daily">Diaria</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Notas Adicionales</label>
+          <textarea class="form-control" rows="2" placeholder="Notas de la entrega..." [(ngModel)]="newRestock.notes"></textarea>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end mt-4">
+          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeScheduleModal()">Cancelar</button>
+          <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="saveRestockSchedule()">Agendar Entrega</button>
         </div>
       </div>
     </div>

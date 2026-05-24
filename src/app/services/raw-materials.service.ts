@@ -10,6 +10,7 @@ export interface RawMaterial {
   description?: string;
   company?: string;
   measurementUnit: 'g' | 'ml' | 'unit';
+  costPrice?: number;
   createdAt?: string;
   updatedAt?: string;
 }
