@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CashRegisterService } from 'src/app/services/cash-register.service';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-caja-detail',
@@ -10,6 +11,9 @@ import 'jspdf-autotable';
   styleUrls: ['./caja-detail.component.css']
 })
 export class CajaDetailComponent implements OnInit {
+  @Input() cajaIdInput?: string;
+  @Input() showBackButton: boolean = true;
+
   cajaId!: string;
   caja!: any;
   subtotalVentas: number = 0;
@@ -23,8 +27,22 @@ export class CajaDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cajaId = this.route.snapshot.paramMap.get('cajaId')!;
-    this.loadCajaDetails();
+    if (!this.cajaIdInput) {
+      this.cajaId = this.route.snapshot.paramMap.get('cajaId')!;
+      if (this.cajaId) {
+        this.loadCajaDetails();
+      }
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['cajaIdInput'] && this.cajaIdInput) {
+      this.cajaId = this.cajaIdInput;
+      this.caja = null; // Reset current data
+      this.activeTab = 'balance';
+      this.expandedSales = {};
+      this.loadCajaDetails();
+    }
   }
 
   loadCajaDetails(): void {
@@ -39,6 +57,40 @@ export class CajaDetailComponent implements OnInit {
       this.subtotalVentas = this.caja.sales.reduce((sum: number, sale: any) => sum + sale.total, 0);
       this.totalEnCaja = this.subtotalVentas + this.caja.initialAmount;
     }
+  }
+
+  verifyDeposit(expenseId: string, status: 'verified' | 'rejected'): void {
+    const actionText = status === 'verified' ? 'conciliar / aprobar' : 'marcar como discrepancia / rechazar';
+    const confirmColor = status === 'verified' ? '#28a745' : '#dc3545';
+    
+    Swal.fire({
+      title: '¿Confirmar Auditoría?',
+      text: `¿Estás seguro de que deseas ${actionText} este depósito?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: confirmColor
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Actualizando estatus...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+        
+        this.cashRegisterService.verifyDeposit(this.cajaId, expenseId, status).subscribe({
+          next: () => {
+            Swal.fire('Éxito', 'El estatus de auditoría se actualizó correctamente', 'success');
+            this.loadCajaDetails();
+          },
+          error: (err) => {
+            console.error('Error al conciliar depósito:', err);
+            Swal.fire('Error', 'No se pudo actualizar el estatus de conciliación', 'error');
+          }
+        });
+      }
+    });
   }
 
   generarPDF(): void {

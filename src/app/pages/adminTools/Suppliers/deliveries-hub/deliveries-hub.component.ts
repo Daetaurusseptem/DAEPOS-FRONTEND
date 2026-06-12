@@ -4,6 +4,7 @@ import { BranchService } from 'src/app/services/branch.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ProductService } from 'src/app/services/product.service';
 import { CategoryService } from 'src/app/services/category.service';
+import { RawMaterialsService } from 'src/app/services/raw-materials.service';
 import { Branch, Supplier, Category, Product } from 'src/app/interfaces/models.interface';
 import Swal from 'sweetalert2';
 
@@ -39,9 +40,9 @@ export class CentralizedDeliveriesComponent implements OnInit {
     recurrenceDays: 0,
     notes: ''
   };
-  restockItemsList: { productId: string; productName: string; quantity: number }[] = [];
-  suppliedProducts: Product[] = [];
-  allCompanyProducts: Product[] = [];
+  restockItemsList: { productId: string; productName: string; quantity: number; itemType?: string; searchText?: string; showDropdown?: boolean; measurementUnit?: string; packs?: number; unitsPerPack?: number }[] = [];
+  suppliedProducts: any[] = [];
+  allCompanyProducts: any[] = [];
 
   // Filters
   selectedBranch: string = '';
@@ -74,6 +75,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
     private branchService: BranchService,
     private productService: ProductService,
     private categoryService: CategoryService,
+    private rawMaterialsService: RawMaterialsService,
     public authService: AuthService
   ) { }
 
@@ -464,7 +466,13 @@ export class CentralizedDeliveriesComponent implements OnInit {
   loadAllCompanyProducts() {
     this.productService.searchProductCompany('', 1, 1000, this.companyId).subscribe({
       next: (resp: any) => {
-        this.allCompanyProducts = resp.products || [];
+        const prods = (resp.products || []).map((p: any) => ({ ...p, itemType: 'Product' }));
+        this.rawMaterialsService.getCompanyRawMaterials(this.companyId).subscribe({
+          next: (rmResp: any) => {
+            const rms = (rmResp.rawMaterials || []).map((rm: any) => ({ ...rm, itemType: 'RawMaterial' }));
+            this.allCompanyProducts = [...prods, ...rms];
+          }
+        });
       }
     });
   }
@@ -503,8 +511,8 @@ export class CentralizedDeliveriesComponent implements OnInit {
       notes: ''
     };
     this.supplierModalSearchText = '';
-    this.restockItemsList = [{ productId: '', productName: '', quantity: 1 }];
-    this.suppliedProducts = [];
+    this.restockItemsList = [{ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined }];
+    this.suppliedProducts = this.allCompanyProducts; // Default to all products to prevent empty list issue
     this.showScheduleModal = true;
   }
 
@@ -513,7 +521,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
   }
 
   addRestockItemRow() {
-    this.restockItemsList.push({ productId: '', productName: '', quantity: 1 });
+    this.restockItemsList.push({ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined });
   }
 
   removeRestockItemRow(idx: number) {
@@ -536,14 +544,38 @@ export class CentralizedDeliveriesComponent implements OnInit {
     this.supplierModalSearchText = supplier.name;
     this.showModalSupplierDropdown = false;
 
-    // Filtrar los productos de la empresa suministrados por este proveedor
-    this.suppliedProducts = this.allCompanyProducts.filter(p => {
-      const sId = typeof p.supplier === 'object' ? (p.supplier as any)?._id : p.supplier;
-      return sId === supplier._id;
-    });
+    // Remove strict supplier filtering to allow selecting any company product
+    this.suppliedProducts = this.allCompanyProducts;
 
     // Resetear lista de artículos al cambiar de proveedor
-    this.restockItemsList = [{ productId: '', productName: '', quantity: 1 }];
+    this.restockItemsList = [{ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined }];
+  }
+
+  getFilteredProductsForDropdown(idx: number): any[] {
+    const text = this.restockItemsList[idx].searchText || '';
+    if (!text) return this.suppliedProducts.slice(0, 50); // limit to 50 for performance
+    const lowerText = text.toLowerCase();
+    return this.suppliedProducts.filter(p => 
+      (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText))
+    ).slice(0, 50);
+  }
+
+  selectProductForRestockRow(idx: number, prod: any) {
+    this.restockItemsList[idx].productId = prod._id || '';
+    this.restockItemsList[idx].productName = prod.name || '';
+    this.restockItemsList[idx].itemType = prod.itemType || 'Product';
+    this.restockItemsList[idx].searchText = prod.name;
+    this.restockItemsList[idx].showDropdown = false;
+    this.restockItemsList[idx].measurementUnit = prod.measurementUnit || (prod.itemType === 'RawMaterial' ? 'U' : 'Pza');
+    this.restockItemsList[idx].packs = undefined;
+    this.restockItemsList[idx].unitsPerPack = undefined;
+  }
+
+  updateItemQuantityFromMultiplier(idx: number) {
+    const item = this.restockItemsList[idx];
+    if (item.packs && item.unitsPerPack) {
+      item.quantity = item.packs * item.unitsPerPack;
+    }
   }
 
   saveRestockSchedule() {
@@ -573,7 +605,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
       company: this.companyId,
       status: 'pending',
       items: validItems.map(it => ({
-        type: 'Product',
+        type: it.itemType || 'Product',
         itemRef: it.productId,
         quantity: it.quantity,
         costPrice: 0

@@ -13,6 +13,7 @@ import { SysadminService } from '../services/sysadmin.service';
 export class PagesComponent {
   isCollapsed: boolean = true;
   currentDate: Date = new Date();
+  isPosRoute: boolean = false;
 
   constructor(
     private router: Router, 
@@ -32,6 +33,10 @@ export class PagesComponent {
           break;
 
         case event instanceof NavigationEnd:
+          this.isPosRoute = this.router.url.includes('/new-sale');
+          this.spinnerService.hide();
+          break;
+
         case event instanceof NavigationCancel:
         case event instanceof NavigationError:
           this.spinnerService.hide();

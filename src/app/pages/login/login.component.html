@@ -31,18 +31,42 @@
       </form>
       
       <!-- Panel de Acceso Rápido Demo -->
-      <div class="demo-credentials-container">
-        <p class="demo-title">Acceso Rápido Demo</p>
-        <div class="demo-buttons-grid">
-          <button type="button" class="demo-btn" (click)="autofill('companyowner')">
-            [ DUEÑO ]
-          </button>
-          <button type="button" class="demo-btn" (click)="autofill('admin')">
-            [ GERENTE ]
-          </button>
-          <button type="button" class="demo-btn" (click)="autofill('cajero1')">
-            [ CAJERO ]
-          </button>
+      <!-- Toggle Demo Envs Button -->
+      <div class="mt-4" style="text-align: center;">
+        <button type="button" class="btn-ghost-muted" style="border-style: none; text-decoration: underline;" (click)="toggleDemoEnv()">
+          {{ showDemoEnv ? 'Ocultar' : 'Mostrar' }} Entornos de Prueba
+        </button>
+      </div>
+
+      <!-- Panel de Acceso Rápido Demo -->
+      <div class="demo-credentials-container" *ngIf="showDemoEnv">
+        <p class="demo-title">Entornos de Prueba</p>
+        
+        <div class="demo-section">
+          <span class="demo-section-label">SYSADMIN</span>
+          <div class="demo-buttons-flex">
+            <button type="button" class="btn-ghost-muted" style="width: 100%;" (click)="autofill('sysadmin')">Sysadmin Principal</button>
+          </div>
+        </div>
+
+        <div class="demo-section">
+          <span class="demo-section-label">CEOs & DUEÑOS DE EMPRESA</span>
+          <div class="demo-buttons-flex" style="flex-wrap: wrap;">
+            <button type="button" class="demo-btn" (click)="autofill('ceo_alsea')" title="Empresa B2B Activa">Alsea (B2B)</button>
+            <button type="button" class="demo-btn" (click)="autofill('ceo_oxxo')" title="Empresa Stripe Activa">Oxxo (Stripe)</button>
+            <button type="button" class="btn-ghost-muted" (click)="autofill('ceo_floral')" title="Empresa Trialing">Floral (Trial)</button>
+            <button type="button" class="btn-ghost-muted" (click)="autofill('ceo_kiosko')" title="Empresa Cancelada">Kiosko (Past Due)</button>
+          </div>
+        </div>
+
+        <div class="demo-section">
+          <span class="demo-section-label">STAFF DE SUCURSAL (EMPRESA ALSEA)</span>
+          <div class="demo-buttons-flex" style="flex-wrap: wrap;">
+            <button type="button" class="demo-btn" (click)="autofill('gerente_hosp')">Gerente Hosp.</button>
+            <button type="button" class="btn-ghost-muted" (click)="autofill('cajero_hosp')">Cajero Hosp.</button>
+            <button type="button" class="btn-ghost-muted" (click)="autofill('chef_hosp')">Chef KDS</button>
+            <button type="button" class="btn-ghost-muted" (click)="autofill('cajero_retail')">Cajero Retail</button>
+          </div>
         </div>
       </div>
           

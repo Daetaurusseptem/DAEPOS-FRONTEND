@@ -17,7 +17,7 @@ export class RecipeListComponent implements OnInit {
   
   // Modal detail control
   selectedRecipe: any = null;
-  scaleFactor: number = 1.0;
+  selectedSize: any = null;
 
   constructor(
     private recipeService: RecipesService,
@@ -42,15 +42,19 @@ export class RecipeListComponent implements OnInit {
           next: (resp: any) => {
             const loadedRecipes = resp.recipes || [];
             
-            // Populate ingredient costs dynamically
+            // Populate cost prices dynamically for all ingredients in all sizes of each recipe
             loadedRecipes.forEach((recipe: any) => {
-              if (recipe.ingredients) {
-                recipe.ingredients.forEach((ri: any) => {
-                  if (ri.ingredient) {
-                    const matched = invItems.find((inv: any) => inv.rawMaterial === ri.ingredient._id || inv.rawMaterial?._id === ri.ingredient._id);
-                    if (matched) {
-                      ri.ingredient.costPrice = matched.costPrice;
-                    }
+              if (recipe.sizes && recipe.sizes.length > 0) {
+                recipe.sizes.forEach((size: any) => {
+                  if (size.ingredients) {
+                    size.ingredients.forEach((ri: any) => {
+                      if (ri.ingredient) {
+                        const matched = invItems.find((inv: any) => inv.rawMaterial === ri.ingredient._id || inv.rawMaterial?._id === ri.ingredient._id);
+                        if (matched) {
+                          ri.ingredient.costPrice = matched.costPrice;
+                        }
+                      }
+                    });
                   }
                 });
               }
@@ -84,8 +88,10 @@ export class RecipeListComponent implements OnInit {
   }
 
   getRecipeTotalCost(recipe: any): number {
-    if (!recipe || !recipe.ingredients) return 0;
-    return recipe.ingredients.reduce((sum: number, ri: any) => {
+    if (!recipe || !recipe.sizes || recipe.sizes.length === 0) return 0;
+    const baseSize = recipe.sizes[0];
+    if (!baseSize.ingredients) return 0;
+    return baseSize.ingredients.reduce((sum: number, ri: any) => {
       const cost = ri.ingredient?.costPrice || 0;
       return sum + (ri.quantity * cost);
     }, 0);
@@ -93,15 +99,28 @@ export class RecipeListComponent implements OnInit {
 
   openRecipeModal(recipe: any): void {
     this.selectedRecipe = recipe;
-    this.scaleFactor = 1.0; // Reset scale multiplier
+    if (recipe.sizes && recipe.sizes.length > 0) {
+      this.selectedSize = recipe.sizes[0]; // Predeterminar el primer tamaño
+    } else {
+      this.selectedSize = null;
+    }
   }
 
   closeRecipeModal(): void {
     this.selectedRecipe = null;
+    this.selectedSize = null;
   }
 
-  changeScale(factor: number): void {
-    this.scaleFactor = factor;
+  selectSize(size: any): void {
+    this.selectedSize = size;
+  }
+
+  getSelectedSizeTotalCost(): number {
+    if (!this.selectedSize || !this.selectedSize.ingredients) return 0;
+    return this.selectedSize.ingredients.reduce((sum: number, ri: any) => {
+      const cost = ri.ingredient?.costPrice || 0;
+      return sum + (ri.quantity * cost);
+    }, 0);
   }
 
   createRecipe(): void {

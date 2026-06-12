@@ -36,12 +36,20 @@ export class CashRegisterService {
     return this.http.post<any>(`${this.url}/open`, data, this.authService.headers);
   }
 
-  addExpense(id: string, amount: number, reason: string, type: 'withdrawal' | 'expense' = 'expense') {
-    return this.http.post<any>(`${this.url}/expense/${id}`, { amount, reason, type }, this.authService.headers);
+  addExpense(id: string, amount: number, reason: string, type: 'withdrawal' | 'expense' = 'expense', depositReference: string = '') {
+    return this.http.post<any>(`${this.url}/expense/${id}`, { amount, reason, type, depositReference }, this.authService.headers);
   }
 
-  closeCashRegister(id: string, actualAmount: number, notes: string = '') {
-    return this.http.post<any>(`${this.url}/close/${id}`, { actualAmount, notes }, this.authService.headers);
+  closeCashRegister(id: string, actualAmount: number, notes: string = '', remanenteFloatAmount: number = 0, depositWithdrawalAmount: number = 0) {
+    return this.http.post<any>(`${this.url}/close/${id}`, { actualAmount, notes, remanenteFloatAmount, depositWithdrawalAmount }, this.authService.headers);
+  }
+
+  registerCorteX(cajaId: string, user: string, expectedAmount: number) {
+    return this.http.post<any>(`${this.url}/corte-x/${cajaId}`, { user, expectedAmount }, this.authService.headers);
+  }
+
+  verifyDeposit(cajaId: string, expenseId: string, auditStatus: 'verified' | 'rejected') {
+    return this.http.patch<any>(`${this.url}/${cajaId}/expenses/${expenseId}/verify`, { auditStatus }, this.authService.headers);
   }
 
   getOpenCashRegister(userId: string) {
@@ -62,6 +70,15 @@ export class CashRegisterService {
 
   getUserCashRegistersByDate(userId: string, startDate: string) {
     return this.http.get<any>(`${this.url}/user/${userId}/cajas/${startDate}`, this.authService.headers);
+  }
+
+  getUserRegistersHistory(userId: string, filters: any = {}) {
+    let queryParams = '';
+    const keys = Object.keys(filters);
+    if (keys.length > 0) {
+      queryParams = '?' + keys.map(key => `${key}=${encodeURIComponent(filters[key])}`).join('&');
+    }
+    return this.http.get<any>(`${this.url}/user/${userId}/history${queryParams}`, this.authService.headers);
   }
 
   // --- Monitoreo y Auditoría por Sucursal ---

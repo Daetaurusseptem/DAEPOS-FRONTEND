@@ -22,6 +22,16 @@ import { NgxPaginationModule } from 'ngx-pagination';
 
 // DASHBOARD & SaaS Control Tower
 import { SysadminDashboardComponent } from './dashboard/sysadmin-dashboard.component';
+import { SysadminTransactionsComponent } from './transactions/sysadmin-transactions.component';
+import { SysadminLogsComponent } from './logs/sysadmin-logs.component';
+import { SysadminSubscriptionsComponent } from './subscriptions/sysadmin-subscriptions.component';
+import { SysadminSubscriptionDetailComponent } from './subscriptions/detail/sysadmin-subscription-detail.component';
+import { SysadminUsersComponent } from './sysadmin-users/sysadmin-users.component';
+
+// TIERS (Subscription Plans)
+import { TiersComponent } from './tiers/tiers.component';
+import { GlobalSettingsComponent } from './global-settings/global-settings.component';
+import { ManualPaymentsComponent } from './manual-payments/manual-payments.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +43,15 @@ import { SysadminDashboardComponent } from './dashboard/sysadmin-dashboard.compo
     AddSubscriptionComponent,
     SelectSubscriptionsComponent,
     UserListComponent,
-    SysadminDashboardComponent
+    SysadminDashboardComponent,
+    SysadminTransactionsComponent,
+    SysadminLogsComponent,
+    SysadminSubscriptionsComponent,
+    SysadminSubscriptionDetailComponent,
+    SysadminUsersComponent,
+    TiersComponent,
+    GlobalSettingsComponent,
+    ManualPaymentsComponent
   ],
   imports: [
     CommonModule,

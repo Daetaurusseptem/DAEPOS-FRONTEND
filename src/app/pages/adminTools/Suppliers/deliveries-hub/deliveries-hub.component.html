@@ -329,7 +329,7 @@
         </div>
 
         <!-- Constructor de artículos interactivo -->
-        <div class="mb-3" *ngIf="newRestock.supplier">
+        <div class="mb-3" *ngIf="newRestock.supplier" style="position: relative; z-index: 10;">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label fw-semibold mb-0">Productos a Recibir *</label>
             <button class="btn btn-outline-dark btn-xs rounded-pill px-2 py-0.5" style="font-size: 0.75rem;" (click)="addRestockItemRow()">
@@ -337,18 +337,52 @@
             </button>
           </div>
           
-          <div class="d-flex flex-column gap-2 mb-2" style="max-height: 200px; overflow-y: auto; padding-right: 4px;">
-            <div *ngFor="let item of restockItemsList; let idx = index" class="d-flex gap-2 align-items-center animate__animated animate__fadeIn">
-              <select class="form-select form-select-sm flex-grow-1" [(ngModel)]="item.productId" (change)="onRestockItemProductChange(idx)">
-                <option value="">-- Seleccionar Producto --</option>
-                <option *ngFor="let prod of suppliedProducts" [value]="prod._id">{{ prod.name }} ({{ prod.brand }})</option>
-              </select>
+          <div class="d-flex flex-column gap-2 mb-2" style="padding-right: 4px;">
+            <div *ngFor="let item of restockItemsList; let idx = index" class="d-flex flex-column gap-2 mb-3 bg-white border border-light-subtle rounded-4 p-3 animate__animated animate__fadeIn shadow-sm" [style.z-index]="1000 - idx" style="position: relative;">
               
-              <input type="number" class="form-control form-control-sm" style="width: 80px;" placeholder="Cant" [(ngModel)]="item.quantity" min="1">
-              
-              <button class="btn btn-outline-danger btn-sm border-0" (click)="removeRestockItemRow(idx)">
-                <i class="bi bi-trash"></i>
-              </button>
+              <!-- Línea 1: Producto y Botón Eliminar -->
+              <div class="d-flex gap-2 align-items-center">
+                <div class="position-relative flex-grow-1">
+                  <input type="text" 
+                         class="form-control border-light-subtle bg-light" 
+                         placeholder="🔍 Buscar producto a recibir..." 
+                         [(ngModel)]="item.searchText"
+                         (focus)="item.showDropdown = true"
+                         (blur)="item.showDropdown = false">
+                  
+                  <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" 
+                      style="max-height: 150px; display: block; z-index: 1050; position: absolute;" 
+                      *ngIf="item.showDropdown && getFilteredProductsForDropdown(idx).length > 0">
+                    <li *ngFor="let prod of getFilteredProductsForDropdown(idx)" 
+                        (mousedown)="selectProductForRestockRow(idx, prod)">
+                      <a class="dropdown-item py-2 text-dark cursor-pointer text-truncate" style="font-size: 0.9rem;">
+                        <span class="fw-bold">{{ prod.name }}</span> <small class="text-muted">({{ prod.brand || 'S/M' }})</small>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <button class="btn btn-outline-danger border-0 px-3 rounded-3" (click)="removeRestockItemRow(idx)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+
+              <!-- Línea 2: Multiplicador y Total -->
+              <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-1 pt-3 border-top border-light-subtle">
+                
+                <!-- Multiplicador -->
+                <div class="d-flex align-items-center gap-1 bg-light px-3 py-1.5 rounded-pill border border-light-subtle">
+                  <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 70px; font-weight: 600;" placeholder="Cajas" [(ngModel)]="item.packs" (input)="updateItemQuantityFromMultiplier(idx)">
+                  <span class="text-muted small fw-bold">✕</span>
+                  <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 80px; font-weight: 600;" placeholder="Cant." [(ngModel)]="item.unitsPerPack" (input)="updateItemQuantityFromMultiplier(idx)">
+                </div>
+                
+                <!-- Total Final -->
+                <div class="input-group shadow-sm" style="min-width: 180px; flex: 1; max-width: 220px;">
+                  <span class="input-group-text bg-dark border-dark text-white fw-bold px-3">Total</span>
+                  <input type="number" class="form-control text-end fw-bold" placeholder="0" [(ngModel)]="item.quantity" min="1">
+                  <span class="input-group-text bg-white text-dark fw-bold px-2">{{ item.measurementUnit || '...' }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

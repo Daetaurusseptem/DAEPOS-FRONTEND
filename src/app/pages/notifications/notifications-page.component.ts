@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService } from 'src/app/services/notification.service';
 import { Subscription } from 'rxjs';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-notifications-page',
@@ -13,25 +14,30 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   activeFilter: 'all' | 'unread' = 'all';
   unreadCount: number = 0;
-  private autoRefreshSub!: any;
+  private socketSub!: Subscription;
 
   constructor(
     private notificationService: NotificationService,
+    private socketService: SocketService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
     this.loadNotifications();
     
-    // Auto refrescar cada 30 segundos en la pantalla completa para ver cambios en tiempo real
-    this.autoRefreshSub = setInterval(() => {
-      this.loadNotifications(false);
-    }, 30000);
+    // Escuchar notificaciones en tiempo real vía Socket.IO
+    this.socketSub = this.socketService.onEvent<any>('new-notification').subscribe({
+      next: (newNotif) => {
+        // Añadir al principio de la lista
+        this.notifications = [newNotif, ...this.notifications];
+        this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+      }
+    });
   }
 
   ngOnDestroy(): void {
-    if (this.autoRefreshSub) {
-      clearInterval(this.autoRefreshSub);
+    if (this.socketSub) {
+      this.socketSub.unsubscribe();
     }
   }
 

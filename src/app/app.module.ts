@@ -12,9 +12,10 @@ import { ComponentsModule } from './components/components.module';
 import { MatCardModule } from '@angular/material/card';
 import { PagesModule } from './pages/pages.module';
 import { RouterLink } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgChartsModule } from 'ng2-charts';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 
 
@@ -38,7 +39,9 @@ import { NgxPaginationModule } from 'ngx-pagination';
     NgChartsModule,
     NgxPaginationModule
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,69 +1,199 @@
-.company-card {
-    display: flex;
-    flex-wrap: wrap;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .company-image {
-    flex: 0 0 300px;
-    max-width: 300px;
-  }
-  
-  .company-image img {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-  }
-  
-  .company-details {
-    flex: 1;
-    padding: 20px;
-  }
-  
-  .company-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .company-name {
-    margin: 0;
-    font-size: 24px;
-    font-weight: bold;
-  }
-  
-  .edit-button {
-    background-color: transparent;
-    border: none;
-    color: #6c757d;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .company-description {
-    margin-bottom: 20px;
-    color: #6c757d;
-    line-height: 1.5;
-  }
-  
-  .company-info {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .company-info li {
-    margin-bottom: 5px;
-    line-height: 1.5;
-  }
-  
-  .company-info li i {
-    margin-right: 5px;
-    color: #6c757d;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+.bento-container {
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  min-height: 100vh;
+  padding: 2rem;
+  color: #0a0a0a;
+}
+
+.bento-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: oklab(0.145 -0.00000143796 0.00000340492 / 0.1) 0px 0px 0px 1px;
+  transition: box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  box-shadow: oklab(0.145 -0.00000143796 0.00000340492 / 0.2) 0px 0px 0px 1px, 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.bento-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0a0a0a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+/* Header Bento */
+.header-bento {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.company-logo-wrapper img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+}
+
+.placeholder-logo {
+  width: 64px;
+  height: 64px;
+  background: #f2f2f2;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #737373;
+  border: 1px solid #e5e5e5;
+}
+
+.company-name {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.45px;
+  color: #000000;
+  line-height: 1.33;
+}
+
+/* Status Badge */
+.status-badge-container .badge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 26px;
+}
+
+.badge-active {
+  background-color: #10c22b !important;
+  color: #ffffff !important;
+}
+
+.badge-suspended {
+  background-color: #c22b10 !important;
+  color: #ffffff !important;
+}
+
+/* Metrics Bento */
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  gap: 16px;
+}
+
+.metric-title {
+  font-size: 14px;
+  color: #737373;
+  font-weight: 400;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metric-icon {
+  font-size: 16px;
+  color: #0a0a0a;
+}
+
+.metric-value {
+  font-size: 48px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 0;
+  line-height: 1;
+  letter-spacing: -2.4px;
+}
+
+/* Actions & Buttons */
+.btn-primary-action {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  padding: 8px 48px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.btn-primary-action:hover {
+  background: #1a1a1a;
+}
+
+.btn-ghost-action {
+  background: transparent;
+  color: #0a0a0a;
+  border: 1px solid #e5e5e5;
+  padding: 8px 48px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.btn-ghost-action:hover {
+  background: #f2f2f2;
+}
+
+.btn-destructive {
+  background: #ffffff;
+  color: #c22b10;
+  border: 1px solid #c22b10;
+  padding: 8px 48px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-destructive:hover {
+  background: #fff5f5;
+}
+
+/* Subscriptions */
+.sub-item {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 8px;
+}
+
+.sub-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e5e5;
+}
+
+.text-muted-custom {
+  color: #737373 !important;
+  font-size: 14px;
+}
+
+.font-mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+}

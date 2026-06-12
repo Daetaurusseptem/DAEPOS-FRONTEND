@@ -28,8 +28,8 @@ export class BranchService {
     return this.http.put<{ ok: boolean, branch: Branch }>(`${this.baseUrl}/${id}`, branch, this.authService.headers);
   }
 
-  deleteBranch(id: string): Observable<{ ok: boolean, message: string }> {
-    return this.http.delete<{ ok: boolean, message: string }>(`${this.baseUrl}/${id}`, this.authService.headers);
+  deleteBranch(companyId: string, id: string): Observable<{ ok: boolean, message: string }> {
+    return this.http.delete<{ ok: boolean, message: string }>(`${this.baseUrl}/${companyId}/${id}`, this.authService.headers);
   }
 
   getBranchById(id: string): Observable<{ ok: boolean, branch: Branch }> {

@@ -28,6 +28,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { DashboardPageComponent } from './dashboard/dashboard-page/dashboard-page.component';
 import { NotificationsPageComponent } from './notifications/notifications-page.component';
+import { ExpiredSubscriptionComponent } from './billing/expired-subscription/expired-subscription.component';
+import { ManageBillingComponent } from './billing/manage-billing/manage-billing.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,9 @@ import { NotificationsPageComponent } from './notifications/notifications-page.c
     PageNotFoundComponent,
     PagesComponent,
     DashboardPageComponent,
-    NotificationsPageComponent
+    NotificationsPageComponent,
+    ExpiredSubscriptionComponent,
+    ManageBillingComponent
   ],
   imports: [
     CommonModule,

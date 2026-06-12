@@ -8,6 +8,7 @@ import { map, catchError } from "rxjs/operators";
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Company } from '../interfaces/models.interface';
+import { SocketService } from './socket.service';
 
 const url = environment.apiUrl;
 const urlAuth = `${url}/auth`;
@@ -21,13 +22,14 @@ export class AuthService {
   company!: Company;
   companyId!: string;
   branch?: any;
+  isGracePeriod: boolean = false;
 
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private activatedRouter: ActivatedRoute,
-
+    private socketService: SocketService
   ){}
 
   login(formData: { usuario?: string, password?: string }) {
@@ -51,16 +53,26 @@ export class AuthService {
           
           this.company = resp.company;
           this.branch = resp.branch;
+          this.isGracePeriod = resp.isGracePeriod || false;
 
           if (role == 'companyAdmin') {
             this.companyId = resp.company?._id;
-          } else if (role == 'admin' || role == 'user') {
+          } else if (role == 'admin' || role == 'user' || role == 'kitchen') {
             this.companyId = resp.company?._id;
           }
           
           console.log('COMPAÑYYYYYY', this.companyId);
 
           this.usuario = new UsuarioModel(_id, username, name, role, email, img, undefined, undefined, resp.usuario.permissions || [], isDemo);
+
+          // Establecer conexión global a Socket.IO para notificaciones en tiempo real
+          const branchId = this.branch?._id || this.branch;
+          this.socketService.connect({
+            userId: _id,
+            companyId: this.companyId,
+            branchId: branchId,
+            role: role
+          });
 
           this.guardarLocalStorage(resp.token, resp.menu)
           return true;

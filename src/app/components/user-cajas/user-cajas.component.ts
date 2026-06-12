@@ -9,7 +9,16 @@ import { CashRegisterService } from 'src/app/services/cash-register.service';
 })
 export class UserCajasComponent implements OnInit {
   userId!: string;
-  fechasConCajas: string[] = [];
+  cashRegisters: any[] = [];
+  
+  // Pagination and Filtering
+  currentPage = 1;
+  limit = 10;
+  totalPages = 1;
+  totalRegisters = 0;
+  filterDate: string = '';
+  loading = false;
+  selectedCajaId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -19,18 +28,45 @@ export class UserCajasComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('userId')!;
-    console.log(this.userId);
-    this.loadUserCashDates();
+    this.loadHistory();
   }
 
-  loadUserCashDates(): void {
-    this.cashRegisterService.getUserCajasByDate(this.userId).subscribe((response) => {
-      console.log(response);
-      this.fechasConCajas = response.fechas;
+  loadHistory(page: number = 1): void {
+    this.currentPage = page;
+    this.loading = true;
+    
+    const filters: any = { page: this.currentPage, limit: this.limit };
+    if (this.filterDate) {
+      filters.date = this.filterDate;
+    }
+
+    this.cashRegisterService.getUserRegistersHistory(this.userId, filters).subscribe({
+      next: (response: any) => {
+        this.cashRegisters = response.cashRegisters || [];
+        this.totalRegisters = response.total || 0;
+        this.totalPages = response.totalPages || 1;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+      }
     });
   }
 
-  navigateToCajasPorFecha(fecha: string): void {
-    this.router.navigate([`/dashboard/admin/users/${this.userId}/cajas/${fecha}`]);
+  onFilterChange(): void {
+    this.loadHistory(1);
   }
+
+  clearFilter(): void {
+    this.filterDate = '';
+    this.loadHistory(1);
+  }
+
+  cambiarPagina(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.loadHistory(page);
+    }
+  }
+
 }

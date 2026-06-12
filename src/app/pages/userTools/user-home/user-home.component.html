@@ -29,13 +29,32 @@
     </div>
   </div>
 
+  <!-- Alerta de Turno por Vencer / Vencido -->
+  <div *ngIf="shiftWarning || shiftExpired" class="alert alert-dismissible fade show mb-4 animate__animated animate__fadeInDown" 
+       [ngClass]="{'alert-warning': shiftWarning && !shiftExpired, 'alert-danger': shiftExpired}">
+    <div class="d-flex align-items-center">
+      <i class="bi me-3 fs-4" [ngClass]="{'bi-exclamation-triangle-fill': shiftWarning && !shiftExpired, 'bi-x-octagon-fill': shiftExpired}"></i>
+      <div>
+        <h5 class="alert-heading fw-bold mb-1">
+          {{ shiftExpired ? 'Tu turno ha expirado' : 'Tu turno está por finalizar' }}
+        </h5>
+        <p class="mb-0 small" *ngIf="shiftWarning && !shiftExpired">
+          Te quedan menos de <strong>{{ hoursLeft | number:'1.0-1' }} horas</strong> para el corte. Prepárate para cerrar la caja.
+        </p>
+        <p class="mb-0 small" *ngIf="shiftExpired">
+          El tiempo límite de caja se ha agotado. Ya no puedes realizar nuevas ventas. Termina las comandas pendientes y realiza tu corte de caja.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Operational Grid -->
   <div class="row">
     
     <!-- Nueva Venta (Large main action card) -->
     <div class="col-md-6 col-lg-8 mb-4">
       <div 
-        [class.disabled-action]="!isOpenCashRegister"
+        [class.disabled-action]="!isOpenCashRegister || shiftExpired"
         class="operation-card primary-action border shadow-sm smooth-transition pointer"
         (click)="performSale()">
         <div class="shortcut-tag">[S]</div>
@@ -48,8 +67,11 @@
           <div *ngIf="!isOpenCashRegister" class="badge-action-warning">
             <i class="bi bi-lock-fill me-1"></i> Requiere abrir turno en caja
           </div>
-          <div *ngIf="isOpenCashRegister" class="badge-action-ready">
+          <div *ngIf="isOpenCashRegister && !shiftExpired" class="badge-action-ready">
             <i class="bi bi-check-circle-fill me-1"></i> Caja abierta y lista para vender
+          </div>
+          <div *ngIf="isOpenCashRegister && shiftExpired" class="badge-action-warning text-danger">
+            <i class="bi bi-clock-history me-1"></i> Turno expirado. Bloqueado.
           </div>
         </div>
       </div>
@@ -127,6 +149,45 @@
       </div>
     </div>
 
+    <!-- Entregas Programadas -->
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div 
+        class="operation-card border shadow-sm smooth-transition pointer"
+        (click)="inspectScheduledDelivery()">
+        <div class="shortcut-tag">[E]</div>
+        <div class="operation-icon-wrapper text-primary bg-primary-subtle" style="width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; position: relative;">
+          <i class="bi bi-truck fs-3"></i>
+          <span *ngIf="pendingDeliveries.length > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-white">
+            {{ pendingDeliveries.length }}
+            <span class="visually-hidden">entregas pendientes</span>
+          </span>
+        </div>
+        <div class="operation-card-body">
+          <h3 class="operation-title">Auditar Entregas</h3>
+          <p class="operation-desc">Recibe mercancía de proveedores que tengan una entrega programada para el día de hoy.</p>
+          <div *ngIf="pendingDeliveries.length > 0" class="badge-action-ready text-success mt-2">
+            <i class="bi bi-exclamation-circle-fill me-1"></i> Tienes entregas esperando hoy
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recepción Inmediata (No Programada) -->
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div 
+        class="operation-card border shadow-sm smooth-transition pointer"
+        (click)="openUnplannedRestock()">
+        <div class="shortcut-tag">[R]</div>
+        <div class="operation-icon-wrapper text-success bg-success-subtle" style="width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+          <i class="bi bi-box-arrow-in-down fs-3"></i>
+        </div>
+        <div class="operation-card-body">
+          <h3 class="operation-title">Ingreso Imprevisto</h3>
+          <p class="operation-desc">Registra mercancía de emergencia que no estaba agendada y actualiza el inventario al instante.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Operational Footer Instructions -->
@@ -138,3 +199,86 @@
   </div>
 
 </div>
+
+<!-- MODAL: Recepción Inmediata (No Programada) -->
+<div class="custom-modal-backdrop" *ngIf="showUnplannedRestockModal" style="background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1040; display: flex; align-items: center; justify-content: center;">
+  <div class="bg-white rounded-4 shadow-lg overflow-hidden animate__animated animate__zoomIn" style="width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column;">
+    
+    <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+      <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-lightning-charge-fill text-warning me-2"></i> Recepción Imprevista</h5>
+      <button class="btn-close" (click)="showUnplannedRestockModal = false"></button>
+    </div>
+
+    <div class="p-4 overflow-auto" style="flex: 1;">
+      
+      <div class="mb-3">
+        <label class="form-label fw-bold small text-muted mb-1">Proveedor *</label>
+        <select class="form-select" [(ngModel)]="unplannedRestock.supplier">
+          <option value="" disabled>Selecciona el proveedor...</option>
+          <option *ngFor="let sup of suppliers" [value]="sup._id">{{ sup.name }}</option>
+        </select>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
+        <label class="form-label fw-bold small text-muted mb-0">Productos Recibidos *</label>
+        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="addUnplannedItem()">
+          <i class="bi bi-plus-circle me-1"></i> Agregar Artículo
+        </button>
+      </div>
+
+      <div class="d-flex flex-column gap-2 mb-3">
+        <div *ngFor="let item of unplannedItems; let idx = index" class="d-flex flex-column gap-2 mb-3 bg-white border border-light-subtle rounded-4 p-3 shadow-sm" [style.z-index]="1000 - idx" style="position: relative;">
+          
+          <div class="d-flex gap-2 align-items-center">
+            <div class="position-relative flex-grow-1">
+              <input type="text" class="form-control border-light-subtle bg-light" placeholder="🔍 Buscar producto a recibir..." [(ngModel)]="item.searchText" (focus)="item.showDropdown = true" (blur)="item.showDropdown = false">
+              <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" style="max-height: 150px; display: block; z-index: 1050; position: absolute;" *ngIf="item.showDropdown && getFilteredProductsForDropdown(idx).length > 0">
+                <li *ngFor="let prod of getFilteredProductsForDropdown(idx)" (mousedown)="selectProductForUnplannedRow(idx, prod)">
+                  <a class="dropdown-item py-2 text-dark cursor-pointer text-truncate" style="font-size: 0.9rem;">
+                    <span class="fw-bold">{{ prod.name }}</span> <small class="text-muted">({{ prod.brand || 'S/M' }})</small>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <button class="btn btn-outline-danger border-0 px-3 rounded-3" (click)="removeUnplannedItem(idx)"><i class="bi bi-trash"></i></button>
+          </div>
+
+          <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-1 pt-3 border-top border-light-subtle">
+            <div class="d-flex align-items-center gap-1 bg-light px-3 py-1.5 rounded-pill border border-light-subtle">
+              <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 70px; font-weight: 600;" placeholder="Cajas" [(ngModel)]="item.packs" (input)="updateItemQuantityFromMultiplier(idx)">
+              <span class="text-muted small fw-bold">✕</span>
+              <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 80px; font-weight: 600;" placeholder="Cant." [(ngModel)]="item.unitsPerPack" (input)="updateItemQuantityFromMultiplier(idx)">
+            </div>
+            <div class="input-group shadow-sm" style="min-width: 180px; flex: 1; max-width: 220px;">
+              <span class="input-group-text bg-dark border-dark text-white fw-bold px-3">Total</span>
+              <input type="number" class="form-control text-end fw-bold" placeholder="0" [(ngModel)]="item.quantity" min="1">
+              <span class="input-group-text bg-white text-dark fw-bold px-2">{{ item.measurementUnit || '...' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-check text-start mt-3 p-3 bg-light border rounded shadow-sm">
+        <input class="form-check-input mt-1" type="checkbox" id="pay-unplanned" [(ngModel)]="unplannedRestock.payFromRegister" style="transform: scale(1.2);">
+        <label class="form-check-label fw-bold text-dark ms-2" for="pay-unplanned">
+          Descontar costo del dinero de Caja Físicamente
+          <small class="text-muted d-block mt-1 fw-normal" style="font-size: 0.8rem;">
+            ¿El proveedor ya fue pagado por transferencia o es a crédito? <strong>Desmarca</strong> esta opción.
+          </small>
+        </label>
+      </div>
+
+      <div class="mt-3">
+        <label class="form-label fw-bold small text-muted mb-1">Motivo / Notas Adicionales</label>
+        <textarea class="form-control border-light-subtle bg-light" rows="2" [(ngModel)]="unplannedRestock.notes"></textarea>
+      </div>
+
+    </div>
+
+    <div class="p-3 bg-light border-top d-flex justify-content-end gap-2">
+      <button class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" (click)="showUnplannedRestockModal = false">Cancelar</button>
+      <button class="btn btn-dark rounded-pill px-4 fw-semibold shadow-sm" (click)="saveUnplannedRestock()">Registrar Entrada</button>
+    </div>
+  </div>
+</div>
+

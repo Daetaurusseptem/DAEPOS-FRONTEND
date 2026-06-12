@@ -54,6 +54,9 @@ export class BranchFormComponent implements OnInit {
         pointsEarnRate: [10, [Validators.required, Validators.min(0.01)]],
         pointsRedeemRate: [0.10, [Validators.required, Validators.min(0.001)]],
         maxRedemptionPercentage: [100, [Validators.required, Validators.min(1), Validators.max(100)]]
+      }),
+      shiftSettings: this.fb.group({
+        maxShiftDurationHours: [12, [Validators.required, Validators.min(1), Validators.max(24)]]
       })
     });
   }
@@ -89,6 +92,9 @@ export class BranchFormComponent implements OnInit {
             pointsEarnRate: 10,
             pointsRedeemRate: 0.10,
             maxRedemptionPercentage: 100
+          },
+          shiftSettings: branch.shiftSettings || {
+            maxShiftDurationHours: 12
           }
         });
         this.isLoading = false;

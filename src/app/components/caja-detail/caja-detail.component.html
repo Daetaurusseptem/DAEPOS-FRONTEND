@@ -1,4 +1,4 @@
-<app-back-button></app-back-button>
+<app-back-button *ngIf="showBackButton"></app-back-button>
 
 <div class="caja-detail-container mt-4">
   <div class="text-center py-5" *ngIf="!caja">
@@ -92,6 +92,22 @@
               </div>
             </div>
 
+            <!-- Corte Z Custody breakdown (Fondo remanente vs Depósito retirado) -->
+            <div class="row g-3 mt-1" *ngIf="caja.closed">
+              <div class="col-6">
+                <div class="p-3 bg-dark-soft rounded border border-secondary-soft" style="border-left: 3px solid #ffc107 !important;">
+                  <span class="text-muted-custom fs-8-5 d-block"><i class="bi bi-wallet2 text-warning me-1"></i> Fondo en Gaveta (Cambio)</span>
+                  <strong class="text-warning fs-5 font-monospace">{{ caja.remanenteFloatAmount | currency }}</strong>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 bg-dark-soft rounded border border-secondary-soft" style="border-left: 3px solid #0d6efd !important;">
+                  <span class="text-muted-custom fs-8-5 d-block"><i class="bi bi-safe2 text-primary me-1"></i> Retirado para Bóveda</span>
+                  <strong class="text-primary fs-5 font-monospace">{{ caja.depositWithdrawalAmount | currency }}</strong>
+                </div>
+              </div>
+            </div>
+
             <!-- Double-card expected vs counted -->
             <div class="row g-3 mt-1">
               <div class="col-12 col-md-6">
@@ -114,6 +130,30 @@
               <span class="text-muted-custom fs-8-5 d-block fw-semibold mb-1">Notas / Observaciones del Cierre:</span>
               <p class="text-white fs-7-5 mb-0 italic">&ldquo;{{ caja.notes }}&rdquo;</p>
             </div>
+
+            <!-- Cortes X Audit Log (Huella de auditoría en vivo) -->
+            <div class="p-3 rounded bg-dark-soft border border-secondary-soft mt-3" *ngIf="caja.cortesX && caja.cortesX.length > 0">
+              <h4 class="h6 text-white text-uppercase tracking-wider fs-8 mb-2">
+                <i class="bi bi-clock-history text-indigo me-1"></i> Auditoría: Cortes X Generados ({{ caja.cortesX.length }})
+              </h4>
+              <div class="table-responsive">
+                <table class="table table-sm table-dark mb-0 fs-8 border border-secondary-soft">
+                  <thead class="table-light text-dark">
+                    <tr>
+                      <th>Fecha / Hora</th>
+                      <th class="text-end">Monto Esperado (Teórico)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let cx of caja.cortesX">
+                      <td class="text-muted-custom">{{ cx.timestamp | date: 'medium' }}</td>
+                      <td class="text-end font-monospace text-success fw-semibold">{{ cx.expectedAmount | currency }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
 
           <!-- Payment Methods Distributions -->
@@ -262,24 +302,55 @@
         </div>
       </div>
 
-      <!-- Tab 3: Expenses list -->
+      <!-- Tab 3: Expenses list (Includes audit status & verifications) -->
       <div *ngIf="activeTab === 'expenses'">
         <div class="text-center py-4 bg-dark-soft rounded text-muted-custom border border-secondary-soft fs-7-5" *ngIf="!caja.expenses || caja.expenses.length === 0">
           No se registraron egresos ni retiros parciales de efectivo en este turno.
         </div>
 
         <div class="timeline" *ngIf="caja.expenses && caja.expenses.length > 0">
-          <div class="timeline-item d-flex gap-3 pb-3 position-relative" *ngFor="let exp of caja.expenses">
-            <div class="timeline-dot bg-danger"></div>
+          <div class="timeline-item d-flex gap-3 pb-4 position-relative" *ngFor="let exp of caja.expenses">
+            <div class="timeline-dot" [ngClass]="exp.type === 'withdrawal' ? 'bg-danger' : 'bg-warning'"></div>
             <div class="timeline-content bg-dark-soft p-3 rounded flex-grow-1 border border-secondary-soft">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <span class="badge bg-danger-soft text-danger text-uppercase fs-9">
-                  {{ exp.type === 'withdrawal' ? 'Retiro Parcial' : 'Gasto' }}
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge" [ngClass]="exp.type === 'withdrawal' ? 'bg-danger-soft text-danger' : 'bg-warning-soft text-warning'">
+                  {{ exp.type === 'withdrawal' ? 'Retiro Parcial (Safe Drop)' : 'Gasto de Operación' }}
                 </span>
                 <span class="text-muted-custom fs-8">{{ exp.timestamp | date: 'medium' }}</span>
               </div>
               <p class="text-white mb-1 fs-7">{{ exp.reason }}</p>
-              <strong class="text-danger fs-6">- {{ exp.amount | currency }}</strong>
+              <strong class="text-danger fs-5">- {{ exp.amount | currency }}</strong>
+
+              <!-- Safe Drop Deposit Audit Details -->
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3 pt-3 border-top border-secondary-soft fs-8" *ngIf="exp.type === 'withdrawal'">
+                <div class="mb-2 mb-md-0">
+                  <span class="d-block text-muted-custom">Folio Sobre / Referencia: <strong class="text-white">{{ exp.depositReference || 'Sin registrar' }}</strong></span>
+                  <span class="d-block text-muted-custom mt-1" *ngIf="exp.auditStatus === 'verified'">
+                    <i class="bi bi-person-check-fill text-success"></i> Conciliado por supervisor el {{ exp.auditedAt | date: 'short' }}
+                  </span>
+                  <span class="d-block text-muted-custom mt-1" *ngIf="exp.auditStatus === 'rejected'">
+                    <i class="bi bi-person-x-fill text-danger"></i> Discrepancia reportada el {{ exp.auditedAt | date: 'short' }}
+                  </span>
+                </div>
+
+                <!-- Admin Action Buttons to verify -->
+                <div class="d-flex gap-2" *ngIf="exp.auditStatus === 'pending'">
+                  <button class="btn btn-success btn-sm py-1 px-3 fs-8" (click)="verifyDeposit(exp._id, 'verified')">
+                    <i class="bi bi-check-circle-fill me-1"></i> Aprobar Depósito
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm py-1 px-3 fs-8" (click)="verifyDeposit(exp._id, 'rejected')">
+                    <i class="bi bi-x-circle-fill me-1"></i> Reportar Faltante
+                  </button>
+                </div>
+
+                <div *ngIf="exp.auditStatus !== 'pending'">
+                  <span class="badge p-2 fs-8-5" [ngClass]="exp.auditStatus === 'verified' ? 'bg-success-soft text-success border border-success-soft' : 'bg-danger-soft text-danger border border-danger-soft'">
+                    <i class="bi" [ngClass]="exp.auditStatus === 'verified' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                    {{ exp.auditStatus === 'verified' ? 'CONCILIADO EN BÓVEDA' : 'CON DISCREPANCIA' }}
+                  </span>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

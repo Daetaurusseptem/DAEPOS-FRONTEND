@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { ModalService } from 'src/app/services/modal.service';
 import { UsersService } from 'src/app/services/users.service';
 import { BranchService } from 'src/app/services/branch.service';
+import { CashRegisterService } from 'src/app/services/cash-register.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 
@@ -23,6 +24,7 @@ export class UserListComponent {
   branches: Branch[] = [];
   selectedBranchId: string = '';
   selectedRole: string = '';
+  selectedStatus: string = 'active';
   searchTerm: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
@@ -34,6 +36,7 @@ export class UserListComponent {
     private authService: AuthService,
     private modalService: ModalService,
     private branchService: BranchService,
+    private cashRegisterService: CashRegisterService,
     private router: Router
   ) { 
     this.adminId = this.authService.idUsuario;
@@ -48,8 +51,11 @@ export class UserListComponent {
 
   ngOnInit() {}
 
+  actualUserRole: string = '';
+
   getRole() {
     const role = this.authService.role;
+    this.actualUserRole = role;
     this.userRole = (role === 'companyAdmin') ? 'admin' : role;
   }
 
@@ -70,7 +76,7 @@ export class UserListComponent {
     this.company = this.authService.getCompany;
     this.companyId = this.authService.companyId;
 
-    this.userService.getAllNonAdminUsersOfCompany(this.adminId, page, this.itemsPerPage, this.searchTerm, this.selectedBranchId, this.selectedRole)
+    this.userService.getAllNonAdminUsersOfCompany(this.adminId, page, this.itemsPerPage, this.searchTerm, this.selectedBranchId, this.selectedRole, this.selectedStatus)
       .pipe(map(response => {
         console.log(response);
         this.totalPages = response.totalPages!;
@@ -175,12 +181,35 @@ export class UserListComponent {
     });
   }
 
+  reactivarUsuario(id: string) {
+    Swal.fire({
+      title: '¿Reactivar Usuario?',
+      text: '¿Estás seguro de que deseas reactivar el acceso a este usuario?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, reactivar',
+      confirmButtonColor: '#198754',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.toggleUserBlock(id, true).subscribe({
+          next: () => {
+            Swal.fire('Reactivado', 'El usuario vuelve a tener acceso al sistema.', 'success');
+            this.onSearch();
+          },
+          error: (err) => {
+            Swal.fire('Error', err.error?.error || 'No se pudo reactivar el usuario', 'error');
+          }
+        });
+      }
+    });
+  }
   abrirModal(element: Company | User, tipo: "empresas" | "usuarios" | "productos") {
     const { _id } = element;
     this.modalService.abrirModal(element.img, tipo, _id!);
   }
 
-  navigateToCajasUsuario(userId: string): void {
+  navigateToUserCajas(userId: string): void {
     this.router.navigate([`/dashboard/admin/users/${userId}/cajas`]);
   }
 

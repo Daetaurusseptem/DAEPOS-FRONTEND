@@ -2,7 +2,7 @@
   <!-- Cabecera de la Consola Principal -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="console-title mb-1">SaaS Control Tower</h1>
+      <h1 class="console-title mb-1">Panel Principal SaaS</h1>
       <p class="console-subtitle text-muted mb-0">Consola operativa global y centro de asistencia para administradores de la plataforma</p>
     </div>
     <div class="d-flex gap-2">
@@ -12,56 +12,36 @@
     </div>
   </div>
 
-  <!-- Pestañas de Navegación Monocromáticas -->
-  <div class="nav-tabs-wrapper mb-4">
-    <ul class="nav-tabs-custom">
-      <li [class.active]="activeTab === 'control-tower'" (click)="activeTab = 'control-tower'; loadControlTowerData()">
-        <i class="bi bi-cpu me-2"></i>Torre de Control
-      </li>
-      <li [class.active]="activeTab === 'companies'" (click)="activeTab = 'companies'; loadCompanies()">
-        <i class="bi bi-building me-2"></i>Clientes y Asistencia
-      </li>
-      <li [class.active]="activeTab === 'onboarding'" (click)="activeTab = 'onboarding'">
-        <i class="bi bi-rocket-takeoff me-2"></i>Onboarding Express
-      </li>
-      <li [class.active]="activeTab === 'errors'" (click)="activeTab = 'errors'; loadSystemErrors()">
-        <i class="bi bi-bug me-2"></i>Consola de Errores
-        <span class="badge bg-danger ms-2" *ngIf="metrics.totalErrors > 0">{{ metrics.totalErrors }}</span>
-      </li>
-    </ul>
-  </div>
-
-  <!-- CONTENIDO DE PESTAÑAS -->
-  <div [ngSwitch]="activeTab">
-
-    <!-- 1. TORRE DE CONTROL (TELEMETRÍA EN VIVO) -->
-    <div *ngSwitchCase="'control-tower'">
+  <!-- CONTENIDO DEL PANEL PRINCIPAL -->
+  <div>
+    <!-- PANEL PRINCIPAL (TELEMETRÍA EN VIVO) -->
+    <div>
       <!-- Tarjetas de Telemetría -->
       <div class="row g-3 mb-4 animate__animated animate__fadeInUp">
         <div class="col-md-3">
-          <div class="metric-card">
+          <div class="metric-card" routerLink="/dashboard/sysadmin/transactions" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="metric-header">
               <span class="metric-label">VOLUMEN TRANSACCIONADO (GMV)</span>
               <i class="bi bi-wallet2 text-muted"></i>
             </div>
             <div class="metric-value font-monospace">{{ metrics.gmv | currency:'MXN':'symbol':'1.2-2' }}</div>
-            <p class="metric-footer text-muted mb-0">Total procesado por inquilinos</p>
+            <p class="metric-footer text-muted mb-0">Total procesado por inquilinos <i class="bi bi-arrow-right ms-1"></i></p>
           </div>
         </div>
 
         <div class="col-md-3">
-          <div class="metric-card">
+          <div class="metric-card" routerLink="/dashboard/sysadmin/companies" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="metric-header">
               <span class="metric-label">COMERCIOS / EMPRESAS</span>
               <i class="bi bi-building text-muted"></i>
             </div>
             <div class="metric-value">{{ metrics.activeCompanies }}</div>
-            <p class="metric-footer text-muted mb-0">Inquilinos SaaS configurados</p>
+            <p class="metric-footer text-muted mb-0">Inquilinos SaaS configurados <i class="bi bi-arrow-right ms-1"></i></p>
           </div>
         </div>
 
         <div class="col-md-3">
-          <div class="metric-card">
+          <div class="metric-card" routerLink="/dashboard/sysadmin/transactions" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="metric-header">
               <span class="metric-label">TERMINALES / POS EN VIVO</span>
               <i class="bi bi-pc-display-horizontal text-muted"></i>
@@ -70,12 +50,12 @@
               {{ metrics.openRegisters }}
               <span class="live-pulse" *ngIf="metrics.openRegisters > 0"></span>
             </div>
-            <p class="metric-footer text-muted mb-0">Cajas abiertas operando hoy</p>
+            <p class="metric-footer text-muted mb-0">Cajas abiertas operando hoy <i class="bi bi-arrow-right ms-1"></i></p>
           </div>
         </div>
 
         <div class="col-md-3">
-          <div class="metric-card" [class.border-danger-subtle]="metrics.totalErrors > 0">
+          <div class="metric-card" [class.border-danger-subtle]="metrics.totalErrors > 0" routerLink="/dashboard/sysadmin/logs" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="metric-header">
               <span class="metric-label">INCIDENTES REGISTRADOS</span>
               <i class="bi bi-exclamation-triangle text-danger" *ngIf="metrics.totalErrors > 0"></i>
@@ -84,265 +64,74 @@
             <div class="metric-value" [class.text-danger]="metrics.totalErrors > 0" [class.text-success]="metrics.totalErrors === 0">
               {{ metrics.totalErrors }}
             </div>
-            <p class="metric-footer text-muted mb-0">Logs de error HTTP 500 activos</p>
+            <p class="metric-footer text-muted mb-0">Logs de error HTTP 500 activos <i class="bi bi-arrow-right ms-1"></i></p>
           </div>
         </div>
       </div>
 
-      <!-- Live Activities Feed -->
-      <div class="card animate__animated animate__fadeInUp">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2>Flujo de Actividad Reciente (Live Stream)</h2>
-          <span class="text-muted tracking-wide text-uppercase font-monospace" style="font-size: 0.65rem;">
-            Se actualiza automáticamente cada 20s
-          </span>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table mb-0 align-middle">
-              <thead>
-                <tr>
-                  <th style="width: 15%">FECHA / HORA</th>
-                  <th style="width: 25%">CLIENTE / EMISOR</th>
-                  <th style="width: 20%">OPERADOR</th>
-                  <th style="width: 25%">CONCEPTO / DETALLES</th>
-                  <th style="width: 15%" class="text-end">IMPORTE</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let activity of liveFeed" class="activity-row">
-                  <td class="font-monospace text-muted" style="font-size: 0.8rem;">
-                    {{ activity.date | date:'dd/MM HH:mm:ss' }}
-                  </td>
-                  <td>
-                    <div class="fw-bold text-dark">{{ activity.company?.name || 'Inquilino del Sistema' }}</div>
-                  </td>
-                  <td class="text-muted" style="font-size: 0.85rem;">
-                    <i class="bi bi-person-circle me-1"></i> {{ activity.user?.name || activity.vendedor }}
-                  </td>
-                  <td>
-                    <span class="badge bg-light text-dark border me-1 font-monospace">{{ activity.paymentMethod || 'cash' }}</span>
-                    <span class="text-secondary" style="font-size: 0.85rem;">Venta registrada con éxito</span>
-                  </td>
-                  <td class="text-end font-monospace fw-bold text-dark">
-                    {{ activity.total | currency:'MXN' }}
-                  </td>
-                </tr>
-                <tr *ngIf="liveFeed.length === 0">
-                  <td colspan="5" class="text-center py-5 text-muted">
-                    <i class="bi bi-activity d-block fs-3 mb-2 text-muted"></i>
-                    No se han registrado actividades o ventas transaccionales en las últimas horas.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+      <!-- Live Activities Feed (Timeline) -->
+      <div class="card animate__animated animate__fadeInUp mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light d-flex justify-content-between align-items-center py-3">
+          <div class="d-flex align-items-center gap-3">
+            <h2 class="h5 mb-0 fw-bold">Flujo de Actividad Reciente</h2>
+            <span class="badge bg-light text-primary tracking-wide text-uppercase font-monospace border" style="font-size: 0.65rem;">
+              <i class="bi bi-broadcast pulse-icon me-1"></i> Actualización en vivo
+            </span>
           </div>
+          <a routerLink="/dashboard/sysadmin/transactions" class="btn btn-sm btn-outline-primary font-monospace d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+            BÚSQUEDA AVANZADA <i class="bi bi-arrow-right"></i>
+          </a>
         </div>
-      </div>
-    </div>
-
-    <!-- 2. DIRECTORIO DE EMPRESAS Y ASISTENCIA REMOTA -->
-    <div *ngSwitchCase="'companies'" class="animate__animated animate__fadeIn">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2>Directorio Operativo de Comercios</h2>
-          <button class="btn btn-dark btn-sm d-flex align-items-center gap-1.5" (click)="activeTab = 'onboarding'">
-            <i class="bi bi-plus-lg"></i> CREAR NUEVO CLIENTE (EXPRESS)
-          </button>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table mb-0 align-middle">
-              <thead>
-                <tr>
-                  <th style="width: 25%">EMPRESA / COMERCIO</th>
-                  <th style="width: 20%">ID FISCAL / RFC</th>
-                  <th style="width: 25%">CONTACTO (CORREO / TEL)</th>
-                  <th style="width: 15%">ESTADO</th>
-                  <th style="width: 15%" class="text-end">ACCIONES</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let c of companies">
-                  <td>
-                    <div class="d-flex align-items-center gap-3">
-                      <div class="company-avatar d-flex align-items-center justify-content-center font-monospace bg-dark text-white fw-bold rounded" style="width: 38px; height: 38px; font-size: 0.9rem;">
-                        {{ c.name.charAt(0).toUpperCase() }}
-                      </div>
-                      <div>
-                        <div class="fw-bold text-dark fs-6">{{ c.name }}</div>
-                        <span class="text-muted text-truncate d-block" style="font-size: 0.75rem; max-width: 220px;">{{ c.address || 'Sin dirección registrada' }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="font-monospace text-secondary" style="font-size: 0.85rem;">
-                    XAXX010101000
-                  </td>
-                  <td>
-                    <div class="text-dark" style="font-size: 0.85rem;">{{ c.email }}</div>
-                    <div class="text-muted font-monospace" style="font-size: 0.75rem;">{{ c.tel || 'Sin teléfono' }}</div>
-                  </td>
-                  <td>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle text-uppercase font-monospace px-2.5 py-1" style="font-size: 0.7rem;">
-                      Activo
-                    </span>
-                  </td>
-                  <td class="text-end">
-                    <button class="btn btn-outline-dark btn-sm d-inline-flex align-items-center gap-1.5 px-3" 
-                            (click)="startImpersonation(c)"
-                            style="border-radius: 8px; font-size: 0.78rem;">
-                      <i class="bi bi-shield-lock-fill"></i> ASISTIR CLIENTE
-                    </button>
-                  </td>
-                </tr>
-                <tr *ngIf="companies.length === 0 && !loadingCompanies">
-                  <td colspan="5" class="text-center py-5 text-muted">
-                    No hay empresas clientes registradas en el sistema.
-                  </td>
-                </tr>
-                <tr *ngIf="loadingCompanies">
-                  <td colspan="5" class="text-center py-5 text-muted">
-                    <span class="spinner-border spinner-border-sm text-dark me-2"></span> Cargando base de clientes...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. ONBOARDING EXPRESS (CREACIÓN SIMULTÁNEA DE COMERCIO) -->
-    <div *ngSwitchCase="'onboarding'" class="animate__animated animate__fadeIn">
-      <div class="card">
-        <div class="card-header">
-          <h2>Asistente de Onboarding Rápido</h2>
-          <p class="text-muted mb-0 mt-1" style="font-size: 0.85rem;">
-            Crea la cuenta de la Empresa, la Sucursal Principal y el usuario Administrador Dueño en un solo paso.
-          </p>
-        </div>
-        <div class="card-body">
-          <form #onboardForm="ngForm" (ngSubmit)="submitExpressOnboarding(onboardForm)">
-            <div class="row g-4">
-              
-              <!-- Sección A: Empresa -->
-              <div class="col-lg-4 border-end pe-lg-4">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <span class="badge bg-dark text-white rounded-circle font-monospace" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">1</span>
-                  <h4 class="mb-0 fw-bold fs-6 uppercase tracking-wider text-secondary">DATOS DE LA EMPRESA</h4>
-                </div>
-                
-                <div class="mb-3">
-                  <label for="companyName" class="form-label">Nombre Comercial</label>
-                  <input type="text" class="form-control" id="companyName" [(ngModel)]="onboardingData.companyName" name="companyName" required placeholder="Ej. Farmacia San Jorge">
-                </div>
-
-                <div class="mb-3">
-                  <label for="companyEmail" class="form-label">Correo Corporativo</label>
-                  <input type="email" class="form-control" id="companyEmail" [(ngModel)]="onboardingData.companyEmail" name="companyEmail" required placeholder="contacto@empresa.com">
-                </div>
-
-                <div class="mb-3">
-                  <label for="companyTel" class="form-label">Teléfono</label>
-                  <input type="text" class="form-control" id="companyTel" [(ngModel)]="onboardingData.companyTel" name="companyTel" required placeholder="10 dígitos">
-                </div>
-
-                <div class="mb-3">
-                  <label for="companyAddress" class="form-label">Dirección Fiscal / Matriz</label>
-                  <input type="text" class="form-control" id="companyAddress" [(ngModel)]="onboardingData.companyAddress" name="companyAddress" required placeholder="Calle, Número, Colonia">
-                </div>
-
-                <div class="mb-3">
-                  <label for="saleType" class="form-label">Tipo de Giro / Negocio</label>
-                  <select class="form-select" id="saleType" [(ngModel)]="onboardingData.saleType" name="saleType" required>
-                    <option value="retail">Retail / Venta de Productos</option>
-                    <option value="restaurant">Restaurante / Alimentos y Bebidas</option>
-                  </select>
+        <div class="card-body p-4">
+          
+          <div class="timeline-container">
+            <div *ngFor="let activity of liveFeed" class="timeline-item animate__animated animate__fadeIn" 
+                 data-bs-toggle="modal" data-bs-target="#forensicModal" (click)="openForensicModal(activity._id)">
+              <div class="timeline-icon text-white shadow-sm" 
+                   [ngClass]="{'bg-success': activity.paymentMethod === 'cash', 'bg-primary': activity.paymentMethod !== 'cash'}">
+                <i class="bi" [ngClass]="{'bi-cash-stack': activity.paymentMethod === 'cash', 'bi-credit-card': activity.paymentMethod !== 'cash'}"></i>
+              </div>
+              <div class="timeline-content card border-light transaction-card">
+                <div class="card-body d-flex justify-content-between align-items-center py-2 px-3">
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark">{{ activity.company?.name || 'Inquilino del Sistema' }}</h6>
+                    <small class="text-muted d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem;">
+                      <span><i class="bi bi-person-circle text-secondary"></i> {{ activity.user?.name || activity.vendedor || 'Sistema' }}</span>
+                      <span class="text-light-muted">&bull;</span>
+                      <span class="font-monospace text-secondary"><i class="bi bi-clock"></i> {{ activity.date | date:'HH:mm:ss' }}</span>
+                    </small>
+                  </div>
+                  <div class="text-end">
+                    <h5 class="mb-1 fw-bold text-dark font-monospace">{{ activity.total | currency:'MXN' }}</h5>
+                    <span class="badge rounded-pill bg-light text-secondary border font-monospace px-2" style="font-size: 0.65rem;">{{ activity.paymentMethod || 'cash' }}</span>
+                  </div>
                 </div>
               </div>
-
-              <!-- Sección B: Sucursal Principal -->
-              <div class="col-lg-4 border-end px-lg-4">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <span class="badge bg-dark text-white rounded-circle font-monospace" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">2</span>
-                  <h4 class="mb-0 fw-bold fs-6 uppercase tracking-wider text-secondary">SUCURSAL PRINCIPAL</h4>
-                </div>
-
-                <div class="mb-3">
-                  <label for="branchName" class="form-label">Nombre de la Sucursal</label>
-                  <input type="text" class="form-control" id="branchName" [(ngModel)]="onboardingData.branchName" name="branchName" required placeholder="Ej. Sucursal Centro">
-                </div>
-
-                <div class="mb-3">
-                  <label for="branchAddress" class="form-label">Dirección de la Sucursal</label>
-                  <input type="text" class="form-control" id="branchAddress" [(ngModel)]="onboardingData.branchAddress" name="branchAddress" placeholder="Dejar en blanco si es igual a la matriz">
-                </div>
-
-                <div class="mb-3">
-                  <label for="branchTel" class="form-label">Teléfono de la Sucursal</label>
-                  <input type="text" class="form-control" id="branchTel" [(ngModel)]="onboardingData.branchTel" placeholder="Dejar en blanco si es el mismo">
-                </div>
-                
-                <div class="p-3 bg-light rounded border border-dashed mt-4 text-secondary" style="font-size: 0.8rem;">
-                  <i class="bi bi-info-circle me-1.5"></i>
-                  El sistema generará la sucursal de manera automática y la enlazará al inventario y a los puntos de venta (cajas físicas).
-                </div>
-              </div>
-
-              <!-- Sección C: Dueño de la Empresa -->
-              <div class="col-lg-4 ps-lg-4">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <span class="badge bg-dark text-white rounded-circle font-monospace" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">3</span>
-                  <h4 class="mb-0 fw-bold fs-6 uppercase tracking-wider text-secondary">CUENTA DEL DUEÑO / ADMIN</h4>
-                </div>
-
-                <div class="mb-3">
-                  <label for="name" class="form-label">Nombre Completo</label>
-                  <input type="text" class="form-control" id="name" [(ngModel)]="onboardingData.name" name="name" required placeholder="Ej. Jaime Martínez">
-                </div>
-
-                <div class="mb-3">
-                  <label for="email" class="form-label">Correo del Administrador</label>
-                  <input type="email" class="form-control" id="email" [(ngModel)]="onboardingData.email" name="email" required placeholder="admin@empresa.com">
-                </div>
-
-                <div class="mb-3">
-                  <label for="username" class="form-label">Nombre de Usuario</label>
-                  <input type="text" class="form-control" id="username" [(ngModel)]="onboardingData.username" name="username" required placeholder="Para iniciar sesión">
-                </div>
-
-                <div class="mb-3">
-                  <label for="password" class="form-label">Contraseña</label>
-                  <input type="password" class="form-control" id="password" [(ngModel)]="onboardingData.password" name="password" required placeholder="Mínimo 6 caracteres">
-                </div>
-              </div>
-
             </div>
 
-            <hr class="my-4 border-light">
-
-            <div class="d-flex justify-content-end gap-3">
-              <button type="button" class="btn btn-outline-dark px-4 py-2.5" (click)="activeTab = 'companies'">
-                CANCELAR
-              </button>
-              <button type="submit" class="btn btn-dark px-5 py-2.5 d-flex align-items-center gap-2" [disabled]="!onboardForm.valid || submittingOnboarding">
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="submittingOnboarding"></span>
-                COMPLETAR ONBOARDING RÁPIDO
-              </button>
+            <div *ngIf="liveFeed.length === 0" class="text-center py-5 text-muted">
+              <i class="bi bi-activity d-block fs-1 mb-3 text-light-muted"></i>
+              <p class="mb-0">No se han registrado actividades recientes.</p>
             </div>
-          </form>
+          </div>
+          
         </div>
       </div>
     </div>
 
-    <!-- 4. CONSOLA DE ERRORES DEL SISTEMA (TELEMETRÍA Y LOGS) -->
-    <div *ngSwitchCase="'errors'" class="animate__animated animate__fadeIn">
+    <!-- CONSOLA DE ERRORES DEL SISTEMA (TELEMETRÍA Y LOGS) -->
+    <div class="animate__animated animate__fadeIn">
       <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2>Logs de Excepciones e Incidentes (HTTP 500)</h2>
-          <button class="btn btn-outline-danger btn-sm font-monospace d-flex align-items-center gap-1.5" (click)="loadSystemErrors()" style="font-size: 0.75rem;">
-            <i class="bi bi-trash"></i> ACTUALIZAR LOG
-          </button>
+        <div class="card-header d-flex justify-content-between align-items-center py-3">
+          <h2 class="h5 mb-0 fw-bold">Logs de Excepciones e Incidentes (HTTP 500)</h2>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-danger btn-sm font-monospace d-flex align-items-center gap-1.5" (click)="loadSystemErrors()" style="font-size: 0.75rem;">
+              <i class="bi bi-arrow-clockwise"></i> ACTUALIZAR
+            </button>
+            <a routerLink="/dashboard/sysadmin/logs" class="btn btn-sm btn-outline-primary font-monospace d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+              BÚSQUEDA AVANZADA <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
@@ -431,5 +220,207 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- Modal Análisis Forense -->
+<div class="modal fade" id="forensicModal" tabindex="-1" aria-labelledby="forensicModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="background-color: var(--bg-main);">
+      <div class="modal-header border-bottom border-light px-4 py-3 bg-white">
+        <div>
+          <h5 class="modal-title fw-bold font-monospace d-flex align-items-center gap-2 text-dark mb-1" id="forensicModalLabel">
+            <i class="bi bi-search text-primary"></i> EXPEDIENTE FORENSE DE TRANSACCIÓN
+          </h5>
+          <small class="text-muted font-monospace" *ngIf="selectedForensicSale">Object ID: {{ selectedForensicSale._id }}</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body p-0" style="background-color: #f8f9fa;">
+        <!-- Spinner -->
+        <div class="d-flex justify-content-center align-items-center py-5" *ngIf="loadingForensic">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Recopilando evidencia forense...</span>
+          </div>
+          <span class="ms-3 font-monospace text-muted">Recopilando evidencia en BD...</span>
+        </div>
+
+        <!-- Contenido Forense -->
+        <div class="container-fluid p-4 animate__animated animate__fadeIn" *ngIf="!loadingForensic && selectedForensicSale">
+          
+          <div class="row g-4">
+            <!-- Columna Izquierda: Metadatos Contextuales -->
+            <div class="col-lg-4">
+              <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-geo-alt me-1"></i> Contexto Operativo</h6>
+                </div>
+                <div class="card-body">
+                  <ul class="list-group list-group-flush font-monospace" style="font-size: 0.85rem;">
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-1">
+                      <span class="text-muted">Timestamp Exacto:</span>
+                      <strong>{{ selectedForensicSale.date | date:'dd/MM/yyyy HH:mm:ss.SSS' }}</strong>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-1">
+                      <span class="text-muted">Inquilino (Company):</span>
+                      <strong class="text-primary">{{ selectedForensicSale.company?.name }}</strong>
+                    </li>
+                    <li class="list-group-item px-0 border-0 py-1 mt-2">
+                      <span class="text-muted d-block">Sucursal / Origen:</span>
+                      <strong>{{ selectedForensicSale.branch?.name }}</strong>
+                      <div class="text-muted" style="font-size: 0.7rem;">{{ selectedForensicSale.branch?.address }}</div>
+                    </li>
+                    <li class="list-group-item px-0 border-0 py-1 mt-2">
+                      <span class="text-muted d-block">Operador (Issuer):</span>
+                      <strong><i class="bi bi-person-fill text-secondary"></i> {{ selectedForensicSale.user?.name }}</strong>
+                      <div class="text-muted" style="font-size: 0.7rem;">@{{ selectedForensicSale.user?.username }} ({{ selectedForensicSale.user?.role }})</div>
+                    </li>
+                    <li class="list-group-item px-0 border-0 py-1 mt-2">
+                      <span class="text-muted d-block">Punto de Venta (POS):</span>
+                      <strong>{{ selectedForensicSale.cashRegister?.registerName }}</strong>
+                      <span class="badge rounded-pill bg-light text-dark border ms-2" style="font-size: 0.65rem;">{{ selectedForensicSale.cashRegister?.isPhysical ? 'Hardware Físico' : 'Instancia Lógica' }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna Central: Resumen Financiero -->
+            <div class="col-lg-4">
+              <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-calculator me-1"></i> Liquidación Financiera</h6>
+                </div>
+                <div class="card-body text-center d-flex flex-column justify-content-center py-4">
+                  <h1 class="display-4 fw-bold font-monospace text-dark mb-0">{{ selectedForensicSale.total | currency:'MXN' }}</h1>
+                  <div class="mt-2 mb-4">
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success fs-6 py-1 px-3 rounded-pill">
+                      <i class="bi bi-check-circle-fill me-1"></i> {{ selectedForensicSale.paymentMethod | uppercase }}
+                    </span>
+                  </div>
+                  
+                  <div class="bg-light rounded p-3 text-start font-monospace mt-auto">
+                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.85rem;">
+                      <span>Importe Recibido:</span>
+                      <strong class="text-dark">{{ (selectedForensicSale.receivedAmount || selectedForensicSale.total) | currency:'MXN' }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem;">
+                      <span>Cambio / Vuelto:</span>
+                      <strong class="text-dark">{{ (selectedForensicSale.change || 0) | currency:'MXN' }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted border-top pt-2 mt-2" style="font-size: 0.85rem;" *ngIf="selectedForensicSale.discount > 0">
+                      <span>Descuentos (Merma):</span>
+                      <strong class="text-danger">- {{ selectedForensicSale.discount | currency:'MXN' }}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna Derecha: Trazabilidad -->
+            <div class="col-lg-4">
+              <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-bezier2 me-1"></i> Trazabilidad Avanzada</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-4">
+                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem;">Fragmentación del Pago</h6>
+                    <ng-container *ngIf="selectedForensicSale.payments && selectedForensicSale.payments.length > 0">
+                      <ul class="list-group list-group-flush font-monospace" style="font-size: 0.8rem;">
+                        <li *ngFor="let p of selectedForensicSale.payments" class="list-group-item px-3 py-2 border rounded bg-light mb-2">
+                          <div class="d-flex justify-content-between fw-bold text-dark">
+                            <span><i class="bi" [ngClass]="{'bi-cash text-success': p.method==='cash', 'bi-credit-card text-primary': p.method!=='cash'}"></i> {{ p.method | uppercase }}</span>
+                            <span>{{ p.amount | currency:'MXN' }}</span>
+                          </div>
+                          <div class="text-muted" *ngIf="p.reference">Auth/Ref: {{ p.reference }}</div>
+                          <div class="text-muted" style="font-size: 0.7rem;">{{ p.date | date:'HH:mm:ss.SSS' }}</div>
+                        </li>
+                      </ul>
+                    </ng-container>
+                    <ng-container *ngIf="!selectedForensicSale.payments || selectedForensicSale.payments.length === 0">
+                      <div class="p-3 bg-light rounded text-center border">
+                        <i class="bi bi-shield-lock d-block text-muted mb-1 fs-4"></i>
+                        <span class="text-muted font-monospace" style="font-size: 0.75rem;">Pago consolidado de origen.<br>Sin fragmentación rastreable.</span>
+                      </div>
+                    </ng-container>
+                  </div>
+
+                  <div *ngIf="selectedForensicSale.customer" class="border-top pt-3">
+                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem;">Entidad Vinculada (Cliente)</h6>
+                    <div class="d-flex align-items-center p-3 bg-light rounded border">
+                      <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+                        <i class="bi bi-person-fill text-primary fs-5"></i>
+                      </div>
+                      <div class="ms-3 font-monospace" style="font-size: 0.8rem;">
+                        <strong class="text-dark d-block">{{ selectedForensicSale.customer.name }}</strong>
+                        <span class="text-muted">{{ selectedForensicSale.customer.email || 'Sin correo registrado' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- End Row -->
+
+          <!-- Payload Ticket Detallado -->
+          <div class="card mt-4 border-0 shadow-sm bg-white forensic-card">
+            <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+              <h6 class="fw-bold text-uppercase text-muted mb-0" style="letter-spacing: 1px; font-size: 0.8rem;"><i class="bi bi-receipt me-1"></i> Payload del Ticket (Productos Mapeados)</h6>
+              <span class="badge bg-light text-dark border font-monospace">{{ selectedForensicSale.productsSold?.length || 0 }} Ítems</span>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-borderless mb-0 align-middle table-hover">
+                <thead class="bg-light font-monospace text-muted" style="font-size: 0.75rem;">
+                  <tr>
+                    <th class="ps-4">PRODUCT REF</th>
+                    <th class="text-center">QTY</th>
+                    <th class="text-end">UNIT BASE</th>
+                    <th class="text-end pe-4">NET LINE SUBTOTAL</th>
+                  </tr>
+                </thead>
+                <tbody class="font-monospace" style="font-size: 0.85rem;">
+                  <ng-container *ngFor="let item of selectedForensicSale.productsSold">
+                    <tr class="border-bottom border-light">
+                      <td class="ps-4 py-3">
+                        <div class="fw-bold text-dark">{{ item.product?.name || 'Objeto Borrado o Huérfano' }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Ref: {{ item.product?._id || 'N/A' }}</div>
+                        <div *ngIf="item.modifications && item.modifications.length > 0" class="mt-2 ps-2 border-start border-2 border-warning bg-light p-2 rounded">
+                          <div class="text-warning fw-bold mb-1" style="font-size: 0.65rem;">MODIFICADORES APLICADOS:</div>
+                          <div *ngFor="let mod of item.modifications" class="text-muted" style="font-size: 0.75rem;">
+                            <i class="bi bi-plus text-warning"></i> {{ mod.name }} ({{ mod.extraPrice | currency:'MXN' }})
+                          </div>
+                        </div>
+                      </td>
+                      <td class="text-center fw-bold">x{{ item.quantity }}</td>
+                      <td class="text-end text-muted">{{ item.unitPrice | currency:'MXN' }}</td>
+                      <td class="text-end fw-bold text-dark pe-4">{{ item.subtotal | currency:'MXN' }}</td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Raw Data Accordion -->
+          <div class="accordion mt-4 shadow-sm" id="accordionRaw">
+            <div class="accordion-item border-0 rounded overflow-hidden">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed bg-dark text-white font-monospace py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRaw" aria-expanded="false" style="font-size: 0.85rem; box-shadow: none;">
+                  <i class="bi bi-braces text-warning me-2"></i> INSPECCIONAR OBJETO JSON NATIVO (DATABASE RAW DUMP)
+                </button>
+              </h2>
+              <div id="collapseRaw" class="accordion-collapse collapse" data-bs-parent="#accordionRaw">
+                <div class="accordion-body p-0 bg-dark">
+                  <pre class="m-0 p-4 text-success font-monospace" style="font-size: 0.75rem; max-height: 500px; overflow-y: auto;">{{ selectedForensicSale | json }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- End Contenido Forense -->
+      </div>
+    </div>
   </div>
 </div>

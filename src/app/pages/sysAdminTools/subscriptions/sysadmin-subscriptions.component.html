@@ -1,0 +1,203 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold text-dark mb-1">
+        <i class="bi bi-wallet2 text-primary me-2"></i> Control de Suscripciones (SaaS)
+      </h1>
+      <p class="text-muted mb-0">Gestión de facturación, periodos de gracia y control manual (SaaS Override).</p>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="text-muted fw-bold mb-0" style="font-size: 0.8rem;">MRR ESTIMADO</h6>
+            <i class="bi bi-currency-dollar fs-4 text-success"></i>
+          </div>
+          <h3 class="fw-bold text-dark mb-0">${{ kpis.mrr | number:'1.2-2' }}</h3>
+          <small class="text-success"><i class="bi bi-arrow-up-right"></i> Ingreso Recurrente Mensual</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="text-muted fw-bold mb-0" style="font-size: 0.8rem;">SUSCRIPCIONES ACTIVAS</h6>
+            <i class="bi bi-check-circle-fill fs-4 text-primary"></i>
+          </div>
+          <h3 class="fw-bold text-dark mb-0">{{ kpis.active }}</h3>
+          <small class="text-muted">Empresas facturando</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="text-muted fw-bold mb-0" style="font-size: 0.8rem;">EN PERIODO DE PRUEBA</h6>
+            <i class="bi bi-clock-history fs-4 text-warning"></i>
+          </div>
+          <h3 class="fw-bold text-dark mb-0">{{ kpis.trialing }}</h3>
+          <small class="text-muted">Trials activos</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 bg-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="text-muted fw-bold mb-0" style="font-size: 0.8rem;">CHURN / CANCELADAS</h6>
+            <i class="bi bi-x-circle-fill fs-4 text-danger"></i>
+          </div>
+          <h3 class="fw-bold text-dark mb-0">{{ kpis.canceled + kpis.pastDue }}</h3>
+          <small class="text-muted">Past Due y Cancelaciones</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de Filtros -->
+  <div class="card border-0 shadow-sm mb-4 bg-white">
+    <div class="card-body p-4">
+      <div class="row g-2">
+        <div class="col-md-4">
+          <label class="form-label text-muted" style="font-size: 0.75rem; font-weight: bold;">BUSCAR EMPRESA</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" placeholder="Nombre de la empresa..." [(ngModel)]="filters.query" (keyup.enter)="onFilterChange()">
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <label class="form-label text-muted" style="font-size: 0.75rem; font-weight: bold;">ESTADO DE SUSCRIPCIÓN</label>
+          <select class="form-select" [(ngModel)]="filters.status" (change)="onFilterChange()">
+            <option value="">Todos los estados</option>
+            <option value="active">Active (Activa)</option>
+            <option value="trialing">Trialing (Prueba)</option>
+            <option value="past_due">Past Due (Vencida)</option>
+            <option value="canceled">Canceled (Cancelada)</option>
+            <option value="unpaid">Unpaid (Impaga)</option>
+            <option value="manual">Manual (Override)</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label text-muted" style="font-size: 0.75rem; font-weight: bold;">PLAN ASIGNADO</label>
+          <select class="form-select" [(ngModel)]="filters.planId" (change)="onFilterChange()">
+            <option value="">Todos los planes</option>
+            <option *ngFor="let p of plans" [value]="p._id">{{ p.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-primary w-100 me-2" (click)="onFilterChange()"><i class="bi bi-funnel"></i></button>
+          <button class="btn btn-light w-100 border" (click)="clearFilters()" title="Limpiar"><i class="bi bi-arrow-counterclockwise"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Resultados -->
+  <div class="card border-0 shadow-sm bg-white">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr class="text-muted" style="font-size: 0.75rem; font-weight: bold;">
+              <th class="ps-4 py-3" style="width: 25%;">EMPRESA</th>
+              <th style="width: 15%;">PLAN & MRR</th>
+              <th style="width: 15%;">STATUS</th>
+              <th style="width: 20%;">FECHA CORTE / FIN TRIAL</th>
+              <th style="width: 10%;" class="text-center pe-4">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody style="font-size: 0.85rem;">
+            <!-- Loading -->
+            <tr *ngIf="loading">
+              <td colspan="5" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- No Results -->
+            <tr *ngIf="!loading && companies?.length === 0">
+              <td colspan="5" class="text-center py-5 text-muted">
+                <i class="bi bi-box-seam d-block fs-1 mb-2 text-secondary"></i>
+                No se encontraron empresas con esos criterios.
+              </td>
+            </tr>
+
+            <!-- Data Rows -->
+            <ng-container *ngIf="!loading">
+              <tr *ngFor="let company of companies" class="border-bottom border-light">
+                <td class="ps-4">
+                  <div class="fw-bold text-dark d-flex align-items-center">
+                    {{ company.name }}
+                    <i class="bi bi-patch-check-fill text-primary ms-2" *ngIf="company.manualOverride" title="Manual Override Activo"></i>
+                  </div>
+                  <div class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-envelope me-1"></i>{{ company.email }}</div>
+                </td>
+                <td>
+                  <div class="fw-bold">{{ company.planId?.name || 'Sin Plan' }}</div>
+                  <div class="text-success fw-bold" style="font-size: 0.75rem;" *ngIf="company.planId?.price">${{ company.planId.price }}/mes</div>
+                </td>
+                <td>
+                  <span class="badge px-3 py-2 rounded-pill" 
+                        [ngClass]="{
+                          'bg-success-subtle text-success': company.subscriptionStatus === 'active',
+                          'bg-warning-subtle text-warning': company.subscriptionStatus === 'trialing',
+                          'bg-danger-subtle text-danger': company.subscriptionStatus === 'past_due' || company.subscriptionStatus === 'unpaid',
+                          'bg-secondary-subtle text-secondary': company.subscriptionStatus === 'canceled' || !company.isActive,
+                          'bg-info-subtle text-info': company.subscriptionStatus === 'manual'
+                        }">
+                    <i class="bi bi-circle-fill me-1" style="font-size: 0.4rem; vertical-align: middle;"></i> 
+                    {{ company.subscriptionStatus | uppercase }}
+                  </span>
+                </td>
+                <td>
+                  <div class="text-dark fw-bold" *ngIf="company.currentPeriodEnd">
+                    {{ company.currentPeriodEnd | date:'dd MMM yyyy' }}
+                  </div>
+                  <div class="text-muted" style="font-size: 0.7rem;" *ngIf="!company.currentPeriodEnd">Sin fecha límite</div>
+                </td>
+                <td class="text-center pe-4">
+                  <button class="btn btn-sm btn-outline-primary px-3 rounded-pill shadow-sm hover-elevate" 
+                          [routerLink]="['/dashboard/sysadmin/subscriptions', company._id]">
+                    <i class="bi bi-eye me-1"></i> Detalles
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Paginación -->
+    <div class="card-footer bg-white border-top py-3 d-flex justify-content-between align-items-center" *ngIf="totalPages > 0">
+      <div class="text-muted" style="font-size: 0.8rem;">
+        Página <strong>{{ page }}</strong> de <strong>{{ totalPages }}</strong> 
+        <span class="mx-2">&bull;</span> {{ total }} empresas
+      </div>
+      <div>
+        <button class="btn btn-sm btn-outline-secondary me-2" [disabled]="page === 1 || loading" (click)="changePage(page - 1)">
+          Anterior
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="page === totalPages || loading" (click)="changePage(page + 1)">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -235,13 +235,15 @@
 
           <div formArrayName="modifications" *ngFor="let modification of modifications.controls; let i = index">
             <div [formGroupName]="i" class="card border border-light-subtle bg-light rounded-4 p-3 mb-3 animate__animated animate__fadeIn">
-              <div class="row align-items-center">
+              
+              <!-- Primera Fila: Nombre y Precio -->
+              <div class="row align-items-center mb-3">
                 <div class="col-md-5 mb-2 mb-md-0">
                   <label class="form-label fw-semibold text-secondary small">Nombre de la modificación:</label>
                   <input type="text" class="form-control border-light-subtle rounded-3 p-2 bg-white" formControlName="name" placeholder="Ej: Extra Queso">
                 </div>
                 <div class="col-md-3 mb-2 mb-md-0">
-                  <label class="form-label fw-semibold text-secondary small">Precio extra:</label>
+                  <label class="form-label fw-semibold text-secondary small">Precio extra ($):</label>
                   <div class="input-group">
                     <span class="input-group-text bg-white border-end-0 rounded-start-3">$</span>
                     <input type="number" class="form-control border-light-subtle rounded-end-3 p-2 border-start-0 bg-white" formControlName="extraPrice" min="0" placeholder="0.00">
@@ -259,6 +261,28 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Segunda Fila: Deducción de Inventario Opcional -->
+              <div class="row align-items-center pt-2 border-top border-light-subtle">
+                <div class="col-md-12 mb-2">
+                  <span class="badge bg-warning text-dark mb-2"><i class="bi bi-box-seam me-1"></i> Descuento de Bodega (Opcional)</span>
+                  <p class="small text-muted mb-2">Si este extra consume materia prima (ej. extra queso = 30g queso cheddar), configúralo aquí:</p>
+                </div>
+                <div class="col-md-6 mb-2 mb-md-0">
+                  <label class="form-label fw-semibold text-secondary small">Vincular a Insumo:</label>
+                  <select class="form-select border-light-subtle rounded-3 p-2 bg-white" formControlName="rawMaterial">
+                    <option value="" selected>-- Ninguno --</option>
+                    <option *ngFor="let rm of rawMaterials" [value]="rm._id">
+                      {{ rm.name }} ({{ rm.measurementUnit }})
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-2 mb-md-0">
+                  <label class="form-label fw-semibold text-secondary small">Cantidad a Descontar:</label>
+                  <input type="number" class="form-control border-light-subtle rounded-3 p-2 bg-white" formControlName="quantityToDeduct" min="0" placeholder="0">
+                </div>
+              </div>
+              
             </div>
           </div>
         </div>

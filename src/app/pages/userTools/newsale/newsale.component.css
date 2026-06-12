@@ -235,8 +235,7 @@
 /* Ticket Items list */
 .ticket-item {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
   margin-bottom: 1.25rem;
   font-size: 0.9rem;
 }
@@ -330,10 +329,49 @@
   gap: 1.25rem;
 }
 
+.hospitality-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.category-sidebar {
+  min-width: 140px;
+  max-width: 160px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.category-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.category-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+.category-sidebar .category-pill {
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  white-space: normal;
+}
+
 .hospitality-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.clickable-card {
+  cursor: pointer;
 }
 
 /* Scroll area horizontally */
@@ -342,4 +380,476 @@
 }
 .scroll-area-x::-webkit-scrollbar {
   display: none;
+}
+
+/* ======================================== */
+/* CHECKOUT INTEGRADO & CRM STYLES */
+/* ======================================== */
+
+.loyalty-container, .promo-container {
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  background-color: var(--bg-ghost) !important;
+}
+
+.search-input, .coupon-input {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.search-input:focus, .coupon-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.04) !important;
+  outline: none;
+}
+
+.selected-customer-pill, .applied-coupon {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.fs-7-5 {
+  font-size: 0.85rem;
+}
+.fs-8 {
+  font-size: 0.8rem;
+}
+
+/* Search results drop down box */
+.search-results-box {
+  position: absolute;
+  z-index: 1050;
+  width: calc(100% - 28px);
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+.search-results-box .list-group-item {
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  transition: var(--transition);
+}
+
+.search-results-box .list-group-item:hover {
+  background-color: var(--bg-ghost) !important;
+}
+
+/* Inputs & Form Controls */
+.premium-input {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.premium-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.04) !important;
+  outline: none;
+}
+
+.premium-select {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.premium-select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.04) !important;
+}
+
+/* CRM Quick Register Popup Backdrop */
+.quick-register-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999 !important;
+}
+
+.quick-register-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  color: var(--text-main);
+}
+
+/* Keyboard Dialog */
+.keyboard-dialog {
+  border: none;
+  background: transparent;
+  padding: 0;
+  outline: none;
+  overflow: visible;
+}
+
+.keyboard-dialog::backdrop {
+  background-color: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+}
+
+.bg-light-soft {
+  background-color: rgba(0,0,0,0.01) !important;
+}
+
+/* --- FASE 2: ESTILOS DE ÓRDENES PENDIENTES --- */
+.order-card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5 !important;
+}
+
+.order-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+  border-color: #000000 !important;
+}
+
+.border-dark {
+  border-color: #000000 !important;
+  border-width: 2px !important;
+}
+
+.bg-warning-soft {
+  background-color: #fef3c7 !important;
+}
+
+.text-warning {
+  color: #d97706 !important;
+}
+
+.bg-info-soft {
+  background-color: #e0f2fe !important;
+}
+
+.text-info {
+  color: #0284c7 !important;
+}
+
+.bg-ghost {
+  background-color: #f3f4f6 !important;
+}
+
+/* Premium Dialog Layout */
+.modal-backdrop-premium {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+.modal-content-premium {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid #e5e5e5 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.form-select, .form-control {
+  border: 1px solid #e5e5e5 !important;
+}
+
+.form-select:focus, .form-control:focus {
+  border-color: #000000 !important;
+  box-shadow: none !important;
+}
+
+.btn-outline-dark {
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.btn-dark {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.btn-dark:hover {
+  background-color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+}
+
+/* --- FASE 2: MAQUETADO DE COMANDAS HORIZONTALES PARA ZERO-SCROLL --- */
+.hospitality-scroll-area {
+  max-height: calc(100vh - 510px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.hospitality-pending-section {
+  height: 270px;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 12px;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.horizontal-scroll-cards {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  flex-grow: 1;
+}
+
+.horizontal-scroll-cards::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-scroll-cards::-webkit-scrollbar-thumb {
+  background: #e5e5e5;
+  border-radius: 10px;
+}
+
+.horizontal-scroll-cards .order-card {
+  width: 260px;
+  flex-shrink: 0;
+  height: 195px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fs-7 {
+  font-size: 0.7rem !important;
+}
+
+.fs-7-5 {
+  font-size: 0.75rem !important;
+}
+
+.py-0-5 {
+  padding-top: 0.125rem !important;
+  padding-bottom: 0.125rem !important;
+}
+
+/* --- BUTTONS FOR DELIVERY PLATFORMS SELECTORS --- */
+.btn-platform {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  border-radius: 20px;
+  font-size: 0.75rem !important;
+  padding: 6px 12px !important;
+}
+
+.btn-platform:hover {
+  background-color: #e2e8f0;
+}
+
+.plat-btn-uber.active {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
+
+.plat-btn-rappi.active {
+  background-color: #ff6b35 !important;
+  color: #ffffff !important;
+  border-color: #ff6b35 !important;
+}
+
+.plat-btn-didi.active {
+  background-color: #fc3d21 !important;
+  color: #ffffff !important;
+  border-color: #fc3d21 !important;
+}
+
+.plat-btn-phone.active {
+  background-color: #6366f1 !important;
+  color: #ffffff !important;
+  border-color: #6366f1 !important;
+}
+
+/* --- SOFT COLORED BADGES FOR KDS --- */
+.bg-warning-soft {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+.bg-info-soft {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+.bg-success-soft {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* --- BLINKING GREEN BUTTON FOR WAITER DOUBLE CHECK --- */
+@keyframes border-pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* NATIVE EDGE-TO-EDGE POS LAYOUT */
+.pos-viewport {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-ghost);
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.pos-header {
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  background-color: white;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  z-index: 10;
+}
+
+.pos-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.pos-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: white;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.pos-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.pos-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+.pos-sidebar .category-pill {
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  white-space: normal; /* Permitir 2 líneas si es muy largo, pero con más ancho es menos probable */
+  line-height: 1.2;
+}
+.pos-sidebar .category-pill.active {
+  background-color: #111;
+  color: white !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.pos-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-ghost);
+}
+
+.pos-tabs {
+  height: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  background-color: white;
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+}
+
+.pos-tab-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+.pos-tab-btn.active {
+  color: var(--dark-bg);
+  border-bottom-color: var(--dark-bg);
+}
+
+.pos-grid-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.pos-ticket-area {
+  width: 380px;
+  flex-shrink: 0;
+  background-color: white;
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.pos-ticket-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.pos-ticket-footer {
+  flex-shrink: 0;
+  padding: 1.5rem;
+  background-color: white;
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
 }

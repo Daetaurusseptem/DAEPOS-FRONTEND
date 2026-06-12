@@ -18,7 +18,7 @@ export class ReceiptPrinterService {
       paper_size: paperSize
     };
 
-    return this.http.post(`${this.apiUrl}/print_ticket`, payload);
+    return this.http.post(`${this.apiUrl}/print`, payload);
   }
 
   setPrinters(printers: any[]) {

@@ -19,7 +19,7 @@ import { TabsMenuComponent } from './shared/tabs-menu/tabs-menu.component';
 import { BackButtonComponent } from './shared/back-button/back-button.component';
 import { AlphanumericKeyboardComponent } from './shared/alphanumeric-keyboard/alphanumeric-keyboard.component';
 import { UserCajasComponent } from './user-cajas/user-cajas.component';
-import { FechaCajasComponent } from './fecha-cajas/fecha-cajas.component';
+
 import { CajaDetailComponent } from './caja-detail/caja-detail.component';
 import { BulkImportComponent } from './shared/bulk-import/bulk-import.component';
 import { NotificationCenterComponent } from './notification-center/notification-center.component';
@@ -39,7 +39,7 @@ import { NotificationCenterComponent } from './notification-center/notification-
     BackButtonComponent,
     AlphanumericKeyboardComponent,
     UserCajasComponent,
-    FechaCajasComponent,
+
     CajaDetailComponent,
     BulkImportComponent,
     NotificationCenterComponent
@@ -58,7 +58,7 @@ import { NotificationCenterComponent } from './notification-center/notification-
     BackButtonComponent,
     AlphanumericKeyboardComponent,
     BulkImportComponent,
-    FechaCajasComponent,
+
     NotificationCenterComponent
   ],
   imports: [

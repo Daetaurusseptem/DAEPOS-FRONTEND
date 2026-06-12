@@ -63,7 +63,7 @@ export class BranchListComponent implements OnInit {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.branchService.deleteBranch(branch._id!).subscribe({
+        this.branchService.deleteBranch(this.companyId, branch._id!).subscribe({
           next: () => {
             this.branches = this.branches.filter(b => b._id !== branch._id);
             Swal.fire('Eliminado', 'La sucursal ha sido eliminada', 'success');

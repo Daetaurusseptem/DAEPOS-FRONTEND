@@ -62,4 +62,8 @@ export class InventoryService {
   getStockByProductAndBranch(productId: string, branchId: string, companyId: string): Observable<any> {
     return this.http.get(`${urlBase}/stock/${companyId}/${branchId}/${productId}`, this.authService.headers);
   }
+
+  getRecipeStockDetails(productId: string, branchId: string): Observable<any> {
+    return this.http.get(`${urlBase}/recipe-stock/${productId}/${branchId}`, this.authService.headers);
+  }
 }

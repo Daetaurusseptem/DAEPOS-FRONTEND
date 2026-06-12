@@ -2,7 +2,7 @@
 
 import { Provider } from "@angular/core";
 
-export type UserRole = 'admin' | 'user' | 'sysadmin' | 'companyAdmin';
+export type UserRole = 'admin' | 'user' | 'sysadmin' | 'companyAdmin' | 'kitchen';
 
 // User Interface
 export interface User {
@@ -18,6 +18,8 @@ export interface User {
   lastLogin?: Date;
   img?: string;
   permissions?: string[];
+  active?: boolean;
+  deactivationReason?: string;
 }
 
 export interface PaymentBreakdown {
@@ -62,8 +64,28 @@ export interface Company {
   tel: string;
   email: string;
   createdAt: Date;
-  SuscriptionsHistory: Suscription[];
+  SubscriptionHistory: Suscription[];
   saleType: 'retail' | 'hospitality';
+  billingType?: 'stripe' | 'manual';
+  subscriptionStatus?: string;
+  stripeCustomerId?: string;
+  currentPeriodEnd?: Date | string;
+  manualOverride?: boolean;
+  planType?: string;
+  planId?: string | { _id: string, name: string };
+  customLimitsOverrides?: {
+      maxBranches?: number;
+      maxUsers?: number;
+      maxActiveRegisters?: number;
+      features?: string[];
+  };
+  currentLimits?: {
+      maxBranches?: number;
+      maxUsers?: number;
+      maxActiveRegisters?: number;
+      features?: string[];
+  };
+  snapshotExpirationDate?: Date | string;
 }
 
 export interface Suscription {
@@ -116,6 +138,34 @@ export interface Product {
   status?: 'active' | 'pending_verification';
 }
 
+export interface RawMaterial {
+  _id?: string;
+  name: string;
+  description: string;
+  company: string;
+  measurementUnit: string;
+  costPrice?: number;
+}
+
+export interface RecipeIngredient {
+  ingredient: string | RawMaterial;
+  quantity: number;
+}
+
+export interface RecipeSize {
+  name: string;
+  priceModifier: number;
+  ingredients: RecipeIngredient[];
+}
+
+export interface Recipe {
+  _id?: string;
+  name: string;
+  description: string;
+  company: string;
+  sizes: RecipeSize[];
+}
+
 export interface InventoryItem {
   _id?: string;
   name: string;
@@ -131,10 +181,13 @@ export interface InventoryItem {
   barCode?: string;
   receivedDate: Date | string;
   expirationDate?: Date | string;
+  theoreticalStock?: number;
   modifications?: {
     name: string;
     extraPrice: number;
     isExclusive?: boolean;
+    rawMaterial?: string | RawMaterial;
+    quantityToDeduct?: number;
   }[];
 }
 
@@ -161,19 +214,7 @@ export interface Sale {
   change?: number;
 }
 
-// Recetas
-export interface RecipeIngredient {
-  ingredient: any; // ID o documento de RawMaterial
-  quantity: number;
-}
-
-export interface Recipe {
-  _id: string;
-  name: string;
-  description: string;
-  company: string;
-  ingredients: RecipeIngredient[];
-}
+// Removed duplicate Recipe interfaces
 
 export interface DashboardSummary {
   totalSalesToday: number;
@@ -199,8 +240,16 @@ export interface Branch {
         pointsRedeemRate: number;
         maxRedemptionPercentage: number;
     };
+    kitchenSettings?: {
+        enableKitchenModule: boolean;
+        bypassKitchenDoubleCheck: boolean;
+    };
+    shiftSettings?: {
+        maxShiftDurationHours: number;
+    };
     createdAt?: Date;
     isActive?: boolean;
+    enableVirtualKeyboard?: boolean;
 }
 
 export interface Customer {

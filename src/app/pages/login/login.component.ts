@@ -12,9 +12,11 @@ import Swal from 'sweetalert2';
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
+  showDemoEnv: boolean = false;
 
-
-
+  toggleDemoEnv() {
+    this.showDemoEnv = !this.showDemoEnv;
+  }
   constructor(
 
     private formBuilder: FormBuilder,

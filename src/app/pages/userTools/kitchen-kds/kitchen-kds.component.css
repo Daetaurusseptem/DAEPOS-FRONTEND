@@ -1,0 +1,543 @@
+/* --- KITCHEN DISPLAY SYSTEM (KDS) DESIGN.MD THEME --- */
+:host {
+  /* Theme: Light (Default) */
+  --kds-bg: #ffffff;
+  --kds-surface: #f2f2f2;
+  --kds-surface-elevated: #ffffff;
+  --kds-border: #e5e5e5;
+  --kds-border-heavy: #a1a1a1;
+  --kds-text-primary: #0a0a0a;
+  --kds-text-secondary: #737373;
+  --kds-heading: #000000;
+  
+  --kds-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+  --kds-card-radius: 14px;
+  --kds-btn-radius: 10px;
+  --kds-pill-radius: 9999px;
+  --kds-badge-radius: 26px;
+  
+  /* Semantics */
+  --kds-success-bg: #10c22b;
+  --kds-success-text: #ffffff;
+  --kds-danger-bg: #c22b10;
+  --kds-danger-text: #ffffff;
+}
+
+.theme-dark {
+  /* Theme: Classic Dark */
+  --kds-bg: #0a0a0a;
+  --kds-surface: #171717;
+  --kds-surface-elevated: #171717;
+  --kds-border: #333333;
+  --kds-border-heavy: #555555;
+  --kds-text-primary: #ffffff;
+  --kds-text-secondary: #a1a1a1;
+  --kds-heading: #ffffff;
+  --kds-shadow: 0px 1px 3px rgba(255,255,255,0.05);
+}
+
+.theme-high-contrast {
+  /* Theme: High Contrast (Yellow/Black) */
+  --kds-bg: #000000;
+  --kds-surface: #000000;
+  --kds-surface-elevated: #000000;
+  --kds-border: #ffff00;
+  --kds-border-heavy: #ffff00;
+  --kds-text-primary: #ffffff;
+  --kds-text-secondary: #cccccc;
+  --kds-heading: #ffff00;
+  --kds-shadow: none;
+  --kds-success-bg: #ffff00;
+  --kds-success-text: #000000;
+  --kds-danger-bg: #ff0000;
+}
+
+.theme-blue-dark {
+  /* Theme: Oceanic/Navy Dark */
+  --kds-bg: #0f172a; /* Slate 900 */
+  --kds-surface: #1e293b; /* Slate 800 */
+  --kds-surface-elevated: #1e293b;
+  --kds-border: #334155; /* Slate 700 */
+  --kds-border-heavy: #475569;
+  --kds-text-primary: #f8fafc;
+  --kds-text-secondary: #94a3b8;
+  --kds-heading: #38bdf8; /* Light Sky Blue */
+  --kds-shadow: 0px 4px 6px rgba(0,0,0,0.3);
+}
+
+.theme-terminal {
+  /* Theme: Retro Terminal (Matrix Green) */
+  --kds-bg: #000000;
+  --kds-surface: #000000;
+  --kds-surface-elevated: #000000;
+  --kds-border: #00ff00;
+  --kds-border-heavy: #00ff00;
+  --kds-text-primary: #00ff00;
+  --kds-text-secondary: #00cc00;
+  --kds-heading: #00ff00;
+  --kds-shadow: 0 0 8px rgba(0,255,0,0.4);
+  --kds-success-bg: #00ff00;
+  --kds-success-text: #000000;
+}
+
+.kds-container {
+  background-color: var(--kds-bg);
+  color: var(--kds-text-primary);
+  /* Remove min-height: 100vh so it flows with the dashboard, unless fullscreen */
+  min-height: 100%; 
+  display: flex;
+  flex-direction: column;
+  font-family: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- FULLSCREEN OVERRIDE --- */
+.kds-container:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+
+/* Fallback for prefixed fullscreen pseudoclasses */
+.kds-container:-webkit-full-screen { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow-y: auto; }
+.kds-container:-moz-full-screen { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow-y: auto; }
+.kds-container:-ms-fullscreen { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow-y: auto; }
+
+/* --- ENCABEZADO --- */
+.kds-header {
+  background-color: var(--kds-surface);
+  border-bottom: 1px solid var(--kds-border);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kds-container:fullscreen .kds-header {
+  padding: 15px 30px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.pulse-indicator {
+  width: 12px;
+  height: 12px;
+  background-color: var(--kds-success-bg);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(16, 194, 43, 0.7);
+  animation: pulse-green 2s infinite;
+}
+
+.header-left h1 {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+  margin: 0;
+  color: var(--kds-heading);
+  letter-spacing: -0.45px;
+}
+
+.badge-branch {
+  background-color: var(--kds-surface-elevated);
+  color: var(--kds-text-primary);
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: var(--kds-badge-radius);
+  font-weight: 500;
+  border: 1px solid var(--kds-border);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.kds-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.stat-badge {
+  background-color: var(--kds-surface-elevated);
+  color: var(--kds-text-primary);
+  padding: 4px 10px;
+  border-radius: var(--kds-btn-radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--kds-border);
+}
+
+.stat-badge.success {
+  border-color: var(--kds-success-bg);
+  color: var(--kds-success-bg);
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-theme, .btn-fullscreen, .btn-logout {
+  background-color: transparent;
+  color: var(--kds-text-primary);
+  border: 1px solid var(--kds-border);
+  padding: 8px 16px;
+  border-radius: var(--kds-btn-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-theme:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-theme:hover, .btn-fullscreen:hover, .btn-logout:hover, .btn-theme.active {
+  background-color: var(--kds-surface);
+  border-color: var(--kds-border-heavy);
+}
+
+/* --- ESPACIO DE TRABAJO --- */
+.kds-workspace {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.kds-container:fullscreen .kds-workspace {
+  padding: 25px 30px;
+}
+
+/* --- GRID DE COMANDAS --- */
+.kds-grid {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+.layout-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.layout-dense {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
+.layout-list {
+  grid-template-columns: 1fr;
+}
+
+/* --- TARJETA DE COMANDA (KDS CARD) --- */
+.kds-card {
+  background-color: var(--kds-surface-elevated);
+  border-radius: var(--kds-card-radius);
+  overflow: hidden;
+  box-shadow: var(--kds-shadow);
+  border: 1px solid var(--kds-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* --- ENCABEZADOS DE CARD SEGÚN PLATAFORMA --- */
+.card-header {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--kds-border);
+  background-color: var(--kds-surface-elevated);
+  color: var(--kds-text-primary);
+}
+
+/* Convert Platform colors to Subtler Badges rather than painting the whole header */
+.plat-uber .service-type {
+  color: #10b981;
+  font-weight: 600;
+}
+.plat-rappi .service-type {
+  color: #ff6b35;
+  font-weight: 600;
+}
+.plat-didi .service-type {
+  color: #fc3d21;
+  font-weight: 600;
+}
+
+.order-timer {
+  background-color: var(--kds-surface);
+  color: var(--kds-text-primary);
+  border: 1px solid var(--kds-border);
+  padding: 2px 8px;
+  border-radius: var(--kds-badge-radius);
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* --- ALERTAS POR EDAD DEL PEDIDO --- */
+.age-warning {
+  border: 1px solid #f59e0b !important; /* Amber */
+}
+
+.age-critical {
+  border: 1px solid var(--kds-danger-bg) !important;
+  animation: border-pulse-red 1.5s infinite;
+}
+
+/* --- CUERPO DE TARJETA --- */
+.card-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center; /* CENTERING AS REQUESTED */
+  text-align: center;
+}
+
+.waiter-meta {
+  font-size: 0.85rem;
+  color: var(--kds-text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centered */
+  gap: 4px;
+  border-bottom: 1px solid var(--kds-border);
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+.waiter-meta i {
+  margin-right: 6px;
+}
+
+/* --- LISTADO DE ITEMS --- */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.item-row {
+  border-bottom: 1px dashed var(--kds-border);
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centered */
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-main {
+  display: flex;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center; /* Centered */
+  flex-wrap: wrap;
+}
+
+.item-qty {
+  color: var(--kds-heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.item-name {
+  color: var(--kds-text-primary);
+}
+
+.item-modifications {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centered */
+  gap: 4px;
+}
+
+.mod-pill {
+  color: var(--kds-danger-bg);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* --- BOTÓN DE ACCIÓN --- */
+.card-footer {
+  padding: 16px;
+  background-color: var(--kds-surface-elevated);
+  border-top: 1px solid var(--kds-border);
+}
+
+.btn-complete {
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 8px 48px;
+  border-radius: var(--kds-btn-radius);
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-complete:hover {
+  opacity: 0.8;
+}
+
+.theme-dark .btn-complete {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Badge Premium para Tamaño de Producto en KDS */
+.badge-size {
+  background-color: var(--kds-heading);
+  color: var(--kds-bg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--kds-badge-radius);
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* --- VACÍO --- */
+.empty-kds {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  color: var(--kds-text-secondary);
+  text-align: center;
+}
+
+.empty-kds h2 {
+  color: var(--kds-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.45px;
+}
+
+/* --- PIE DE RECUPERACIÓN RÁPIDA --- */
+.kds-recent-footer {
+  background-color: var(--kds-surface);
+  border-top: 1px solid var(--kds-border);
+  padding: 15px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recent-header h3 {
+  font-size: 0.95rem;
+  color: var(--kds-text-secondary);
+  margin: 0;
+  font-weight: 600;
+}
+
+.recent-list {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.recent-list::-webkit-scrollbar {
+  height: 4px;
+}
+
+.recent-list::-webkit-scrollbar-thumb {
+  background: var(--kds-border-heavy);
+  border-radius: 10px;
+}
+
+.recent-pill {
+  background-color: var(--kds-surface-elevated);
+  border: 1px solid var(--kds-border);
+  padding: 4px 10px;
+  border-radius: var(--kds-badge-radius);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.pill-title {
+  color: var(--kds-text-primary);
+  font-weight: 500;
+}
+
+.btn-undo {
+  background: none;
+  border: none;
+  color: var(--kds-heading);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-undo:hover {
+  text-decoration: underline;
+}
+
+/* --- ANIMACIONES --- */
+@keyframes pulse-green {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 194, 43, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 194, 43, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 194, 43, 0);
+  }
+}
+
+@keyframes border-pulse-red {
+  0% { border-color: rgba(194, 43, 16, 0.4); }
+  50% { border-color: rgba(194, 43, 16, 1); }
+  100% { border-color: rgba(194, 43, 16, 0.4); }
+}
+
+@keyframes float-utensils {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}

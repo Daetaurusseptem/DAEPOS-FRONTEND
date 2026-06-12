@@ -1,74 +1,138 @@
 <div class="main-container">
-  <!-- Búsqueda de Empresas -->
-  <div class="search-container">
-    <div class="search-header">
-      <div class="search-title">
-        <h5>Búsqueda de Empresas</h5>
-      </div>
-      <a class="create-company-link" routerLink="new" role="button">
-        <i class="bi bi-plus-lg"></i> Crear Empresa
-      </a>
+  <div class="container mt-4 animate__animated animate__fadeIn">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="console-title mb-1">Directorio de Empresas (Inquilinos)</h1>
+      <p class="console-subtitle text-muted mb-0">Gestiona comercios, Suscripciónes y asistencia tÃ©cnica</p>
     </div>
-    <form class="search-form">
-      <div class="search-input">
-        <input type="text" id="busquedaEmpresa" aria-describedby="busquedaHelp" #terminoEmpresa placeholder="Buscar...">
-      </div>
-    </form>
+    <div class="d-flex gap-2">
+      <button class="btn btn-dark d-flex align-items-center gap-1.5" routerLink="/dashboard/sysadmin/companies/new">
+        <i class="bi bi-plus-lg"></i> NUEVA EMPRESA (EXPRESS)
+      </button>
+    </div>
   </div>
-  
-  <!-- Empresas Registradas -->
-  <div class="companies-container">
-    <div class="companies-header">
-      <div class="companies-title">
-        <h2>Empresas Registradas</h2>
-      </div>
-    </div>
-    <div class="companies-list">
-      <table class="companies-table">
-        <thead>
-          <tr>
-            <th>Imagen</th>
-            <th>Nombre</th>
-            <th>Teléfono</th>
-            <th>Email</th>
-            <th>Dirección</th>
-            <th>Estado</th>
-            <th>Herramientas</th>
-          </tr>
-        </thead>
-        <tbody *ngIf="empresas">
-        <tr *ngFor="let company of empresas; index as i">
-            <td class="img-cell">
-                <img [src]="company.img" alt="Avatar de usuario" (click)="abrirModal(company)">
-                <i class="edit-icon bi bi-pencil-fill" (click)="abrirModal(company)"></i>
-            </td>
-            <td>{{ company.name }}</td>
-            <td>{{ company.tel }}</td>
-            <td>{{ company.email }}</td>
-            <td>{{ company.address }}</td>
-            <td>
-              <ng-container *ngIf="getLatestSubscription(company) as latestSubscription">
-                {{ latestSubscription.state }}
-              </ng-container>
-              <ng-container *ngIf="!getLatestSubscription(company)">
-                Sin suscripciones
-              </ng-container>
-            </td>
-            <td class="action-cell">
-              <button class="btn-details" [routerLink]="['/dashboard/sysadmin/companies/details', company._id]">
-                <i class="bi bi-eye-fill"></i>Detalles
-              </button>
-              <button class="btn-edit" [routerLink]="['/dashboard/sysadmin/companies/edit', company._id]">
-                <i class="bi bi-pencil-fill"></i> Editar
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="loading-spinner" *ngIf="!empresas">
-        <app-loading-data-spinner></app-loading-data-spinner>
-        <p>Cargando Registros</p>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead>
+            <tr>
+              <th style="width: 25%">EMPRESA / COMERCIO</th>
+              <th style="width: 20%">ID FISCAL / RFC</th>
+              <th style="width: 25%">CONTACTO (CORREO / TEL)</th>
+              <th style="width: 15%">ESTADO</th>
+              <th style="width: 15%" class="text-end">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of empresas">
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="company-avatar d-flex align-items-center justify-content-center font-monospace bg-dark text-white fw-bold rounded" style="width: 38px; height: 38px; font-size: 0.9rem;">
+                    {{ c.name.charAt(0).toUpperCase() }}
+                  </div>
+                  <div>
+                    <div class="fw-bold text-dark fs-6">{{ c.name }}</div>
+                    <span class="text-muted text-truncate d-block" style="font-size: 0.75rem; max-width: 220px;">{{ c.address || 'Sin direcciÃ³n registrada' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="font-monospace text-secondary" style="font-size: 0.85rem;">
+                XAXX010101000
+              </td>
+              <td>
+                <div class="text-dark" style="font-size: 0.85rem;">{{ c.email }}</div>
+                <div class="text-muted font-monospace" style="font-size: 0.75rem;">{{ c.tel || 'Sin telÃ©fono' }}</div>
+              </td>
+              <td>
+                <span class="badge bg-success-subtle text-success border border-success-subtle text-uppercase font-monospace px-2.5 py-1" style="font-size: 0.7rem;">
+                  Activo
+                </span>
+              </td>
+              <td class="text-end">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-outline-dark btn-sm d-inline-flex align-items-center gap-1.5 px-3" 
+                          (click)="startImpersonation(c)"
+                          style="font-size: 0.78rem;" title="Asistir Cliente">
+                    <i class="bi bi-shield-lock-fill"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-dark btn-sm px-2" [routerLink]="['/dashboard/sysadmin/companies/details', c._id]" title="Detalles">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-dark btn-sm px-2" (click)="openSubscriptionModal(c)" title="Gestionar Suscripción">
+                    <i class="bi bi-credit-card"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm px-2" (click)="deleteCompany(c._id!)" title="Desactivar Empresa">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="empresas.length === 0 && !loadingCompanies">
+              <td colspan="5" class="text-center py-5 text-muted">
+                No hay empresas clientes registradas en el sistema.
+              </td>
+            </tr>
+            <tr *ngIf="loadingCompanies">
+              <td colspan="5" class="text-center py-5 text-muted">
+                <span class="spinner-border spinner-border-sm text-dark me-2"></span> Cargando base de clientes...
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
+</div>
+
+<!-- MODAL Suscripción MANUAL -->
+<div class="modal fade show" *ngIf="showSubscriptionModal" style="display: block; background: rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-sm">
+      <div class="modal-header bg-dark text-white border-0 rounded-top-4">
+        <h5 class="modal-title fw-bold"><i class="bi bi-credit-card-fill me-2"></i>Gestionar Suscripción</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeSubscriptionModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="mb-3 text-muted">Empresa: <strong class="text-dark">{{ selectedCompany?.name }}</strong></p>
+        
+        <div class="mb-3">
+          <label class="form-label fw-bold fs-7">Estado Manual</label>
+          <select class="form-select" [(ngModel)]="subscriptionFormData.subscriptionStatus">
+            <option value="active">Activo (Pagado)</option>
+            <option value="past_due">Past Due (Deuda)</option>
+            <option value="trialing">Trialing (Prueba)</option>
+            <option value="canceled">Cancelado (Bloqueado)</option>
+            <option value="manual">Manual (Cortesía)</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold fs-7">Tipo de Plan</label>
+          <select class="form-select" [(ngModel)]="subscriptionFormData.planType">
+            <option value="basic">Plan Básico</option>
+            <option value="premium">Plan Premium</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold fs-7">Vencimiento del Ciclo</label>
+          <input type="date" class="form-control" [(ngModel)]="subscriptionFormData.currentPeriodEnd">
+        </div>
+
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="manualOverride" [(ngModel)]="subscriptionFormData.manualOverride">
+          <label class="form-check-label fs-7 fw-bold" for="manualOverride">Activar Override Manual</label>
+          <div class="form-text fs-8">Ignorar el estado real de Stripe y basarse en estos valores.</div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-dark rounded-pill px-4" (click)="closeSubscriptionModal()">Cancelar</button>
+        <button type="button" class="btn btn-dark rounded-pill px-4" (click)="updateSubscription()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+

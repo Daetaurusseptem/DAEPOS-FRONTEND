@@ -1,0 +1,138 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">Validación de Pagos Manuales</h2>
+      <p class="text-muted">Revisa y aprueba depósitos o transferencias</p>
+    </div>
+    <div>
+      <select class="form-select rounded-pill" [(ngModel)]="filtroStatus" (change)="cargarPagos()">
+        <option value="all">Todos los estados</option>
+        <option value="pending">Pendientes de Revisión</option>
+        <option value="approved">Aprobados</option>
+        <option value="rejected">Rechazados</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted small">
+            <tr>
+              <th class="ps-4">Fecha</th>
+              <th>Empresa / CEO</th>
+              <th>Monto</th>
+              <th>Plan Solicitado</th>
+              <th>Estado</th>
+              <th class="pe-4 text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="!loading">
+            <tr *ngFor="let p of pagos">
+              <td class="ps-4">
+                <span class="d-block fw-bold">{{ p.createdAt | date:'shortDate' }}</span>
+                <span class="small text-muted">{{ p.createdAt | date:'shortTime' }}</span>
+              </td>
+              <td>
+                <span class="d-block fw-bold">{{ p.company?.name }}</span>
+                <span class="small text-muted">{{ p.company?.email }}</span>
+              </td>
+              <td class="fw-bolder">{{ p.amount | currency }}</td>
+              <td><span class="badge bg-secondary">{{ p.planRequested?.name || 'N/A' }}</span></td>
+              <td>
+                <span class="badge" [ngClass]="{'bg-warning text-dark': p.status === 'pending', 'bg-success': p.status === 'approved', 'bg-danger': p.status === 'rejected'}">
+                    {{ p.status | uppercase }}
+                </span>
+              </td>
+              <td class="pe-4 text-end">
+                <a *ngIf="p.proofImageUrl" [href]="p.proofImageUrl" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill me-2" title="Ver Comprobante">
+                  <i class="bi bi-image"></i>
+                </a>
+                <button *ngIf="p.status === 'pending'" class="btn btn-sm btn-success rounded-pill me-2" title="Aprobar" (click)="abrirAprobarModal(p)" data-bs-toggle="modal" data-bs-target="#aprobarModal">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button *ngIf="p.status === 'pending'" class="btn btn-sm btn-danger rounded-pill" title="Rechazar" (click)="rechazarPago(p)">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="pagos.length === 0">
+              <td colspan="6" class="text-center py-5 text-muted">No hay pagos en esta categoría.</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL APROBAR Y CUSTOMIZAR -->
+<div class="modal fade" id="aprobarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold">Aprobar Pago y Asignar Plan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedPago">
+        
+        <div class="alert alert-info rounded-3 mb-4">
+            Aprobando el pago de <strong>{{ selectedPago.company?.name }}</strong> por <strong>{{ selectedPago.amount | currency }}</strong>.
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Plan Base a Asignar</label>
+                <select class="form-select rounded-pill" [(ngModel)]="formAprobar.assignedPlanId" (change)="onPlanSelectChange()">
+                    <option value="">-- Seleccione un Plan --</option>
+                    <option *ngFor="let plan of planes" [value]="plan._id">{{ plan.name }}</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Nueva Fecha de Corte</label>
+                <input type="date" class="form-control rounded-pill" [(ngModel)]="formAprobar.newEndDate">
+            </div>
+
+            <!-- OVERRIDES -->
+            <div class="col-12 mt-4">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">Custom Overrides (Acuerdos B2B)</h6>
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">Max Sucursales (-1 = Infinito)</label>
+                <input type="number" class="form-control rounded-pill" [(ngModel)]="formAprobar.customMaxBranches">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">Max Usuarios</label>
+                <input type="number" class="form-control rounded-pill" [(ngModel)]="formAprobar.customMaxUsers">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">Max Cajas Activas</label>
+                <input type="number" class="form-control rounded-pill" [(ngModel)]="formAprobar.customMaxRegisters">
+            </div>
+
+            <div class="col-12 mt-4">
+                <label class="form-label fw-bold small text-muted">Notas Internas (Solo Sysadmin)</label>
+                <textarea class="form-control rounded-3" rows="2" [(ngModel)]="formAprobar.adminNotes" placeholder="Ej. Promesa de pago restante el día 15..."></textarea>
+            </div>
+            <div class="col-12 mt-2">
+                <label class="form-label fw-bold small text-muted">Fecha de Recordatorio para ti (Opcional)</label>
+                <input type="date" class="form-control rounded-pill w-50" [(ngModel)]="formAprobar.reminderDate">
+            </div>
+        </div>
+
+      </div>
+      <div class="modal-footer border-top-0 pt-0 mt-3">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal" (click)="confirmarAprobacion()">
+            <i class="bi bi-check-circle me-2"></i>Confirmar Aprobación
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,7 @@
-<div class="container">
-  <app-back-button class="m-2"></app-back-button>
+<div class="container mt-4">
+  <div class="back-btn-wrapper mb-3">
+    <app-back-button></app-back-button>
+  </div>
   <div class="card">
     <div class="card-header">
       <h3 class="start">Confirmar Venta</h3>
@@ -224,22 +226,22 @@
       </div>
       
       <form [formGroup]="confirmSaleForm" (ngSubmit)="confirmSale()">
-        <div class="mb-3">
-          <label for="paymentMethod" class="form-label">Método de Pago</label>
-          <select id="paymentMethod" class="form-select" formControlName="paymentMethod">
+        <div class="mb-4">
+          <label for="paymentMethod" class="form-label fs-8 text-muted fw-bold mb-1">Método de Pago</label>
+          <select id="paymentMethod" class="form-select premium-select" formControlName="paymentMethod">
             <option value="cash">Efectivo</option>
-            <option value="credit">Tarjeta</option>
+            <option value="credit">Tarjeta de Crédito/Débito</option>
           </select>
         </div>
         
-        <div class="mb-3" *ngIf="paymentMethod!.value === 'cash'">
-          <label for="receivedAmount" class="form-label">Cantidad Recibida</label>
+        <div class="mb-4" *ngIf="paymentMethod!.value === 'cash'">
+          <label for="receivedAmount" class="form-label fs-8 text-muted fw-bold mb-1">Cantidad Recibida ($)</label>
           <div class="input-group">
             <span class="input-group-text">$</span>
-            <input type="text" id="receivedAmount" class="form-control" formControlName="receivedAmount" 
-                   (click)="openKeyboard('receivedAmount', true)" readonly>
+            <input type="number" id="receivedAmount" class="form-control premium-input font-monospace" formControlName="receivedAmount" 
+                   (click)="onInputClick('receivedAmount', true)" [readOnly]="branchSettings.enableVirtualKeyboard" placeholder="0.00">
           </div>
-          <div *ngIf="receivedAmount!.invalid && (receivedAmount!.dirty || receivedAmount!.touched)" class="text-danger">
+          <div *ngIf="receivedAmount!.invalid && (receivedAmount!.dirty || receivedAmount!.touched)" class="text-danger small mt-1">
             <small *ngIf="receivedAmount!.errors?.['required']">Este campo es requerido.</small>
             <small *ngIf="receivedAmount!.errors?.['min']">La cantidad debe ser mayor a 0.</small>
             <small *ngIf="receivedAmount!.errors?.['pattern']">Formato inválido.</small>
@@ -247,29 +249,29 @@
           </div>
         </div>
         
-        <div class="mb-3" *ngIf="paymentMethod!.value === 'credit'">
-          <label for="paymentReference" class="form-label">Referencia de Pago</label>
-          <input type="text" id="paymentReference" class="form-control" formControlName="paymentReference"
-                 (click)="openKeyboard('paymentReference', false)" readonly>
-          <div *ngIf="paymentReference!.invalid && (paymentReference!.dirty || paymentReference!.touched)" class="text-danger">
+        <div class="mb-4" *ngIf="paymentMethod!.value === 'credit'">
+          <label for="paymentReference" class="form-label fs-8 text-muted fw-bold mb-1">Referencia de Pago</label>
+          <input type="text" id="paymentReference" class="form-control premium-input" formControlName="paymentReference"
+                 placeholder="Ej. TRANS-8472" (click)="onInputClick('paymentReference', false)" [readOnly]="branchSettings.enableVirtualKeyboard">
+          <div *ngIf="paymentReference!.invalid && (paymentReference!.dirty || paymentReference!.touched)" class="text-danger small mt-1">
             <small *ngIf="paymentReference!.errors?.['required']">Este campo es requerido.</small>
           </div>
         </div>
         
-        <div class="mb-3" *ngIf="paymentMethod!.value === 'cash'">
-          <label for="change" class="form-label">Cambio</label>
+        <div class="mb-4" *ngIf="paymentMethod!.value === 'cash'">
+          <label for="change" class="form-label fs-8 text-muted fw-bold mb-1">Cambio ($)</label>
           <div class="input-group">
             <span class="input-group-text">$</span>
-            <input type="text" id="change" class="form-control" formControlName="change" readonly>
+            <input type="text" id="change" class="form-control premium-input font-monospace text-success fw-bold" formControlName="change" readonly>
           </div>
         </div>
         
-        <div class="d-flex justify-content-between">
-          <button [disabled]="!confirmSaleForm.valid" type="submit" class="btn btn-primary">
-            Confirmar Venta
+        <div class="d-flex justify-content-between gap-3 mt-4">
+          <button [disabled]="!confirmSaleForm.valid" type="submit" class="btn btn-dark btn-lg flex-grow-1 py-3 fs-7 fw-bold smooth-transition">
+            <i class="bi bi-check-circle-fill me-1"></i> Confirmar Venta
           </button>
-          <button type="button" class="btn btn-secondary" (click)="generarComanda()">
-            Imprimir Comanda
+          <button type="button" class="btn btn-outline-dark btn-lg py-3 px-4 fs-7 smooth-transition" (click)="generarComanda()">
+            <i class="bi bi-printer me-1"></i> Comanda
           </button>
         </div>
       </form>

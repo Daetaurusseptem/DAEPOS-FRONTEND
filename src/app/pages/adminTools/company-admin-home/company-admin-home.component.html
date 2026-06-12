@@ -45,6 +45,22 @@
     </button>
   </div>
 
+  <!-- Upsell: Alerta de Sucursales Inactivas -->
+  <div *ngIf="inactiveBranchesCount > 0" class="alert alert-info border border-info-subtle shadow-sm rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3 animate__animated animate__fadeIn">
+    <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-2" style="width: 38px; height: 38px;">
+        <i class="bi bi-shop fs-5"></i>
+      </div>
+      <div>
+        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">Tienes {{ inactiveBranchesCount }} sucursal(es) inactiva(s)</h6>
+        <p class="text-secondary small mb-0">¿Estás listo para reactivarlas y expandir tus operaciones? Revisa las opciones de tu plan actual.</p>
+      </div>
+    </div>
+    <button routerLink="/dashboard/admin/billing" class="btn btn-outline-info btn-sm px-4 py-2 fw-semibold rounded-2">
+      Ver Opciones de Suscripción
+    </button>
+  </div>
+
   <!-- Fila 1: KPIs Consolidados Corporativos -->
   <div class="row g-4 mb-4">
     <div class="col-md-3 col-sm-6">
@@ -150,9 +166,15 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                  <button class="btn btn-dark btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;" [routerLink]="['/dashboard/admin/branches', b._id]">
+                  <!-- Botón Habilitado (Activa) -->
+                  <button *ngIf="b.isActive" class="btn btn-dark btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;" [routerLink]="['/dashboard/admin/branches', b._id]">
                     Auditar Operaciones
                   </button>
+                  <!-- Botón Deshabilitado (Inactiva) -->
+                  <button *ngIf="!b.isActive" class="btn btn-secondary btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0 opacity-50" disabled style="background-color: #64748b !important;">
+                    <i class="bi bi-lock-fill me-1"></i> Sucursal Suspendida
+                  </button>
+
                   <button class="btn btn-light btn-sm px-3 py-2 border border-light-subtle text-muted" [routerLink]="['/dashboard/admin/branches/edit', b._id]">
                     <i class="bi bi-gear-fill"></i>
                   </button>
@@ -278,6 +300,17 @@
               </div>
             </button>
 
+            <button routerLink="/dashboard/kitchen/kds" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn">
+              <div class="d-flex align-items-center">
+                <div class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                  <i class="bi bi-fire-fill text-danger animate-pulse"></i>
+                </div>
+                <div class="d-flex flex-column">
+                  <span class="fw-bold text-dark lh-sm">Pantalla de Cocina (KDS)</span>
+                  <span class="text-muted small">Visualizar pedidos en tiempo real</span>
+                </div>
+              </div>
+            </button>
 
             <button *ngIf="isDemoUser()" (click)="restoreDemoDatabase()" class="btn btn-outline-danger text-start p-3 rounded-3 border-danger-subtle fw-semibold mt-2" style="background-color: #fef2f2; border-color: #fecaca; color: #dc2626;">
               <i class="bi bi-arrow-counterclockwise me-2 fs-5 align-middle"></i> Reestablecer Datos Demo

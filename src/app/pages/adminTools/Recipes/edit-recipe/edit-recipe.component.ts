@@ -5,7 +5,6 @@ import { RecipesService } from 'src/app/services/recipes.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { RawMaterialsService, RawMaterial } from 'src/app/services/raw-materials.service';
 import { InventoryService } from 'src/app/services/inventory.service';
-import { Recipe } from 'src/app/interfaces/models.interface';
 import { map } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -15,9 +14,10 @@ import Swal from 'sweetalert2';
   styleUrls: ['./edit-recipe.component.css']
 })
 export class EditRecipeComponent implements OnInit {
-  recipeForm: FormGroup;
+  recipeForm!: FormGroup;
   recipeId: string = '';
   rawMaterials: RawMaterial[] = [];
+  collapsedSizes: boolean[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -27,16 +27,17 @@ export class EditRecipeComponent implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
-  ) {
+  ) { }
+
+  ngOnInit(): void {
     this.recipeForm = this.fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
-      rawMaterials: this.fb.array([])
+      sizes: this.fb.array([])
     });
-  }
 
-  ngOnInit(): void {
     this.loadRawMaterials();
+    
     this.route.params.subscribe(params => {
       this.recipeId = params['id'];
       if (this.recipeId) {
@@ -74,66 +75,71 @@ export class EditRecipeComponent implements OnInit {
       });
   }
 
-  get rawMaterialsArray(): FormArray {
-    return this.recipeForm.get('rawMaterials') as FormArray;
+  get sizesArray(): FormArray {
+    return this.recipeForm.get('sizes') as FormArray;
   }
 
-  loadRecipe(): void {
-    this.recipeService.getRecipe(this.recipeId).subscribe({
-      next: (response: any) => {
-        if (response && response.data) {
-          const recipe = response.data;
-          this.recipeForm.patchValue({
-            name: recipe.name,
-            description: recipe.description
-          });
+  addSize(name: string = '', priceModifier: number = 0): void {
+    const ingredientsArray = new FormArray<any>([]);
+    
+    // Si ya existe al menos un tamaño, clonar sus ingredientes para arrancar desde ahí
+    if (this.sizesArray && this.sizesArray.length > 0) {
+      const firstSizeIngredients = this.getIngredientsArray(0);
+      firstSizeIngredients.controls.forEach(ctrl => {
+        ingredientsArray.push(this.fb.group({
+          rawMaterial: [ctrl.get('rawMaterial')?.value || '', Validators.required],
+          quantity: [ctrl.get('quantity')?.value || null, [Validators.required, Validators.min(0.0001)]]
+        }));
+      });
+    }
 
-          this.rawMaterialsArray.clear();
-          if (recipe.ingredients) {
-            recipe.ingredients.forEach((ing: any) => {
-              this.rawMaterialsArray.push(this.fb.group({
-                rawMaterial: [ing.ingredient?._id || ing.ingredient || '', Validators.required],
-                quantity: [ing.quantity, [Validators.required, Validators.min(0.0001)]]
-              }));
-            });
-          }
-        }
-      },
-      error: (err) => {
-        console.error('Error al cargar la receta:', err);
-        Swal.fire('Error', 'No se pudo cargar la receta.', 'error');
-      }
-    });
+    this.sizesArray.push(this.fb.group({
+      name: [name, Validators.required],
+      priceModifier: [priceModifier, [Validators.required, Validators.min(0)]],
+      ingredients: ingredientsArray
+    }));
+    this.collapsedSizes.push(false);
   }
 
-  addIngredient(): void {
-    this.rawMaterialsArray.push(this.fb.group({
+  removeSize(index: number): void {
+    if (this.sizesArray.length > 1) {
+      this.sizesArray.removeAt(index);
+      this.collapsedSizes.splice(index, 1);
+    } else {
+      Swal.fire('Atención', 'La receta debe tener al menos un tamaño.', 'warning');
+    }
+  }
+
+  toggleCollapse(index: number): void {
+    this.collapsedSizes[index] = !this.collapsedSizes[index];
+  }
+
+  getIngredientsArray(sizeIndex: number): FormArray {
+    return this.sizesArray.at(sizeIndex).get('ingredients') as FormArray;
+  }
+
+  addIngredient(sizeIndex: number): void {
+    this.getIngredientsArray(sizeIndex).push(this.fb.group({
       rawMaterial: ['', Validators.required],
       quantity: [null, [Validators.required, Validators.min(0.0001)]]
     }));
   }
 
-  removeIngredient(index: number): void {
-    this.rawMaterialsArray.removeAt(index);
+  removeIngredient(sizeIndex: number, ingredientIndex: number): void {
+    this.getIngredientsArray(sizeIndex).removeAt(ingredientIndex);
   }
 
-  isIngredientSelected(rawMaterialId: string | undefined, currentIndex: number): boolean {
+  isIngredientSelected(sizeIndex: number, rawMaterialId: string | undefined, currentIndex: number): boolean {
     if (!rawMaterialId) return false;
-    return this.rawMaterialsArray.controls.some((ctrl, i) => {
+    return this.getIngredientsArray(sizeIndex).controls.some((ctrl, i) => {
       if (i === currentIndex) return false;
       return ctrl.get('rawMaterial')?.value === rawMaterialId;
     });
   }
 
-  getIngredientUnit(rawMaterialId: string): string {
-    if (!rawMaterialId) return 'u';
-    const material = this.rawMaterials.find(m => m._id === rawMaterialId);
-    return material ? (material.measurementUnit || 'u') : 'u';
-  }
-
-  get recipeTotalCost(): number {
+  getRecipeTotalCost(sizeIndex: number): number {
     let total = 0;
-    this.rawMaterialsArray.controls.forEach(ctrl => {
+    this.getIngredientsArray(sizeIndex).controls.forEach(ctrl => {
       const selectedId = ctrl.get('rawMaterial')?.value;
       const quantity = ctrl.get('quantity')?.value || 0;
       if (selectedId) {
@@ -146,26 +152,85 @@ export class EditRecipeComponent implements OnInit {
     return total;
   }
 
+  getIngredientUnit(rawMaterialId: string): string {
+    if (!rawMaterialId) return 'u';
+    const material = this.rawMaterials.find(m => m._id === rawMaterialId);
+    return material ? (material.measurementUnit || 'u') : 'u';
+  }
+
+  loadRecipe(): void {
+    this.recipeService.getRecipe(this.recipeId).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          const recipe = response.data;
+          this.recipeForm.patchValue({
+            name: recipe.name,
+            description: recipe.description
+          });
+
+          this.sizesArray.clear();
+          this.collapsedSizes = [];
+          if (recipe.sizes && recipe.sizes.length > 0) {
+            recipe.sizes.forEach((size: any, idx: number) => {
+              const sizeGroup = this.fb.group({
+                name: [size.name, Validators.required],
+                priceModifier: [idx === 0 ? 0 : (size.priceModifier || 0), [Validators.required, Validators.min(0)]],
+                ingredients: this.fb.array([])
+              });
+
+              const ingredientsArray = sizeGroup.get('ingredients') as FormArray;
+              if (size.ingredients) {
+                size.ingredients.forEach((ing: any) => {
+                  ingredientsArray.push(this.fb.group({
+                    rawMaterial: [ing.ingredient?._id || ing.ingredient || '', Validators.required],
+                    quantity: [ing.quantity, [Validators.required, Validators.min(0.0001)]]
+                  }));
+                });
+              }
+
+              this.sizesArray.push(sizeGroup);
+              this.collapsedSizes.push(false);
+            });
+          } else {
+            // Fallback default size
+            this.addSize('Único', 0);
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar la receta:', err);
+        Swal.fire('Error', 'No se pudo cargar la receta.', 'error');
+      }
+    });
+  }
+
   onSubmit(): void {
     if (this.recipeForm.invalid) {
+      Swal.fire('Error', 'Por favor completa todos los campos requeridos.', 'warning');
       return;
     }
 
-    if (this.rawMaterialsArray.length === 0) {
-      Swal.fire('Error', 'La receta debe tener al menos un ingrediente/materia prima.', 'warning');
+    if (this.sizesArray.length === 0) {
+      Swal.fire('Error', 'La receta debe tener al menos un tamaño.', 'warning');
       return;
     }
 
-    const selectedIds = this.rawMaterialsArray.value.map((rm: any) => rm.rawMaterial);
-    const uniqueIds = new Set(selectedIds);
-    if (selectedIds.length !== uniqueIds.size) {
-      Swal.fire('Error', 'No puedes agregar el mismo ingrediente más de una vez.', 'warning');
+    let hasEmptyIngredients = false;
+    this.sizesArray.controls.forEach(sizeCtrl => {
+      const ingredients = sizeCtrl.get('ingredients') as FormArray;
+      if (ingredients.length === 0) {
+        hasEmptyIngredients = true;
+      }
+    });
+
+    if (hasEmptyIngredients) {
+      Swal.fire('Error', 'Cada tamaño debe tener al menos un ingrediente.', 'warning');
       return;
     }
 
     Swal.fire({
       title: '¿Estás seguro?',
-      text: '¿Deseas actualizar la receta con los nuevos ingredientes?',
+      text: '¿Deseas actualizar la receta con los nuevos tamaños e ingredientes?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Actualizar',
@@ -173,18 +238,23 @@ export class EditRecipeComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         const formVal = this.recipeForm.value;
-        const formattedIngredients = (formVal.rawMaterials || []).map((rm: any) => ({
-          ingredient: rm.rawMaterial,
-          quantity: rm.quantity
+        
+        const formattedSizes = formVal.sizes.map((size: any, idx: number) => ({
+          name: size.name,
+          priceModifier: idx === 0 ? 0 : size.priceModifier,
+          ingredients: size.ingredients.map((rm: any) => ({
+            ingredient: rm.rawMaterial,
+            quantity: rm.quantity
+          }))
         }));
 
-        const updatedRecipe: Partial<Recipe> = {
+        const updatedRecipe = {
           name: formVal.name,
           description: formVal.description,
-          ingredients: formattedIngredients as any
+          sizes: formattedSizes
         };
 
-        this.recipeService.updateRecipe(this.recipeId, updatedRecipe as Recipe).subscribe({
+        this.recipeService.updateRecipe(this.recipeId, updatedRecipe as any).subscribe({
           next: () => {
             Swal.fire('Receta actualizada', 'La receta se ha actualizado correctamente.', 'success');
             this.router.navigate(['/dashboard/admin/recipes']);

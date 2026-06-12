@@ -5,6 +5,8 @@ import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { IGlobalMetricsResponse, ISystemErrorsResponse, IForensicSaleResponse, IGlobalTransactionsResponse } from '../interfaces/sysadmin.interface';
+
 
 const urlApi = `${environment.apiUrl}/sysadmin`;
 
@@ -19,8 +21,20 @@ export class SysadminService {
     private router: Router
   ) { }
 
-  getGlobalMetrics(): Observable<any> {
-    return this.http.get<any>(`${urlApi}/metrics`, this.authService.headers);
+  getGlobalMetrics(): Observable<IGlobalMetricsResponse> {
+    return this.http.get<IGlobalMetricsResponse>(`${urlApi}/metrics`, this.authService.headers);
+  }
+
+  getSaleForensics(saleId: string): Observable<IForensicSaleResponse> {
+    return this.http.get<IForensicSaleResponse>(`${urlApi}/telemetry/sale/${saleId}`, this.authService.headers);
+  }
+
+  searchGlobalTransactions(params: any): Observable<IGlobalTransactionsResponse> {
+    const options = {
+      ...this.authService.headers,
+      params
+    };
+    return this.http.get<IGlobalTransactionsResponse>(`${urlApi}/telemetry/transactions`, options);
   }
 
   onboardCompanyExpress(data: any): Observable<any> {
@@ -84,7 +98,63 @@ export class SysadminService {
     }
   }
 
-  getSystemErrors(page: number = 1, limit: number = 10): Observable<any> {
-    return this.http.get<any>(`${urlApi}/errors?page=${page}&limit=${limit}`, this.authService.headers);
+  getSystemErrors(params: any): Observable<ISystemErrorsResponse> {
+    const options = {
+      ...this.authService.headers,
+      params
+    };
+    return this.http.get<ISystemErrorsResponse>(`${urlApi}/errors`, options);
+  }
+
+  getCompanyTelemetry(companyId: string): Observable<any> {
+    return this.http.get<any>(`${urlApi}/telemetry/${companyId}`, this.authService.headers);
+  }
+
+  updateCompanySubscriptionManual(companyId: string, data: any): Observable<any> {
+    return this.http.put<any>(`${urlApi}/subscription/${companyId}`, data, this.authService.headers);
+  }
+
+  getCompanyInvoices(companyId: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/subs/admin/invoices/${companyId}`, this.authService.headers);
+  }
+
+  // Tiers & Subscription Plans
+  getPlans(): Observable<any> {
+    return this.http.get<any>(`${urlApi}/plans`, this.authService.headers);
+  }
+
+  getStripeProducts(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/subs`, this.authService.headers);
+  }
+
+  createPlan(data: any): Observable<any> {
+    return this.http.post<any>(`${urlApi}/plans`, data, this.authService.headers);
+  }
+
+  updatePlan(id: string, data: any): Observable<any> {
+    return this.http.put<any>(`${urlApi}/plans/${id}`, data, this.authService.headers);
+  }
+
+  deletePlan(planId: string): Observable<any> {
+    return this.http.delete(`${urlApi}/plans/${planId}`, this.authService.headers);
+  }
+
+  // -------------------------
+  // Subscriptions & SaaS Override
+  // -------------------------
+  searchSubscriptions(params: any): Observable<any> {
+    const options = {
+      ...this.authService.headers,
+      params
+    };
+    return this.http.get(`${urlApi}/subscriptions`, options);
+  }
+
+  getSubscriptionDetails(companyId: string): Observable<any> {
+    return this.http.get(`${urlApi}/subscriptions/${companyId}/details`, this.authService.headers);
+  }
+
+  overrideSubscription(companyId: string, data: any): Observable<any> {
+    return this.http.put(`${urlApi}/subscriptions/${companyId}/override`, data, this.authService.headers);
   }
 }

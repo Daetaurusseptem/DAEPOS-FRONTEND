@@ -24,15 +24,17 @@ export class RoleGuard implements CanActivate {
       // Redirecciona al dashboard del usuario si el rol es User
       this.router.navigate(['/dashboard/user']);
       return false;
-    } else if(userRole === 'sysadmin'){
-      // Redirecciona al login o a una página de error si el usuario no tiene un rol válido
-      this.router.navigate(['/dashboard/sysadmin/users']);
+    } else if (userRole === 'sysadmin') {
+      // Redirecciona al dashboard principal de SysAdmin
+      this.router.navigate(['/dashboard/sysadmin/dashboard']);
       return false;
-    }
-    else{
+    } else if (userRole === 'kitchen') {
+      // Redirecciona a la pantalla KDS si el rol es Kitchen
+      this.router.navigate(['/dashboard/kitchen/kds']);
+      return false;
+    } else {
       this.router.navigate(['/login']);
       return false;
-
     }
   }
 }

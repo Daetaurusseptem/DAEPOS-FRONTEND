@@ -1,18 +1,167 @@
-.card {
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  .table th, .table td {
-    vertical-align: middle;
-  }
-  
-  .table th {
-    background-color: #343a40;
-    color: white;
-  }
-  
-  .alert {
-    margin-top: 20px;
-  }
-  
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+.container-design {
+  font-family: 'Inter', sans-serif;
+  color: #0a0a0a;
+  background-color: #ffffff;
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.design-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: oklab(0.145 -0.00000143796 0.00000340492 / 0.1) 0px 0px 0px 1px;
+}
+
+.design-card-ghost {
+  background: #f2f2f2;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid #e5e5e5;
+}
+
+.design-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 16px;
+}
+
+.design-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  letter-spacing: -0.45px;
+  margin: 0;
+}
+
+/* Badges */
+.design-badge-success {
+  background-color: #10c22b;
+  color: #ffffff;
+  border-radius: 26px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.design-badge-ghost {
+  background-color: #f2f2f2;
+  color: #0a0a0a;
+  border-radius: 26px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.design-badge-danger {
+  background-color: #c22b10;
+  color: #ffffff;
+  border-radius: 26px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Alert */
+.design-alert-danger {
+  background-color: #ffffff;
+  border: 1px solid #c22b10;
+  border-radius: 10px;
+  padding: 16px;
+  color: #c22b10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Grid layout for summaries */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #737373;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+.summary-value.danger { color: #c22b10; }
+
+/* Buttons */
+.btn-primary-action {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  padding: 8px 48px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-primary-action:hover {
+  background: #1a1a1a;
+}
+.btn-ghost-action {
+  background: transparent;
+  color: #0a0a0a;
+  border: 1px solid #e5e5e5;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-ghost-action:hover {
+  background: #f2f2f2;
+}
+
+/* Tables */
+.design-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+.design-table th, .design-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  text-align: left;
+}
+.design-table th {
+  color: #737373;
+  font-weight: 500;
+}
+.design-table tbody tr:hover {
+  background-color: #fcfcfc;
+}
+
+.font-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}

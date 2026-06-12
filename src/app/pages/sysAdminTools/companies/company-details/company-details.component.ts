@@ -1,17 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { Category, Product, Supplier, User, Company, InventoryItem, UserRole } from 'src/app/interfaces/models.interface';
+import { Company, User } from 'src/app/interfaces/models.interface';
 import { CompanyService } from 'src/app/services/company.service';
-import { UsersService } from 'src/app/services/users.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { ProductService } from 'src/app/services/product.service';
-import { SupplierService } from 'src/app/services/provider.service';
-import { CategoryService } from 'src/app/services/category.service';
-import { ModalService } from 'src/app/services/modal.service';
-import { InventoryService } from 'src/app/services/inventory.service';
+import { SysadminService } from 'src/app/services/sysadmin.service';
 import Swal from 'sweetalert2';
-import { TabSelectedService } from 'src/app/service/tab-selected.service';
 
 @Component({
   selector: 'app-company-details',
@@ -19,184 +12,167 @@ import { TabSelectedService } from 'src/app/service/tab-selected.service';
   styleUrls: ['./company-details.component.css']
 })
 export class CompanyDetailsComponent implements OnInit {
-  items: InventoryItem[] = [];
   company!: Company;
   admin!: User;
   id: string = '';
-  users: User[] = [];
-  products: Product[] = [];
-  suppliers: Supplier[] = [];
-  categories: Category[] = [];
-  totalItems: number = 0;
-  currentPage: number = 1;
-  adminId: string = '';
-  userRole!: UserRole;
-
-  itemsPerPage: number = 10;
-  searchTerm: string = '';
-  tabSelected: 'usuarios' | 'productos' | 'suscripciones' | 'proveedores' | 'categorias' | 'inventario' = localStorage.getItem('tabSelected') as any || 'usuarios';
-  
-  tabsArray = [
-    { name: 'usuarios', icon: 'bi bi-people-fill' },
-    { name: 'productos', icon: 'bi bi-bag-fill' },
-    { name: 'inventario', icon: 'bi bi-box-fill' },
-    { name: 'categorias', icon: 'bi bi-bag-fill' },
-    { name: 'proveedores', icon: 'bi bi-file-earmark-person' },
-    { name: 'suscripciones', icon: 'bi bi-card-checklist' }
-  ];
+  telemetry: any = null;
+  loading: boolean = true;
+  invoices: any[] = [];
+  loadingInvoices: boolean = true;
+  availablePlans: any[] = [];
 
   constructor(
     private companyService: CompanyService,
-    private userService: UsersService,
+    private sysadminService: SysadminService,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private authService: AuthService,
-    private productService: ProductService,
-    private suppliersService: SupplierService,
-    private categoryService: CategoryService,
-    private modalService: ModalService,
-    private inventoryService: InventoryService,
-    private tabSelectedService: TabSelectedService
-  ) {
-    this.adminId = this.authService.idUsuario;
-    this.userRole = this.authService.role;
-  }
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {  
       this.id = params['id'];
       if (this.id) {
-        this.getCompany(this.id);
-        this.getUsers();
-        this.getInventoryCompany();
+        this.loadCompanyData();
       }
     });
   }
 
-  getCompany(id: string) {
-    return this.companyService.getCompany(id)
+  loadCompanyData() {
+    this.loading = true;
+    this.loadingInvoices = true;
+    
+    // 1. Obtener datos básicos de la empresa
+    this.companyService.getCompany(this.id)
       .pipe(map(item => item.company))
-      .subscribe(company => {
-        this.company = company!;
-        if (company?.adminId) {
-          this.getAdmin(company.adminId);
+      .subscribe({
+        next: (company) => {
+          this.company = company!;
+          
+          // 2. Cargar telemetría SaaS
+          this.sysadminService.getCompanyTelemetry(this.id).subscribe({
+            next: (resp) => {
+              if (resp.ok) {
+                this.telemetry = resp.telemetry;
+              }
+              this.loading = false;
+            },
+            error: () => this.loading = false
+          });
+
+          // 3. Cargar facturas de Stripe
+          this.sysadminService.getCompanyInvoices(this.id).subscribe({
+            next: (resp) => {
+              if (resp.ok) {
+                this.invoices = resp.invoices;
+              }
+              this.loadingInvoices = false;
+            },
+            error: () => this.loadingInvoices = false
+          });
+
+          // 4. Cargar Tiers Disponibles
+          this.sysadminService.getPlans().subscribe(resp => {
+            if (resp.ok) this.availablePlans = resp.plans;
+          });
+        },
+        error: () => {
+          this.loading = false;
+          this.loadingInvoices = false;
         }
       });
   }
 
-  getAdmin(adminId: string) {
-    this.userService.getUserById(adminId)
-      .pipe(map(item => item.user))
-      .subscribe(adminCompany => {
-        this.admin = adminCompany!;
-      });
-  }
-
-  changeTab(tab: any) {
-    this.tabSelected = tab;
-    this.tabSelectedService.updateTabSelected(tab);
-    
-    switch (tab) {
-      case 'usuarios':
-        this.getUsers();
-        break;
-      case 'productos':
-        this.getProducts(this.id);
-        break;
-      case 'inventario':
-        this.getInventoryCompany();
-        break;
-      case 'proveedores':
-        this.getSuppliers(this.id);
-        break;
-      case 'categorias':
-        this.getCategories(this.id);
-        break;
-    }
-  }
-
-  getUsers() {
-    this.userService.getAllUsersOfCompany(this.id)
-      .pipe(map(item => item.users || []))
-      .subscribe(users => {
-        this.users = users;
-      });
-  }
-
-  getProducts(idEmpresa: string) {
-    this.productService.getCompanyProductsSysadmin(idEmpresa)
-      .pipe(map(item => item.products || []))
-      .subscribe(products => {
-        this.products = products;
-      });
-  }
-
-  getSuppliers(idEmpresa: string) {
-    this.suppliersService.getCompanySuppliers(idEmpresa)
-      .pipe(map(i => i.suppliers || []))
-      .subscribe(suppliers => {
-        this.suppliers = suppliers;
-      });
-  }
-
-  getCategories(idEmpresa: string) {
-    this.categoryService.getCompanyCategories(idEmpresa)
-      .pipe(map(i => i.categories || []))
-      .subscribe(categories => {
-        this.categories = categories;
-      });
-  }
-
-  getInventoryCompany() {
-    this.inventoryService.getInventory(this.id, this.searchTerm)
-      .pipe(map(item => item.items || []))
-      .subscribe(items => {
-        this.items = items;
-      });
-  }
-
-  deleteItem(idItem: string | undefined) {
-    if (!idItem) return;
+  assignPlan(planId: string) {
+    if (!planId) return;
 
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Esto eliminará definitivamente el stock seleccionado',
+      title: '¿Asignar Tier a la Empresa?',
+      text: 'Se tomará un "Snapshot" de los límites actuales del Plan seleccionado y se inyectarán en la empresa de forma permanente.',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Eliminar',
+      confirmButtonText: 'Sí, Asignar',
       cancelButtonText: 'Cancelar'
-    })
-    .then(res => {
-      if (res.isConfirmed) {
-        this.inventoryService.deleteInventoryItem(idItem)
-          .subscribe({
-            next: () => {
-              Swal.fire('Eliminado', 'Registro eliminado', 'success');
-              this.getInventoryCompany();
-            },
-            error: (err) => {
-              console.error('Error deleting item', err);
-              Swal.fire('Error', 'No se pudo eliminar el item', 'error');
-            }
-          });
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.showLoading();
+        this.sysadminService.updateCompanySubscriptionManual(this.id, { planId }).subscribe({
+          next: () => {
+            Swal.fire('Asignado', 'El plan y sus límites (Snapshot) han sido inyectados.', 'success');
+            this.loadCompanyData();
+          },
+          error: (err) => {
+            Swal.fire('Error', err.error?.msg || 'No se pudo asignar el plan', 'error');
+          }
+        });
       }
     });
   }
 
-  asProduct(product: any): Product {
-    return product as Product;
+  impersonateCompany() {
+    Swal.fire({
+      title: '¿Iniciar Soporte Remoto?',
+      text: `Entrarás temporalmente a la cuenta de ${this.company.name}. Para salir, usa el botón "Salir de Soporte" en el menú superior.`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, entrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#007bff'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Conectando...',
+          allowOutsideClick: false,
+          didOpen: () => { Swal.showLoading(); }
+        });
+        
+        this.sysadminService.impersonateCompany(this.id).subscribe({
+          next: () => {
+            Swal.close();
+            // Redirección manejada en el servicio
+          },
+          error: (err) => {
+            Swal.fire('Error', err.error?.msg || 'No se pudo iniciar la sesión remota. Verifica que tengan un administrador asignado.', 'error');
+          }
+        });
+      }
+    });
   }
 
-  abrirModal(element: Company | User | Product, tipo: 'empresas' | 'usuarios' | 'productos') {
-    const { _id, img } = element as any;
-    this.modalService.abrirModal(img, tipo, _id!);
+  suspendCompany() {
+    const isCurrentlyActive = this.telemetry?.isActive;
+    const actionWord = isCurrentlyActive ? 'Suspender' : 'Reactivar';
+    const warningText = isCurrentlyActive 
+      ? 'Esto bloqueará el acceso a todos los usuarios, gerentes y cajeros de esta empresa inmediatamente. (Soft Delete)'
+      : 'Esto reactivará el acceso para todos los usuarios de la empresa.';
+
+    Swal.fire({
+      title: `¿${actionWord} Empresa?`,
+      text: warningText,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Sí, ${actionWord}`,
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: isCurrentlyActive ? '#dc3545' : '#198754'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (isCurrentlyActive) {
+          // Soft Delete (Suspender)
+          this.companyService.deleteCompany(this.id).subscribe({
+            next: () => {
+              Swal.fire('Suspendida', 'La empresa ha sido suspendida exitosamente.', 'success');
+              this.loadCompanyData();
+            },
+            error: () => Swal.fire('Error', 'No se pudo suspender la empresa.', 'error')
+          });
+        } else {
+          // Reactivar (necesitaría endpoint si se requiere, de momento informamos)
+          Swal.fire('Aviso', 'La reactivación manual debe hacerse actualizando la base de datos o el endpoint respectivo.', 'info');
+        }
+      }
+    });
   }
 
-  pageChanged(event: any): void {
-    this.currentPage = event;
-    this.getInventoryCompany();
-  }
-
-  editItem() {
-    // Implement edit logic if needed
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value || 0);
   }
 }

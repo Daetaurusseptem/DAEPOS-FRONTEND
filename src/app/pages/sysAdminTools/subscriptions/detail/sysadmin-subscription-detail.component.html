@@ -1,0 +1,222 @@
+<div class="container-fluid p-4" *ngIf="!loading && data">
+  <!-- Cabecera -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <a routerLink="/dashboard/sysadmin/subscriptions" class="text-decoration-none text-muted mb-2 d-inline-block">
+        <i class="bi bi-arrow-left me-1"></i> Volver a Suscripciones
+      </a>
+      <h1 class="h3 fw-bold text-dark mb-1">
+        Detalle de Suscripción: {{ data.company.name }}
+        <i class="bi bi-patch-check-fill text-primary ms-2 fs-5" *ngIf="data.company.manualOverride" title="Manual Override Activo"></i>
+      </h1>
+      <p class="text-muted mb-0"><i class="bi bi-envelope me-1"></i> {{ data.company.email }}</p>
+    </div>
+    <div>
+      <span class="badge px-3 py-2 rounded-pill fs-6 shadow-sm" 
+            [ngClass]="{
+              'bg-success': data.company.subscriptionStatus === 'active',
+              'bg-warning text-dark': data.company.subscriptionStatus === 'trialing',
+              'bg-danger': data.company.subscriptionStatus === 'past_due' || data.company.subscriptionStatus === 'unpaid',
+              'bg-secondary': data.company.subscriptionStatus === 'canceled' || !data.company.isActive,
+              'bg-info': data.company.subscriptionStatus === 'manual'
+            }">
+        <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> 
+        {{ data.company.subscriptionStatus | uppercase }}
+      </span>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Columna Izquierda: Detalles Stripe -->
+    <div class="col-md-7">
+      
+      <!-- Panel de Stripe -->
+      <div class="card border-0 shadow-sm mb-4 bg-white" *ngIf="useStripe">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-stripe text-primary me-2"></i> Integración Stripe</h5>
+          <span class="badge bg-light text-dark border"><i class="bi bi-cloud-check me-1"></i> Sincronizado</span>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-6">
+              <label class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">ESTADO EN STRIPE</label>
+              <div class="fw-bold fs-5 text-dark">{{ data.stripeData.stripeStatus | uppercase }}</div>
+              <small class="text-danger" *ngIf="data.stripeData.cancelAtPeriodEnd">
+                <i class="bi bi-exclamation-circle me-1"></i> Se cancelará al final del ciclo
+              </small>
+            </div>
+            <div class="col-6">
+              <label class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">PRÓXIMO COBRO / FIN DE CICLO</label>
+              <div class="fw-bold fs-5 text-dark" *ngIf="data.stripeData.nextPayment">
+                {{ data.stripeData.nextPayment * 1000 | date:'dd MMM yyyy' }}
+              </div>
+              <div class="fw-bold fs-5 text-muted" *ngIf="!data.stripeData.nextPayment">N/A</div>
+              <small class="text-muted" *ngIf="data.stripeData.nextPaymentAmount">
+                Monto proyectado: <strong class="text-dark">${{ data.stripeData.nextPaymentAmount / 100 | number:'1.2-2' }}</strong>
+              </small>
+            </div>
+          </div>
+
+          <!-- Historial de Facturas (Invoices) -->
+          <label class="text-muted fw-bold d-block mb-3" style="font-size: 0.75rem;">ÚLTIMAS FACTURAS (INVOICES)</label>
+          <div class="list-group list-group-flush border-top">
+            
+            <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center" *ngFor="let inv of data.stripeData.invoices">
+              <div>
+                <div class="fw-bold text-dark">${{ inv.amount_due / 100 | number:'1.2-2' }}</div>
+                <div class="text-muted" style="font-size: 0.8rem;">{{ inv.created * 1000 | date:'mediumDate' }}</div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge me-3" 
+                      [ngClass]="{'bg-success-subtle text-success': inv.status === 'paid', 'bg-warning-subtle text-warning': inv.status === 'open', 'bg-danger-subtle text-danger': inv.status === 'uncollectible' || inv.status === 'void'}">
+                  {{ inv.status | uppercase }}
+                </span>
+                <a [href]="inv.invoice_pdf" target="_blank" class="btn btn-sm btn-light border" title="Descargar PDF" *ngIf="inv.invoice_pdf">
+                  <i class="bi bi-file-earmark-pdf text-danger"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="list-group-item px-0 py-3 text-center text-muted" *ngIf="data.stripeData.invoices.length === 0">
+              No hay facturas registradas en Stripe para este cliente.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Modo Manual -->
+      <div class="card border-0 shadow-sm mb-4 bg-white" *ngIf="!useStripe">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-bank text-primary me-2"></i> Estado de Cuenta (Modo Manual)</h5>
+          <span class="badge bg-light text-dark border"><i class="bi bi-info-circle me-1"></i> Stripe Desactivado</span>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-6">
+              <label class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">FECHA LÍMITE DE PAGO</label>
+              <div class="fw-bold fs-5 text-dark" *ngIf="data.company.currentPeriodEnd">
+                {{ data.company.currentPeriodEnd | date:'dd MMM yyyy' }}
+              </div>
+              <div class="fw-bold fs-5 text-muted" *ngIf="!data.company.currentPeriodEnd">N/A</div>
+            </div>
+          </div>
+          <div class="alert alert-info border-0 shadow-sm">
+            <i class="bi bi-info-circle me-2"></i> El sistema está operando en <strong>Modo B2B Manual</strong>. 
+            Todas las renovaciones y cambios de plan se gestionan a través de la bandeja de <strong>Validación de Pagos</strong> en base a comprobantes enviados por el cliente.
+          </div>
+
+          <!-- Historial de Pagos Manuales -->
+          <label class="text-muted fw-bold d-block mb-3 mt-4" style="font-size: 0.75rem;">HISTORIAL DE REPORTES ENVIADOS</label>
+          <div *ngIf="loadingPayments" class="text-center text-muted py-3">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando historial...
+          </div>
+          
+          <div class="list-group list-group-flush border-top" *ngIf="!loadingPayments">
+            <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center" *ngFor="let pago of manualPayments">
+              <div>
+                <div class="fw-bold text-dark">${{ pago.amount | number:'1.2-2' }}</div>
+                <div class="text-muted" style="font-size: 0.8rem;">
+                  {{ pago.createdAt | date:'mediumDate' }} 
+                  <span *ngIf="pago.planRequested" class="ms-2 badge bg-light text-dark border">
+                    Solicitó: {{ pago.planRequested.name }}
+                  </span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge me-3" 
+                      [ngClass]="{
+                        'bg-success-subtle text-success': pago.status === 'approved', 
+                        'bg-warning-subtle text-warning': pago.status === 'pending', 
+                        'bg-danger-subtle text-danger': pago.status === 'rejected'
+                      }">
+                  {{ pago.status | uppercase }}
+                </span>
+                <a [href]="pago.proofImageUrl" target="_blank" class="btn btn-sm btn-light border" title="Ver Comprobante">
+                  <i class="bi bi-card-image text-primary"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="list-group-item px-0 py-3 text-center text-muted" *ngIf="manualPayments.length === 0">
+              Esta empresa no ha enviado comprobantes manuales todavía.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Danger Zone -->
+    <div class="col-md-5">
+      <!-- Info de Plan local -->
+      <div class="card border-0 shadow-sm mb-4 bg-primary text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+        <div class="card-body p-4">
+          <label class="text-white-50 fw-bold d-block mb-1" style="font-size: 0.75rem;">PLAN ASIGNADO (BD LOCAL)</label>
+          <h3 class="fw-bold mb-0">{{ data.company.planId?.name || 'Sin plan asignado' }}</h3>
+          <div class="mt-3 text-white-50" style="font-size: 0.85rem;">
+            <i class="bi bi-info-circle me-1"></i> Este es el plan que el sistema lee para dar acceso a módulos.
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion: Zona Peligrosa (Gestión B2B) -->
+      <div class="accordion shadow-sm" id="accordionOverride">
+        <div class="accordion-item border-0">
+          <h2 class="accordion-header" id="headingOverride">
+            <button class="accordion-button collapsed bg-dark text-white fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOverride" aria-expanded="false" aria-controls="collapseOverride">
+              <i class="bi bi-briefcase text-warning me-2 fs-5"></i> Gestión Corporativa B2B (Control Manual)
+            </button>
+          </h2>
+          <div id="collapseOverride" class="accordion-collapse collapse" aria-labelledby="headingOverride" data-bs-parent="#accordionOverride">
+            <div class="accordion-body bg-light p-4">
+              <div class="alert alert-danger border-0 shadow-sm d-flex align-items-start mb-4">
+                <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                <div style="font-size: 0.85rem;">
+                  <strong>Acuerdo B2B / Gestión Manual:</strong> Al activar este control, pausarás las acciones automáticas de Stripe para esta empresa (por si pagan por transferencia u otro acuerdo corporativo). Si lo desactivas después, el sistema regresará al estado de Stripe.
+                </div>
+              </div>
+
+              <form>
+                <!-- Status Override -->
+                <div class="mb-3">
+                  <label class="form-label fw-bold text-dark mb-1" style="font-size: 0.8rem;">Estatus Forzado</label>
+                  <select class="form-select" [(ngModel)]="overrideData.status" name="overrideStatus">
+                    <option value="active">Active (Acceso Total)</option>
+                    <option value="trialing">Trialing (En Prueba)</option>
+                    <option value="manual">Manual (Paga en Efectivo/B2B)</option>
+                    <option value="past_due">Past Due (Acceso Restringido)</option>
+                    <option value="canceled">Canceled (Sin Acceso)</option>
+                  </select>
+                </div>
+
+                <!-- Date Override -->
+                <div class="mb-3">
+                  <label class="form-label fw-bold text-dark mb-1" style="font-size: 0.8rem;">Fecha Límite (Local)</label>
+                  <input type="date" class="form-control" [(ngModel)]="overrideData.currentPeriodEnd" name="overrideDate">
+                </div>
+
+                <!-- Protection Override Toggle -->
+                <div class="form-check form-switch mt-4 mb-4 p-3 bg-white rounded border border-danger-subtle">
+                  <input class="form-check-input ms-0 me-3" type="checkbox" role="switch" id="manualOverrideSwitch" style="transform: scale(1.2);" [(ngModel)]="overrideData.manualOverride" name="manualOverride">
+                  <label class="form-check-label" for="manualOverrideSwitch">
+                    <strong class="d-block text-danger" style="font-size: 0.9rem;">Ignorar a Stripe</strong>
+                    <span class="text-muted" style="font-size: 0.75rem;">Stripe ya no desactivará a esta empresa si falla un pago.</span>
+                  </label>
+                </div>
+
+                <button class="btn btn-dark w-100 fw-bold shadow-sm" (click)="submitOverride()">
+                  Guardar Configuración B2B
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="container p-5 text-center" *ngIf="loading">
+  <div class="spinner-border text-primary fs-3" role="status"></div>
+  <div class="mt-3 text-muted">Cargando datos desde Stripe...</div>
+</div>

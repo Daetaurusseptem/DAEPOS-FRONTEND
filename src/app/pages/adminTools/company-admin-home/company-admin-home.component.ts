@@ -156,6 +156,10 @@ export class CompanyAdminHomeComponent implements OnInit {
     return !!(this.authService.usuario && this.authService.usuario.isDemo);
   }
 
+  get inactiveBranchesCount(): number {
+    return this.branches ? this.branches.filter(b => b.isActive === false).length : 0;
+  }
+
   restoreDemoDatabase() {
     Swal.fire({
       title: '¿Restaurar Base de Datos?',

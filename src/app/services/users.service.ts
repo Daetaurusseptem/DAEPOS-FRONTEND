@@ -38,13 +38,16 @@ export class UsersService {
     return this.http.get<InventoryResponse>(`${urlApiUsers}/company/admin/${id}`, this.authService.headers);
   }
 
-  getAllNonAdminUsersOfCompany(adminId: string, page: number = 1, limit: number = 10, search: string = '', branchId: string = '', role: string = ''): Observable<any> {
+  getAllNonAdminUsersOfCompany(adminId: string, page: number = 1, limit: number = 10, search: string = '', branchId: string = '', role: string = '', status: string = ''): Observable<any> {
     let url = `${urlApiUsers}/company/${adminId}?page=${page}&limit=${limit}&search=${search}`;
     if (branchId) {
       url += `&branchId=${branchId}`;
     }
     if (role) {
       url += `&role=${role}`;
+    }
+    if (status) {
+      url += `&status=${status}`;
     }
     return this.http.get<any>(url, this.authService.headers);
   }
@@ -53,12 +56,20 @@ export class UsersService {
     return this.http.get<InventoryResponse>(`${urlApiUsers}/company/sysadmin/${userId}`, this.authService.headers);
   }
   getAllAdmins() {
-    
     return this.http.get<InventoryResponse>(`${urlApiUsers}/company/admins/all`, this.authService.headers);
   }
+  getAllSysadmins() {
+    return this.http.get<InventoryResponse>(`${urlApiUsers}/company/sysadmins/all`, this.authService.headers);
+  }
   getUnassignedAdmins() {
-    
     return this.http.get<InventoryResponse>(`${urlApiUsers}/company/admins/unassigned`, this.authService.headers);
+  }
+  toggleUserBlock(id: string, active: boolean) {
+    if (this.authService.role === 'sysadmin') {
+      return this.http.put<InventoryResponse>(`${urlApiUsers}/${id}/toggle-block`, { active }, this.authService.headers);
+    } else {
+      return this.http.put<InventoryResponse>(`${urlApiUsers}/admin/${this.authService.companyId}/${id}/toggle-block`, { active }, this.authService.headers);
+    }
   }
   isAdmin(empresaId:string, adminId:string) {
     return this.http.get<InventoryResponse>(`${urlApiUsers}/admins/${empresaId}/${adminId}`, this.authService.headers);

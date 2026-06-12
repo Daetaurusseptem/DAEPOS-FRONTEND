@@ -5,6 +5,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { Sale, User } from 'src/app/interfaces/models.interface';
 import { AuthService } from 'src/app/services/auth.service';
+import { HardwareConnectorService } from 'src/app/services/hardware-connector.service';
 
 @Component({
   selector: 'app-sale-detail',
@@ -20,7 +21,8 @@ export class SaleDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private salesService: SalesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private hardwareConnector: HardwareConnectorService
   ) { }
 
   ngOnInit(): void {
@@ -43,6 +45,33 @@ export class SaleDetailComponent implements OnInit {
       return 0;
     }
     return modifications.reduce((sum, mod) => sum + (mod.extraPrice || 0), 0);
+  }
+
+  printHardware() {
+    let ticketContent = `
+--- DAEPOINT POS ---
+Fecha: ${new Date(this.sale.date).toLocaleString()}
+Cajero: ${this.usuario.name}
+-------------------------
+Productos:
+`;
+    this.products.forEach((p: any) => {
+      ticketContent += `- ${p.product.name} (x${p.quantity}) $${(p.unitPrice * p.quantity).toFixed(2)}\n`;
+    });
+    ticketContent += `-------------------------
+TOTAL: $${this.sale.total.toFixed(2)}
+-------------------------
+`;
+    if (this.sale.paymentMethod === 'credit') {
+      ticketContent += `Metodo: TARJETA\nRef: ${this.sale.paymentReference}\n`;
+    } else {
+      ticketContent += `Metodo: EFECTIVO\nRecibido: $${this.sale.receivedAmount}\nCambio: $${this.sale.change}\n`;
+    }
+
+    this.hardwareConnector.printReceipt(ticketContent).subscribe(res => {
+      console.log('Respuesta del conector de hardware:', res);
+      alert(res.message || 'Comando de impresión enviado');
+    });
   }
 
   generarPDF() {

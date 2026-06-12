@@ -105,44 +105,22 @@
     <div class="modal-body-premium p-4">
       <p class="text-muted mb-4 fs-6">{{ selectedRecipe.description }}</p>
 
-      <!-- Selector de Escala de Porciones -->
+      <!-- Selector de Tamaños de la Receta -->
       <div class="scale-section-premium mb-4 p-3 bg-light rounded-3">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="fw-bold text-dark"><i class="bi bi-sliders me-1 text-success"></i> Escala / Variante de Tamaño</span>
-          <span class="badge bg-success fs-7">x{{ scaleFactor }}</span>
+          <span class="fw-bold text-dark"><i class="bi bi-aspect-ratio me-1 text-success"></i> Escala / Variante de Tamaño</span>
+          <span class="badge bg-success fs-7" *ngIf="selectedSize">{{ selectedSize.name | titlecase }}</span>
         </div>
-        <div class="btn-group w-100" role="group">
+        <div class="d-flex flex-wrap gap-2">
           <button 
+            *ngFor="let size of selectedRecipe.sizes" 
             type="button" 
-            class="btn btn-outline-secondary fw-semibold" 
-            [class.active]="scaleFactor === 0.5" 
-            (click)="changeScale(0.5)"
+            class="btn btn-outline-success fw-semibold flex-grow-1" 
+            [class.active]="selectedSize?.name === size.name" 
+            (click)="selectSize(size)"
           >
-            Chico (0.5x)
-          </button>
-          <button 
-            type="button" 
-            class="btn btn-outline-secondary fw-semibold" 
-            [class.active]="scaleFactor === 1.0" 
-            (click)="changeScale(1.0)"
-          >
-            Estándar (1.0x)
-          </button>
-          <button 
-            type="button" 
-            class="btn btn-outline-secondary fw-semibold" 
-            [class.active]="scaleFactor === 1.5" 
-            (click)="changeScale(1.5)"
-          >
-            Mediano (1.5x)
-          </button>
-          <button 
-            type="button" 
-            class="btn btn-outline-secondary fw-semibold" 
-            [class.active]="scaleFactor === 2.0" 
-            (click)="changeScale(2.0)"
-          >
-            Grande (2.0x)
+            {{ size.name | titlecase }}
+            <span *ngIf="size.priceModifier > 0" class="badge bg-success ms-1">+{{ size.priceModifier | currency }}</span>
           </button>
         </div>
       </div>
@@ -154,22 +132,20 @@
           <thead class="table-dark">
             <tr>
               <th>Insumo</th>
-              <th class="text-center">Cant. Unit</th>
-              <th class="text-center">Cant. Escala</th>
+              <th class="text-center">Cantidad Requerida</th>
               <th class="text-end">Costo Unit.</th>
               <th class="text-end">Costo Subtotal</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let ri of selectedRecipe.ingredients">
+          <tbody *ngIf="selectedSize">
+            <tr *ngFor="let ri of selectedSize.ingredients">
               <td class="fw-semibold text-dark">{{ ri.ingredient?.name || 'Insumo' }}</td>
-              <td class="text-center font-mono">{{ ri.quantity | number }} ({{ ri.ingredient?.measurementUnit || 'u' }})</td>
               <td class="text-center font-mono text-success fw-bold">
-                {{ ri.quantity * scaleFactor | number }} ({{ ri.ingredient?.measurementUnit || 'u' }})
+                {{ ri.quantity | number:'1.0-4' }} ({{ ri.ingredient?.measurementUnit || 'u' }})
               </td>
               <td class="text-end font-mono">{{ (ri.ingredient?.costPrice || 0) | currency }}</td>
               <td class="text-end font-mono fw-semibold">
-                {{ (ri.quantity * scaleFactor * (ri.ingredient?.costPrice || 0)) | currency }}
+                {{ (ri.quantity * (ri.ingredient?.costPrice || 0)) | currency }}
               </td>
             </tr>
           </tbody>
@@ -180,8 +156,8 @@
     <!-- Footer Modal con Resumen de Costo -->
     <div class="modal-footer-premium p-3 bg-light d-flex justify-content-between align-items-center border-top">
       <div>
-        <span class="text-muted d-block fs-8 uppercase">Costo Estimado Producción</span>
-        <span class="fs-4 fw-bold text-success font-mono">{{ (getRecipeTotalCost(selectedRecipe) * scaleFactor) | currency }}</span>
+        <span class="text-muted d-block fs-8 uppercase">Costo Estimado Producción ({{ selectedSize?.name | titlecase }})</span>
+        <span class="fs-4 fw-bold text-success font-mono">{{ getSelectedSizeTotalCost() | currency }}</span>
       </div>
       <button class="btn btn-dark fw-bold" (click)="closeRecipeModal()">Entendido</button>
     </div>

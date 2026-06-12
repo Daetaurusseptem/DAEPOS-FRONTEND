@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService } from 'src/app/services/notification.service';
-import { Subscription, interval } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   selector: 'app-notification-center',
@@ -14,37 +14,32 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
   unreadCount: number = 0;
   showDropdown: boolean = false;
   activeFilter: 'all' | 'unread' = 'all';
-  private pollingSub!: Subscription;
+  private socketSub!: Subscription;
 
   constructor(
     private notificationService: NotificationService,
+    private socketService: SocketService,
     private router: Router,
     private elementRef: ElementRef
   ) { }
 
   ngOnInit(): void {
-    // Polling ligero cada 30 segundos
-    this.pollingSub = interval(30000)
-      .pipe(
-        startWith(0),
-        switchMap(() => this.notificationService.getMyNotifications())
-      )
-      .subscribe({
-        next: (resp: any) => {
-          if (resp.ok) {
-            this.notifications = resp.notifications || [];
-            this.updateUnreadCount();
-          }
-        },
-        error: (err) => {
-          console.error('Error polling notifications:', err);
-        }
-      });
+    // Carga inicial
+    this.loadNotifications();
+
+    // Escuchar notificaciones en tiempo real vía Socket.IO
+    this.socketSub = this.socketService.onEvent<any>('new-notification').subscribe({
+      next: (newNotif) => {
+        // Añadir al principio de la lista
+        this.notifications = [newNotif, ...this.notifications];
+        this.updateUnreadCount();
+      }
+    });
   }
 
   ngOnDestroy(): void {
-    if (this.pollingSub) {
-      this.pollingSub.unsubscribe();
+    if (this.socketSub) {
+      this.socketSub.unsubscribe();
     }
   }
 

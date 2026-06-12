@@ -1,68 +1,109 @@
-<div class="container mt-5">
-  <div class="card shadow-lg">
-    <div class="card-header bg-dark text-white">
-      <h2 class="card-title text-center mb-0">
-        <i class="bi bi-receipt me-2"></i> Detalle de Venta
-      </h2>
-    </div>
-    <div class="card-body">
-      <div *ngIf="sale">
-        <div class="mb-3">
-          <i class="bi bi-person-circle me-2"></i> <strong>Usuario:</strong> {{ usuario.name }}
+<div class="container py-5">
+  <div class="receipt-container">
+    
+    <div class="receipt-card" *ngIf="sale; else loadingTpl">
+      <!-- HEADER -->
+      <div class="receipt-header">
+        <div>
+          <h2 class="receipt-title">Comprobante de Venta</h2>
+          <div class="receipt-subtitle">Folio: {{ sale._id | slice:-8 | uppercase }}</div>
         </div>
-        <div class="mb-3">
-          <i class="bi bi-calendar-event me-2"></i> <strong>Fecha:</strong> {{ sale.date | date:'fullDate' }} - {{ sale.date | date:'shortTime' }}
+        <div>
+          <span class="status-badge" [ngClass]="{'credit': sale.paymentMethod === 'credit'}">
+            <i class="bi bi-check-circle-fill me-1"></i> 
+            {{ sale.paymentMethod === 'cash' ? 'Pagado en Efectivo' : 'Pagado con Tarjeta' }}
+          </span>
         </div>
-        <div class="mb-3">
-          <i class="bi bi-cash-coin me-2"></i> <strong>Total:</strong> {{ sale.total | currency }}
+      </div>
+
+      <!-- BODY -->
+      <div class="receipt-body">
+        
+        <!-- Info Grid -->
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-person-badge"></i> Atendido por</div>
+            <div class="info-value">{{ usuario?.name || 'Cajero' }}</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-calendar3"></i> Fecha y Hora</div>
+            <div class="info-value">{{ sale.date | date:'mediumDate' }} &bull; {{ sale.date | date:'shortTime' }}</div>
+          </div>
+
+          <div class="info-item" *ngIf="sale.paymentMethod === 'cash'">
+            <div class="info-label"><i class="bi bi-cash"></i> Monto Recibido</div>
+            <div class="info-value">{{ sale.receivedAmount | currency }}</div>
+          </div>
+
+          <div class="info-item" *ngIf="sale.paymentMethod === 'cash'">
+            <div class="info-label"><i class="bi bi-arrow-return-left"></i> Cambio Entregado</div>
+            <div class="info-value">{{ sale.change | currency }}</div>
+          </div>
+
+          <div class="info-item" *ngIf="sale.paymentMethod === 'credit'">
+            <div class="info-label"><i class="bi bi-credit-card-2-front"></i> Ref. Bancaria</div>
+            <div class="info-value">{{ sale.paymentReference || 'N/A' }}</div>
+          </div>
         </div>
 
-        <div class="mb-3" *ngIf="sale.paymentMethod === 'cash'">
-          <i class="bi bi-wallet2 me-2"></i> <strong>Pago con:</strong> {{ sale.receivedAmount | currency }}
-        </div>
-        <div class="mb-3" *ngIf="sale.paymentMethod === 'cash'">
-          <i class="bi bi-cash-stack me-2"></i> <strong>Cambio:</strong> {{ sale.change | currency }}
-        </div>
-        <div class="mb-3" *ngIf="sale.paymentMethod === 'credit'">
-          <i class="bi bi-credit-card me-2"></i> <strong>Referencia de Pago:</strong> {{ sale.paymentReference }}
-        </div>
-
-        <h4 class="text-secondary mb-3 mt-4">
-          <i class="bi bi-cart-check-fill"></i> Productos Vendidos:
-        </h4>
-        <ul class="list-group list-group-flush mb-4">
-          <li class="list-group-item" *ngFor="let product of products">
-            <div class="row align-items-center">
-              <div class="col-md-5">
-                <i class="bi bi-box me-2"></i> <strong>{{ product.product.name }}</strong>
-              </div>
-              <div class="col-md-2 text-md-end">
-                 Cantidad: {{ product.quantity }}
-              </div>
-              <div class="col-md-3 text-md-end">
-                <ul *ngIf="product.modifications && product.modifications.length > 0" class="list-unstyled mb-0">
-                  <li *ngFor="let mod of product.modifications">
-                    <i class="bi bi-tools me-2"></i> {{ mod.name }} (+{{ mod.extraPrice | currency }})
+        <!-- Products List -->
+        <div class="products-section">
+          <div class="section-title"><i class="bi bi-basket-fill"></i> Artículos Vendidos</div>
+          
+          <ul class="product-list">
+            <li class="product-item" *ngFor="let item of products">
+              <div class="prod-details">
+                <div class="prod-name">{{ item.product.name }}</div>
+                <ul class="prod-mods" *ngIf="item.modifications && item.modifications.length > 0">
+                  <li *ngFor="let mod of item.modifications">
+                    <i class="bi bi-plus-circle text-muted" style="font-size: 0.7rem; margin-right: 4px;"></i> 
+                    {{ mod.name }} 
+                    <span *ngIf="mod.extraPrice > 0" class="text-success fw-bold">(+{{ mod.extraPrice | currency }})</span>
                   </li>
                 </ul>
               </div>
-              <div class="col-md-2 text-md-end">
-                <i class="bi bi-currency-dollar me-2"></i> Precio: {{ (product.unitPrice + getModificationsTotalPrice(product.modifications)) * product.quantity | currency }}
-              </div>
-            </div>
-          </li>
-        </ul>
+              <div class="prod-qty">x{{ item.quantity }}</div>
+              <div class="prod-price">{{ (item.unitPrice + getModificationsTotalPrice(item.modifications)) * item.quantity | currency }}</div>
+            </li>
+          </ul>
+        </div>
+        
+      </div>
 
-        <div class="d-flex justify-content-between align-items-center">
+      <!-- FOOTER -->
+      <div class="receipt-footer">
+        <div class="total-row">
+          <div class="total-label">Total Cobrado</div>
+          <div class="total-amount">{{ sale.total | currency }}</div>
+        </div>
+        
+        <div class="action-buttons">
           <app-back-button></app-back-button>
-          <button class="btn btn-outline-dark" (click)="generarPDF()">
-            <i class="bi bi-printer-fill"></i> Imprimir Ticket
-          </button>
+          
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-dark" (click)="generarPDF()">
+              <i class="bi bi-file-earmark-pdf"></i> PDF
+            </button>
+            <button class="btn-print" (click)="printHardware()">
+              <i class="bi bi-printer"></i> Imprimir Ticket
+            </button>
+          </div>
         </div>
       </div>
-      <div *ngIf="!sale" class="alert alert-info text-center mt-4">
-        <i class="bi bi-exclamation-circle-fill"></i> Cargando detalles de la venta...
-      </div>
+      
     </div>
+
+    <!-- LOADING STATE -->
+    <ng-template #loadingTpl>
+      <div class="receipt-card">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <h5>Generando comprobante...</h5>
+          <p class="text-muted small">Cargando detalles desde la base de datos</p>
+        </div>
+      </div>
+    </ng-template>
+
   </div>
 </div>

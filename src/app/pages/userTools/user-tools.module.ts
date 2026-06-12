@@ -14,8 +14,7 @@ import { InventoryAvailableComponent } from './inventory-available/inventory-ava
 import { AdminToolsModule } from '../adminTools/admin-tools.module';
 import { ComponentsModule } from 'src/app/components/components.module';
 import { SaleDetailComponent } from './sale-detail/sale-detail.component';
-
-
+import { KitchenKdsComponent } from './kitchen-kds/kitchen-kds.component';
 
 @NgModule({
   declarations: [
@@ -29,11 +28,13 @@ import { SaleDetailComponent } from './sale-detail/sale-detail.component';
     DailySalesComponent,
     InventoryAvailableComponent,
     SaleDetailComponent,
+    KitchenKdsComponent,
   ],
   exports: [
     NewsaleComponent,
     CashRegisterComponent,
-    OpenCashRegisterComponent
+    OpenCashRegisterComponent,
+    KitchenKdsComponent,
   ],
   
   imports: [

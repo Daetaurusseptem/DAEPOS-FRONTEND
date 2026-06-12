@@ -124,6 +124,32 @@
                 </div>
               </div>
 
+              <hr class="my-4 opacity-5">
+
+              <!-- MÓDULO DE CAJA / TURNOS -->
+              <div class="col-md-12" formGroupName="shiftSettings">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Configuración de Turnos / Caja</h5>
+                    <p class="small text-muted mb-0">Establece el tiempo máximo que una caja puede permanecer abierta sin realizar corte.</p>
+                  </div>
+                </div>
+
+                <div class="row g-3 animate__animated animate__fadeIn">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Duración Máxima del Turno</label>
+                    <div class="input-group">
+                      <input type="number" formControlName="maxShiftDurationHours" class="form-control rounded-3" min="1" max="24" placeholder="Ej. 12">
+                      <span class="input-group-text">horas</span>
+                    </div>
+                    <p class="small text-muted mt-1 mb-0">Recomendado: 8 a 16 horas. El sistema bloqueará nuevas ventas al expirar el tiempo.</p>
+                    <div *ngIf="branchForm.get('shiftSettings.maxShiftDurationHours')?.errors" class="text-danger small mt-1">
+                      El valor debe estar entre 1 y 24 horas.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="col-md-12 mt-5">
                 <div class="d-flex justify-content-end gap-3">
                   <button type="button" routerLink="/dashboard/admin/branches" class="btn btn-light px-4 rounded-pill">Cancelar</button>

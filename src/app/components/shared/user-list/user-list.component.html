@@ -9,7 +9,10 @@
             </button>
         </div>
         
-        <div class="search-input-group d-flex gap-3">
+        <!-- Controles de Búsqueda y Filtros -->
+        <div class="d-flex flex-column gap-3 mt-2 w-100">
+            
+            <!-- Barra de búsqueda principal -->
             <div class="input-group">
                 <span class="input-group-text bg-white border-end-0">
                     <i class="bi bi-search text-muted"></i>
@@ -22,17 +25,33 @@
                        name="searchTerm">
             </div>
 
-            <!-- Filtro por Sucursal (Solo para el Company Admin / Dueño) -->
-            <div class="branch-filter" *ngIf="userRole === 'companyAdmin'">
-                <select class="form-select" 
-                        [(ngModel)]="selectedBranchId" 
-                        (change)="onSearch()"
-                        name="selectedBranchId">
-                    <option value="">Todas las sucursales</option>
-                    <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
-                    <option value="corporativo">Solo Corporativo (Sin sucursal)</option>
-                </select>
+            <!-- Fila de Filtros Avanzados -->
+            <div class="d-flex justify-content-end gap-3 w-100">
+                <!-- Filtro por Sucursal (Solo para el Company Admin / Dueño) -->
+                <div class="branch-filter" *ngIf="actualUserRole === 'companyAdmin'" style="width: 250px;">
+                    <select class="form-select" 
+                            [(ngModel)]="selectedBranchId" 
+                            (change)="onSearch()"
+                            name="selectedBranchId">
+                        <option value="">Todas las sucursales</option>
+                        <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+                        <option value="corporativo">Solo Corporativo (Sin sucursal)</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Estado -->
+                <div class="status-filter" style="width: 200px;">
+                    <select class="form-select" 
+                            [(ngModel)]="selectedStatus" 
+                            (change)="onSearch()"
+                            name="selectedStatus">
+                        <option value="">Todos los Estados</option>
+                        <option value="active">Activos</option>
+                        <option value="suspended">Suspendidos</option>
+                    </select>
+                </div>
             </div>
+            
         </div>
     </div>
 
@@ -49,7 +68,7 @@
         </div>
 
         <!-- Selector de Pestañas de Rol (Solo para el Company Admin / Dueño) -->
-        <div class="role-tabs-container mb-4" *ngIf="userRole === 'companyAdmin'">
+        <div class="role-tabs-container mb-4" *ngIf="actualUserRole === 'companyAdmin'">
             <div class="d-flex gap-2 border-bottom pb-2">
                 <button type="button" 
                         class="tab-item-btn" 
@@ -109,6 +128,10 @@
                                 'bg-warning-subtle text-warning': user.role === 'sysadmin',
                                 'bg-dark-subtle text-dark': user.role === 'companyAdmin'
                             }">{{ user.role }}</span>
+                            <br *ngIf="user.active === false">
+                            <span *ngIf="user.active === false" class="badge bg-danger-subtle text-danger mt-1" [title]="user.deactivationReason || 'Desactivado'">
+                                <i class="bi bi-lock-fill"></i> Suspendido
+                            </span>
                         </td>
                         <td>
                             <span class="text-muted small" *ngIf="user.branch">
@@ -120,14 +143,17 @@
                         </td>
                         <td>
                             <div class="actions-cell">
-                                <button class="btn btn-light btn-sm" (click)="navigateToCajasUsuario(user._id!)" title="Ver Cajas">
+                                <button class="btn btn-light btn-sm" (click)="navigateToUserCajas(user._id!)" title="Ver Historial de Cajas">
                                     <i class="bi bi-box-seam text-primary"></i>
                                 </button>
                                 <button class="btn btn-light btn-sm" [routerLink]="['/dashboard', userRole, 'users', 'edit', user._id]" title="Editar">
                                     <i class="bi bi-pencil-fill text-secondary"></i>
                                 </button>
-                                <button class="btn btn-light btn-sm text-danger" (click)="eliminarUsuario(user._id!)" title="Eliminar">
-                                    <i class="bi bi-trash3-fill"></i>
+                                <button *ngIf="user.active !== false" class="btn btn-light btn-sm text-danger" (click)="eliminarUsuario(user._id!)" title="Desactivar">
+                                    <i class="bi bi-slash-circle-fill"></i>
+                                </button>
+                                <button *ngIf="user.active === false" class="btn btn-light btn-sm text-success" (click)="reactivarUsuario(user._id!)" title="Reactivar Acceso">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
                                 </button>
                             </div>
                         </td>
@@ -167,3 +193,4 @@
         </div>
     </div>
 </div>
+

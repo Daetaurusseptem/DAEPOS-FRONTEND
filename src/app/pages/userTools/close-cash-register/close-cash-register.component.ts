@@ -29,7 +29,18 @@ export class CloseCashRegisterComponent implements OnInit {
   ngOnInit(): void {
     this.closeCashRegisterForm = this.fb.group({
       finalAmount: [0, [Validators.required, Validators.min(0)]],
+      remanenteFloatAmount: [1000, [Validators.required, Validators.min(0)]],
+      depositWithdrawalAmount: [0],
       notes: ['']
+    });
+
+    // Auto-calculate deposit safe drop based on count and change float
+    this.closeCashRegisterForm.valueChanges.subscribe((vals) => {
+      const finalAmount = vals.finalAmount || 0;
+      const remanente = vals.remanenteFloatAmount || 0;
+      const deposit = Math.max(0, finalAmount - remanente);
+      
+      this.closeCashRegisterForm.get('depositWithdrawalAmount')?.setValue(deposit, { emitEvent: false });
     });
 
     const userId = this.authService.usuario.id;
@@ -74,8 +85,16 @@ export class CloseCashRegisterComponent implements OnInit {
 
     const finalAmount = this.closeCashRegisterForm.get('finalAmount')?.value;
     const notes = this.closeCashRegisterForm.get('notes')?.value;
+    const remanente = this.closeCashRegisterForm.get('remanenteFloatAmount')?.value;
+    const deposit = this.closeCashRegisterForm.get('depositWithdrawalAmount')?.value;
 
-    this.cashRegisterService.closeCashRegister(this.cashId, finalAmount, notes).subscribe({
+    Swal.fire({
+      title: 'Procesando cierre...',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
+
+    this.cashRegisterService.closeCashRegister(this.cashId, finalAmount, notes, remanente, deposit).subscribe({
       next: (resp) => {
         const diff = resp.difference;
         let diffText = '';

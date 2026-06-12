@@ -1,0 +1,263 @@
+<div class="container-fluid py-5 bg-light min-vh-100">
+  <div class="row justify-content-center">
+    <div class="col-12 col-xl-10">
+      
+      <!-- Header -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
+        <div>
+          <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.5px;">Gestión de Facturación</h2>
+          <p class="text-muted mb-0">Administra tu suscripción y métodos de pago</p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex align-items-center gap-3">
+            <span class="text-muted small">Empresa: <span class="fw-bold text-dark">{{ company?.name }}</span></span>
+            <span class="badge bg-secondary" *ngIf="company?.billingType === 'manual'">
+              <i class="bi bi-building"></i> Cliente B2B Manual
+            </span>
+            <span class="badge bg-primary" *ngIf="company?.billingType === 'stripe'">
+              <i class="bi bi-credit-card"></i> Cliente Stripe
+            </span>
+            <span class="badge" 
+                  [ngClass]="company?.subscriptionStatus === 'active' || company?.subscriptionStatus === 'manual' ? 'bg-success' : 'bg-danger'">
+              {{ company?.subscriptionStatus || 'No configurada' }}
+            </span>
+        </div>
+      </div>
+
+      <!-- Alerta Inactiva -->
+      <div class="alert alert-info border-0 shadow-sm rounded-4 mb-4" *ngIf="company?.subscriptionStatus !== 'active' && company?.subscriptionStatus !== 'manual'">
+        <i class="bi bi-info-circle-fill me-2"></i> Su suscripción se encuentra inactiva o expirada. Por favor seleccione su plan y procese su pago para continuar accediendo al sistema.
+      </div>
+      
+      <!-- Alerta Cancelada -->
+      <div class="alert alert-warning border-0 shadow-sm rounded-4 text-start d-flex align-items-center mb-4" *ngIf="isCanceled">
+          <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-warning"></i>
+          <div>
+            <strong>Suscripción Cancelada.</strong><br>
+            Seguirás teniendo acceso a tus beneficios actuales hasta el <strong>{{ company.currentPeriodEnd | date:'longDate' }}</strong>.<br>
+            <small>Puedes restaurar tu suscripción reportando un nuevo pago.</small>
+          </div>
+      </div>
+
+      <!-- Alerta Gestión B2B -->
+      <div class="alert alert-dark border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center" *ngIf="company?.manualOverride">
+        <i class="bi bi-briefcase-fill fs-3 me-3 text-primary"></i>
+        <div>
+          <strong class="d-block mb-1" style="font-size: 1.1rem;">Gestión Corporativa (B2B) Activa</strong>
+          <span class="text-muted">Tu cuenta está actualmente bajo un esquema de Gestión Corporativa (B2B). Las renovaciones y ajustes de plan son manejadas directamente por tu ejecutivo de cuenta. Contacta a soporte para más detalles.</span>
+        </div>
+      </div>
+
+      <div *ngIf="loadingPlanes" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3 text-muted fw-medium">Cargando planes y suscripción...</p>
+      </div>
+
+      <!-- Contenedor Principal (Oculto si hay manualOverride) -->
+      <div class="row g-5" *ngIf="!loadingPlanes && !company?.manualOverride">
+        
+        <!-- COLUMNA IZQUIERDA: ESTADO ACTUAL -->
+        <div class="col-lg-4" *ngIf="company.stripeCustomerId || !useStripe">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="bg-dark text-white p-4">
+                    <p class="text-white-50 small text-uppercase tracking-wider mb-1 fw-bold">Plan Actual</p>
+                    <h3 class="fw-bolder mb-0 text-uppercase">{{ planName }}</h3>
+                </div>
+                
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="mb-4" *ngIf="company?.currentPeriodEnd">
+                        <span class="text-muted small d-block mb-1">Vencimiento del Ciclo</span>
+                        <span class="fw-bold text-dark">{{ company?.currentPeriodEnd | date:'longDate' }}</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-3">Beneficios Incluidos:</h6>
+                        <ul class="list-unstyled mb-0">
+                          <li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i> 
+                            <span class="text-secondary"><strong>{{ company.currentLimits?.maxBranches === -1 ? 'Ilimitadas' : company.currentLimits?.maxBranches }}</strong> Sucursales permitidas</span>
+                          </li>
+                          <li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i> 
+                            <span class="text-secondary"><strong>{{ company.currentLimits?.maxUsers === -1 ? 'Ilimitados' : company.currentLimits?.maxUsers }}</strong> Usuarios</span>
+                          </li>
+                          <li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i> 
+                            <span class="text-secondary"><strong>{{ company.currentLimits?.maxActiveRegisters === -1 ? 'Ilimitadas' : company.currentLimits?.maxActiveRegisters }}</strong> Cajas activas</span>
+                          </li>
+                          <li class="mb-2 d-flex align-items-start gap-2" *ngIf="company.currentLimits?.features?.includes('kitchen')">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i> 
+                            <span class="text-secondary">Módulo de Cocina KDS</span>
+                          </li>
+                          <li class="mb-2 d-flex align-items-start gap-2" *ngIf="company.currentLimits?.features?.includes('loyalty')">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i> 
+                            <span class="text-secondary">Programa de Lealtad</span>
+                          </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-auto" *ngIf="useStripe">
+                        <p class="text-muted small mb-3">Gestiona tu método de pago, cancela o descarga facturas desde el Portal Seguro.</p>
+                        <button class="btn btn-dark w-100 rounded-pill fw-bold py-2 shadow-sm" (click)="abrirPortal()" [disabled]="loading">
+                            <span *ngIf="!loading"><i class="bi bi-box-arrow-up-right me-2"></i>Portal de Facturación</span>
+                            <span *ngIf="loading"><i class="spinner-border spinner-border-sm me-2"></i>Abriendo...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: PLANES STRIPE (Si useStripe es true) -->
+        <div class="col-lg-8" *ngIf="useStripe">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1 text-dark">Explora Nuestros Planes</h4>
+                    <p class="text-muted mb-0">Sube de nivel y desbloquea el potencial completo de tu operación.</p>
+                </div>
+            </div>
+            
+            <div class="row g-4 row-cols-1 row-cols-md-2">
+                
+                <div class="col" *ngFor="let plan of planes">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 pricing-card text-center overflow-hidden position-relative"
+                         [ngClass]="{'border border-3 border-success': company.planId === plan.id || planName === plan.name}">
+                         
+                        <div *ngIf="company.planId === plan.id || planName === plan.name" class="position-absolute top-0 start-50 translate-middle-x bg-success text-white px-4 py-1 rounded-bottom-3 fw-bold small shadow-sm z-3">
+                          TU PLAN ACTUAL
+                        </div>
+
+                        <div class="card-header border-0 text-white p-4 pt-5" [ngClass]="plan.name.toLowerCase().includes('pro') ? 'bg-gradient-pro' : 'bg-gradient-basic'">
+                          <div class="pricing-icon mb-3">
+                            <i class="bi" [ngClass]="plan.name.toLowerCase().includes('pro') ? 'bi-stars' : 'bi-shop'"></i>
+                          </div>
+                          <h3 class="fw-bolder mb-0 text-uppercase tracking-wide">{{ plan.name }}</h3>
+                        </div>
+                        
+                        <div class="card-body p-4 d-flex flex-column">
+                          <p class="text-muted small mb-4 flex-grow-1">
+                            {{ plan.description || 'La solución perfecta para tu negocio.' }}
+                          </p>
+                          
+                          <div class="pricing-price mb-4">
+                            <span class="fs-2 fw-bolder text-dark">{{ plan.default_price?.unit_amount / 100 | currency:'MXN' }}</span>
+                            <span class="text-muted">/mes</span>
+                          </div>
+              
+                          <button *ngIf="company.subscriptionStatus !== 'active'" class="btn btn-lg rounded-pill fw-bold w-100" 
+                                  [ngClass]="plan.name.toLowerCase().includes('pro') ? 'btn-primary' : 'btn-dark'"
+                                  (click)="iniciarPago(plan.default_price.id)"
+                                  [disabled]="loading">
+                            <span *ngIf="!loading"><i class="bi bi-cart-check me-2"></i>Suscribirme</span>
+                            <span *ngIf="loading"><i class="spinner-border spinner-border-sm me-2"></i>Procesando...</span>
+                          </button>
+    
+                          <button *ngIf="company.subscriptionStatus === 'active'" class="btn btn-lg rounded-pill fw-bold w-100 shadow-sm" 
+                                  [ngClass]="company.planId === plan.id || planName === plan.name ? 'btn-outline-success disabled' : (plan.name.toLowerCase().includes('pro') ? 'btn-primary' : 'btn-outline-dark')"
+                                  (click)="abrirPortal()"
+                                  [disabled]="loading || company.planId === plan.id || planName === plan.name">
+                            <span *ngIf="company.planId === plan.id || planName === plan.name"><i class="bi bi-check-circle-fill me-2"></i>Activo</span>
+                            <span *ngIf="company.planId !== plan.id && planName !== plan.name"><i class="bi bi-arrow-up-circle-fill me-2"></i>Cambiar a {{ plan.name }}</span>
+                          </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: PAGO MANUAL (Si useStripe es false) -->
+        <div class="col-lg-8" *ngIf="!useStripe">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
+                    <h5 class="fw-bold mb-0">Instrucciones de Pago</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-secondary rounded-4 mb-4" *ngIf="globalSettings?.bankInstructions">
+                        <div class="row">
+                          <div class="col-md-6 mb-2"><strong>Banco:</strong> {{globalSettings.bankInstructions.bankName}}</div>
+                          <div class="col-md-6 mb-2"><strong>Cuenta:</strong> {{globalSettings.bankInstructions.accountNumber}}</div>
+                          <div class="col-md-6 mb-2"><strong>CLABE:</strong> {{globalSettings.bankInstructions.clabe}}</div>
+                          <div class="col-md-6 mb-2"><strong>Titular:</strong> {{globalSettings.bankInstructions.accountName}}</div>
+                        </div>
+                        <p class="mt-2 mb-0 small text-muted"><i class="bi bi-info-circle me-1"></i> {{globalSettings.bankInstructions.extraNotes}}</p>
+                    </div>
+
+                    <h6 class="fw-bold mb-3">Reportar un Pago</h6>
+                    <form (ngSubmit)="reportarPago()" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">Plan a renovar/activar</label>
+                            <select class="form-select rounded-pill" name="plan" [(ngModel)]="selectedPlanManual">
+                                <option value="">Seleccione un plan...</option>
+                                <option *ngFor="let plan of planes" [value]="plan._id">{{ plan.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">Monto Pagado</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-pill">$</span>
+                                <input type="number" class="form-control border-start-0 rounded-end-pill" name="amount" [(ngModel)]="amountManual" placeholder="Ej. 500">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted small fw-bold">Comprobante de Pago (Foto/Captura)</label>
+                            <input type="file" class="form-control rounded-pill" (change)="cambiarImagen($event)" accept="image/*">
+                        </div>
+                        <div class="col-12 mt-3" *ngIf="imgTemp">
+                            <img [src]="imgTemp" class="img-thumbnail rounded-4" style="max-height: 200px;">
+                        </div>
+                        <div class="col-12 mt-4 text-end">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" [disabled]="loading">
+                                <span *ngIf="!loading"><i class="bi bi-send me-2"></i>Enviar Reporte</span>
+                                <span *ngIf="loading"><i class="spinner-border spinner-border-sm me-2"></i>Subiendo...</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de historial manual -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
+                    <h5 class="fw-bold mb-0">Mis Reportes Recientes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted small">
+                                <tr>
+                                    <th class="ps-4">Fecha</th>
+                                    <th>Plan</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                    <th class="pe-4 text-end">Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let pm of myPayments">
+                                    <td class="ps-4">{{ pm.createdAt | date:'mediumDate' }}</td>
+                                    <td>{{ pm.planRequested?.name || 'Otro' }}</td>
+                                    <td class="fw-bold">{{ pm.amount | currency }}</td>
+                                    <td>
+                                        <span class="badge" [ngClass]="{'bg-warning': pm.status === 'pending', 'bg-success': pm.status === 'approved', 'bg-danger': pm.status === 'rejected'}">
+                                            {{ pm.status | uppercase }}
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <a *ngIf="pm.proofImageUrl" [href]="pm.proofImageUrl" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="myPayments.length === 0">
+                                    <td colspan="5" class="text-center py-4 text-muted">No has realizado reportes manuales.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

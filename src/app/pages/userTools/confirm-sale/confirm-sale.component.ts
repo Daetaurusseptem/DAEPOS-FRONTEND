@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -7,6 +8,7 @@ import { ReceiptPrinterService } from 'src/app/services/receipt-printer.service'
 import { CustomerService } from 'src/app/services/customer.service';
 import { PromotionService } from 'src/app/services/promotion.service';
 import { BranchService } from 'src/app/services/branch.service';
+import { HardwareConnectorService } from 'src/app/services/hardware-connector.service';
 
 @Component({
   selector: 'app-confirm-sale',
@@ -51,7 +53,8 @@ export class ConfirmSaleComponent implements OnInit {
     private receiptPrinterService: ReceiptPrinterService,
     private customerService: CustomerService,
     private promotionService: PromotionService,
-    private branchService: BranchService
+    private branchService: BranchService,
+    private hardwareConnector: HardwareConnectorService
   ) {
     this.companyId = this.authService.companyId || (this.authService.company as any)?._id || '';
 
@@ -89,12 +92,15 @@ export class ConfirmSaleComponent implements OnInit {
     if (branchId) {
       this.branchService.getBranchById(branchId).subscribe(resp => {
         if (resp.ok && resp.branch) {
-          this.branchSettings = resp.branch.loyaltySettings || {
-            enabled: true,
-            identifierType: 'phone',
-            pointsEarnRate: 10,
-            pointsRedeemRate: 0.10,
-            maxRedemptionPercentage: 100
+          this.branchSettings = {
+            ...(resp.branch.loyaltySettings || {
+              enabled: true,
+              identifierType: 'phone',
+              pointsEarnRate: 10,
+              pointsRedeemRate: 0.10,
+              maxRedemptionPercentage: 100
+            }),
+            enableVirtualKeyboard: resp.branch.enableVirtualKeyboard ?? false
           };
           
           // Adaptar dinámicamente los validadores del registro in-situ según la sucursal
@@ -166,41 +172,82 @@ export class ConfirmSaleComponent implements OnInit {
       }))
     };
 
-    this.saleService.createSale(saleData).subscribe((response: any) => {
-      console.log('Venta creada con éxito', response);
-      this.generarTicket({ ...saleData, _id: response._id, date: response.date });
-      this.generarComanda(); // Generar comanda para cocina
+    const proceedWithSaleCreation = () => {
+      this.saleService.createSale(saleData).subscribe((response: any) => {
+        console.log('Venta creada con éxito', response);
+        this.generarTicket({ ...saleData, _id: response._id, date: response.date });
+        this.generarComanda(); // Generar comanda para cocina
 
-      // Limpiar localStorage después de confirmar la venta
-      this.clearSaleFromLocalStorage();
+        if (saleData.paymentMethod === 'cash') {
+          this.hardwareConnector.openCashDrawer().subscribe();
+        }
 
-      // Alerta de seguridad si se excede el límite de efectivo
-      if (response.cashLimitExceeded) {
+        // Limpiar localStorage después de confirmar la venta
+        this.clearSaleFromLocalStorage();
+
+        // Alerta de seguridad si se excede el límite de efectivo
+        if (response.cashLimitExceeded) {
+          import('sweetalert2').then((Swal) => {
+            Swal.default.fire({
+              icon: 'warning',
+              title: 'Límite de Efectivo Excedido',
+              text: 'Has superado el límite de seguridad en caja. Por favor, realiza un retiro parcial a la brevedad.',
+              confirmButtonText: 'Entendido',
+              confirmButtonColor: '#f8bb86'
+            }).then(() => {
+              this.router.navigate(['dashboard/user/sales-success']);
+            });
+          });
+        } else {
+          this.router.navigate(['dashboard/user/sales-success']);
+        }
+      }, error => {
+        console.error('Error al crear la venta', error);
         import('sweetalert2').then((Swal) => {
           Swal.default.fire({
-            icon: 'warning',
-            title: 'Límite de Efectivo Excedido',
-            text: 'Has superado el límite de seguridad en caja. Por favor, realiza un retiro parcial a la brevedad.',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#f8bb86'
-          }).then(() => {
-            this.router.navigate(['dashboard/user/sales-success']);
+            icon: 'error',
+            title: 'Error de Cobro',
+            text: error.error?.message || 'Ocurrió un error al procesar el cobro.',
+            confirmButtonColor: '#d33'
           });
         });
-      } else {
-        this.router.navigate(['dashboard/user/sales-success']);
-      }
-    }, error => {
-      console.error('Error al crear la venta', error);
+      });
+    };
+
+    if (this.confirmSaleForm.value.paymentMethod === 'credit') {
+      let paymentSub: Subscription;
+
       import('sweetalert2').then((Swal) => {
         Swal.default.fire({
-          icon: 'error',
-          title: 'Error de Cobro',
-          text: error.error?.message || 'Ocurrió un error al procesar el cobro.',
-          confirmButtonColor: '#d33'
+          title: 'Cobrando en Terminal...',
+          text: `Por favor inserte la tarjeta y cobre $${this.totalAmount.toFixed(2)}`,
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar Operación',
+          allowOutsideClick: false,
+          didOpen: () => Swal.default.showLoading(),
+        }).then((result) => {
+          if (result.isDismissed) {
+            // El usuario canceló la espera
+            if (paymentSub) {
+              paymentSub.unsubscribe();
+            }
+            Swal.default.fire('Cancelado', 'Operación cancelada por el cajero', 'info');
+          }
+        });
+
+        paymentSub = this.hardwareConnector.chargePayment(this.totalAmount).subscribe(res => {
+          if (res.status === 'approved') {
+            saleData.paymentReference = res.reference;
+            Swal.default.close();
+            proceedWithSaleCreation();
+          } else {
+            Swal.default.fire('Error en Terminal', res.message || 'Pago rechazado o cancelado', 'error');
+          }
         });
       });
-    });
+    } else {
+      proceedWithSaleCreation();
+    }
   }
 
   // --- MÉTODOS DE CRM, CLIENTE FRECUENTE Y CUPONES ---
@@ -520,6 +567,12 @@ ${product.modifications && product.modifications.length > 0 ? `     * Mod: ${pro
 
   get changeControl() {
     return this.confirmSaleForm.get('change');
+  }
+
+  onInputClick(fieldName: string, numericOnly: boolean): void {
+    if (this.branchSettings.enableVirtualKeyboard) {
+      this.openKeyboard(fieldName, numericOnly);
+    }
   }
 
   openKeyboard(fieldName: string, numericOnly: boolean): void {

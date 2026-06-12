@@ -1,27 +1,29 @@
-/* Modern Premium Layout Styles for POS Confirmation Checkout */
+/* Minimalist Canvas White POS Checkout Layout Styles */
 
 .container {
   max-width: 900px;
   margin: 0 auto;
+  padding: 0 15px 40px;
+  font-family: 'Inter', sans-serif;
 }
 
 .card {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-  background-color: #ffffff;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
 .card-header {
-  background-color: #fafafa;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: var(--bg-ghost) !important;
+  border-bottom: 1px solid var(--border-color) !important;
   padding: 20px 24px;
 }
 
 .card-header h3 {
   font-weight: 700;
-  color: #111111;
+  color: var(--text-main);
   font-size: 1.35rem;
   letter-spacing: -0.02em;
   margin-bottom: 0;
@@ -29,93 +31,140 @@
 
 .card-body {
   padding: 24px;
+  color: var(--text-main);
 }
 
-/* CRM Loyalty Container Styles */
+h5, h6 {
+  color: var(--text-main) !important;
+  font-weight: 700;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Table Style Matching Global minimal theme */
+.table {
+  color: var(--text-main) !important;
+}
+
+.table th {
+  color: var(--text-muted) !important;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color) !important;
+  font-weight: 700;
+}
+
+.table td {
+  border-bottom: 1px solid var(--border-color) !important;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  padding: 12px 8px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--bg-ghost) !important;
+}
+
+/* CRM Loyalty & Promo Containers - Clean Ash Gray */
 .loyalty-container, .promo-container {
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 16px;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md);
+  padding: 18px;
   margin-bottom: 20px;
-  background-color: #fafafa !important;
+  background-color: var(--bg-ghost) !important;
 }
 
-.loyalty-container h6, .promo-container h6 {
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
-  color: #111111;
-}
-
-/* Rounded Buttons */
-.rounded-pill {
-  border-radius: 50px !important;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-/* Input Styles */
-.search-input, .coupon-input {
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+.coupon-input, .search-input {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-sm);
   padding: 10px 14px;
-  font-size: 0.88rem;
-  color: #333333;
-  transition: all 0.2s ease-in-out;
+  font-size: 0.9rem;
+  transition: var(--transition);
 }
 
-.search-input:focus, .coupon-input:focus {
-  border-color: #0070f3;
-  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.15);
+.coupon-input:focus, .search-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.05) !important;
+  outline: none;
 }
 
 .input-group-text {
-  background-color: #f5f5f7;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 10px 0 0 10px;
-  color: #888888;
+  background-color: var(--bg-ghost) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  color: var(--text-muted);
 }
 
 .search-input {
-  border-radius: 0 10px 10px 0 !important;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
 }
 
-/* Customer Search Results Panel */
-.search-results {
-  max-height: 250px;
-  overflow-y: auto;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  margin-top: 6px;
-}
-
-.list-group-item-action {
-  transition: all 0.15s ease;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.list-group-item-action:hover {
-  background-color: #f7f7f9;
-}
-
-/* Selected Customer Pill */
-.selected-customer-pill {
-  background-color: #ffffff;
+/* Selected Loyalty Customer */
+.selected-customer-pill, .applied-coupon {
+  background-color: #ffffff !important;
   padding: 12px 16px !important;
-  border: 1px solid rgba(25, 135, 84, 0.2) !important;
-  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.04);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Switch styling for point redemption */
-.form-check-input.check-success:checked {
-  background-color: #198754;
-  border-color: #198754;
+.text-success {
+  color: var(--success) !important;
 }
 
-/* Quick Registration Dialog Backdrop */
+.text-danger {
+  color: var(--danger) !important;
+}
+
+/* Totals Break Down */
+.bg-light {
+  background-color: var(--bg-ghost) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Inputs & Form Controls */
+.premium-input {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.premium-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.05) !important;
+  outline: none;
+}
+
+.premium-select {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.premium-select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.05) !important;
+}
+
+/* Rounded Pill */
+.rounded-pill {
+  border-radius: var(--radius-lg) !important;
+}
+
+/* Quick register popup */
 .quick-register-backdrop {
   position: fixed;
   top: 0;
@@ -127,63 +176,24 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: fadeIn 0.2s ease-out;
   z-index: 9999 !important;
 }
 
 .quick-register-card {
   width: 100%;
   max-width: 460px;
-  background-color: #ffffff;
-  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: visible;
-}
-
-.quick-register-card label {
-  font-size: 0.8rem;
-  letter-spacing: -0.01em;
-}
-
-.quick-register-card input {
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  padding: 10px 14px;
-  font-size: 0.88rem;
-  color: #333333;
-}
-
-.quick-register-card input:focus {
-  border-color: #0070f3;
-  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.15);
+  color: var(--text-main);
+  padding: 24px;
 }
 
 .btn-close {
   cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s;
 }
 
-.btn-close:hover {
-  opacity: 1;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* Responsive Styles */
-@media (max-width: 576px) {
-  .quick-register-card {
-    max-width: 90%;
-  }
+.fs-8 {
+  font-size: 0.8rem;
 }

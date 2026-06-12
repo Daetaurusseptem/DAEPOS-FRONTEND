@@ -189,3 +189,87 @@ h4 {
 .error-detail-row td {
   border-bottom: 1px solid var(--border-color) !important;
 }
+
+/* --- Timeline Moderno --- */
+.timeline-container {
+  position: relative;
+  padding-left: 2.5rem;
+  margin-top: 1rem;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.8rem;
+  width: 2px;
+  background-color: var(--border-color);
+  border-radius: 2px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-icon {
+  position: absolute;
+  left: -2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  z-index: 1;
+  border: 3px solid var(--bg-main);
+  transition: var(--transition);
+}
+
+.transaction-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.timeline-item:hover .transaction-card {
+  border-color: var(--primary) !important;
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md) !important;
+}
+
+.timeline-item:hover .timeline-icon {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.pulse-icon {
+  display: inline-block;
+  color: var(--primary);
+  animation: pulse-color 2s infinite;
+}
+
+@keyframes pulse-color {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.text-light-muted {
+  color: #adb5bd;
+}
+
+/* --- Forensic Modal --- */
+.forensic-card {
+  border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.forensic-card .card-header {
+  background-color: transparent !important;
+}

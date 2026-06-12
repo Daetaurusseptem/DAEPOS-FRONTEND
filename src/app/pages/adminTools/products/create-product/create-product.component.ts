@@ -52,7 +52,7 @@ export class CreateProductComponent implements OnInit {
       name: ['', Validators.required],
       description: [''],
       brand: ['', Validators.required],
-      supplier: ['', Validators.required],
+      supplier: [''],
       categories: [[], Validators.required],
       isComposite: [false, Validators.required],
       recipe: [''],
@@ -71,10 +71,23 @@ export class CreateProductComponent implements OnInit {
     // Suscribirse a los cambios en el campo isComposite
     this.productForm.get('isComposite')!.valueChanges.subscribe(value => {
       this.isComposite = value;
-      if (!value) {
+      const supplierControl = this.productForm.get('supplier');
+      
+      if (value) {
+        // Es compuesto: quitamos proveedor
+        supplierControl!.clearValidators();
+        supplierControl!.setValue(null);
+      } else {
+        // Es simple: quitamos receta, requerimos proveedor
         this.productForm.get('recipe')!.setValue('');
+        supplierControl!.setValidators([Validators.required]);
       }
+      supplierControl!.updateValueAndValidity();
     });
+    
+    // Set initial state
+    this.productForm.get('supplier')!.setValidators([Validators.required]);
+    this.productForm.get('supplier')!.updateValueAndValidity();
   }
 
   loadCategories() {

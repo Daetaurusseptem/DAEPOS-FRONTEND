@@ -31,7 +31,7 @@
           </ng-select>
         </div>
         <div class="row">
-          <div class="col-md-6 mb-3">
+          <div class="col-md-6 mb-3" *ngIf="!isComposite">
             <label for="supplier" class="form-label">Proveedor:</label>
             <select class="form-select" formControlName="supplier" id="supplier">
               <option value="" disabled selected>Selecciona un proveedor</option>

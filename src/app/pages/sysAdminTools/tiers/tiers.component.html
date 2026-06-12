@@ -1,0 +1,167 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 fw-bold text-dark mb-0">
+      <i class="bi bi-layers text-primary me-2"></i>Gestión de Tiers SaaS
+    </h2>
+  </div>
+
+  <div class="row">
+    <!-- Formulario (Izquierda) -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">{{ isEditing ? 'Editar Límites del Plan' : 'Configurar Plan' }}</h5>
+          <button class="btn btn-sm btn-outline-primary" (click)="crearPlanManual()">
+            <i class="bi bi-plus-circle me-1"></i>Nuevo Plan B2B
+          </button>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="planForm" (ngSubmit)="savePlan()">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nombre en el POS (Alias)</label>
+              <input type="text" class="form-control" formControlName="name" placeholder="Ej. Plan Pro">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Modo de Cobro</label>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" formControlName="billingType" value="stripe" id="btStripe">
+                  <label class="form-check-label" for="btStripe"><i class="bi bi-credit-card text-primary me-1"></i>Stripe Automático</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" formControlName="billingType" value="manual" id="btManual">
+                  <label class="form-check-label" for="btManual"><i class="bi bi-building text-secondary me-1"></i>Manual B2B</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3" *ngIf="planForm.get('billingType')?.value === 'stripe'">
+              <label class="form-label fw-bold">ID Producto Stripe</label>
+              <select class="form-select" formControlName="stripeProductId" *ngIf="!planForm.get('stripeProductId')?.value?.startsWith('manual_') && !isEditing">
+                <option value="">Seleccione un producto de Stripe</option>
+                <option *ngFor="let prod of stripeProducts" [value]="prod.id">
+                  {{ prod.name }} ({{ prod.id }})
+                </option>
+              </select>
+              <input type="text" class="form-control" formControlName="stripeProductId" [attr.disabled]="true" *ngIf="isEditing">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Precio Mensual ($)</label>
+              <input type="number" class="form-control" formControlName="price" placeholder="Ej. 499">
+            </div>
+            
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label fw-bold">Max. Sucursales</label>
+                <input type="number" class="form-control" formControlName="maxBranches" placeholder="-1 ilimitado">
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label fw-bold">Max. Usuarios</label>
+                <input type="number" class="form-control" formControlName="maxUsers" placeholder="-1 ilimitado">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Max. Cajas Activas</label>
+              <input type="number" class="form-control" formControlName="maxActiveRegisters" placeholder="-1 ilimitado">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Features y Permisos Especiales</label>
+              <div class="card bg-light border-0">
+                <div class="card-body py-2">
+                  <div class="form-check" *ngFor="let feature of availableFeatures">
+                    <input class="form-check-input" type="checkbox" [value]="feature.id" [id]="'feat_' + feature.id" (change)="onCheckboxChange($event)" [checked]="isFeatureChecked(feature.id)">
+                    <label class="form-check-label" [for]="'feat_' + feature.id">
+                      {{ feature.name }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-3 mb-4">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" formControlName="isActive" id="isActive">
+                <label class="form-check-label" for="isActive">Plan Activo (Disponible para asignar)</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" formControlName="isCustom" id="isCustom">
+                <label class="form-check-label text-warning fw-bold" for="isCustom">Plan Especial / Custom (Oculto)</label>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary" [disabled]="planForm.invalid || loading">
+                {{ isEditing ? 'Guardar Cambios' : 'Vincular y Guardar' }}
+              </button>
+              <button type="button" class="btn btn-light" *ngIf="currentEditId || planForm.get('stripeProductId')?.value" (click)="cancelEdit()">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Planes (Derecha) -->
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="border-0">Plan (Stripe)</th>
+                  <th class="border-0 text-center">Límites (Sucursales / Usrs)</th>
+                  <th class="border-0 text-center">Estado POS</th>
+                  <th class="border-0 text-end pe-4">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let plan of mergedPlans" [class.bg-light]="!plan.isConfigured">
+                  <td>
+                    <div class="fw-bold">{{ plan.dbName || plan.name }} <span *ngIf="plan.isConfigured" class="text-success ms-1">${{ plan.price || 0 }}</span></div>
+                    <small class="text-muted d-block mt-1">
+                      <span *ngIf="plan.billingType === 'stripe' || (!plan.billingType && plan.stripeProductId)" class="badge bg-primary me-1">SaaS Stripe</span>
+                      <span *ngIf="plan.billingType === 'manual'" class="badge bg-dark me-1">SaaS B2B Manual</span>
+                      <code *ngIf="plan.billingType !== 'manual'">{{ plan.stripeProductId }}</code>
+                    </small>
+                  </td>
+                  <td class="text-center">
+                    <span *ngIf="plan.isConfigured">
+                      <span class="badge bg-secondary me-1">{{ plan.maxBranches === -1 ? '∞' : plan.maxBranches }} Suc.</span>
+                      <span class="badge bg-secondary">{{ plan.maxUsers === -1 ? '∞' : plan.maxUsers }} Usr.</span>
+                    </span>
+                    <span *ngIf="!plan.isConfigured" class="text-muted fst-italic">Sin vincular</span>
+                  </td>
+                  <td class="text-center">
+                    <span *ngIf="plan.isConfigured" class="badge" [ngClass]="plan.isActive ? 'bg-success' : 'bg-danger'">
+                      {{ plan.isActive ? 'Activo' : 'Inactivo' }}
+                    </span>
+                    <span *ngIf="!plan.isConfigured" class="badge bg-secondary">
+                      Pendiente
+                    </span>
+                  </td>
+                  <td class="text-end pe-4">
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="configurePlan(plan)">
+                      <i class="bi" [ngClass]="plan.isConfigured ? 'bi-pencil' : 'bi-link-45deg'"></i> 
+                      {{ plan.isConfigured ? 'Editar' : 'Configurar' }}
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" *ngIf="plan.isConfigured" (click)="deletePlan(plan._id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="mergedPlans.length === 0 && !loading">
+                  <td colspan="4" class="text-center py-4 text-muted">No hay planes en Stripe ni configurados.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -54,35 +54,7 @@ export class DailySalesComponent implements OnInit {
   }
 
   closeShift() {
-    Swal.fire({
-      title: 'Cierre de Turno (Corte Z)',
-      html: `
-        <div class="text-start">
-          <p class="mb-2">Por favor, ingresa el monto total de <b>efectivo</b> contado en caja:</p>
-          <input type="number" id="actualAmount" class="swal2-input" placeholder="Monto contado ($)" min="0">
-          <p class="mt-3 mb-1"><small>Notas adicionales:</small></p>
-          <textarea id="notes" class="swal2-textarea" placeholder="Observaciones del cierre..."></textarea>
-        </div>
-      `,
-      icon: 'info',
-      showCancelButton: true,
-      confirmButtonText: 'Finalizar Turno',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#28a745',
-      preConfirm: () => {
-        const actualAmount = (document.getElementById('actualAmount') as HTMLInputElement).value;
-        const notes = (document.getElementById('notes') as HTMLTextAreaElement).value;
-        if (!actualAmount || parseFloat(actualAmount) < 0) {
-          Swal.showValidationMessage('Debes ingresar un monto válido');
-          return false;
-        }
-        return { actualAmount: parseFloat(actualAmount), notes };
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.executeClose(result.value.actualAmount, result.value.notes);
-      }
-    });
+    this.router.navigate(['/dashboard/user/close-register']);
   }
 
   addExpenseUI() {
@@ -90,31 +62,60 @@ export class DailySalesComponent implements OnInit {
       title: 'Retiro de Efectivo / Gasto',
       html: `
         <div class="text-start">
-          <label class="form-label">Monto ($)</label>
-          <input type="number" id="expAmount" class="swal2-input" placeholder="0.00" min="0">
+          <label class="form-label" style="font-weight: 600; color: #1a1a1a;">Monto ($)</label>
+          <input type="number" id="expAmount" class="swal2-input m-0 w-100" placeholder="0.00" min="0">
           
-          <label class="form-label mt-2">Tipo de Movimiento</label>
-          <select id="expType" class="swal2-select w-100 m-0">
-            <option value="withdrawal">Retiro de Seguridad</option>
+          <label class="form-label mt-3" style="font-weight: 600; color: #1a1a1a;">Tipo de Movimiento</label>
+          <select id="expType" class="swal2-select w-100 m-0" style="padding: 10px;" onchange="window.toggleRefField()">
+            <option value="withdrawal">Retiro de Seguridad para Bóveda</option>
             <option value="expense">Gasto de Operación</option>
           </select>
 
-          <label class="form-label mt-2">Motivo / Descripción</label>
-          <input type="text" id="expReason" class="swal2-input" placeholder="Ej: Pago de luz, Retiro parcial...">
+          <div id="refFieldContainer" class="mt-3">
+            <label class="form-label" style="font-weight: 600; color: #1a1a1a;">Folio de Sobre / Referencia de Bóveda</label>
+            <input type="text" id="expRef" class="swal2-input m-0 w-100" placeholder="Ej: SOBRE-4893">
+          </div>
+
+          <label class="form-label mt-3" style="font-weight: 600; color: #1a1a1a;">Motivo / Descripción</label>
+          <input type="text" id="expReason" class="swal2-input m-0 w-100" placeholder="Ej: Retiro parcial por seguridad...">
         </div>
       `,
       showCancelButton: true,
       confirmButtonText: 'Registrar Movimiento',
       confirmButtonColor: '#007bff',
+      didOpen: () => {
+        (window as any).toggleRefField = () => {
+          const typeEl = document.getElementById('expType') as HTMLSelectElement;
+          const refContainer = document.getElementById('refFieldContainer');
+          if (typeEl && refContainer) {
+            refContainer.style.display = typeEl.value === 'withdrawal' ? 'block' : 'none';
+          }
+        };
+        (window as any).toggleRefField();
+      },
       preConfirm: () => {
         const amount = (document.getElementById('expAmount') as HTMLInputElement).value;
         const reason = (document.getElementById('expReason') as HTMLInputElement).value;
         const type = (document.getElementById('expType') as HTMLSelectElement).value;
+        const refVal = (document.getElementById('expRef') as HTMLInputElement).value;
+        
         if (!amount || parseFloat(amount) <= 0 || !reason) {
           Swal.showValidationMessage('Monto y motivo son obligatorios');
           return false;
         }
-        return { amount: parseFloat(amount), reason, type };
+        
+        const parsedAmount = parseFloat(amount);
+        const available = this.openCashRegisterWithSales.expectedAmount || 0;
+        if (parsedAmount > available) {
+          Swal.showValidationMessage(`No puedes retirar más del efectivo disponible en caja ($${available.toFixed(2)})`);
+          return false;
+        }
+
+        if (type === 'withdrawal' && !refVal) {
+          Swal.showValidationMessage('El folio del sobre de seguridad es obligatorio');
+          return false;
+        }
+        return { amount: parsedAmount, reason, type, depositReference: type === 'withdrawal' ? refVal : '' };
       }
     }).then((result) => {
       if (result.isConfirmed) {
@@ -122,63 +123,39 @@ export class DailySalesComponent implements OnInit {
           this.openCashRegisterWithSales._id, 
           result.value.amount, 
           result.value.reason, 
-          result.value.type as any
+          result.value.type as any,
+          result.value.depositReference
         ).subscribe({
           next: () => {
             Swal.fire('Éxito', 'Movimiento registrado correctamente', 'success');
             this.loadOpenCashRegisterWithSales();
           },
-          error: () => Swal.fire('Error', 'No se pudo registrar el movimiento', 'error')
+          error: (err) => {
+            const errorMsg = err.error?.message || 'No se pudo registrar el movimiento';
+            Swal.fire('Error', errorMsg, 'error');
+          }
         });
       }
     });
   }
 
-  executeClose(actualAmount: number, notes: string) {
-    Swal.fire({
-      title: 'Procesando cierre...',
-      allowOutsideClick: false,
-      didOpen: () => { Swal.showLoading(); }
-    });
-
-    this.cashRegisterService.closeCashRegister(
-      this.openCashRegisterWithSales._id, 
-      actualAmount, 
-      notes
-    ).subscribe({
-      next: (resp) => {
-        const diff = resp.difference;
-        let diffText = '';
-        let diffIcon: 'success' | 'warning' | 'error' = 'success';
-
-        if (diff === 0) {
-          diffText = '¡Caja perfecta! No hubo descuadres.';
-        } else if (diff > 0) {
-          diffText = `Sobran $${diff.toFixed(2)} en caja.`;
-          diffIcon = 'warning';
-        } else {
-          diffText = `Faltan $${Math.abs(diff).toFixed(2)} en caja.`;
-          diffIcon = 'error';
-        }
-
-        Swal.fire({
-          title: 'Turno Cerrado',
-          text: diffText,
-          icon: diffIcon,
-          confirmButtonText: 'Ir al Inicio'
-        }).then(() => {
-          this.router.navigate(['/dashboard/user']);
-        });
-      },
-      error: (err) => {
-        console.error('Error closing shift', err);
-        Swal.fire('Error', 'No se pudo cerrar el turno. Intenta de nuevo.', 'error');
-      }
-    });
-  }
+  // executeClose removed
 
   generarPDF() {
     if (!this.openCashRegisterWithSales) return;
+
+    const userId = this.authService.usuario.id;
+    const expected = this.openCashRegisterWithSales.expectedAmount || 0;
+    
+    // Registrar huella de Corte X en base de datos antes de mandar a imprimir
+    this.cashRegisterService.registerCorteX(this.openCashRegisterWithSales._id, userId, expected).subscribe({
+      next: () => {
+        console.log('Huella de Corte X registrada en el servidor.');
+      },
+      error: (err) => {
+        console.error('Error al registrar huella de Corte X:', err);
+      }
+    });
 
     const doc = new jsPDF({
       format: [58.28, 350.89]

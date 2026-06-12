@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ExpiredSubscriptionComponent } from './billing/expired-subscription/expired-subscription.component';
 
 import { SysAdminGuard } from 'src/app/guards/sys-admin.guard';
 import { AuthGuardGuard } from 'src/app/guards/is-auth.guard';
 import { AdminGuard } from 'src/app/guards/admin-guard.guard';
+import { CompanyAdminGuard } from 'src/app/guards/company-admin.guard';
 import { OverviewComponent } from './dashboard/overview/overview.component';
 import { ReportsComponent } from './dashboard/reports/reports.component';
 import { CompanyAdminHomeComponent } from './adminTools/company-admin-home/company-admin-home.component';
@@ -19,6 +21,14 @@ import { SelectSubscriptionsComponent } from './sysAdminTools/subscriptions/sele
 import { CreateUserReComponent } from '../components/shared/create-user/create-user.component';
 import { UserListComponent } from '../components/shared/user-list/user-list.component';
 import { SysadminDashboardComponent } from './sysAdminTools/dashboard/sysadmin-dashboard.component';
+import { SysadminTransactionsComponent } from './sysAdminTools/transactions/sysadmin-transactions.component';
+import { SysadminLogsComponent } from './sysAdminTools/logs/sysadmin-logs.component';
+import { SysadminSubscriptionsComponent } from './sysAdminTools/subscriptions/sysadmin-subscriptions.component';
+import { SysadminSubscriptionDetailComponent } from './sysAdminTools/subscriptions/detail/sysadmin-subscription-detail.component';
+import { SysadminUsersComponent } from './sysAdminTools/sysadmin-users/sysadmin-users.component';
+import { TiersComponent } from './sysAdminTools/tiers/tiers.component';
+import { GlobalSettingsComponent } from './sysAdminTools/global-settings/global-settings.component';
+import { ManualPaymentsComponent } from './sysAdminTools/manual-payments/manual-payments.component';
 import { RoleGuard } from '../guards/role.guard';
 import { CreateProductComponent } from './adminTools/products/create-product/create-product.component';
 import { CreateSupplierComponent } from './adminTools/Suppliers/create-supplier/create-supplier.component';
@@ -33,6 +43,8 @@ import { CashRegisterGuard } from '../guards/cash-register.guard';
 import { UserHomeComponent } from './userTools/user-home/user-home.component';
 import { userGuard } from '../guards/user.guard';
 import { NewsaleComponent } from './userTools/newsale/newsale.component';
+import { KitchenKdsComponent } from './userTools/kitchen-kds/kitchen-kds.component';
+import { kitchenGuard } from '../guards/kitchen.guard';
 import { ProductsListComponent } from './adminTools/products/products-list/products-list.component';
 import { SuppliersListComponent } from './adminTools/Suppliers/suppliers-list/suppliers-list.component';
 import { CategoriesListComponent } from './adminTools/Categories/categories-list/categories-list.component';
@@ -57,7 +69,7 @@ import { StatisticsComponent } from './adminTools/statistics/statistics.componen
 import { SaleDetailComponent } from './userTools/sale-detail/sale-detail.component';
 import { ManagePrintersComponent } from './adminTools/manage-printers/manage-printers.component';
 import { UserCajasComponent } from '../components/user-cajas/user-cajas.component';
-import { FechaCajasComponent } from '../components/fecha-cajas/fecha-cajas.component';
+
 import { CajaDetailComponent } from '../components/caja-detail/caja-detail.component';
 import { BranchListComponent } from './adminTools/branches/branch-list/branch-list.component';
 import { BranchFormComponent } from './adminTools/branches/branch-form/branch-form.component';
@@ -67,6 +79,7 @@ import { CustomersListComponent } from './adminTools/customers/customers-list.co
 import { PromotionsListComponent } from './adminTools/promotions/promotions-list.component';
 import { LiveRegistersComponent } from './adminTools/live-registers/live-registers.component';
 import { CajasHistorialComponent } from './adminTools/cajas-historial/cajas-historial.component';
+import { ManageBillingComponent } from './billing/manage-billing/manage-billing.component';
 
 const routes: Routes = [
   {
@@ -80,13 +93,21 @@ const routes: Routes = [
       { path: 'notifications', component: NotificationsPageComponent },
       //SYSADMIN
       { path: 'sysadmin/dashboard', canActivate: [SysAdminGuard], component: SysadminDashboardComponent },
-      { path: 'sysadmin/users', canActivate: [SysAdminGuard], component: UserListComponent },
+      { path: 'sysadmin/transactions', canActivate: [SysAdminGuard], component: SysadminTransactionsComponent },
+      { path: 'sysadmin/logs', canActivate: [SysAdminGuard], component: SysadminLogsComponent },
+      { path: 'sysadmin/subscriptions', canActivate: [SysAdminGuard], component: SysadminSubscriptionsComponent },
+      { path: 'sysadmin/subscriptions/:id', canActivate: [SysAdminGuard], component: SysadminSubscriptionDetailComponent },
+      { path: 'sysadmin/users', canActivate: [SysAdminGuard], component: SysadminUsersComponent },
       { path: 'sysadmin/users/edit/:id', canActivate: [SysAdminGuard], component: UserEditComponent },
       { path: 'sysadmin/users/new', canActivate: [SysAdminGuard], component: CreateUserReComponent },
+      { path: 'sysadmin/tiers', canActivate: [SysAdminGuard], component: TiersComponent },
+      { path: 'sysadmin/global-settings', canActivate: [SysAdminGuard], component: GlobalSettingsComponent },
+      { path: 'sysadmin/manual-payments', canActivate: [SysAdminGuard], component: ManualPaymentsComponent },
       { path: 'sysadmin/companies', canActivate: [SysAdminGuard], component: CompanyListComponent },
       { path: 'sysadmin/companies/new', canActivate: [SysAdminGuard], component: CreateCompanyComponent },
       { path: 'sysadmin/companies/edit/:id', canActivate: [SysAdminGuard], component: EditCompanyComponent },
       { path: 'sysadmin/companies/details/:id', canActivate: [SysAdminGuard], component: CompanyDetailsComponent },
+      { path: 'sysadmin/tiers', canActivate: [SysAdminGuard], component: TiersComponent },
       { path: 'sysadmin/companies/subscriptions/select', canActivate: [SysAdminGuard], component: SelectSubscriptionsComponent },
       { path: 'sysadmin/companies/subscription/:id', canActivate: [SysAdminGuard], component: AddSubscriptionComponent },
       { path: 'sysadmin/suppliers', canActivate: [SysAdminGuard], component: SuppliersListComponent },
@@ -101,11 +122,12 @@ const routes: Routes = [
       { path: 'sysadmin/categories/new/:id', canActivate: [SysAdminGuard], component: CreateCompanyCategoryComponent },
       //ADMIN
       { path: 'admin', canActivate: [AdminGuard], component: CompanyAdminHomeComponent },
+      { path: 'admin/billing', canActivate: [CompanyAdminGuard], component: ManageBillingComponent },
       { path: 'admin/users', canActivate: [AdminGuard], component: UserListComponent },
       { path: 'admin/users/new', canActivate: [AdminGuard], component: CreateUserReComponent },
       { path: 'admin/users/edit/:id', canActivate: [AdminGuard], component: UserEditComponent },
       { path: 'admin/users/:userId/cajas', component: UserCajasComponent, canActivate: [AdminGuard] },
-      { path: 'admin/users/:userId/cajas/:fecha', component: FechaCajasComponent, canActivate: [AdminGuard] },
+
       { path: 'admin/cajas/:cajaId', component: CajaDetailComponent, canActivate: [AdminGuard] },
       { path: 'admin/products', canActivate: [AdminGuard], component: ProductsListComponent },
       { path: 'admin/product/new', canActivate: [AdminGuard], component: CreateProductComponent },
@@ -148,10 +170,14 @@ const routes: Routes = [
       { path: 'user/open-cash-register', component: OpenCashRegisterComponent, canActivate: [AuthGuardGuard, userGuard] },
       { path: 'user/new-sale/confirm-sale', component: ConfirmSaleComponent },
       { path: 'user/sales-success', component: SuccessSaleComponent },
-      { path: 'user/sales-success/close-cash-register', component: CloseCashRegisterComponent },
+      { path: 'user/close-register', component: CloseCashRegisterComponent, canActivate: [AuthGuardGuard, userGuard] },
       { path: 'user/daily-sales', component: DailySalesComponent, canActivate: [AuthGuardGuard, userGuard] },
       { path: 'user/sale-details/:saleId', component: SaleDetailComponent, canActivate: [AuthGuardGuard, userGuard] },
       { path: 'user/inventory-available', component: InventoryAvailableComponent, canActivate: [AuthGuardGuard, userGuard] },
+      { path: 'kitchen/kds', component: KitchenKdsComponent, canActivate: [AuthGuardGuard, kitchenGuard] },
+      
+      // BILLING / SUSCRIPCION (Para todos los roles que intenten acceder bloqueados)
+      { path: 'billing/expired', component: ExpiredSubscriptionComponent },
     ]
   }
 ];

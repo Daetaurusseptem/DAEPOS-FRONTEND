@@ -102,7 +102,9 @@ export class AddInventoryComponent implements OnInit {
     const modificationGroup = this.fb.group({
       name: ['', Validators.required],
       extraPrice: [0, [Validators.required, Validators.min(0)]],
-      isExclusive: [false, Validators.required]
+      isExclusive: [false, Validators.required],
+      rawMaterial: [''],
+      quantityToDeduct: [0, [Validators.min(0)]]
     });
     this.modifications.push(modificationGroup);
   }

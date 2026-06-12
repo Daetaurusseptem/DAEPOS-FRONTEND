@@ -1,0 +1,8 @@
+/* --- Forensic Modal Reutilizado --- */
+.forensic-card {
+  border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.forensic-card .card-header {
+  background-color: transparent !important;
+}
