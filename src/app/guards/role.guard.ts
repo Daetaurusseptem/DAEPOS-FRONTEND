@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RoleGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     const userRole = this.authService.role; // Obtiene el rol del usuario desde el servicio
@@ -15,7 +17,7 @@ export class RoleGuard implements CanActivate {
     if (userRole === 'companyAdmin') {
       // Redirecciona al dashboard de administrador si el rol es CompanyAdmin
       this.router.navigate(['/dashboard/admin']);
-      return false; 
+      return false;
     } else if (userRole === 'admin') {
       // Redirecciona al dashboard de sucursal si el rol es Admin (Gerente)
       this.router.navigate(['/dashboard/branch']);

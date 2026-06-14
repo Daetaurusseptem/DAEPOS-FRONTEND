@@ -1,75 +1,129 @@
 <div class="container mt-4">
-    <div class="card shadow">
-      <div class="card-header bg-primary text-white">
-        <h2 class="mb-0">Crear Nuevo Usuario</h2>
-      </div>
-      <div class="card-body">
-        <form #userForm="ngForm" (ngSubmit)="createUser(userForm)">
-          <div class="mb-3">
-            <label for="fullName" class="form-label">Nombre Completo</label>
-            <input type="text" class="form-control" id="fullName" [(ngModel)]="user.name" name="name" required placeholder="Introduce el nombre completo">
-          </div>
-          <div class="mb-3">
-            <label for="username" class="form-label">Nombre de Usuario</label>
-            <input type="text" class="form-control" id="username" [(ngModel)]="user.username" name="username" required placeholder="Introduce el nombre de usuario">
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" [(ngModel)]="user.email" name="email" required placeholder="Introduce el correo electrónico">
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="password" [(ngModel)]="user.password" name="password" required placeholder="Introduce la contraseña">
-          </div>
-          <!-- Selector de Empresa (Solo para SysAdmin cuando crea usuarios no sysadmin) -->
-          <div class="mb-3" *ngIf="userRole === 'sysadmin' && user.role !== 'sysadmin'">
-            <label for="company" class="form-label">Empresa / Compañía</label>
-            <select class="form-select" id="company" [(ngModel)]="companyId" name="companyId" (change)="onCompanyChange()" required>
-              <option value="" disabled selected>Selecciona una empresa</option>
-              <option *ngFor="let c of companies" [value]="c._id">{{ c.name }}</option>
-            </select>
-          </div>
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Crear Nuevo Usuario</h2>
+    </div>
+    <div class="card-body">
+      <form #userForm="ngForm" (ngSubmit)="createUser(userForm)">
+        <div class="mb-3">
+          <label for="fullName" class="form-label">Nombre Completo</label>
+          <input
+            type="text"
+            class="form-control"
+            id="fullName"
+            [(ngModel)]="user.name"
+            name="name"
+            required
+            placeholder="Introduce el nombre completo"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="username" class="form-label">Nombre de Usuario</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            [(ngModel)]="user.username"
+            name="username"
+            required
+            placeholder="Introduce el nombre de usuario"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            [(ngModel)]="user.email"
+            name="email"
+            required
+            placeholder="Introduce el correo electrónico"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            [(ngModel)]="user.password"
+            name="password"
+            required
+            placeholder="Introduce la contraseña"
+          />
+        </div>
+        <!-- Selector de Empresa (Solo para SysAdmin cuando crea usuarios no sysadmin) -->
+        <div class="mb-3" *ngIf="userRole === 'sysadmin' && user.role !== 'sysadmin'">
+          <label for="company" class="form-label">Empresa / Compañía</label>
+          <select
+            class="form-select"
+            id="company"
+            [(ngModel)]="companyId"
+            name="companyId"
+            (change)="onCompanyChange()"
+            required
+          >
+            <option value="" disabled selected>Selecciona una empresa</option>
+            <option *ngFor="let c of companies" [value]="c._id">{{ c.name }}</option>
+          </select>
+        </div>
 
-          <!-- Selector de Sucursal (Para Company Admin, o SysAdmin cuando crea admin/user) -->
-          <div class="mb-3" *ngIf="userRole === 'companyAdmin' || (userRole === 'sysadmin' && (user.role === 'admin' || user.role === 'user'))">
-            <label for="branch" class="form-label">Sucursal</label>
-            <select class="form-select" id="branch" [(ngModel)]="user.branch" name="branch" [required]="user.role === 'admin' || user.role === 'user'">
-              <option value="" disabled selected>Selecciona una sucursal</option>
-              <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
-            </select>
-          </div>
+        <!-- Selector de Sucursal (Para Company Admin, o SysAdmin cuando crea admin/user) -->
+        <div
+          class="mb-3"
+          *ngIf="
+            userRole === 'companyAdmin' || (userRole === 'sysadmin' && (user.role === 'admin' || user.role === 'user'))
+          "
+        >
+          <label for="branch" class="form-label">Sucursal</label>
+          <select
+            class="form-select"
+            id="branch"
+            [(ngModel)]="user.branch"
+            name="branch"
+            [required]="user.role === 'admin' || user.role === 'user'"
+          >
+            <option value="" disabled selected>Selecciona una sucursal</option>
+            <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+          </select>
+        </div>
 
-          <!-- Selector de Rol (Para SysAdmin y Company Admin) -->
-          <div class="mb-3" *ngIf="userRole === 'sysadmin' || userRole === 'companyAdmin'">
-            <label for="role" class="form-label">Rol</label>
-            <select class="form-select" id="role" [(ngModel)]="user.role" name="role" (change)="onRoleChange()" required>
-              <option value="" disabled selected>Selecciona un rol</option>
-              <option value="admin" *ngIf="userRole === 'sysadmin' || userRole === 'companyAdmin'">Administrador / Gerente</option>
-              <option value="user">Usuario / Cajero</option>
-              <option value="companyAdmin" *ngIf="userRole === 'sysadmin'">Dueño de Empresa</option>
-              <option value="sysadmin" *ngIf="userRole === 'sysadmin'">Administrador del Sistema (SysAdmin)</option>
-            </select>
+        <!-- Selector de Rol (Para SysAdmin y Company Admin) -->
+        <div class="mb-3" *ngIf="userRole === 'sysadmin' || userRole === 'companyAdmin'">
+          <label for="role" class="form-label">Rol</label>
+          <select class="form-select" id="role" [(ngModel)]="user.role" name="role" (change)="onRoleChange()" required>
+            <option value="" disabled selected>Selecciona un rol</option>
+            <option value="admin" *ngIf="userRole === 'sysadmin' || userRole === 'companyAdmin'">
+              Administrador / Gerente
+            </option>
+            <option value="user">Usuario / Cajero</option>
+            <option value="companyAdmin" *ngIf="userRole === 'sysadmin'">Dueño de Empresa</option>
+            <option value="sysadmin" *ngIf="userRole === 'sysadmin'">Administrador del Sistema (SysAdmin)</option>
+          </select>
+        </div>
+        <!-- Permisos Adicionales -->
+        <div class="mb-3">
+          <label class="form-label d-block fw-bold">Permisos Especiales</label>
+          <div class="form-check form-check-inline" *ngFor="let perm of availablePermissions">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="perm.id"
+              [checked]="user.permissions?.includes(perm.id)"
+              (change)="togglePermission(perm.id)"
+            />
+            <label class="form-check-label" [for]="perm.id">
+              {{ perm.name }}
+            </label>
           </div>
-          <!-- Permisos Adicionales -->
-          <div class="mb-3">
-            <label class="form-label d-block fw-bold">Permisos Especiales</label>
-            <div class="form-check form-check-inline" *ngFor="let perm of availablePermissions">
-              <input class="form-check-input" type="checkbox" 
-                     [id]="perm.id" 
-                     [checked]="user.permissions?.includes(perm.id)"
-                     (change)="togglePermission(perm.id)">
-              <label class="form-check-label" [for]="perm.id">
-                {{ perm.name }}
-              </label>
-            </div>
-          </div>
+        </div>
 
-          <div class="d-flex justify-content-between">
-            <app-back-button></app-back-button>
-            <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid">Crear Usuario</button>
-          </div>
-        </form>
-      </div>
+        <div class="d-flex justify-content-between">
+          <app-back-button></app-back-button>
+          <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid">Crear Usuario</button>
+        </div>
+      </form>
     </div>
   </div>
-  
+</div>

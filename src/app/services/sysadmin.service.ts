@@ -5,21 +5,24 @@ import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { IGlobalMetricsResponse, ISystemErrorsResponse, IForensicSaleResponse, IGlobalTransactionsResponse } from '../interfaces/sysadmin.interface';
-
+import {
+  IGlobalMetricsResponse,
+  ISystemErrorsResponse,
+  IForensicSaleResponse,
+  IGlobalTransactionsResponse,
+} from '../interfaces/sysadmin.interface';
 
 const urlApi = `${environment.apiUrl}/sysadmin`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SysadminService {
-
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private router: Router
-  ) { }
+    private router: Router,
+  ) {}
 
   getGlobalMetrics(): Observable<IGlobalMetricsResponse> {
     return this.http.get<IGlobalMetricsResponse>(`${urlApi}/metrics`, this.authService.headers);
@@ -32,7 +35,7 @@ export class SysadminService {
   searchGlobalTransactions(params: any): Observable<IGlobalTransactionsResponse> {
     const options = {
       ...this.authService.headers,
-      params
+      params,
     };
     return this.http.get<IGlobalTransactionsResponse>(`${urlApi}/telemetry/transactions`, options);
   }
@@ -61,10 +64,10 @@ export class SysadminService {
             next: () => {
               // Redireccionar al panel principal del administrador de la empresa
               this.router.navigateByUrl('/dashboard');
-            }
+            },
           });
         }
-      })
+      }),
     );
   }
 
@@ -93,7 +96,7 @@ export class SysadminService {
       this.authService.validarToken().subscribe({
         next: () => {
           this.router.navigateByUrl('/dashboard/sysadmin/users');
-        }
+        },
       });
     }
   }
@@ -101,7 +104,7 @@ export class SysadminService {
   getSystemErrors(params: any): Observable<ISystemErrorsResponse> {
     const options = {
       ...this.authService.headers,
-      params
+      params,
     };
     return this.http.get<ISystemErrorsResponse>(`${urlApi}/errors`, options);
   }
@@ -145,7 +148,7 @@ export class SysadminService {
   searchSubscriptions(params: any): Observable<any> {
     const options = {
       ...this.authService.headers,
-      params
+      params,
     };
     return this.http.get(`${urlApi}/subscriptions`, options);
   }

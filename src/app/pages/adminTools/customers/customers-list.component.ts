@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-customers-list',
   templateUrl: './customers-list.component.html',
-  styleUrls: ['./customers-list.component.css']
+  styleUrls: ['./customers-list.component.css'],
 })
 export class CustomersListComponent implements OnInit {
   customers: Customer[] = [];
@@ -33,7 +33,7 @@ export class CustomersListComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private customerService: CustomerService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     this.companyId = this.authService.companyId || (this.authService.company as any)?._id || '';
   }
@@ -50,7 +50,7 @@ export class CustomersListComponent implements OnInit {
       cardNumber: [''],
       email: ['', [Validators.email]],
       rfc: [''],
-      loyaltyPoints: [0, [Validators.min(0)]]
+      loyaltyPoints: [0, [Validators.min(0)]],
     });
   }
 
@@ -68,7 +68,7 @@ export class CustomersListComponent implements OnInit {
         console.error(err);
         this.isLoading = false;
         Swal.fire('Error', 'No se pudieron obtener los clientes.', 'error');
-      }
+      },
     });
   }
 
@@ -92,7 +92,7 @@ export class CustomersListComponent implements OnInit {
       cardNumber: '',
       email: '',
       rfc: '',
-      loyaltyPoints: 0
+      loyaltyPoints: 0,
     });
     this.showModal = true;
   }
@@ -106,7 +106,7 @@ export class CustomersListComponent implements OnInit {
       cardNumber: customer.cardNumber || '',
       email: customer.email || '',
       rfc: (customer as any).rfc || '',
-      loyaltyPoints: customer.loyaltyPoints || 0
+      loyaltyPoints: customer.loyaltyPoints || 0,
     });
     this.showModal = true;
   }
@@ -136,7 +136,7 @@ export class CustomersListComponent implements OnInit {
         },
         error: (err) => {
           Swal.fire('Error', err.error?.message || 'No se pudo actualizar el cliente.', 'error');
-        }
+        },
       });
     } else {
       this.customerService.createCustomer(customerData, this.companyId).subscribe({
@@ -149,7 +149,7 @@ export class CustomersListComponent implements OnInit {
         },
         error: (err) => {
           Swal.fire('Error', err.error?.message || 'No se pudo crear el cliente.', 'error');
-        }
+        },
       });
     }
   }
@@ -158,7 +158,7 @@ export class CustomersListComponent implements OnInit {
     this.isLoadingDetails = true;
     this.selectedCustomer = customer;
     this.customerSalesHistory = [];
-    
+
     this.customerService.getCustomerDetails(customer._id!).subscribe({
       next: (resp) => {
         if (resp.ok) {
@@ -171,7 +171,7 @@ export class CustomersListComponent implements OnInit {
         console.error(err);
         this.isLoadingDetails = false;
         Swal.fire('Error', 'No se pudieron cargar los detalles del cliente.', 'error');
-      }
+      },
     });
   }
 
@@ -190,7 +190,7 @@ export class CustomersListComponent implements OnInit {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: `Sí, ${nextStatus ? 'activar' : 'desactivar'}`,
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.customerService.updateCustomer(customer._id!, { isActive: nextStatus }).subscribe({
@@ -200,7 +200,7 @@ export class CustomersListComponent implements OnInit {
           },
           error: (err) => {
             Swal.fire('Error', 'No se pudo cambiar el estado del cliente.', 'error');
-          }
+          },
         });
       }
     });

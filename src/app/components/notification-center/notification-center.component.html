@@ -1,47 +1,57 @@
 <div class="notification-center-container position-relative">
   <!-- Botón de Campana -->
-  <button class="btn btn-link text-dark p-2 position-relative border-0 shadow-none d-flex align-items-center justify-content-center transition-all bell-trigger" 
-          (click)="toggleDropdown()">
+  <button
+    class="btn btn-link text-dark p-2 position-relative border-0 shadow-none d-flex align-items-center justify-content-center transition-all bell-trigger"
+    (click)="toggleDropdown()"
+  >
     <i class="bi bi-bell-fill fs-5"></i>
     <!-- Badge de no leídas -->
-    <span class="badge-unread position-absolute d-flex align-items-center justify-content-center fw-bold animate__animated animate__scaleIn" 
-          *ngIf="unreadCount > 0">
+    <span
+      class="badge-unread position-absolute d-flex align-items-center justify-content-center fw-bold animate__animated animate__scaleIn"
+      *ngIf="unreadCount > 0"
+    >
       {{ unreadCount }}
     </span>
   </button>
 
   <!-- Dropdown de Notificaciones Desplegable -->
-  <div class="notification-dropdown border border-light-subtle shadow-lg bg-white rounded-4 animate__animated animate__fadeIn animate__faster" 
-       *ngIf="showDropdown">
-    
+  <div
+    class="notification-dropdown border border-light-subtle shadow-lg bg-white rounded-4 animate__animated animate__fadeIn animate__faster"
+    *ngIf="showDropdown"
+  >
     <!-- Encabezado del Dropdown -->
     <div class="dropdown-header-custom p-3 border-bottom d-flex align-items-center justify-content-between">
       <h6 class="fw-bold mb-0 text-dark">Centro de Notificaciones</h6>
-      <button class="btn btn-link text-decoration-none btn-mark-all p-0 fw-semibold" 
-              *ngIf="unreadCount > 0" 
-              (click)="markAllAsRead()">
+      <button
+        class="btn btn-link text-decoration-none btn-mark-all p-0 fw-semibold"
+        *ngIf="unreadCount > 0"
+        (click)="markAllAsRead()"
+      >
         Marcar leídas
       </button>
     </div>
 
     <!-- Pestañas Filtros Geist -->
     <div class="filter-tabs d-flex px-3 py-2 border-bottom border-light-subtle bg-light-subtle">
-      <button class="filter-tab-btn py-1.5 px-3 border-0 bg-transparent small fw-semibold text-secondary"
-              [class.active]="activeFilter === 'all'"
-              (click)="setFilter('all')">
+      <button
+        class="filter-tab-btn py-1.5 px-3 border-0 bg-transparent small fw-semibold text-secondary"
+        [class.active]="activeFilter === 'all'"
+        (click)="setFilter('all')"
+      >
         Todas
       </button>
-      <button class="filter-tab-btn py-1.5 px-3 border-0 bg-transparent small fw-semibold text-secondary position-relative"
-              [class.active]="activeFilter === 'unread'"
-              (click)="setFilter('unread')">
+      <button
+        class="filter-tab-btn py-1.5 px-3 border-0 bg-transparent small fw-semibold text-secondary position-relative"
+        [class.active]="activeFilter === 'unread'"
+        (click)="setFilter('unread')"
+      >
         No Leídas
         <span class="dot-unread-count bg-danger ms-1 d-inline-block rounded-circle" *ngIf="unreadCount > 0"></span>
       </button>
     </div>
 
     <!-- Contenedor Scroll de Lista -->
-    <div class="notification-list-scroll overflow-y-auto" style="max-height: 350px;">
-      
+    <div class="notification-list-scroll overflow-y-auto" style="max-height: 350px">
       <!-- Estado Vacío -->
       <div class="text-center py-5 px-3 text-muted opacity-50" *ngIf="getFilteredNotifications().length === 0">
         <i class="bi bi-bell-slash display-6 d-block mb-2"></i>
@@ -50,26 +60,31 @@
 
       <!-- Lista de Notificaciones -->
       <div *ngIf="getFilteredNotifications().length > 0" class="d-flex flex-column">
-        <div *ngFor="let notif of getFilteredNotifications()" 
-             class="notification-item p-3 border-bottom border-light-subtle d-flex gap-3 align-items-start transition-all cursor-pointer"
-             [class.unread-bg]="!notif.isRead"
-             (click)="handleNotificationClick(notif)">
-          
+        <div
+          *ngFor="let notif of getFilteredNotifications()"
+          class="notification-item p-3 border-bottom border-light-subtle d-flex gap-3 align-items-start transition-all cursor-pointer"
+          [class.unread-bg]="!notif.isRead"
+          (click)="handleNotificationClick(notif)"
+        >
           <!-- Icono segun el Tipo de Notificacion -->
-          <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center shadow-sm"
-               [class.bg-info-soft]="notif.type === 'info'"
-               [class.text-info]="notif.type === 'info'"
-               [class.bg-success-soft]="notif.type === 'success'"
-               [class.text-success]="notif.type === 'success'"
-               [class.bg-warning-soft]="notif.type === 'warning'"
-               [class.text-warning]="notif.type === 'warning'"
-               [class.bg-danger-soft]="notif.type === 'error'"
-               [class.text-danger]="notif.type === 'error'">
-            <i class="bi" 
-               [class.bi-info-circle-fill]="notif.type === 'info'"
-               [class.bi-check-circle-fill]="notif.type === 'success'"
-               [class.bi-exclamation-triangle-fill]="notif.type === 'warning'"
-               [class.bi-x-circle-fill]="notif.type === 'error'"></i>
+          <div
+            class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+            [class.bg-info-soft]="notif.type === 'info'"
+            [class.text-info]="notif.type === 'info'"
+            [class.bg-success-soft]="notif.type === 'success'"
+            [class.text-success]="notif.type === 'success'"
+            [class.bg-warning-soft]="notif.type === 'warning'"
+            [class.text-warning]="notif.type === 'warning'"
+            [class.bg-danger-soft]="notif.type === 'error'"
+            [class.text-danger]="notif.type === 'error'"
+          >
+            <i
+              class="bi"
+              [class.bi-info-circle-fill]="notif.type === 'info'"
+              [class.bi-check-circle-fill]="notif.type === 'success'"
+              [class.bi-exclamation-triangle-fill]="notif.type === 'warning'"
+              [class.bi-x-circle-fill]="notif.type === 'error'"
+            ></i>
           </div>
 
           <!-- Detalles del Mensaje -->
@@ -80,18 +95,18 @@
               <span class="unread-dot rounded-circle bg-dark mt-1" *ngIf="!notif.isRead"></span>
             </div>
             <p class="mb-1 text-secondary text-wrap small mt-1 message-text">{{ notif.message }}</p>
-            <span class="text-muted text-time font-monospace">{{ notif.createdAt | date:'short' }}</span>
+            <span class="text-muted text-time font-monospace">{{ notif.createdAt | date: 'short' }}</span>
           </div>
-
         </div>
       </div>
-
     </div>
 
     <!-- Footer del Dropdown -->
     <div class="dropdown-footer border-top bg-light-subtle p-2 text-center">
-      <button class="btn btn-link text-decoration-none text-dark small w-100 fw-bold fs-7 p-1" 
-              (click)="goToNotificationsPage()">
+      <button
+        class="btn btn-link text-decoration-none text-dark small w-100 fw-bold fs-7 p-1"
+        (click)="goToNotificationsPage()"
+      >
         Ver todas las notificaciones
       </button>
     </div>

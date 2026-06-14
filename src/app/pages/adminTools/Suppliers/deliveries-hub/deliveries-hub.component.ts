@@ -11,10 +11,9 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-deliveries-hub',
   templateUrl: './deliveries-hub.component.html',
-  styleUrls: ['./deliveries-hub.component.css']
+  styleUrls: ['./deliveries-hub.component.css'],
 })
 export class CentralizedDeliveriesComponent implements OnInit {
-
   companyId!: string;
   branches: Branch[] = [];
   suppliers: Supplier[] = [];
@@ -38,9 +37,19 @@ export class CentralizedDeliveriesComponent implements OnInit {
     isRecurring: false,
     recurrence: 'none',
     recurrenceDays: 0,
-    notes: ''
+    notes: '',
   };
-  restockItemsList: { productId: string; productName: string; quantity: number; itemType?: string; searchText?: string; showDropdown?: boolean; measurementUnit?: string; packs?: number; unitsPerPack?: number }[] = [];
+  restockItemsList: {
+    productId: string;
+    productName: string;
+    quantity: number;
+    itemType?: string;
+    searchText?: string;
+    showDropdown?: boolean;
+    measurementUnit?: string;
+    packs?: number;
+    unitsPerPack?: number;
+  }[] = [];
   suppliedProducts: any[] = [];
   allCompanyProducts: any[] = [];
 
@@ -57,7 +66,16 @@ export class CentralizedDeliveriesComponent implements OnInit {
   // Inspect Modal Bindings
   showInspectModal: boolean = false;
   selectedRestockForInspect: any = null;
-  inspectedItems: { productId?: string; type?: string; name: string; quantity: number; costPrice: number; verified: boolean; agreedCost?: number | null; varianceNote?: string }[] = [];
+  inspectedItems: {
+    productId?: string;
+    type?: string;
+    name: string;
+    quantity: number;
+    costPrice: number;
+    verified: boolean;
+    agreedCost?: number | null;
+    varianceNote?: string;
+  }[] = [];
   payFromRegister: boolean = true;
   canVerifyRestock: boolean = false;
 
@@ -67,7 +85,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
     name: '',
     brand: '',
     category: '',
-    isComposite: false
+    isComposite: false,
   };
 
   constructor(
@@ -76,17 +94,18 @@ export class CentralizedDeliveriesComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private rawMaterialsService: RawMaterialsService,
-    public authService: AuthService
-  ) { }
+    public authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.companyId = this.authService.companyId || this.authService.company?._id || '';
-    
+
     const user = this.authService.usuario;
     const permissions = (user as any).permissions || [];
-    this.canVerifyRestock = this.authService.role === 'companyAdmin' || 
-                            this.authService.role === 'admin' || 
-                            permissions.includes('verify_restock');
+    this.canVerifyRestock =
+      this.authService.role === 'companyAdmin' ||
+      this.authService.role === 'admin' ||
+      permissions.includes('verify_restock');
 
     if (this.authService.role !== 'companyAdmin') {
       this.selectedBranch = this.authService.branch?._id || this.authService.branch || '';
@@ -111,7 +130,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
             this.branches = allBranches;
           }
         }
-      }
+      },
     });
   }
 
@@ -121,7 +140,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
         if (resp.ok) {
           this.suppliers = resp.suppliers || [];
         }
-      }
+      },
     });
   }
 
@@ -131,7 +150,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
         if (resp.ok) {
           this.categories = resp.categories || [];
         }
-      }
+      },
     });
   }
 
@@ -143,12 +162,12 @@ export class CentralizedDeliveriesComponent implements OnInit {
           this.applyFilters();
           this.calculateKPIs();
         }
-      }
+      },
     });
   }
 
   applyFilters() {
-    this.filteredRestocks = this.allRestocks.filter(r => {
+    this.filteredRestocks = this.allRestocks.filter((r) => {
       // 1. Branch filter
       if (this.selectedBranch) {
         const bId = typeof r.branch === 'object' ? r.branch?._id : r.branch;
@@ -177,13 +196,12 @@ export class CentralizedDeliveriesComponent implements OnInit {
     this.kpiWeeklyInvestment = 0;
 
     const todayDate = new Date();
-    todayDate.setHours(0,0,0,0);
+    todayDate.setHours(0, 0, 0, 0);
 
-    const targetBranch = this.authService.role !== 'companyAdmin' 
-      ? (this.authService.branch?._id || this.authService.branch || '') 
-      : '';
+    const targetBranch =
+      this.authService.role !== 'companyAdmin' ? this.authService.branch?._id || this.authService.branch || '' : '';
 
-    this.allRestocks.forEach(r => {
+    this.allRestocks.forEach((r) => {
       if (targetBranch) {
         const bId = typeof r.branch === 'object' ? r.branch?._id : r.branch;
         if (bId !== targetBranch) return;
@@ -191,7 +209,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
 
       if (r.status === 'pending') {
         const expected = new Date(r.expectedDate);
-        expected.setHours(0,0,0,0);
+        expected.setHours(0, 0, 0, 0);
 
         const expStr = expected.toISOString().substring(0, 10);
         if (expStr === todayStr) {
@@ -226,7 +244,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
           costPrice: it.costPrice || 0,
           verified: true,
           agreedCost: null,
-          varianceNote: ''
+          varianceNote: '',
         };
       });
     } else {
@@ -243,7 +261,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
             costPrice: 0,
             verified: false,
             agreedCost: null,
-            varianceNote: ''
+            varianceNote: '',
           };
         }
         return {
@@ -254,7 +272,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
           costPrice: 0,
           verified: false,
           agreedCost: null,
-          varianceNote: ''
+          varianceNote: '',
         };
       });
     }
@@ -291,7 +309,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
             }
           }
         });
-      }
+      },
     });
 
     this.showInspectModal = true;
@@ -307,7 +325,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
       name: '',
       brand: '',
       category: this.categories[0]?._id || '',
-      isComposite: false
+      isComposite: false,
     };
     this.showQuickProductModal = true;
   }
@@ -322,9 +340,10 @@ export class CentralizedDeliveriesComponent implements OnInit {
       return;
     }
 
-    const sId = typeof this.selectedRestockForInspect.supplier === 'object' 
-      ? this.selectedRestockForInspect.supplier?._id 
-      : this.selectedRestockForInspect.supplier;
+    const sId =
+      typeof this.selectedRestockForInspect.supplier === 'object'
+        ? this.selectedRestockForInspect.supplier?._id
+        : this.selectedRestockForInspect.supplier;
 
     const formData = new FormData();
     formData.append('name', this.quickProduct.name);
@@ -339,19 +358,19 @@ export class CentralizedDeliveriesComponent implements OnInit {
         const saved = resp.savedProduct;
         Swal.fire('¡Producto Creado!', 'Se agregó como [Por Verificar] de forma flexible', 'success');
         this.showQuickProductModal = false;
-        
+
         this.inspectedItems.push({
           productId: saved._id,
           type: 'Product',
           name: saved.name,
           quantity: 1,
           costPrice: 0,
-          verified: true
+          verified: true,
         });
       },
       error: () => {
         Swal.fire('Error', 'No se pudo registrar el producto', 'error');
-      }
+      },
     });
   }
 
@@ -360,20 +379,24 @@ export class CentralizedDeliveriesComponent implements OnInit {
   }
 
   isInspectionValid(): boolean {
-    const verifiedItems = this.inspectedItems.filter(it => it.verified);
+    const verifiedItems = this.inspectedItems.filter((it) => it.verified);
     if (verifiedItems.length === 0) return false;
-    return !verifiedItems.some(it => this.hasPriceVariance(it) && !it.varianceNote?.trim());
+    return !verifiedItems.some((it) => this.hasPriceVariance(it) && !it.varianceNote?.trim());
   }
 
   completeInspection() {
-    const verifiedItems = this.inspectedItems.filter(it => it.verified);
+    const verifiedItems = this.inspectedItems.filter((it) => it.verified);
     if (verifiedItems.length === 0) {
       Swal.fire('Atención', 'Debes verificar al menos un artículo para recibir la entrega', 'warning');
       return;
     }
 
     if (!this.isInspectionValid()) {
-      Swal.fire('Atención', 'Hay artículos con costos superiores al pactado. Por favor, ingresa la justificación (Nota de Desviación de Costo) en cada uno.', 'warning');
+      Swal.fire(
+        'Atención',
+        'Hay artículos con costos superiores al pactado. Por favor, ingresa la justificación (Nota de Desviación de Costo) en cada uno.',
+        'warning',
+      );
       return;
     }
 
@@ -383,20 +406,20 @@ export class CentralizedDeliveriesComponent implements OnInit {
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Completar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         const payload = {
           status: 'completed',
           payFromRegister: this.payFromRegister,
-          items: verifiedItems.map(it => ({
+          items: verifiedItems.map((it) => ({
             type: it.type || 'Product',
             itemRef: it.productId || undefined,
             quantity: it.quantity,
             costPrice: it.costPrice || 0,
             agreedCost: it.agreedCost || undefined,
-            varianceNote: this.hasPriceVariance(it) ? it.varianceNote : undefined
-          }))
+            varianceNote: this.hasPriceVariance(it) ? it.varianceNote : undefined,
+          })),
         };
 
         this.supplierService.updateRestockStatus(this.selectedRestockForInspect._id, payload).subscribe({
@@ -406,7 +429,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
                 title: '¡Entrega Recibida!',
                 text: 'La mercancía ha sido auditada e ingresada automáticamente al inventario activo.',
                 icon: 'success',
-                confirmButtonText: 'Aceptar'
+                confirmButtonText: 'Aceptar',
               }).then(() => {
                 this.showInspectModal = false;
                 this.loadAllRestocks();
@@ -415,7 +438,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
           },
           error: (err) => {
             Swal.fire('Error', err.error?.message || 'No se pudo completar la recepción', 'error');
-          }
+          },
         });
       }
     });
@@ -429,14 +452,14 @@ export class CentralizedDeliveriesComponent implements OnInit {
       showCancelButton: true,
       confirmButtonColor: '#d33',
       confirmButtonText: 'Sí, Eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.supplierService.deleteRestock(id).subscribe({
           next: () => {
             Swal.fire('Eliminado', 'Entrega cancelada correctamente', 'success');
             this.loadAllRestocks();
-          }
+          },
         });
       }
     });
@@ -471,20 +494,20 @@ export class CentralizedDeliveriesComponent implements OnInit {
           next: (rmResp: any) => {
             const rms = (rmResp.rawMaterials || []).map((rm: any) => ({ ...rm, itemType: 'RawMaterial' }));
             this.allCompanyProducts = [...prods, ...rms];
-          }
+          },
         });
-      }
+      },
     });
   }
 
   get filteredSuppliersForFilter(): Supplier[] {
     if (!this.supplierFilterSearchText) return this.suppliers;
-    return this.suppliers.filter(s => s.name.toLowerCase().includes(this.supplierFilterSearchText.toLowerCase()));
+    return this.suppliers.filter((s) => s.name.toLowerCase().includes(this.supplierFilterSearchText.toLowerCase()));
   }
 
   get filteredSuppliersForModal(): Supplier[] {
     if (!this.supplierModalSearchText) return this.suppliers;
-    return this.suppliers.filter(s => s.name.toLowerCase().includes(this.supplierModalSearchText.toLowerCase()));
+    return this.suppliers.filter((s) => s.name.toLowerCase().includes(this.supplierModalSearchText.toLowerCase()));
   }
 
   selectSupplierInFilter(supplier: Supplier | null) {
@@ -508,10 +531,22 @@ export class CentralizedDeliveriesComponent implements OnInit {
       isRecurring: false,
       recurrence: 'none',
       recurrenceDays: 0,
-      notes: ''
+      notes: '',
     };
     this.supplierModalSearchText = '';
-    this.restockItemsList = [{ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined }];
+    this.restockItemsList = [
+      {
+        productId: '',
+        productName: '',
+        quantity: 1,
+        itemType: 'Product',
+        searchText: '',
+        showDropdown: false,
+        measurementUnit: '',
+        packs: undefined,
+        unitsPerPack: undefined,
+      },
+    ];
     this.suppliedProducts = this.allCompanyProducts; // Default to all products to prevent empty list issue
     this.showScheduleModal = true;
   }
@@ -521,7 +556,17 @@ export class CentralizedDeliveriesComponent implements OnInit {
   }
 
   addRestockItemRow() {
-    this.restockItemsList.push({ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined });
+    this.restockItemsList.push({
+      productId: '',
+      productName: '',
+      quantity: 1,
+      itemType: 'Product',
+      searchText: '',
+      showDropdown: false,
+      measurementUnit: '',
+      packs: undefined,
+      unitsPerPack: undefined,
+    });
   }
 
   removeRestockItemRow(idx: number) {
@@ -533,7 +578,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
 
   onRestockItemProductChange(idx: number) {
     const row = this.restockItemsList[idx];
-    const prod = this.suppliedProducts.find(p => p._id === row.productId);
+    const prod = this.suppliedProducts.find((p) => p._id === row.productId);
     if (prod) {
       row.productName = prod.name || '';
     }
@@ -548,16 +593,31 @@ export class CentralizedDeliveriesComponent implements OnInit {
     this.suppliedProducts = this.allCompanyProducts;
 
     // Resetear lista de artículos al cambiar de proveedor
-    this.restockItemsList = [{ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined }];
+    this.restockItemsList = [
+      {
+        productId: '',
+        productName: '',
+        quantity: 1,
+        itemType: 'Product',
+        searchText: '',
+        showDropdown: false,
+        measurementUnit: '',
+        packs: undefined,
+        unitsPerPack: undefined,
+      },
+    ];
   }
 
   getFilteredProductsForDropdown(idx: number): any[] {
     const text = this.restockItemsList[idx].searchText || '';
     if (!text) return this.suppliedProducts.slice(0, 50); // limit to 50 for performance
     const lowerText = text.toLowerCase();
-    return this.suppliedProducts.filter(p => 
-      (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText))
-    ).slice(0, 50);
+    return this.suppliedProducts
+      .filter(
+        (p) =>
+          (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText)),
+      )
+      .slice(0, 50);
   }
 
   selectProductForRestockRow(idx: number, prod: any) {
@@ -566,7 +626,8 @@ export class CentralizedDeliveriesComponent implements OnInit {
     this.restockItemsList[idx].itemType = prod.itemType || 'Product';
     this.restockItemsList[idx].searchText = prod.name;
     this.restockItemsList[idx].showDropdown = false;
-    this.restockItemsList[idx].measurementUnit = prod.measurementUnit || (prod.itemType === 'RawMaterial' ? 'U' : 'Pza');
+    this.restockItemsList[idx].measurementUnit =
+      prod.measurementUnit || (prod.itemType === 'RawMaterial' ? 'U' : 'Pza');
     this.restockItemsList[idx].packs = undefined;
     this.restockItemsList[idx].unitsPerPack = undefined;
   }
@@ -579,7 +640,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
   }
 
   saveRestockSchedule() {
-    const validItems = this.restockItemsList.filter(it => it.productId && it.quantity > 0);
+    const validItems = this.restockItemsList.filter((it) => it.productId && it.quantity > 0);
     if (!this.newRestock.supplier) {
       Swal.fire('Error', 'Por favor selecciona un proveedor', 'error');
       return;
@@ -594,22 +655,20 @@ export class CentralizedDeliveriesComponent implements OnInit {
     }
 
     // Formatear itemsSummary automáticamente
-    const summary = validItems
-      .map(row => `${row.quantity} ${row.productName}`)
-      .join(', ');
-    
+    const summary = validItems.map((row) => `${row.quantity} ${row.productName}`).join(', ');
+
     this.newRestock.itemsSummary = summary;
 
     const payload = {
       ...this.newRestock,
       company: this.companyId,
       status: 'pending',
-      items: validItems.map(it => ({
+      items: validItems.map((it) => ({
         type: it.itemType || 'Product',
         itemRef: it.productId,
         quantity: it.quantity,
-        costPrice: 0
-      }))
+        costPrice: 0,
+      })),
     };
 
     this.supplierService.createRestockSchedule(payload).subscribe({
@@ -622,7 +681,7 @@ export class CentralizedDeliveriesComponent implements OnInit {
       },
       error: () => {
         Swal.fire('Error', 'Hubo un error al guardar el recordatorio', 'error');
-      }
+      },
     });
   }
 }

@@ -1,6 +1,5 @@
 <div class="main-container py-5">
   <div class="form-container card border-0 shadow-sm rounded-4 bg-white overflow-hidden max-w-md mx-auto">
-    
     <!-- Encabezado con estética minimalista de DESIGN.md -->
     <div class="form-header bg-dark py-4 px-4 text-center">
       <h2 class="form-title text-white mb-0 fs-4 fw-semibold tracking-tight">EDITAR USUARIO</h2>
@@ -9,48 +8,55 @@
 
     <div class="card-body p-4">
       <form [formGroup]="userForm" (ngSubmit)="updateUser()" class="d-flex flex-column gap-3">
-        
         <!-- Nombre Completo -->
         <div class="form-group-item">
           <label for="name" class="form-label text-dark fw-medium small mb-2">Nombre Completo</label>
-          <input type="text" 
-                 id="name" 
-                 formControlName="name" 
-                 class="form-control premium-input" 
-                 placeholder="Introduce el nombre completo del usuario"
-                 [class.is-invalid]="campoNoValidoDatosUsuario('name')">
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            class="form-control premium-input"
+            placeholder="Introduce el nombre completo del usuario"
+            [class.is-invalid]="campoNoValidoDatosUsuario('name')"
+          />
         </div>
 
         <!-- Nombre de Usuario -->
         <div class="form-group-item">
           <label for="username" class="form-label text-dark fw-medium small mb-2">Nombre de Usuario</label>
-          <input type="text" 
-                 id="username" 
-                 formControlName="username" 
-                 class="form-control premium-input" 
-                 placeholder="Introduce el nombre de usuario"
-                 [class.is-invalid]="campoNoValidoDatosUsuario('username')">
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            class="form-control premium-input"
+            placeholder="Introduce el nombre de usuario"
+            [class.is-invalid]="campoNoValidoDatosUsuario('username')"
+          />
         </div>
-        
+
         <!-- Correo Electrónico -->
         <div class="form-group-item">
           <label for="email" class="form-label text-dark fw-medium small mb-2">Correo Electrónico</label>
-          <input type="email" 
-                 id="email" 
-                 formControlName="email" 
-                 class="form-control premium-input" 
-                 placeholder="Introduce el correo electrónico"
-                 [class.is-invalid]="campoNoValidoDatosUsuario('email')">
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-control premium-input"
+            placeholder="Introduce el correo electrónico"
+            [class.is-invalid]="campoNoValidoDatosUsuario('email')"
+          />
         </div>
 
         <!-- Nueva Contraseña (Opcional) -->
         <div class="form-group-item">
           <label for="password" class="form-label text-dark fw-medium small mb-2">Nueva Contraseña (Opcional)</label>
-          <input type="password" 
-                 id="password" 
-                 formControlName="password" 
-                 class="form-control premium-input" 
-                 placeholder="Dejar en blanco para mantener la contraseña actual">
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-control premium-input"
+            placeholder="Dejar en blanco para mantener la contraseña actual"
+          />
         </div>
 
         <!-- Selector de Sucursal (Para Company Admin y SysAdmin) -->
@@ -78,11 +84,13 @@
           <label class="form-label text-dark fw-bold small mb-2 d-block">Permisos Especiales</label>
           <div class="d-flex flex-column gap-2 border rounded-3 p-3 bg-light-subtle">
             <div class="form-check form-switch" *ngFor="let perm of availablePermissions">
-              <input class="form-check-input premium-switch" 
-                     type="checkbox" 
-                     [id]="perm.id" 
-                     [checked]="user.permissions?.includes(perm.id)"
-                     (change)="togglePermission(perm.id)">
+              <input
+                class="form-check-input premium-switch"
+                type="checkbox"
+                [id]="perm.id"
+                [checked]="user.permissions?.includes(perm.id)"
+                (change)="togglePermission(perm.id)"
+              />
               <label class="form-check-label text-secondary small fw-medium" [for]="perm.id">
                 {{ perm.name }}
               </label>
@@ -94,22 +102,32 @@
         </div>
 
         <!-- Validaciones en Alerta -->
-        <div *ngIf="userForm.invalid && userForm.touched" class="alert alert-danger border-0 rounded-3 py-2 px-3 small mt-2">
-          <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0"><i class="bi bi-exclamation-triangle me-1"></i> El nombre completo es obligatorio.</p>
-          <p *ngIf="campoNoValidoDatosUsuario('username')" class="mb-0"><i class="bi bi-exclamation-triangle me-1"></i> El nombre de usuario es obligatorio.</p>
-          <p *ngIf="campoNoValidoDatosUsuario('email')" class="mb-0"><i class="bi bi-exclamation-triangle me-1"></i> El correo debe tener un formato válido.</p>
+        <div
+          *ngIf="userForm.invalid && userForm.touched"
+          class="alert alert-danger border-0 rounded-3 py-2 px-3 small mt-2"
+        >
+          <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0">
+            <i class="bi bi-exclamation-triangle me-1"></i> El nombre completo es obligatorio.
+          </p>
+          <p *ngIf="campoNoValidoDatosUsuario('username')" class="mb-0">
+            <i class="bi bi-exclamation-triangle me-1"></i> El nombre de usuario es obligatorio.
+          </p>
+          <p *ngIf="campoNoValidoDatosUsuario('email')" class="mb-0">
+            <i class="bi bi-exclamation-triangle me-1"></i> El correo debe tener un formato válido.
+          </p>
         </div>
 
         <!-- Botones de Acción -->
         <div class="d-flex justify-content-between gap-3 mt-4">
           <app-back-button class="w-50"></app-back-button>
-          <button type="submit" 
-                  class="btn btn-dark w-50 premium-action-btn py-2 text-uppercase tracking-wider fw-semibold" 
-                  [disabled]="!userForm.valid">
+          <button
+            type="submit"
+            class="btn btn-dark w-50 premium-action-btn py-2 text-uppercase tracking-wider fw-semibold"
+            [disabled]="!userForm.valid"
+          >
             Guardar Cambios
           </button>
         </div>
-
       </form>
     </div>
   </div>

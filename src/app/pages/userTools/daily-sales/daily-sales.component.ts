@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { Router } from '@angular/router';
+import { LoggerService } from '../../../services/logger.service';
 import Swal from 'sweetalert2';
 
 interface Sale {
@@ -15,7 +16,7 @@ interface Sale {
 @Component({
   selector: 'app-daily-sales',
   templateUrl: './daily-sales.component.html',
-  styleUrls: ['./daily-sales.component.css']
+  styleUrls: ['./daily-sales.component.css'],
 })
 export class DailySalesComponent implements OnInit {
   openCashRegisterWithSales: any;
@@ -24,8 +25,9 @@ export class DailySalesComponent implements OnInit {
   constructor(
     private cashRegisterService: CashRegisterService,
     private authService: AuthService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private logger: LoggerService,
+  ) {}
 
   ngOnInit() {
     this.loadOpenCashRegisterWithSales();
@@ -49,7 +51,7 @@ export class DailySalesComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching open cash register with sales', error);
-      }
+      },
     });
   }
 
@@ -98,16 +100,18 @@ export class DailySalesComponent implements OnInit {
         const reason = (document.getElementById('expReason') as HTMLInputElement).value;
         const type = (document.getElementById('expType') as HTMLSelectElement).value;
         const refVal = (document.getElementById('expRef') as HTMLInputElement).value;
-        
+
         if (!amount || parseFloat(amount) <= 0 || !reason) {
           Swal.showValidationMessage('Monto y motivo son obligatorios');
           return false;
         }
-        
+
         const parsedAmount = parseFloat(amount);
         const available = this.openCashRegisterWithSales.expectedAmount || 0;
         if (parsedAmount > available) {
-          Swal.showValidationMessage(`No puedes retirar más del efectivo disponible en caja ($${available.toFixed(2)})`);
+          Swal.showValidationMessage(
+            `No puedes retirar más del efectivo disponible en caja ($${available.toFixed(2)})`,
+          );
           return false;
         }
 
@@ -116,25 +120,27 @@ export class DailySalesComponent implements OnInit {
           return false;
         }
         return { amount: parsedAmount, reason, type, depositReference: type === 'withdrawal' ? refVal : '' };
-      }
+      },
     }).then((result) => {
       if (result.isConfirmed) {
-        this.cashRegisterService.addExpense(
-          this.openCashRegisterWithSales._id, 
-          result.value.amount, 
-          result.value.reason, 
-          result.value.type as any,
-          result.value.depositReference
-        ).subscribe({
-          next: () => {
-            Swal.fire('Éxito', 'Movimiento registrado correctamente', 'success');
-            this.loadOpenCashRegisterWithSales();
-          },
-          error: (err) => {
-            const errorMsg = err.error?.message || 'No se pudo registrar el movimiento';
-            Swal.fire('Error', errorMsg, 'error');
-          }
-        });
+        this.cashRegisterService
+          .addExpense(
+            this.openCashRegisterWithSales._id,
+            result.value.amount,
+            result.value.reason,
+            result.value.type as any,
+            result.value.depositReference,
+          )
+          .subscribe({
+            next: () => {
+              Swal.fire('Éxito', 'Movimiento registrado correctamente', 'success');
+              this.loadOpenCashRegisterWithSales();
+            },
+            error: (err) => {
+              const errorMsg = err.error?.message || 'No se pudo registrar el movimiento';
+              Swal.fire('Error', errorMsg, 'error');
+            },
+          });
       }
     });
   }
@@ -146,19 +152,19 @@ export class DailySalesComponent implements OnInit {
 
     const userId = this.authService.usuario.id;
     const expected = this.openCashRegisterWithSales.expectedAmount || 0;
-    
+
     // Registrar huella de Corte X en base de datos antes de mandar a imprimir
     this.cashRegisterService.registerCorteX(this.openCashRegisterWithSales._id, userId, expected).subscribe({
       next: () => {
-        console.log('Huella de Corte X registrada en el servidor.');
+        this.logger.log('Huella de Corte X registrada en el servidor.');
       },
       error: (err) => {
         console.error('Error al registrar huella de Corte X:', err);
-      }
+      },
     });
 
     const doc = new jsPDF({
-      format: [58.28, 350.89]
+      format: [58.28, 350.89],
     });
 
     const marginX = 2;
@@ -188,24 +194,43 @@ export class DailySalesComponent implements OnInit {
           sale.total.toFixed(2),
           sale.paymentMethod,
         ]),
-        [{ content: 'Ventas Totales', colSpan: 1, styles: { halign: 'right', fontStyle: 'bold' } }, { content: subtotal.toFixed(2), colSpan: 1, styles: { halign: 'right', fontStyle: 'bold' } }, ''],
-        [{ content: 'Total Esperado en Caja', colSpan: 1, styles: { halign: 'right', fontStyle: 'bold' } }, { content: this.openCashRegisterWithSales.expectedAmount.toFixed(2), colSpan: 1, styles: { halign: 'right', fontStyle: 'bold' } }, '']
+        [
+          { content: 'Ventas Totales', colSpan: 1, styles: { halign: 'right', fontStyle: 'bold' } },
+          { content: subtotal.toFixed(2), colSpan: 1, styles: { halign: 'right', fontStyle: 'bold' } },
+          '',
+        ],
+        [
+          { content: 'Total Esperado en Caja', colSpan: 1, styles: { halign: 'right', fontStyle: 'bold' } },
+          {
+            content: this.openCashRegisterWithSales.expectedAmount.toFixed(2),
+            colSpan: 1,
+            styles: { halign: 'right', fontStyle: 'bold' },
+          },
+          '',
+        ],
       ],
       startY: currentY,
       margin: { left: marginX, right: marginX },
       styles: { fontSize: 7, cellPadding: 1, overflow: 'linebreak' },
       columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 15 }, 2: { cellWidth: 23 } },
-      theme: 'plain'
+      theme: 'plain',
     });
 
     const pdfBlob = doc.output('blob');
     const url = URL.createObjectURL(pdfBlob);
-    const printWindow = window.open(url)!;
+    const printWindow = window.open(url);
+
+    if (!printWindow) {
+      Swal.fire('Error', 'No se pudo abrir la ventana de impresión. Verifica que no esté bloqueada por el navegador.', 'error');
+      URL.revokeObjectURL(url);
+      return;
+    }
 
     printWindow.onload = () => {
       printWindow.print();
       printWindow.onafterprint = () => {
         printWindow.close();
+        URL.revokeObjectURL(url);
       };
     };
   }

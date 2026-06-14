@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-caja-detail',
   templateUrl: './caja-detail.component.html',
-  styleUrls: ['./caja-detail.component.css']
+  styleUrls: ['./caja-detail.component.css'],
 })
 export class CajaDetailComponent implements OnInit {
   @Input() cajaIdInput?: string;
@@ -23,7 +23,7 @@ export class CajaDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private cashRegisterService: CashRegisterService
+    private cashRegisterService: CashRegisterService,
   ) {}
 
   ngOnInit(): void {
@@ -62,7 +62,7 @@ export class CajaDetailComponent implements OnInit {
   verifyDeposit(expenseId: string, status: 'verified' | 'rejected'): void {
     const actionText = status === 'verified' ? 'conciliar / aprobar' : 'marcar como discrepancia / rechazar';
     const confirmColor = status === 'verified' ? '#28a745' : '#dc3545';
-    
+
     Swal.fire({
       title: '¿Confirmar Auditoría?',
       text: `¿Estás seguro de que deseas ${actionText} este depósito?`,
@@ -70,15 +70,15 @@ export class CajaDetailComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Sí, registrar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: confirmColor
+      confirmButtonColor: confirmColor,
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
           title: 'Actualizando estatus...',
           allowOutsideClick: false,
-          didOpen: () => Swal.showLoading()
+          didOpen: () => Swal.showLoading(),
         });
-        
+
         this.cashRegisterService.verifyDeposit(this.cajaId, expenseId, status).subscribe({
           next: () => {
             Swal.fire('Éxito', 'El estatus de auditoría se actualizó correctamente', 'success');
@@ -87,7 +87,7 @@ export class CajaDetailComponent implements OnInit {
           error: (err) => {
             console.error('Error al conciliar depósito:', err);
             Swal.fire('Error', 'No se pudo actualizar el estatus de conciliación', 'error');
-          }
+          },
         });
       }
     });
@@ -150,11 +150,11 @@ export class CajaDetailComponent implements OnInit {
               `${product.subtotal.toFixed(2)} MXN`,
               product.modifications.length > 0
                 ? product.modifications.map((mod: any) => `${mod.name} (+${mod.extraPrice.toFixed(2)} MXN)`).join(', ')
-                : 'Ninguna'
+                : 'Ninguna',
             ]),
             margin: { left: marginX, right: marginX },
             styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
-            theme: 'grid'
+            theme: 'grid',
           });
           currentY = (doc as any).lastAutoTable.finalY + 10;
         }
@@ -229,11 +229,11 @@ export class CajaDetailComponent implements OnInit {
               `${product.subtotal.toFixed(2)} MXN`,
               product.modifications.length > 0
                 ? product.modifications.map((mod: any) => `${mod.name} (+${mod.extraPrice.toFixed(2)} MXN)`).join(', ')
-                : 'Ninguna'
+                : 'Ninguna',
             ]),
             margin: { left: marginX, right: marginX },
             styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
-            theme: 'grid'
+            theme: 'grid',
           });
           currentY = (doc as any).lastAutoTable.finalY + 10;
         }

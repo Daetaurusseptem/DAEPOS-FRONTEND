@@ -6,16 +6,17 @@ import { ModalService } from 'src/app/services/modal.service';
 import { UsersService } from 'src/app/services/users.service';
 import { BranchService } from 'src/app/services/branch.service';
 import { CashRegisterService } from 'src/app/services/cash-register.service';
+import { LoggerService } from '../../../services/logger.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'user-list',
   templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.css']
+  styleUrls: ['./user-list.component.css'],
 })
 export class UserListComponent {
-  @Input() padre: Boolean = false;
+  @Input() padre: boolean = false;
   adminId!: string;
   companyId!: string;
   users!: User[];
@@ -37,8 +38,9 @@ export class UserListComponent {
     private modalService: ModalService,
     private branchService: BranchService,
     private cashRegisterService: CashRegisterService,
-    private router: Router
-  ) { 
+    private router: Router,
+    private logger: LoggerService,
+  ) {
     this.adminId = this.authService.idUsuario;
     this.getRole();
     if (this.userRole == 'admin' || this.userRole == 'companyAdmin') {
@@ -56,7 +58,7 @@ export class UserListComponent {
   getRole() {
     const role = this.authService.role;
     this.actualUserRole = role;
-    this.userRole = (role === 'companyAdmin') ? 'admin' : role;
+    this.userRole = role === 'companyAdmin' ? 'admin' : role;
   }
 
   getBranches() {
@@ -68,7 +70,7 @@ export class UserListComponent {
         if (resp.ok) {
           this.branches = resp.branches;
         }
-      }
+      },
     });
   }
 
@@ -76,13 +78,24 @@ export class UserListComponent {
     this.company = this.authService.getCompany;
     this.companyId = this.authService.companyId;
 
-    this.userService.getAllNonAdminUsersOfCompany(this.adminId, page, this.itemsPerPage, this.searchTerm, this.selectedBranchId, this.selectedRole, this.selectedStatus)
-      .pipe(map(response => {
-        console.log(response);
-        this.totalPages = response.totalPages!;
-        return response.users
-      }))
-      .subscribe(users => {
+    this.userService
+      .getAllNonAdminUsersOfCompany(
+        this.adminId,
+        page,
+        this.itemsPerPage,
+        this.searchTerm,
+        this.selectedBranchId,
+        this.selectedRole,
+        this.selectedStatus,
+      )
+      .pipe(
+        map((response) => {
+          this.logger.log(response);
+          this.totalPages = response.totalPages!;
+          return response.users;
+        }),
+      )
+      .subscribe((users) => {
         this.users = users!;
         this.currentPage = page;
         this.generateVisiblePages();
@@ -90,15 +103,18 @@ export class UserListComponent {
   }
 
   getAllAdminUsers(page: number = 1): void {
-    this.userService.getAllAdmins()
-      .pipe(map(response => {
-        console.log(response);
-        this.totalPages = response.totalPages!;
-        return response.users
-      }))
-      .subscribe(users => {
+    this.userService
+      .getAllAdmins()
+      .pipe(
+        map((response) => {
+          this.logger.log(response);
+          this.totalPages = response.totalPages!;
+          return response.users;
+        }),
+      )
+      .subscribe((users) => {
         this.users = users!;
-        
+
         this.currentPage = page;
         this.generateVisiblePages();
       });
@@ -127,7 +143,7 @@ export class UserListComponent {
     const pages = [];
     const maxVisible = 5;
     let start = Math.max(1, this.currentPage - 2);
-    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    const end = Math.min(this.totalPages, start + maxVisible - 1);
 
     if (end - start < maxVisible - 1) {
       start = Math.max(1, end - maxVisible + 1);
@@ -157,26 +173,31 @@ export class UserListComponent {
           return false;
         }
         return reason;
-      }
-    })
-    .then(resp => {
+      },
+    }).then((resp) => {
       if (resp.isConfirmed && resp.value) {
         const reason = resp.value;
-        this.userService.deleteuserByCompanyAdmin(id, this.companyId, reason)
-          .subscribe(resp => {
+        this.userService.deleteuserByCompanyAdmin(id, this.companyId, reason).subscribe(
+          (resp) => {
             if (resp.ok) {
-              Swal.fire({ title: 'Usuario desactivado', text: 'La cuenta ha sido deshabilitada con éxito.', icon: 'success' });
+              Swal.fire({
+                title: 'Usuario desactivado',
+                text: 'La cuenta ha sido deshabilitada con éxito.',
+                icon: 'success',
+              });
               this.getCompanyUsers(this.currentPage); // Recargar lista de usuarios
             } else {
               Swal.fire({ title: 'Error', text: 'El usuario no pudo ser desactivado.', icon: 'error' });
             }
-          }, err => {
+          },
+          (err) => {
             Swal.fire({
               title: 'Error',
               icon: 'error',
-              text: err.error.msg || 'No se pudo desactivar el usuario.'
+              text: err.error.msg || 'No se pudo desactivar el usuario.',
             });
-          });
+          },
+        );
       }
     });
   }
@@ -199,12 +220,12 @@ export class UserListComponent {
           },
           error: (err) => {
             Swal.fire('Error', err.error?.error || 'No se pudo reactivar el usuario', 'error');
-          }
+          },
         });
       }
     });
   }
-  abrirModal(element: Company | User, tipo: "empresas" | "usuarios" | "productos") {
+  abrirModal(element: Company | User, tipo: 'empresas' | 'usuarios' | 'productos') {
     const { _id } = element;
     this.modalService.abrirModal(element.img, tipo, _id!);
   }

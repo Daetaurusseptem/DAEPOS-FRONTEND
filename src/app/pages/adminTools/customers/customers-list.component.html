@@ -1,8 +1,12 @@
 <div class="dashboard-wrapper animate__animated animate__fadeIn">
   <header class="dashboard-header mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
     <div>
-      <h1 class="h3 fw-bold mb-1 text-dark"><i class="bi bi-people-fill me-2 text-primary"></i>Gestión de Clientes (CRM)</h1>
-      <p class="text-muted mb-0">Administra tus clientes, historial de consumo, niveles de lealtad (tiers) y saldos de puntos.</p>
+      <h1 class="h3 fw-bold mb-1 text-dark">
+        <i class="bi bi-people-fill me-2 text-primary"></i>Gestión de Clientes (CRM)
+      </h1>
+      <p class="text-muted mb-0">
+        Administra tus clientes, historial de consumo, niveles de lealtad (tiers) y saldos de puntos.
+      </p>
     </div>
     <button (click)="openCreateModal()" class="btn btn-dark rounded-pill px-4 shadow-sm">
       <i class="bi bi-person-plus-fill me-2"></i>Registrar Cliente
@@ -18,11 +22,13 @@
           <div class="mb-4">
             <div class="input-group search-group">
               <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="bi bi-search"></i></span>
-              <input type="text" 
-                     class="form-control border-start-0 rounded-end-3" 
-                     placeholder="Buscar por Nombre, Teléfono o Número de Tarjeta..."
-                     [value]="searchTerm"
-                     (input)="onSearch($any($event.target).value)">
+              <input
+                type="text"
+                class="form-control border-start-0 rounded-end-3"
+                placeholder="Buscar por Nombre, Teléfono o Número de Tarjeta..."
+                [value]="searchTerm"
+                (input)="onSearch($any($event.target).value)"
+              />
             </div>
           </div>
 
@@ -48,36 +54,55 @@
                 </tr>
               </thead>
               <tbody class="small">
-                <tr *ngFor="let customer of customers | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCustomers }"
-                    [ngClass]="{'table-active-row': selectedCustomer?._id === customer._id}"
-                    style="cursor: pointer;"
-                    (click)="viewCustomerDetails(customer)">
+                <tr
+                  *ngFor="
+                    let customer of customers
+                      | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCustomers }
+                  "
+                  [ngClass]="{ 'table-active-row': selectedCustomer?._id === customer._id }"
+                  style="cursor: pointer"
+                  (click)="viewCustomerDetails(customer)"
+                >
                   <td>
                     <div class="fw-bold text-dark">{{ customer.name }}</div>
                     <div class="text-muted small" *ngIf="customer.email">{{ customer.email }}</div>
                   </td>
                   <td>
-                    <div *ngIf="customer.phone" class="text-muted"><i class="bi bi-phone me-1"></i>{{ customer.phone }}</div>
-                    <div *ngIf="customer.cardNumber" class="text-primary font-monospace small"><i class="bi bi-credit-card me-1"></i>{{ customer.cardNumber }}</div>
+                    <div *ngIf="customer.phone" class="text-muted">
+                      <i class="bi bi-phone me-1"></i>{{ customer.phone }}
+                    </div>
+                    <div *ngIf="customer.cardNumber" class="text-primary font-monospace small">
+                      <i class="bi bi-credit-card me-1"></i>{{ customer.cardNumber }}
+                    </div>
                   </td>
                   <td class="text-center">
-                    <span class="badge rounded-pill px-3 py-1" [ngClass]="{
-                      'bg-warning text-dark': customer.tier === 'gold',
-                      'bg-secondary text-white': customer.tier === 'silver',
-                      'bg-dark text-white': customer.tier === 'bronze'
-                    }">{{ customer.tier | uppercase }}</span>
+                    <span
+                      class="badge rounded-pill px-3 py-1"
+                      [ngClass]="{
+                        'bg-warning text-dark': customer.tier === 'gold',
+                        'bg-secondary text-white': customer.tier === 'silver',
+                        'bg-dark text-white': customer.tier === 'bronze',
+                      }"
+                      >{{ customer.tier | uppercase }}</span
+                    >
                   </td>
                   <td class="text-end fw-bold text-success">{{ customer.loyaltyPoints }} pts</td>
                   <td class="text-end fw-semibold">{{ customer.totalSpent | currency }}</td>
                   <td class="text-end" (click)="$event.stopPropagation()">
                     <div class="d-flex justify-content-end gap-1">
-                      <button (click)="openEditModal(customer)" class="btn btn-ghost-primary btn-sm rounded-circle" title="Editar">
+                      <button
+                        (click)="openEditModal(customer)"
+                        class="btn btn-ghost-primary btn-sm rounded-circle"
+                        title="Editar"
+                      >
                         <i class="bi bi-pencil-fill"></i>
                       </button>
-                      <button (click)="toggleCustomerStatus(customer)" 
-                              class="btn btn-sm rounded-circle"
-                              [ngClass]="customer.isActive ? 'btn-ghost-danger' : 'btn-ghost-success'"
-                              [title]="customer.isActive ? 'Desactivar' : 'Activar'">
+                      <button
+                        (click)="toggleCustomerStatus(customer)"
+                        class="btn btn-sm rounded-circle"
+                        [ngClass]="customer.isActive ? 'btn-ghost-danger' : 'btn-ghost-success'"
+                        [title]="customer.isActive ? 'Desactivar' : 'Activar'"
+                      >
                         <i class="bi" [ngClass]="customer.isActive ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
                       </button>
                     </div>
@@ -88,9 +113,16 @@
           </div>
 
           <!-- Paginación -->
-          <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2" *ngIf="!isLoading && customers.length > 0">
+          <div
+            class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2"
+            *ngIf="!isLoading && customers.length > 0"
+          >
             <span class="text-muted small">Mostrando {{ customers.length }} de {{ totalCustomers }} clientes</span>
-            <pagination-controls (pageChange)="onPageChange($event)" previousLabel="Anterior" nextLabel="Siguiente"></pagination-controls>
+            <pagination-controls
+              (pageChange)="onPageChange($event)"
+              previousLabel="Anterior"
+              nextLabel="Siguiente"
+            ></pagination-controls>
           </div>
 
           <!-- Vacío -->
@@ -105,20 +137,35 @@
 
     <!-- Panel Derecho: Detalle del Cliente y Ficha de Lealtad (Historial de Compras) -->
     <div class="col-lg-5 animate__animated animate__fadeInRight" *ngIf="selectedCustomer">
-      <div class="card border-0 shadow-lg rounded-4 bg-white position-sticky" style="top: 24px;">
+      <div class="card border-0 shadow-lg rounded-4 bg-white position-sticky" style="top: 24px">
         <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center rounded-top-4">
           <div class="d-flex align-items-center gap-3">
-            <div class="avatar-circle" [ngClass]="{
-              'bg-gold': selectedCustomer.tier === 'gold',
-              'bg-silver': selectedCustomer.tier === 'silver',
-              'bg-bronze': selectedCustomer.tier === 'bronze'
-            }">{{ selectedCustomer.name.substring(0, 2) | uppercase }}</div>
+            <div
+              class="avatar-circle"
+              [ngClass]="{
+                'bg-gold': selectedCustomer.tier === 'gold',
+                'bg-silver': selectedCustomer.tier === 'silver',
+                'bg-bronze': selectedCustomer.tier === 'bronze',
+              }"
+            >
+              {{ selectedCustomer.name.substring(0, 2) | uppercase }}
+            </div>
             <div>
               <h5 class="fw-bold mb-0 text-white">{{ selectedCustomer.name }}</h5>
               <div class="d-flex align-items-center gap-2 mt-1">
-                <span class="badge text-uppercase bg-light text-dark font-monospace small px-2">{{ selectedCustomer.tier }}</span>
-                <span class="badge text-uppercase bg-success text-white font-monospace small px-2" *ngIf="selectedCustomer.isActive">ACTIVO</span>
-                <span class="badge text-uppercase bg-danger text-white font-monospace small px-2" *ngIf="!selectedCustomer.isActive">INACTIVO</span>
+                <span class="badge text-uppercase bg-light text-dark font-monospace small px-2">{{
+                  selectedCustomer.tier
+                }}</span>
+                <span
+                  class="badge text-uppercase bg-success text-white font-monospace small px-2"
+                  *ngIf="selectedCustomer.isActive"
+                  >ACTIVO</span
+                >
+                <span
+                  class="badge text-uppercase bg-danger text-white font-monospace small px-2"
+                  *ngIf="!selectedCustomer.isActive"
+                  >INACTIVO</span
+                >
               </div>
             </div>
           </div>
@@ -127,14 +174,16 @@
           </button>
         </div>
 
-        <div class="card-body p-4 scroll-container" style="max-height: 70vh; overflow-y: auto;">
+        <div class="card-body p-4 scroll-container" style="max-height: 70vh; overflow-y: auto">
           <!-- Estadísticas y Puntos -->
           <div class="row g-3 mb-4 text-center">
             <div class="col-6">
               <div class="p-3 bg-light rounded-3 border">
                 <div class="text-muted small mb-1 text-uppercase fw-semibold">Puntos Acumulados</div>
                 <div class="h3 fw-bold text-success mb-0">{{ selectedCustomer.loyaltyPoints }}</div>
-                <div class="text-muted small mt-1">Equivale a {{ selectedCustomer.loyaltyPoints * 0.10 | currency }}</div>
+                <div class="text-muted small mt-1">
+                  Equivale a {{ selectedCustomer.loyaltyPoints * 0.1 | currency }}
+                </div>
               </div>
             </div>
             <div class="col-6">
@@ -173,7 +222,7 @@
 
           <!-- Historial de Ventas / Tickets -->
           <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Historial de Compras</h6>
-          
+
           <div class="text-center py-4" *ngIf="isLoadingDetails">
             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
             <p class="text-muted mt-1 small">Cargando transacciones...</p>
@@ -185,7 +234,7 @@
                 <span class="small font-monospace fw-bold text-primary">#{{ sale._id.substring(18) | uppercase }}</span>
                 <span class="text-muted small">{{ sale.date | date: 'dd/MM/yyyy HH:mm' }}</span>
               </div>
-              
+
               <!-- Productos -->
               <div class="small text-dark mb-2">
                 <div *ngFor="let prod of sale.productsSold" class="d-flex justify-content-between">
@@ -204,7 +253,10 @@
             </div>
           </div>
 
-          <div class="text-center py-4 text-muted bg-light border rounded" *ngIf="!isLoadingDetails && customerSalesHistory.length === 0">
+          <div
+            class="text-center py-4 text-muted bg-light border rounded"
+            *ngIf="!isLoadingDetails && customerSalesHistory.length === 0"
+          >
             <i class="bi bi-cart-x"></i> Sin historial de compras en esta empresa.
           </div>
         </div>
@@ -217,58 +269,92 @@
 <div class="quick-register-backdrop z-3" *ngIf="showModal">
   <div class="quick-register-card card shadow-lg p-4">
     <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-      <h5 class="mb-0 text-dark fw-bold"><i class="bi bi-person-bounding-box me-2 text-primary"></i>{{ isEditMode ? 'Editar Ficha de' : 'Nuevo' }} Cliente</h5>
+      <h5 class="mb-0 text-dark fw-bold">
+        <i class="bi bi-person-bounding-box me-2 text-primary"></i
+        >{{ isEditMode ? 'Editar Ficha de' : 'Nuevo' }} Cliente
+      </h5>
       <button type="button" class="btn-close border-0 bg-transparent text-muted" (click)="closeModal()">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
-    
+
     <form [formGroup]="customerForm" (ngSubmit)="onSubmitCustomer()">
       <div class="mb-3">
         <label class="form-label small fw-semibold mb-1 text-muted">Nombre Completo *</label>
-        <input type="text" class="form-control form-control-sm" formControlName="name" placeholder="Ej. Carlos Pérez">
-        <div *ngIf="customerForm.get('name')!.invalid && customerForm.get('name')!.touched" class="text-danger small mt-1">
+        <input type="text" class="form-control form-control-sm" formControlName="name" placeholder="Ej. Carlos Pérez" />
+        <div
+          *ngIf="customerForm.get('name')!.invalid && customerForm.get('name')!.touched"
+          class="text-danger small mt-1"
+        >
           <small>El nombre es requerido.</small>
         </div>
       </div>
 
       <div class="mb-3">
         <label class="form-label small fw-semibold mb-1 text-muted">Número Celular (10 dígitos)</label>
-        <input type="text" class="form-control form-control-sm" formControlName="phone" placeholder="Ej. 5512345678">
-        <div *ngIf="customerForm.get('phone')!.invalid && customerForm.get('phone')!.touched" class="text-danger small mt-1">
+        <input type="text" class="form-control form-control-sm" formControlName="phone" placeholder="Ej. 5512345678" />
+        <div
+          *ngIf="customerForm.get('phone')!.invalid && customerForm.get('phone')!.touched"
+          class="text-danger small mt-1"
+        >
           <small>Formato telefónico inválido (10 dígitos).</small>
         </div>
       </div>
 
       <div class="mb-3">
         <label class="form-label small fw-semibold mb-1 text-muted">Tarjeta de Puntos / Membresía</label>
-        <input type="text" class="form-control form-control-sm" formControlName="cardNumber" placeholder="Escanea o escribe código...">
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          formControlName="cardNumber"
+          placeholder="Escanea o escribe código..."
+        />
       </div>
 
       <div class="mb-3">
         <label class="form-label small fw-semibold mb-1 text-muted">Correo electrónico</label>
-        <input type="email" class="form-control form-control-sm" formControlName="email" placeholder="carlos@gmail.com">
-        <div *ngIf="customerForm.get('email')!.invalid && customerForm.get('email')!.touched" class="text-danger small mt-1">
+        <input
+          type="email"
+          class="form-control form-control-sm"
+          formControlName="email"
+          placeholder="carlos@gmail.com"
+        />
+        <div
+          *ngIf="customerForm.get('email')!.invalid && customerForm.get('email')!.touched"
+          class="text-danger small mt-1"
+        >
           <small>Formato de correo electrónico inválido.</small>
         </div>
       </div>
 
       <div class="mb-3">
         <label class="form-label small fw-semibold mb-1 text-muted">RFC (Facturación)</label>
-        <input type="text" class="form-control form-control-sm text-uppercase" formControlName="rfc" placeholder="Ej. CARP900101XYZ">
+        <input
+          type="text"
+          class="form-control form-control-sm text-uppercase"
+          formControlName="rfc"
+          placeholder="Ej. CARP900101XYZ"
+        />
       </div>
 
       <div class="mb-3" *ngIf="isEditMode">
         <label class="form-label small fw-semibold mb-1 text-muted">Ajuste de Puntos de Lealtad *</label>
-        <input type="number" class="form-control form-control-sm" formControlName="loyaltyPoints">
-        <div *ngIf="customerForm.get('loyaltyPoints')!.invalid && customerForm.get('loyaltyPoints')!.touched" class="text-danger small mt-1">
+        <input type="number" class="form-control form-control-sm" formControlName="loyaltyPoints" />
+        <div
+          *ngIf="customerForm.get('loyaltyPoints')!.invalid && customerForm.get('loyaltyPoints')!.touched"
+          class="text-danger small mt-1"
+        >
           <small>Saldo de puntos inválido.</small>
         </div>
       </div>
 
       <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
-        <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-pill" (click)="closeModal()">Cancelar</button>
-        <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill" [disabled]="customerForm.invalid">Guardar</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-pill" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill" [disabled]="customerForm.invalid">
+          Guardar
+        </button>
       </div>
     </form>
   </div>

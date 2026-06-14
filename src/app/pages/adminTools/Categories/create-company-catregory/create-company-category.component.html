@@ -7,15 +7,36 @@
       <form #categorForm="ngForm">
         <div class="mb-3">
           <label for="name" class="form-label">Nombre Categoría</label>
-          <input type="text" class="form-control" id="name" [(ngModel)]="category.name" name="name" required placeholder="Introduce el nombre de la categoría">
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            [(ngModel)]="category.name"
+            name="name"
+            required
+            placeholder="Introduce el nombre de la categoría"
+          />
         </div>
         <div class="mb-3">
           <label for="description" class="form-label">Descripción Categoría</label>
-          <textarea class="form-control" id="description" [(ngModel)]="category.description" name="description" rows="3" required placeholder="Describe la categoría"></textarea>
+          <textarea
+            class="form-control"
+            id="description"
+            [(ngModel)]="category.description"
+            name="description"
+            rows="3"
+            required
+            placeholder="Describe la categoría"
+          ></textarea>
         </div>
         <div class="d-flex justify-content-between align-items-center">
           <app-back-button></app-back-button>
-          <button type="submit" class="btn btn-primary" (click)="createCategory(categorForm)" [disabled]="!categorForm.form.valid">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            (click)="createCategory(categorForm)"
+            [disabled]="!categorForm.form.valid"
+          >
             Crear Categoría
           </button>
         </div>

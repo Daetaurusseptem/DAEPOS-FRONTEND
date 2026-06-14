@@ -15,10 +15,9 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-create-product',
   templateUrl: './create-product.component.html',
-  styleUrls: ['./create-product.component.css']
+  styleUrls: ['./create-product.component.css'],
 })
 export class CreateProductComponent implements OnInit {
-
   suppliers!: Supplier[];
   Categories!: Category[];
   recipes!: Recipe[];
@@ -36,12 +35,12 @@ export class CreateProductComponent implements OnInit {
     private recipeService: RecipesService,
     private modal: ModalService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) { }
+    private activatedRoute: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     if (this.authService.usuario.role === 'sysadmin') {
-      this.activatedRoute.params.subscribe(params => {
+      this.activatedRoute.params.subscribe((params) => {
         this.companyId = params['id'];
       });
     } else {
@@ -61,7 +60,7 @@ export class CreateProductComponent implements OnInit {
       stock: [0, [Validators.required, Validators.min(0)]],
       costPrice: [0, [Validators.required, Validators.min(0)]],
       sellingPrice: [0, [Validators.required, Validators.min(0)]],
-      unitOfMeasure: ['unit', Validators.required]
+      unitOfMeasure: ['unit', Validators.required],
     });
 
     this.loadCategories();
@@ -69,10 +68,10 @@ export class CreateProductComponent implements OnInit {
     this.loadRecipes();
 
     // Suscribirse a los cambios en el campo isComposite
-    this.productForm.get('isComposite')!.valueChanges.subscribe(value => {
+    this.productForm.get('isComposite')!.valueChanges.subscribe((value) => {
       this.isComposite = value;
       const supplierControl = this.productForm.get('supplier');
-      
+
       if (value) {
         // Es compuesto: quitamos proveedor
         supplierControl!.clearValidators();
@@ -84,31 +83,34 @@ export class CreateProductComponent implements OnInit {
       }
       supplierControl!.updateValueAndValidity();
     });
-    
+
     // Set initial state
     this.productForm.get('supplier')!.setValidators([Validators.required]);
     this.productForm.get('supplier')!.updateValueAndValidity();
   }
 
   loadCategories() {
-    this.categoryService.getCompanyCategories(this.companyId)
-      .pipe(map(item => item.categories))
+    this.categoryService
+      .getCompanyCategories(this.companyId)
+      .pipe(map((item) => item.categories))
       .subscribe((categories: any) => {
         this.Categories = categories!;
       });
   }
 
   loadSuppliers() {
-    this.supplierService.getCompanySuppliers(this.companyId)
-      .pipe(map(item => item.suppliers))
+    this.supplierService
+      .getCompanySuppliers(this.companyId)
+      .pipe(map((item) => item.suppliers))
       .subscribe((suppliers: any) => {
         this.suppliers = suppliers!;
       });
   }
 
   loadRecipes() {
-    this.recipeService.getCompanyRecipes(this.companyId)
-      .pipe(map(item => item.recipes))
+    this.recipeService
+      .getCompanyRecipes(this.companyId)
+      .pipe(map((item) => item.recipes))
       .subscribe((recipes: any) => {
         this.recipes = recipes!;
       });
@@ -130,8 +132,8 @@ export class CreateProductComponent implements OnInit {
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Sí',
-        cancelButtonText: 'No'
-      }).then(res => {
+        cancelButtonText: 'No',
+      }).then((res) => {
         if (res.isConfirmed) {
           const formValue = { ...this.productForm.value };
           if (!this.isComposite || !formValue.recipe) {
@@ -149,7 +151,7 @@ export class CreateProductComponent implements OnInit {
             error: (error: any) => {
               console.error('Error al crear producto', error);
               Swal.fire('Error', 'Hubo un problema al crear el producto', 'error');
-            }
+            },
           });
         }
       });

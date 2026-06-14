@@ -10,7 +10,7 @@
 }
 
 .price-mono {
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  font-family: var(--font-mono);
 }
 
 .stat-label {
@@ -137,13 +137,16 @@
   transition: all 0.15s ease;
 }
 
-.dropdown-item:hover, .dropdown-item:focus {
+.dropdown-item:hover,
+.dropdown-item:focus {
   background-color: #f5f6f8 !important;
   color: #000000 !important;
 }
 
 .btn-clear-select {
-  transition: color 0.15s ease, transform 0.15s ease;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .btn-clear-select:hover {

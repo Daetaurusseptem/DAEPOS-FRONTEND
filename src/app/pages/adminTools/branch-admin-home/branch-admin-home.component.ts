@@ -9,7 +9,7 @@ import { BranchService } from 'src/app/services/branch.service';
 @Component({
   selector: 'app-branch-admin-home',
   templateUrl: './branch-admin-home.component.html',
-  styleUrls: ['./branch-admin-home.component.css']
+  styleUrls: ['./branch-admin-home.component.css'],
 })
 export class BranchAdminHomeComponent implements OnInit {
   company!: Company;
@@ -20,7 +20,7 @@ export class BranchAdminHomeComponent implements OnInit {
     transactionsToday: 0,
     lowStockCount: 0,
     activeRegisters: 0,
-    recentSales: []
+    recentSales: [],
   };
   isLoading: boolean = true;
   today: Date = new Date();
@@ -29,14 +29,14 @@ export class BranchAdminHomeComponent implements OnInit {
     private authService: AuthService,
     private statisticsService: StatisticsService,
     private activatedRoute: ActivatedRoute,
-    private branchService: BranchService
-  ) { }
+    private branchService: BranchService,
+  ) {}
 
   ngOnInit(): void {
     this.admin = this.authService.usuario;
     this.company = this.authService.company;
 
-    this.activatedRoute.params.subscribe(params => {
+    this.activatedRoute.params.subscribe((params) => {
       const branchIdFromUrl = params['id'];
       if (branchIdFromUrl) {
         this.getBranchDetails(branchIdFromUrl);
@@ -56,14 +56,14 @@ export class BranchAdminHomeComponent implements OnInit {
           this.loadDashboardSummary(id);
         }
       },
-      error: () => this.isLoading = false
+      error: () => (this.isLoading = false),
     });
   }
 
   loadDashboardSummary(branchId?: string) {
     const companyId = this.authService.companyId || this.authService.company?._id;
     const bid = branchId || this.branch?._id;
-    
+
     if (!companyId || !bid) return;
 
     this.isLoading = true;
@@ -76,7 +76,7 @@ export class BranchAdminHomeComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 

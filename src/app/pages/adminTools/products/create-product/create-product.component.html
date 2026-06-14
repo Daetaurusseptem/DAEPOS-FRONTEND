@@ -8,11 +8,23 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="name" class="form-label">Nombre:</label>
-            <input type="text" class="form-control" formControlName="name" id="name" placeholder="Nombre del producto">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              id="name"
+              placeholder="Nombre del producto"
+            />
           </div>
           <div class="col-md-6 mb-3">
             <label for="brand" class="form-label">Marca:</label>
-            <input type="text" class="form-control" formControlName="brand" id="brand" placeholder="Marca del producto">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="brand"
+              id="brand"
+              placeholder="Marca del producto"
+            />
           </div>
         </div>
         <div class="mb-3">
@@ -27,7 +39,8 @@
             bindValue="_id"
             [multiple]="true"
             formControlName="categories"
-            placeholder="Selecciona las categorías">
+            placeholder="Selecciona las categorías"
+          >
           </ng-select>
         </div>
         <div class="row">
@@ -40,7 +53,12 @@
           </div>
           <div class="col-md-6 mb-3">
             <label for="isComposite" class="form-label">¿Es un producto compuesto?</label>
-            <select class="form-select" formControlName="isComposite" id="isComposite" (change)="onIsCompositeChange($event)">
+            <select
+              class="form-select"
+              formControlName="isComposite"
+              id="isComposite"
+              (change)="onIsCompositeChange($event)"
+            >
               <option [value]="false">No</option>
               <option [value]="true">Sí</option>
             </select>
@@ -54,17 +72,23 @@
           </select>
         </div>
 
-        <hr class="my-4">
+        <hr class="my-4" />
         <h4 class="mb-3 text-muted">Inventario y Precios</h4>
-        
+
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="barCode" class="form-label">Código de Barras:</label>
-            <input type="text" class="form-control" formControlName="barCode" id="barCode" placeholder="Eje: 750123456789">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="barCode"
+              id="barCode"
+              placeholder="Eje: 750123456789"
+            />
           </div>
           <div class="col-md-3 mb-3">
             <label for="stock" class="form-label">Stock Inicial:</label>
-            <input type="number" class="form-control" formControlName="stock" id="stock">
+            <input type="number" class="form-control" formControlName="stock" id="stock" />
           </div>
           <div class="col-md-3 mb-3">
             <label for="unitOfMeasure" class="form-label">Unidad:</label>
@@ -82,18 +106,18 @@
             <label for="costPrice" class="form-label">Precio de Costo:</label>
             <div class="input-group">
               <span class="input-group-text">$</span>
-              <input type="number" class="form-control" formControlName="costPrice" id="costPrice">
+              <input type="number" class="form-control" formControlName="costPrice" id="costPrice" />
             </div>
           </div>
           <div class="col-md-6 mb-3">
             <label for="sellingPrice" class="form-label">Precio de Venta:</label>
             <div class="input-group">
               <span class="input-group-text">$</span>
-              <input type="number" class="form-control" formControlName="sellingPrice" id="sellingPrice">
+              <input type="number" class="form-control" formControlName="sellingPrice" id="sellingPrice" />
             </div>
           </div>
         </div>
-        
+
         <div class="d-flex justify-content-between">
           <app-back-button></app-back-button>
           <button type="submit" class="btn btn-primary" [disabled]="!productForm.valid">Crear Producto</button>

@@ -11,13 +11,13 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: 'dashboard',
-    loadChildren: () => import('./pages/pages-routing.module').then(m => m.PagesRoutingModule)
+    loadChildren: () => import('./pages/pages-routing.module').then((m) => m.PagesRoutingModule),
   },
-  { path: '**', component: PageNotFoundComponent }, 
+  { path: '**', component: PageNotFoundComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

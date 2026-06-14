@@ -1,250 +1,337 @@
 <div class="inventory-wrapper animate__animated animate__fadeIn">
-    
-    <!-- Sección de Búsqueda y Acción -->
-    <div class="search-section shadow-sm">
-        <div class="search-header">
-            <div>
-                <h5 class="mb-1">Inventario General</h5>
-                <p class="text-muted small mb-0">Gestione el stock y precios de sus productos</p>
-            </div>
-            <div class="d-flex gap-2 flex-wrap justify-content-end align-items-center">
-                <button class="btn btn-outline-primary px-3 position-relative" (click)="inspectScheduledDelivery()">
-                    <i class="bi bi-truck me-2"></i> Entregas
-                    <span *ngIf="pendingDeliveries.length > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-white" style="font-size: 0.7rem;">
-                      {{ pendingDeliveries.length }}
-                    </span>
-                </button>
-                <button class="btn btn-outline-success px-3" (click)="openUnplannedRestock()">
-                    <i class="bi bi-lightning-charge-fill me-2"></i> Ingreso Imprevisto
-                </button>
-                <button class="btn btn-outline-secondary px-3" *ngIf="userRole === 'companyAdmin'" routerLink="/dashboard/admin/inventory/transfers/new">
-                    <i class="bi bi-arrow-left-right me-1"></i> Traspasos
-                </button>
-                <button class="btn btn-light px-3 border" *ngIf="userRole === 'companyAdmin'" routerLink="/dashboard/admin/inventory/transfers">
-                    <i class="bi bi-clock-history"></i>
-                </button>
-                <button class="btn btn-primary px-4 shadow-sm" (click)="crearItem()">
-                    <i class="bi bi-plus-circle-fill me-1"></i> Nuevo
-                </button>
-            </div>
-        </div>
-        
-        <div class="search-input-group d-flex flex-wrap gap-3 mt-3">
-            <div class="input-group flex-grow-1" style="min-width: 250px;">
-                <span class="input-group-text bg-white border-end-0">
-                    <i class="bi bi-search text-muted"></i>
-                </span>
-                <input type="text" 
-                       class="form-control border-start-0 ps-0" 
-                       placeholder="Buscar por nombre de producto..." 
-                       [(ngModel)]="searchTerm" 
-                       (keyup.enter)="loadItems()"
-                       name="searchTerm">
-            </div>
-
-            <!-- Filtro por Stock -->
-            <div class="stock-filter flex-shrink-0" style="min-width: 220px;">
-                <select class="form-select" 
-                        [(ngModel)]="stockFilter"
-                        name="stockFilter">
-                    <option value="all">🔍 Todos los Niveles</option>
-                    <option value="low">⚠️ Stock Bajo (&lt; 10)</option>
-                    <option value="normal">✅ Stock Suficiente (&gt;= 10)</option>
-                </select>
-            </div>
-
-            <!-- Filtro por Sucursal (Solo para Dueño) -->
-            <div class="branch-filter flex-shrink-0" style="min-width: 220px;" *ngIf="userRole === 'companyAdmin'">
-                <select class="form-select" 
-                        [(ngModel)]="selectedBranchId" 
-                        (change)="loadItems()"
-                        name="selectedBranchId">
-                    <option value="">Todas las sucursales</option>
-                    <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
-                </select>
-            </div>
-        </div>
-    </div>
-    <div class="d-flex gap-2 mb-4">
-        <button type="button" class="btn px-4 py-2 border rounded-pill d-flex align-items-center gap-2 transition" 
-                [ngClass]="itemType === 'product' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary'" 
-                (click)="setItemType('product')">
-            <i class="bi bi-box-seam fs-5"></i>
-            <span class="fw-semibold">Productos Vendibles</span>
+  <!-- Sección de Búsqueda y Acción -->
+  <div class="search-section shadow-sm">
+    <div class="search-header">
+      <div>
+        <h5 class="mb-1">Inventario General</h5>
+        <p class="text-muted small mb-0">Gestione el stock y precios de sus productos</p>
+      </div>
+      <div class="d-flex gap-2 flex-wrap justify-content-end align-items-center">
+        <button class="btn btn-outline-primary px-3 position-relative" (click)="inspectScheduledDelivery()">
+          <i class="bi bi-truck me-2"></i> Entregas
+          <span
+            *ngIf="pendingDeliveries.length > 0"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-white"
+            style="font-size: 0.7rem"
+          >
+            {{ pendingDeliveries.length }}
+          </span>
         </button>
-        <button type="button" class="btn px-4 py-2 border rounded-pill d-flex align-items-center gap-2 transition" 
-                [ngClass]="itemType === 'raw_material' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary'" 
-                (click)="setItemType('raw_material')">
-            <i class="bi bi-egg-fill fs-5"></i>
-            <span class="fw-semibold">Insumos (Materias Primas)</span>
+        <button class="btn btn-outline-success px-3" (click)="openUnplannedRestock()">
+          <i class="bi bi-lightning-charge-fill me-2"></i> Ingreso Imprevisto
         </button>
+        <button
+          class="btn btn-outline-secondary px-3"
+          *ngIf="userRole === 'companyAdmin'"
+          routerLink="/dashboard/admin/inventory/transfers/new"
+        >
+          <i class="bi bi-arrow-left-right me-1"></i> Traspasos
+        </button>
+        <button
+          class="btn btn-light px-3 border"
+          *ngIf="userRole === 'companyAdmin'"
+          routerLink="/dashboard/admin/inventory/transfers"
+        >
+          <i class="bi bi-clock-history"></i>
+        </button>
+        <button class="btn btn-primary px-4 shadow-sm" (click)="crearItem()">
+          <i class="bi bi-plus-circle-fill me-1"></i> Nuevo
+        </button>
+      </div>
     </div>
 
-    <!-- Lista de Stock -->
-    <div class="list-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0 fw-bold text-main">Lista de Existencias</h4>
-        </div>
+    <div class="search-input-group d-flex flex-wrap gap-3 mt-3">
+      <div class="input-group flex-grow-1" style="min-width: 250px">
+        <span class="input-group-text bg-white border-end-0">
+          <i class="bi bi-search text-muted"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control border-start-0 ps-0"
+          placeholder="Buscar por nombre de producto..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="loadItems()"
+          name="searchTerm"
+        />
+      </div>
 
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th width="80">Imagen</th>
-                        <th>{{ itemType === 'product' ? 'Producto' : 'Insumo Maestro' }}</th>
-                        <th>Presentación</th>
-                        <th>{{ itemType === 'product' ? 'Precio Venta' : 'Costo Promedio' }}</th>
-                        <th width="180" class="sortable-header" (click)="toggleStockSort()" style="cursor: pointer; user-select: none;">
-                            Stock Actual
-                            <i class="bi" 
-                               [ngClass]="{
-                                 'bi-arrow-down-up text-muted': stockSortDirection === 'none',
-                                 'bi-sort-numeric-down text-primary': stockSortDirection === 'asc',
-                                 'bi-sort-numeric-up-alt text-primary': stockSortDirection === 'desc'
-                               }"
-                               style="font-size: 0.9rem; margin-left: 4px;"></i>
-                        </th>
-                        <th *ngIf="userRole === 'companyAdmin'">Sucursal</th>
-                        <th>Última Entrada</th>
-                        <th class="text-end">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody *ngIf="displayedItems && displayedItems.length > 0">
-                    <tr *ngFor="let item of displayedItems" class="animate__animated animate__fadeIn">
-                        <td>
-                            <div class="img-container">
-                                <img *ngIf="item.product && asProduct(item.product).img && asProduct(item.product).img !== 'no-image'" 
-                                     [src]="asProduct(item.product).img" 
-                                     class="item-img" 
-                                     alt="Producto">
-                                <div *ngIf="!item.product || !asProduct(item.product).img || asProduct(item.product).img === 'no-image'" class="placeholder-icon">
-                                    <i class="bi bi-box-seam"></i>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="fw-bold">{{ item.name }}</div>
-                            <small class="text-muted" *ngIf="item.product && asProduct(item.product)">{{ asProduct(item.product).brand }}</small>
-                            <small class="badge bg-secondary text-white" *ngIf="itemType === 'raw_material'">Insumo Interno</small>
-                        </td>
-                        <td>
-                            <span class="badge bg-light text-primary border">{{ item.measurement || 'Unidad' | uppercase }}</span>
-                        </td>
-                        <td>
-                            <div class="fw-bold text-success" *ngIf="itemType === 'product'">{{ item.sellingPrice | currency }}</div>
-                            <div class="fw-bold text-secondary" *ngIf="itemType === 'raw_material'">{{ item.costPrice | currency }} <small class="smallest text-muted">(Costo)</small></div>
-                        </td>
-                        <td>
-                            <ng-container *ngIf="item.product && asProduct(item.product).isComposite; else standardStock">
-                                <div class="stock-indicator">
-                                    <div class="stock-info">
-                                        <span [ngClass]="item.theoreticalStock !== undefined && item.theoreticalStock <= 0 ? 'text-danger fw-bold' : 'text-main fw-bold'" style="font-size: 1.1rem;">
-                                            {{ item.theoreticalStock !== undefined ? item.theoreticalStock : '∞' }}
-                                        </span>
-                                        <span class="text-muted smallest">
-                                            <ng-container *ngIf="item.theoreticalStock !== undefined && item.theoreticalStock <= 0; else noInsumos">
-                                                <span class="cursor-pointer text-decoration-underline hover-text-primary" (click)="restockCompositeProduct(item)" title="Ver insumos faltantes y recargar">
-                                                    <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Sin insumos
-                                                </span>
-                                            </ng-container>
-                                            <ng-template #noInsumos>
-                                                Max. Estimado
-                                            </ng-template>
-                                        </span>
-                                    </div>
-                                    <div class="stock-progress">
-                                        <div class="progress-fill" 
-                                             [ngClass]="item.theoreticalStock !== undefined && item.theoreticalStock <= 0 ? 'bg-danger' : 'bg-secondary'"
-                                             style="width: 100%; opacity: 0.3;"></div>
-                                    </div>
-                                </div>
-                            </ng-container>
-                            <ng-template #standardStock>
-                                <div class="stock-indicator">
-                                    <div class="stock-info">
-                                        <span [ngClass]="item.stock < 10 ? 'text-danger fw-bold' : 'text-main fw-semibold'">
-                                            {{ item.stock }}
-                                        </span>
-                                        <span class="text-muted smallest">{{ item.stock < 10 ? 'Bajo' : 'OK' }}</span>
-                                    </div>
-                                    <div class="stock-progress">
-                                        <div class="progress-fill" 
-                                             [ngClass]="item.stock < 10 ? 'bg-danger' : 'bg-success'"
-                                             [style.width.%]="item.stock > 100 ? 100 : item.stock">
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </td>
-                        <td *ngIf="userRole === 'companyAdmin'">
-                            <span class="badge bg-secondary-subtle text-secondary">
-                                {{ $any(item).branch?.name || 'Global' }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="small text-muted">{{ item.receivedDate | date:'mediumDate' }}</div>
-                        </td>
-                        <td>
-                            <div class="actions-cell">
-                                <button *ngIf="!(item.product && asProduct(item.product).isComposite)" class="btn btn-light btn-sm text-success me-1" (click)="adjustStock(item)" title="Reabastecer Rápido">
-                                    <i class="bi bi-plus-circle-fill"></i>
-                                </button>
-                                <button *ngIf="userRole === 'companyAdmin' || userRole === 'admin'" class="btn btn-light btn-sm" [routerLink]="['/dashboard/admin/inventory/update', item._id]" title="Editar">
-                                    <i class="bi bi-pencil-fill text-secondary"></i>
-                                </button>
-                                <button *ngIf="userRole === 'companyAdmin' || userRole === 'admin'" class="btn btn-light btn-sm text-danger" (click)="deleteItem(item._id)" title="Eliminar">
-                                    <i class="bi bi-trash3-fill"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+      <!-- Filtro por Stock -->
+      <div class="stock-filter flex-shrink-0" style="min-width: 220px">
+        <select class="form-select" [(ngModel)]="stockFilter" name="stockFilter">
+          <option value="all">🔍 Todos los Niveles</option>
+          <option value="low">⚠️ Stock Bajo (&lt; 10)</option>
+          <option value="normal">✅ Stock Suficiente (&gt;= 10)</option>
+        </select>
+      </div>
 
-            <!-- Empty State / Loading -->
-            <div class="loading-container py-5 text-center" *ngIf="!displayedItems || displayedItems.length === 0">
-                <app-loading-data-spinner *ngIf="!displayedItems"></app-loading-data-spinner>
-                <div *ngIf="displayedItems && displayedItems.length === 0">
-                    <i class="bi bi-archive text-muted" style="font-size: 3rem;"></i>
-                    <p class="mt-3">No se encontraron registros de inventario.</p>
+      <!-- Filtro por Proveedor -->
+      <div class="supplier-filter flex-shrink-0" style="min-width: 220px">
+        <select class="form-select" [(ngModel)]="selectedSupplierId" (change)="loadItems()" name="selectedSupplierId">
+          <option value="">🛒 Todos los Proveedores</option>
+          <option *ngFor="let sup of suppliersList" [value]="sup._id">{{ sup.name }}</option>
+        </select>
+      </div>
+
+      <!-- Filtro por Sucursal (Solo para Dueño) -->
+      <div class="branch-filter flex-shrink-0" style="min-width: 220px" *ngIf="userRole === 'companyAdmin'">
+        <select class="form-select" [(ngModel)]="selectedBranchId" (change)="loadItems()" name="selectedBranchId">
+          <option value="">Todas las sucursales</option>
+          <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 mb-4">
+    <button
+      type="button"
+      class="btn px-4 py-2 border rounded-pill d-flex align-items-center gap-2 transition"
+      [ngClass]="itemType === 'product' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary'"
+      (click)="setItemType('product')"
+    >
+      <i class="bi bi-box-seam fs-5"></i>
+      <span class="fw-semibold">Productos Vendibles</span>
+    </button>
+    <button
+      type="button"
+      class="btn px-4 py-2 border rounded-pill d-flex align-items-center gap-2 transition"
+      [ngClass]="itemType === 'raw_material' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary'"
+      (click)="setItemType('raw_material')"
+    >
+      <i class="bi bi-egg-fill fs-5"></i>
+      <span class="fw-semibold">Insumos (Materias Primas)</span>
+    </button>
+  </div>
+
+  <!-- Lista de Stock -->
+  <div class="list-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0 fw-bold text-main">Lista de Existencias</h4>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th width="80">Imagen</th>
+            <th>{{ itemType === 'product' ? 'Producto' : 'Insumo Maestro' }}</th>
+            <th>Presentación</th>
+            <th>{{ itemType === 'product' ? 'Precio Venta' : 'Costo Promedio' }}</th>
+            <th
+              width="180"
+              class="sortable-header"
+              (click)="toggleStockSort()"
+              style="cursor: pointer; user-select: none"
+            >
+              Stock Actual
+              <i
+                class="bi"
+                [ngClass]="{
+                  'bi-arrow-down-up text-muted': stockSortDirection === 'none',
+                  'bi-sort-numeric-down text-primary': stockSortDirection === 'asc',
+                  'bi-sort-numeric-up-alt text-primary': stockSortDirection === 'desc',
+                }"
+                style="font-size: 0.9rem; margin-left: 4px"
+              ></i>
+            </th>
+            <th *ngIf="userRole === 'companyAdmin'">Sucursal</th>
+            <th>Última Entrada</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="displayedItems && displayedItems.length > 0">
+          <tr *ngFor="let item of displayedItems" class="animate__animated animate__fadeIn">
+            <td>
+              <div class="img-container">
+                <img
+                  *ngIf="item.product && asProduct(item.product).img && asProduct(item.product).img !== 'no-image'"
+                  [src]="asProduct(item.product).img"
+                  class="item-img"
+                  alt="Producto"
+                />
+                <div
+                  *ngIf="!item.product || !asProduct(item.product).img || asProduct(item.product).img === 'no-image'"
+                  class="placeholder-icon"
+                >
+                  <i class="bi bi-box-seam"></i>
                 </div>
-            </div>
-        </div>
+              </div>
+            </td>
+            <td>
+              <div class="fw-bold">{{ item.name }}</div>
+              <small class="text-muted" *ngIf="item.product && asProduct(item.product)">{{
+                asProduct(item.product).brand
+              }}</small>
+              <small class="badge bg-secondary text-white" *ngIf="itemType === 'raw_material'">Insumo Interno</small>
+            </td>
+            <td>
+              <span class="badge bg-light text-primary border">{{ item.measurement || 'Unidad' | uppercase }}</span>
+            </td>
+            <td>
+              <div class="fw-bold text-success" *ngIf="itemType === 'product'">{{ item.sellingPrice | currency }}</div>
+              <div class="fw-bold text-secondary" *ngIf="itemType === 'raw_material'">
+                {{ item.costPrice | currency }} <small class="smallest text-muted">(Costo)</small>
+              </div>
+            </td>
+            <td>
+              <ng-container *ngIf="item.product && asProduct(item.product).isComposite; else standardStock">
+                <div class="stock-indicator">
+                  <div class="stock-info">
+                    <span
+                      [ngClass]="
+                        item.theoreticalStock !== undefined && item.theoreticalStock <= 0
+                          ? 'text-danger fw-bold'
+                          : 'text-main fw-bold'
+                      "
+                      style="font-size: 1.1rem"
+                    >
+                      {{ item.theoreticalStock !== undefined ? item.theoreticalStock : '∞' }}
+                    </span>
+                    <span class="text-muted smallest">
+                      <ng-container
+                        *ngIf="item.theoreticalStock !== undefined && item.theoreticalStock <= 0; else noInsumos"
+                      >
+                        <span
+                          class="cursor-pointer text-decoration-underline hover-text-primary"
+                          (click)="restockCompositeProduct(item)"
+                          title="Ver insumos faltantes y recargar"
+                        >
+                          <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Sin insumos
+                        </span>
+                      </ng-container>
+                      <ng-template #noInsumos> Max. Estimado </ng-template>
+                    </span>
+                  </div>
+                  <div class="stock-progress">
+                    <div
+                      class="progress-fill"
+                      [ngClass]="
+                        item.theoreticalStock !== undefined && item.theoreticalStock <= 0 ? 'bg-danger' : 'bg-success'
+                      "
+                      [style.width.%]="item.theoreticalStock !== undefined ? (item.theoreticalStock > 100 ? 100 : item.theoreticalStock) : 100"
+                    ></div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #standardStock>
+                <div class="stock-indicator">
+                  <div class="stock-info">
+                    <span [ngClass]="item.stock < 10 ? 'text-danger fw-bold' : 'text-main fw-semibold'">
+                      {{ item.stock }}
+                    </span>
+                    <span class="text-muted smallest">{{ item.stock < 10 ? 'Bajo' : 'OK' }}</span>
+                  </div>
+                  <div class="stock-progress">
+                    <div
+                      class="progress-fill"
+                      [ngClass]="item.stock < 10 ? 'bg-danger' : 'bg-success'"
+                      [style.width.%]="item.stock > 100 ? 100 : item.stock"
+                    ></div>
+                  </div>
+                </div>
+              </ng-template>
+            </td>
+            <td *ngIf="userRole === 'companyAdmin'">
+              <span class="badge bg-secondary-subtle text-secondary">
+                {{ $any(item).branch?.name || 'Global' }}
+              </span>
+            </td>
+            <td>
+              <div class="small text-muted">{{ item.receivedDate | date: 'mediumDate' }}</div>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button
+                  *ngIf="!(item.product && asProduct(item.product).isComposite)"
+                  class="btn btn-light btn-sm text-success me-1"
+                  (click)="adjustStock(item)"
+                  title="Reabastecer Rápido"
+                >
+                  <i class="bi bi-plus-circle-fill"></i>
+                </button>
+                <button
+                  *ngIf="userRole === 'companyAdmin' || userRole === 'admin'"
+                  class="btn btn-light btn-sm"
+                  [routerLink]="['/dashboard/admin/inventory/update', item._id]"
+                  title="Editar"
+                >
+                  <i class="bi bi-pencil-fill text-secondary"></i>
+                </button>
+                <button
+                  *ngIf="userRole === 'companyAdmin' || userRole === 'admin'"
+                  class="btn btn-light btn-sm text-danger"
+                  (click)="deleteItem(item._id)"
+                  title="Eliminar"
+                >
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        <!-- Paginación Premium -->
-        <div class="pagination-container" *ngIf="totalPages >= 1">
-            <ul class="pagination pagination-sm mb-0">
-                <li class="page-item" [class.disabled]="currentPage === 1">
-                    <button class="page-link" (click)="cambiarPagina(currentPage - 1)" title="Anterior">
-                        <i class="bi bi-chevron-left"></i>
-                    </button>
-                </li>
-                
-                <li class="page-item" *ngFor="let page of visiblePages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="cambiarPagina(page)">{{ page }}</button>
-                </li>
-
-                <li class="page-item" [class.disabled]="currentPage === totalPages">
-                    <button class="page-link" (click)="cambiarPagina(currentPage + 1)" title="Siguiente">
-                        <i class="bi bi-chevron-right"></i>
-                    </button>
-                </li>
-            </ul>
+      <!-- Empty State / Loading -->
+      <div class="loading-container py-5 text-center" *ngIf="!displayedItems || displayedItems.length === 0">
+        <app-loading-data-spinner *ngIf="!displayedItems"></app-loading-data-spinner>
+        <div *ngIf="displayedItems && displayedItems.length === 0">
+          <i class="bi bi-archive text-muted" style="font-size: 3rem"></i>
+          <p class="mt-3">No se encontraron registros de inventario.</p>
         </div>
+      </div>
     </div>
+
+    <!-- Paginación Premium -->
+    <div class="pagination-container" *ngIf="totalPages >= 1">
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="cambiarPagina(currentPage - 1)" title="Anterior">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        </li>
+
+        <li class="page-item" *ngFor="let page of visiblePages" [class.active]="page === currentPage">
+          <button class="page-link" (click)="cambiarPagina(page)">{{ page }}</button>
+        </li>
+
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link" (click)="cambiarPagina(currentPage + 1)" title="Siguiente">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL: Recepción Inmediata (No Programada) -->
-<div class="custom-modal-backdrop" *ngIf="showUnplannedRestockModal" style="background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1040; display: flex; align-items: center; justify-content: center;">
-  <div class="bg-white rounded-4 shadow-lg overflow-hidden animate__animated animate__zoomIn" style="width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column;">
-    
+<div
+  class="custom-modal-backdrop"
+  *ngIf="showUnplannedRestockModal"
+  style="
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1040;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  "
+>
+  <div
+    class="bg-white rounded-4 shadow-lg overflow-hidden animate__animated animate__zoomIn"
+    style="width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column"
+  >
     <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
-      <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-lightning-charge-fill text-warning me-2"></i> Recepción Imprevista</h5>
+      <h5 class="mb-0 fw-bold text-dark">
+        <i class="bi bi-lightning-charge-fill text-warning me-2"></i> Recepción Imprevista
+      </h5>
       <button class="btn-close" (click)="showUnplannedRestockModal = false"></button>
     </div>
 
-    <div class="p-4 overflow-auto" style="flex: 1;">
-      
+    <div class="p-4 overflow-auto" style="flex: 1">
       <div class="mb-3">
         <label class="form-label fw-bold small text-muted mb-1">Proveedor *</label>
         <select class="form-select" [(ngModel)]="unplannedRestock.supplier">
@@ -261,31 +348,74 @@
       </div>
 
       <div class="d-flex flex-column gap-2 mb-3">
-        <div *ngFor="let item of unplannedItems; let idx = index" class="d-flex flex-column gap-2 mb-3 bg-white border border-light-subtle rounded-4 p-3 shadow-sm" [style.z-index]="1000 - idx" style="position: relative;">
-          
+        <div
+          *ngFor="let item of unplannedItems; let idx = index"
+          class="d-flex flex-column gap-2 mb-3 bg-white border border-light-subtle rounded-4 p-3 shadow-sm"
+          [style.z-index]="1000 - idx"
+          style="position: relative"
+        >
           <div class="d-flex gap-2 align-items-center">
             <div class="position-relative flex-grow-1">
-              <input type="text" class="form-control border-light-subtle bg-light" placeholder="🔍 Buscar producto a recibir..." [(ngModel)]="item.searchText" (focus)="item.showDropdown = true" (blur)="item.showDropdown = false">
-              <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" style="max-height: 150px; display: block; z-index: 1050; position: absolute;" *ngIf="item.showDropdown && getFilteredProductsForDropdown(idx).length > 0">
-                <li *ngFor="let prod of getFilteredProductsForDropdown(idx)" (mousedown)="selectProductForUnplannedRow(idx, prod)">
-                  <a class="dropdown-item py-2 text-dark cursor-pointer text-truncate" style="font-size: 0.9rem;">
-                    <span class="fw-bold">{{ prod.name }}</span> <small class="text-muted">({{ prod.brand || 'S/M' }})</small>
+              <input
+                type="text"
+                class="form-control border-light-subtle bg-light"
+                placeholder="🔍 Buscar producto a recibir..."
+                [(ngModel)]="item.searchText"
+                (focus)="item.showDropdown = true"
+                (blur)="item.showDropdown = false"
+              />
+              <ul
+                class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto"
+                style="max-height: 150px; display: block; z-index: 1050; position: absolute"
+                *ngIf="item.showDropdown && getFilteredProductsForDropdown(idx).length > 0"
+              >
+                <li
+                  *ngFor="let prod of getFilteredProductsForDropdown(idx)"
+                  (mousedown)="selectProductForUnplannedRow(idx, prod)"
+                >
+                  <a class="dropdown-item py-2 text-dark cursor-pointer text-truncate" style="font-size: 0.9rem">
+                    <span class="fw-bold">{{ prod.name }}</span>
+                    <small class="text-muted">({{ prod.brand || 'S/M' }})</small>
                   </a>
                 </li>
               </ul>
             </div>
-            <button class="btn btn-outline-danger border-0 px-3 rounded-3" (click)="removeUnplannedItem(idx)"><i class="bi bi-trash"></i></button>
+            <button class="btn btn-outline-danger border-0 px-3 rounded-3" (click)="removeUnplannedItem(idx)">
+              <i class="bi bi-trash"></i>
+            </button>
           </div>
 
-          <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-1 pt-3 border-top border-light-subtle">
+          <div
+            class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-1 pt-3 border-top border-light-subtle"
+          >
             <div class="d-flex align-items-center gap-1 bg-light px-3 py-1.5 rounded-pill border border-light-subtle">
-              <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 70px; font-weight: 600;" placeholder="Cajas" [(ngModel)]="item.packs" (input)="updateItemQuantityFromMultiplier(idx)">
+              <input
+                type="number"
+                class="form-control form-control-sm text-center border-0 bg-transparent px-1"
+                style="width: 70px; font-weight: 600"
+                placeholder="Cajas"
+                [(ngModel)]="item.packs"
+                (input)="updateItemQuantityFromMultiplier(idx)"
+              />
               <span class="text-muted small fw-bold">✕</span>
-              <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 80px; font-weight: 600;" placeholder="Cant." [(ngModel)]="item.unitsPerPack" (input)="updateItemQuantityFromMultiplier(idx)">
+              <input
+                type="number"
+                class="form-control form-control-sm text-center border-0 bg-transparent px-1"
+                style="width: 80px; font-weight: 600"
+                placeholder="Cant."
+                [(ngModel)]="item.unitsPerPack"
+                (input)="updateItemQuantityFromMultiplier(idx)"
+              />
             </div>
-            <div class="input-group shadow-sm" style="min-width: 180px; flex: 1; max-width: 220px;">
+            <div class="input-group shadow-sm" style="min-width: 180px; flex: 1; max-width: 220px">
               <span class="input-group-text bg-dark border-dark text-white fw-bold px-3">Total</span>
-              <input type="number" class="form-control text-end fw-bold" placeholder="0" [(ngModel)]="item.quantity" min="1">
+              <input
+                type="number"
+                class="form-control text-end fw-bold"
+                placeholder="0"
+                [(ngModel)]="item.quantity"
+                min="1"
+              />
               <span class="input-group-text bg-white text-dark fw-bold px-2">{{ item.measurementUnit || '...' }}</span>
             </div>
           </div>
@@ -293,10 +423,16 @@
       </div>
 
       <div class="form-check text-start mt-3 p-3 bg-light border rounded shadow-sm">
-        <input class="form-check-input mt-1" type="checkbox" id="pay-unplanned" [(ngModel)]="unplannedRestock.payFromRegister" style="transform: scale(1.2);">
+        <input
+          class="form-check-input mt-1"
+          type="checkbox"
+          id="pay-unplanned"
+          [(ngModel)]="unplannedRestock.payFromRegister"
+          style="transform: scale(1.2)"
+        />
         <label class="form-check-label fw-bold text-dark ms-2" for="pay-unplanned">
           Descontar costo del dinero de Caja Físicamente
-          <small class="text-muted d-block mt-1 fw-normal" style="font-size: 0.8rem;">
+          <small class="text-muted d-block mt-1 fw-normal" style="font-size: 0.8rem">
             ¿El proveedor ya fue pagado por transferencia o es a crédito? <strong>Desmarca</strong> esta opción.
           </small>
         </label>
@@ -304,14 +440,24 @@
 
       <div class="mt-3">
         <label class="form-label fw-bold small text-muted mb-1">Motivo / Notas Adicionales</label>
-        <textarea class="form-control border-light-subtle bg-light" rows="2" [(ngModel)]="unplannedRestock.notes"></textarea>
+        <textarea
+          class="form-control border-light-subtle bg-light"
+          rows="2"
+          [(ngModel)]="unplannedRestock.notes"
+        ></textarea>
       </div>
-
     </div>
 
     <div class="p-3 bg-light border-top d-flex justify-content-end gap-2">
-      <button class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" (click)="showUnplannedRestockModal = false">Cancelar</button>
-      <button class="btn btn-dark rounded-pill px-4 fw-semibold shadow-sm" (click)="saveUnplannedRestock()">Registrar Entrada</button>
+      <button
+        class="btn btn-outline-secondary rounded-pill px-4 fw-semibold"
+        (click)="showUnplannedRestockModal = false"
+      >
+        Cancelar
+      </button>
+      <button class="btn btn-dark rounded-pill px-4 fw-semibold shadow-sm" (click)="saveUnplannedRestock()">
+        Registrar Entrada
+      </button>
     </div>
   </div>
 </div>

@@ -12,14 +12,13 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-supplier-details',
   templateUrl: './supplier-details.component.html',
-  styleUrls: ['./supplier-details.component.css']
+  styleUrls: ['./supplier-details.component.css'],
 })
 export class SupplierDetailsComponent implements OnInit {
-
   supplierId!: string;
   companyId!: string;
   supplier!: Supplier;
-  
+
   // Lists
   products: Product[] = [];
   suppliedProducts: Product[] = [];
@@ -53,19 +52,26 @@ export class SupplierDetailsComponent implements OnInit {
     isRecurring: false,
     recurrence: 'none',
     recurrenceDays: 0,
-    notes: ''
+    notes: '',
   };
 
   // Inspect Restock State
   selectedRestockForInspect: any = null;
-  inspectedItems: { productId?: string; type?: string; name: string; quantity: number; costPrice: number; verified: boolean }[] = [];
+  inspectedItems: {
+    productId?: string;
+    type?: string;
+    name: string;
+    quantity: number;
+    costPrice: number;
+    verified: boolean;
+  }[] = [];
 
   // Quick Product Form Bindings
   quickProduct = {
     name: '',
     brand: '',
     category: '',
-    isComposite: false
+    isComposite: false,
   };
 
   // Listado estructurado de ítems para el reabastecimiento programado
@@ -80,8 +86,8 @@ export class SupplierDetailsComponent implements OnInit {
     private inventoryService: InventoryService,
     private branchService: BranchService,
     private categoryService: CategoryService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.supplierId = this.route.snapshot.paramMap.get('id') || '';
@@ -95,9 +101,10 @@ export class SupplierDetailsComponent implements OnInit {
     // Determinar permisos: verify_restock está disponible para dueños o cajeros con el permiso específico
     const user = this.authService.usuario;
     const permissions = (user as any).permissions || [];
-    this.canVerifyRestock = this.authService.role === 'companyAdmin' || 
-                            this.authService.role === 'admin' || 
-                            permissions.includes('verify_restock');
+    this.canVerifyRestock =
+      this.authService.role === 'companyAdmin' ||
+      this.authService.role === 'admin' ||
+      permissions.includes('verify_restock');
 
     this.loadSupplier();
     this.loadBranches();
@@ -112,7 +119,7 @@ export class SupplierDetailsComponent implements OnInit {
         if (resp.ok) {
           this.supplier = resp.supplier;
         }
-      }
+      },
     });
   }
 
@@ -122,7 +129,7 @@ export class SupplierDetailsComponent implements OnInit {
         if (resp.ok) {
           this.branches = resp.branches || [];
         }
-      }
+      },
     });
   }
 
@@ -132,7 +139,7 @@ export class SupplierDetailsComponent implements OnInit {
         if (resp.ok) {
           this.categories = resp.categories || [];
         }
-      }
+      },
     });
   }
 
@@ -142,12 +149,12 @@ export class SupplierDetailsComponent implements OnInit {
       next: (resp: any) => {
         const allProducts: Product[] = resp.products || [];
         // Filtrar productos suministrados por este proveedor
-        this.suppliedProducts = allProducts.filter(p => {
+        this.suppliedProducts = allProducts.filter((p) => {
           const sId = typeof p.supplier === 'object' ? (p.supplier as any)?._id : p.supplier;
           return sId === this.supplierId;
         });
         this.catalogCount = this.suppliedProducts.length;
-      }
+      },
     });
 
     // 2. Cargar items del inventario de la compañía
@@ -156,7 +163,7 @@ export class SupplierDetailsComponent implements OnInit {
         if (resp.ok) {
           const allInventory: InventoryItem[] = resp.items || [];
           // Filtrar items suministrados por este proveedor
-          this.suppliedInventory = allInventory.filter(item => {
+          this.suppliedInventory = allInventory.filter((item) => {
             const sId = typeof item.supplier === 'object' ? (item.supplier as any)?._id : item.supplier;
             return sId === this.supplierId;
           });
@@ -164,12 +171,12 @@ export class SupplierDetailsComponent implements OnInit {
           // Calcular Stock Físico e Inversión Financiera Total
           this.totalStock = 0;
           this.totalInvestment = 0;
-          this.suppliedInventory.forEach(item => {
+          this.suppliedInventory.forEach((item) => {
             this.totalStock += item.stock || 0;
             this.totalInvestment += (item.stock || 0) * (item.costPrice || 0);
           });
         }
-      }
+      },
     });
   }
 
@@ -179,12 +186,12 @@ export class SupplierDetailsComponent implements OnInit {
         if (resp.ok) {
           // Filtrar restocks pertenecientes únicamente a este proveedor
           const allRestocks: any[] = resp.restocks || [];
-          this.restocks = allRestocks.filter(r => {
+          this.restocks = allRestocks.filter((r) => {
             const sId = typeof r.supplier === 'object' ? r.supplier?._id : r.supplier;
             return sId === this.supplierId;
           });
         }
-      }
+      },
     });
   }
 
@@ -202,7 +209,7 @@ export class SupplierDetailsComponent implements OnInit {
       isRecurring: false,
       recurrence: 'none',
       recurrenceDays: 0,
-      notes: ''
+      notes: '',
     };
     // Inicializar con una fila vacía para el constructor interactivo
     this.restockItemsList = [{ productId: '', productName: '', quantity: 1 }];
@@ -227,7 +234,7 @@ export class SupplierDetailsComponent implements OnInit {
 
   onRestockItemProductChange(idx: number) {
     const row = this.restockItemsList[idx];
-    const prod = this.suppliedProducts.find(p => p._id === row.productId);
+    const prod = this.suppliedProducts.find((p) => p._id === row.productId);
     if (prod) {
       row.productName = prod.name || '';
     }
@@ -244,7 +251,7 @@ export class SupplierDetailsComponent implements OnInit {
   }
 
   saveRestockSchedule() {
-    const validItems = this.restockItemsList.filter(it => it.productId && it.quantity > 0);
+    const validItems = this.restockItemsList.filter((it) => it.productId && it.quantity > 0);
     if (validItems.length === 0) {
       Swal.fire('Error', 'Por favor selecciona al menos un producto de la lista e indica su cantidad', 'error');
       return;
@@ -256,10 +263,8 @@ export class SupplierDetailsComponent implements OnInit {
     }
 
     // Formatear itemsSummary automáticamente a partir de los productos reales seleccionados
-    const summary = validItems
-      .map(row => `${row.quantity} ${row.productName}`)
-      .join(', ');
-    
+    const summary = validItems.map((row) => `${row.quantity} ${row.productName}`).join(', ');
+
     this.newRestock.itemsSummary = summary;
 
     const payload = {
@@ -267,12 +272,12 @@ export class SupplierDetailsComponent implements OnInit {
       company: this.companyId,
       supplier: this.supplierId,
       status: 'pending',
-      items: validItems.map(it => ({
+      items: validItems.map((it) => ({
         type: 'Product',
         itemRef: it.productId,
         quantity: it.quantity,
-        costPrice: 0
-      }))
+        costPrice: 0,
+      })),
     };
 
     this.supplierService.createRestockSchedule(payload).subscribe({
@@ -285,7 +290,7 @@ export class SupplierDetailsComponent implements OnInit {
       },
       error: () => {
         Swal.fire('Error', 'Hubo un error al guardar el recordatorio', 'error');
-      }
+      },
     });
   }
 
@@ -302,7 +307,7 @@ export class SupplierDetailsComponent implements OnInit {
           name: prodName,
           quantity: it.quantity || 0,
           costPrice: it.costPrice || 0,
-          verified: true
+          verified: true,
         };
       });
     } else {
@@ -317,7 +322,7 @@ export class SupplierDetailsComponent implements OnInit {
             name: parts[2],
             quantity: parseInt(parts[1], 10),
             costPrice: 0,
-            verified: false
+            verified: false,
           };
         }
         return {
@@ -326,7 +331,7 @@ export class SupplierDetailsComponent implements OnInit {
           name: trimmed,
           quantity: 1,
           costPrice: 0,
-          verified: false
+          verified: false,
         };
       });
     }
@@ -345,7 +350,7 @@ export class SupplierDetailsComponent implements OnInit {
       name: '',
       brand: '',
       category: this.categories[0]?._id || '',
-      isComposite: false
+      isComposite: false,
     };
     this.showQuickProductModal = true;
   }
@@ -373,7 +378,7 @@ export class SupplierDetailsComponent implements OnInit {
         const saved = resp.savedProduct;
         Swal.fire('¡Producto Creado!', 'Se agregó como [Por Verificar] de forma flexible', 'success');
         this.showQuickProductModal = false;
-        
+
         // Agregar al catálogo de suministro de la ficha
         this.loadDataAndCalculateKPIs();
 
@@ -385,7 +390,7 @@ export class SupplierDetailsComponent implements OnInit {
           this.restockItemsList.push({
             productId: saved._id,
             productName: saved.name,
-            quantity: 1
+            quantity: 1,
           });
         } else {
           // Si venimos de la pantalla de inspección, lo agregamos a la checklist interactiva
@@ -393,18 +398,18 @@ export class SupplierDetailsComponent implements OnInit {
             name: saved.name,
             quantity: 1,
             costPrice: 0,
-            verified: true
+            verified: true,
           });
         }
       },
       error: () => {
         Swal.fire('Error', 'No se pudo registrar el producto', 'error');
-      }
+      },
     });
   }
 
   completeInspection() {
-    const verifiedItems = this.inspectedItems.filter(it => it.verified);
+    const verifiedItems = this.inspectedItems.filter((it) => it.verified);
     if (verifiedItems.length === 0) {
       Swal.fire('Atención', 'Debes verificar al menos un artículo para recibir la entrega', 'warning');
       return;
@@ -416,18 +421,18 @@ export class SupplierDetailsComponent implements OnInit {
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Completar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         const payload = {
           status: 'completed',
           payFromRegister: this.payFromRegister,
-          items: verifiedItems.map(it => ({
+          items: verifiedItems.map((it) => ({
             type: it.type || 'Product',
             itemRef: it.productId || undefined,
             quantity: it.quantity,
-            costPrice: it.costPrice || 0
-          }))
+            costPrice: it.costPrice || 0,
+          })),
         };
 
         this.supplierService.updateRestockStatus(this.selectedRestockForInspect._id, payload).subscribe({
@@ -437,7 +442,7 @@ export class SupplierDetailsComponent implements OnInit {
                 title: '¡Entrega Recibida!',
                 text: 'La mercancía ha sido auditada e ingresada automáticamente al inventario activo.',
                 icon: 'success',
-                confirmButtonText: 'Aceptar'
+                confirmButtonText: 'Aceptar',
               }).then(() => {
                 this.showInspectModal = false;
                 this.loadRestocks();
@@ -447,7 +452,7 @@ export class SupplierDetailsComponent implements OnInit {
           },
           error: (err) => {
             Swal.fire('Error', err.error?.message || 'No se pudo completar la recepción', 'error');
-          }
+          },
         });
       }
     });
@@ -461,14 +466,14 @@ export class SupplierDetailsComponent implements OnInit {
       showCancelButton: true,
       confirmButtonColor: '#d33',
       confirmButtonText: 'Sí, Eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.supplierService.deleteRestock(id).subscribe({
           next: () => {
             Swal.fire('Eliminado', 'Entrega cancelada correctamente', 'success');
             this.loadRestocks();
-          }
+          },
         });
       }
     });
@@ -486,7 +491,7 @@ export class SupplierDetailsComponent implements OnInit {
     return this.supplier.name
       .split(' ')
       .slice(0, 2)
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .toUpperCase();
   }

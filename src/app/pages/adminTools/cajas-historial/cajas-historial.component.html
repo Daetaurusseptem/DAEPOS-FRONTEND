@@ -10,9 +10,11 @@
     <div class="d-flex align-items-center gap-3" *ngIf="isCompanyAdmin && branches.length > 0">
       <div class="branch-select-container">
         <label class="text-muted d-block mb-1 small text-uppercase fw-semibold tracking-wider">Sucursal</label>
-        <select class="form-select branch-select bg-dark text-white border-secondary" 
-                [ngModel]="selectedBranchId" 
-                (ngModelChange)="onBranchChange($event)">
+        <select
+          class="form-select branch-select bg-dark text-white border-secondary"
+          [ngModel]="selectedBranchId"
+          (ngModelChange)="onBranchChange($event)"
+        >
           <option *ngFor="let branch of branches" [value]="branch._id">{{ branch.name }}</option>
         </select>
       </div>
@@ -21,13 +23,20 @@
 
   <!-- Advanced Filters Bar (Glass Panel) -->
   <div class="filters-bar glass-card p-4 mb-4">
-    <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3"><i class="bi bi-funnel-fill text-indigo"></i> Filtros de Auditoría</h3>
-    
+    <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3">
+      <i class="bi bi-funnel-fill text-indigo"></i> Filtros de Auditoría
+    </h3>
+
     <div class="row g-3">
       <!-- Cajero Filter -->
       <div class="col-12 col-sm-6 col-md-3">
         <label class="form-label text-muted-custom fs-7" for="filterCashier">Cajero</label>
-        <select id="filterCashier" class="form-select bg-dark border-secondary text-white" [(ngModel)]="filterCashier" (change)="applyFilters()">
+        <select
+          id="filterCashier"
+          class="form-select bg-dark border-secondary text-white"
+          [(ngModel)]="filterCashier"
+          (change)="applyFilters()"
+        >
           <option value="">-- Todos los Cajeros --</option>
           <option *ngFor="let u of cashiers" [value]="u._id">{{ u.name }}</option>
         </select>
@@ -36,7 +45,12 @@
       <!-- Discrepancia Filter -->
       <div class="col-12 col-sm-6 col-md-3">
         <label class="form-label text-muted-custom fs-7" for="filterDiscrepancy">Diferencia de Arqueo</label>
-        <select id="filterDiscrepancy" class="form-select bg-dark border-secondary text-white" [(ngModel)]="filterDiscrepancy" (change)="applyFilters()">
+        <select
+          id="filterDiscrepancy"
+          class="form-select bg-dark border-secondary text-white"
+          [(ngModel)]="filterDiscrepancy"
+          (change)="applyFilters()"
+        >
           <option value="all">-- Todos --</option>
           <option value="perfect">Cajas Cuadradas (Perfectas)</option>
           <option value="discrepancy">Cajas con Descuadre (Cualquiera)</option>
@@ -48,13 +62,25 @@
       <!-- Fecha Inicio -->
       <div class="col-12 col-sm-6 col-md-2.5">
         <label class="form-label text-muted-custom fs-7" for="filterStart">Desde</label>
-        <input type="date" id="filterStart" class="form-control bg-dark border-secondary text-white" [(ngModel)]="filterStartDate" (change)="applyFilters()">
+        <input
+          type="date"
+          id="filterStart"
+          class="form-control bg-dark border-secondary text-white"
+          [(ngModel)]="filterStartDate"
+          (change)="applyFilters()"
+        />
       </div>
 
       <!-- Fecha Fin -->
       <div class="col-12 col-sm-6 col-md-2.5">
         <label class="form-label text-muted-custom fs-7" for="filterEnd">Hasta</label>
-        <input type="date" id="filterEnd" class="form-control bg-dark border-secondary text-white" [(ngModel)]="filterEndDate" (change)="applyFilters()">
+        <input
+          type="date"
+          id="filterEnd"
+          class="form-control bg-dark border-secondary text-white"
+          [(ngModel)]="filterEndDate"
+          (change)="applyFilters()"
+        />
       </div>
 
       <!-- Actions -->
@@ -81,10 +107,14 @@
         <i class="bi bi-calendar-x text-muted fs-1"></i>
       </div>
       <h3 class="h4 text-white">Sin registros de arqueos</h3>
-      <p class="text-muted mx-auto" style="max-width: 400px;">
+      <p class="text-muted mx-auto" style="max-width: 400px">
         No se encontraron turnos de cajas que coincidan con los filtros seleccionados o no hay cierres registrados.
       </p>
-      <button class="btn btn-primary-soft mt-2" (click)="resetFilters()" *ngIf="filterCashier || filterStartDate || filterEndDate || filterDiscrepancy !== 'all'">
+      <button
+        class="btn btn-primary-soft mt-2"
+        (click)="resetFilters()"
+        *ngIf="filterCashier || filterStartDate || filterEndDate || filterDiscrepancy !== 'all'"
+      >
         Limpiar Filtros
       </button>
     </div>
@@ -108,13 +138,14 @@
           </thead>
           <tbody>
             <tr *ngFor="let reg of cashRegisters" (click)="viewCajaDetail(reg._id)" class="clickable-row">
-              
               <!-- Cajero -->
               <td>
                 <div class="d-flex align-items-center gap-2">
                   <div class="user-avatar-sm">
-                    <img *ngIf="reg.user?.img" [src]="reg.user?.img" alt="Avatar">
-                    <div *ngIf="!reg.user?.img" class="avatar-fallback-sm">{{ (reg.user?.name || 'U').substring(0,1).toUpperCase() }}</div>
+                    <img *ngIf="reg.user?.img" [src]="reg.user?.img" alt="Avatar" />
+                    <div *ngIf="!reg.user?.img" class="avatar-fallback-sm">
+                      {{ (reg.user?.name || 'U').substring(0, 1).toUpperCase() }}
+                    </div>
                   </div>
                   <div>
                     <strong class="text-white d-block fs-7-5">{{ reg.user?.name }}</strong>
@@ -161,57 +192,72 @@
               <td class="text-end vertical-center font-monospace text-success fs-7-5 fw-semibold" *ngIf="reg.closed">
                 {{ reg.actualAmount | currency }}
               </td>
-              <td class="text-end vertical-center text-muted-custom fs-7-5" *ngIf="!reg.closed">
-                &mdash;
-              </td>
+              <td class="text-end vertical-center text-muted-custom fs-7-5" *ngIf="!reg.closed">&mdash;</td>
 
               <!-- Arqueo Status Badge -->
               <td class="text-center vertical-center">
                 <span *ngIf="!reg.closed" class="badge bg-primary-soft text-indigo border border-primary-soft fs-8">
                   <span class="live-bullet me-1"></span> Activa
                 </span>
-                
-                <span *ngIf="reg.closed && reg.difference === 0" class="badge bg-success-soft text-success border border-success-soft fs-8">
+
+                <span
+                  *ngIf="reg.closed && reg.difference === 0"
+                  class="badge bg-success-soft text-success border border-success-soft fs-8"
+                >
                   <i class="bi bi-check-circle-fill"></i> Cuadrada
                 </span>
 
-                <span *ngIf="reg.closed && reg.difference !== undefined && reg.difference < 0" class="badge bg-danger-soft text-danger border border-danger-soft fs-8">
+                <span
+                  *ngIf="reg.closed && reg.difference !== undefined && reg.difference < 0"
+                  class="badge bg-danger-soft text-danger border border-danger-soft fs-8"
+                >
                   <i class="bi bi-dash-circle-fill"></i> Faltante ({{ reg.difference | currency }})
                 </span>
 
-                <span *ngIf="reg.closed && reg.difference !== undefined && reg.difference > 0" class="badge bg-warning-soft text-warning border border-warning-soft fs-8">
+                <span
+                  *ngIf="reg.closed && reg.difference !== undefined && reg.difference > 0"
+                  class="badge bg-warning-soft text-warning border border-warning-soft fs-8"
+                >
                   <i class="bi bi-plus-circle-fill"></i> Sobrante (+{{ reg.difference | currency }})
                 </span>
               </td>
 
               <!-- Acciones -->
               <td class="text-center vertical-center">
-                <button class="btn btn-outline-light btn-sm rounded-circle px-2" (click)="$event.stopPropagation(); viewCajaDetail(reg._id)">
+                <button
+                  class="btn btn-outline-light btn-sm rounded-circle px-2"
+                  (click)="$event.stopPropagation(); viewCajaDetail(reg._id)"
+                >
                   <i class="bi bi-chevron-right"></i>
                 </button>
               </td>
-
             </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Pagination Footer -->
-      <div class="pagination-footer border-top border-secondary-soft p-3 d-flex justify-content-between align-items-center bg-dark-soft">
+      <div
+        class="pagination-footer border-top border-secondary-soft p-3 d-flex justify-content-between align-items-center bg-dark-soft"
+      >
         <span class="text-muted-custom fs-7-5">
           Mostrando página <strong>{{ currentPage }}</strong> de {{ totalPages }} (Total: {{ totalRecords }} turnos)
         </span>
-        
+
         <div class="pagination-nav d-flex gap-1">
-          <button class="btn btn-outline-light btn-sm fs-8 rounded-lg px-3" 
-                  [disabled]="currentPage === 1" 
-                  (click)="changePage(currentPage - 1)">
+          <button
+            class="btn btn-outline-light btn-sm fs-8 rounded-lg px-3"
+            [disabled]="currentPage === 1"
+            (click)="changePage(currentPage - 1)"
+          >
             <i class="bi bi-chevron-left"></i> Anterior
           </button>
-          
-          <button class="btn btn-outline-light btn-sm fs-8 rounded-lg px-3" 
-                  [disabled]="currentPage === totalPages" 
-                  (click)="changePage(currentPage + 1)">
+
+          <button
+            class="btn btn-outline-light btn-sm fs-8 rounded-lg px-3"
+            [disabled]="currentPage === totalPages"
+            (click)="changePage(currentPage + 1)"
+          >
             Siguiente <i class="bi bi-chevron-right"></i>
           </button>
         </div>

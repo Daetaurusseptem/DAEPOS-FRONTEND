@@ -5,28 +5,33 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-global-settings',
   templateUrl: './global-settings.component.html',
-  styleUrls: ['./global-settings.component.css']
+  styleUrls: ['./global-settings.component.css'],
 })
 export class GlobalSettingsComponent implements OnInit {
-
   settings: any = {
     bankInstructions: { bankName: '', accountName: '', accountNumber: '', clabe: '', extraNotes: '' },
-    contactEmail: ''
+    contactEmail: '',
   };
   loading: boolean = false;
 
-  constructor(private manualPaymentService: ManualPaymentService) { }
+  constructor(private manualPaymentService: ManualPaymentService) {}
 
   ngOnInit(): void {
     this.cargarAjustes();
   }
 
   cargarAjustes() {
-    this.manualPaymentService.getGlobalSettings().subscribe(resp => {
+    this.manualPaymentService.getGlobalSettings().subscribe((resp) => {
       if (resp.ok && resp.settings) {
         this.settings = resp.settings;
         if (!this.settings.bankInstructions) {
-          this.settings.bankInstructions = { bankName: '', accountName: '', accountNumber: '', clabe: '', extraNotes: '' };
+          this.settings.bankInstructions = {
+            bankName: '',
+            accountName: '',
+            accountNumber: '',
+            clabe: '',
+            extraNotes: '',
+          };
         }
       }
     });
@@ -44,7 +49,7 @@ export class GlobalSettingsComponent implements OnInit {
       error: (err) => {
         this.loading = false;
         Swal.fire('Error', 'No se pudieron guardar los ajustes', 'error');
-      }
+      },
     });
   }
 }

@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-branch-list',
   templateUrl: './branch-list.component.html',
-  styleUrls: ['./branch-list.component.css']
+  styleUrls: ['./branch-list.component.css'],
 })
 export class BranchListComponent implements OnInit {
   branches: Branch[] = [];
@@ -16,8 +16,8 @@ export class BranchListComponent implements OnInit {
 
   constructor(
     private branchService: BranchService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.companyId = this.authService.company?._id || '';
@@ -34,7 +34,7 @@ export class BranchListComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -49,7 +49,7 @@ export class BranchListComponent implements OnInit {
       error: () => {
         branch.isActive = originalStatus;
         Swal.fire('Error', 'No se pudo actualizar el estado', 'error');
-      }
+      },
     });
   }
 
@@ -60,17 +60,17 @@ export class BranchListComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.branchService.deleteBranch(this.companyId, branch._id!).subscribe({
           next: () => {
-            this.branches = this.branches.filter(b => b._id !== branch._id);
+            this.branches = this.branches.filter((b) => b._id !== branch._id);
             Swal.fire('Eliminado', 'La sucursal ha sido eliminada', 'success');
           },
           error: (err) => {
             Swal.fire('Error', 'No se pudo eliminar la sucursal', 'error');
-          }
+          },
         });
       }
     });

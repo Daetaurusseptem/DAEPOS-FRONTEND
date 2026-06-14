@@ -6,12 +6,13 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
   const indexPath = path.join(__dirname, 'dist/daepoint-pos-frontend/index.html');
-  console.log('Index path:', indexPath); // Agrega un log para verificar la ruta
   win.loadFile(indexPath)
     .catch(err => {
       console.error('Failed to load the page', err);

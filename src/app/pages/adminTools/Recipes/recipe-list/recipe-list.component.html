@@ -19,12 +19,12 @@
             <span class="input-group-text bg-light border-end-0">
               <i class="bi bi-search text-muted"></i>
             </span>
-            <input 
-              type="text" 
-              class="form-control bg-light border-start-0 ps-0" 
-              placeholder="Buscar por nombre o descripción de receta..." 
+            <input
+              type="text"
+              class="form-control bg-light border-start-0 ps-0"
+              placeholder="Buscar por nombre o descripción de receta..."
               [(ngModel)]="searchText"
-            >
+            />
           </div>
         </div>
       </div>
@@ -37,7 +37,7 @@
               <th class="fw-semibold text-muted py-3">Nombre</th>
               <th class="fw-semibold text-muted py-3">Descripción</th>
               <th class="fw-semibold text-muted py-3 text-end">Costo Est. Producir</th>
-              <th class="fw-semibold text-muted py-3 text-center" style="width: 250px;">Acciones</th>
+              <th class="fw-semibold text-muted py-3 text-center" style="width: 250px">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -48,23 +48,17 @@
                 {{ getRecipeTotalCost(recipe) | currency }}
               </td>
               <td class="text-center py-3">
-                <button 
-                  class="btn btn-sm btn-outline-success me-1 fw-medium" 
+                <button
+                  class="btn btn-sm btn-outline-success me-1 fw-medium"
                   (click)="openRecipeModal(recipe)"
                   title="Ver Ingredientes y Escala"
                 >
                   <i class="bi bi-eye-fill me-1"></i> Ver
                 </button>
-                <button 
-                  class="btn btn-sm btn-outline-primary me-1 fw-medium" 
-                  (click)="editRecipe(recipe._id)"
-                >
+                <button class="btn btn-sm btn-outline-primary me-1 fw-medium" (click)="editRecipe(recipe._id)">
                   <i class="bi bi-pencil-fill me-1"></i> Editar
                 </button>
-                <button 
-                  class="btn btn-sm btn-outline-danger fw-medium" 
-                  (click)="deleteRecipe(recipe._id)"
-                >
+                <button class="btn btn-sm btn-outline-danger fw-medium" (click)="deleteRecipe(recipe._id)">
                   <i class="bi bi-trash-fill me-1"></i> Eliminar
                 </button>
               </td>
@@ -83,13 +77,9 @@
 </div>
 
 <!-- Modal Glassmorphic de Detalle de Receta y Escala Dinámica -->
-<div 
-  class="recipe-detail-modal-backdrop" 
-  *ngIf="selectedRecipe" 
-  (click)="closeRecipeModal()"
->
-  <div 
-    class="recipe-detail-modal-card animate__animated animate__zoomIn animate__faster" 
+<div class="recipe-detail-modal-backdrop" *ngIf="selectedRecipe" (click)="closeRecipeModal()">
+  <div
+    class="recipe-detail-modal-card animate__animated animate__zoomIn animate__faster"
     (click)="$event.stopPropagation()"
   >
     <div class="modal-header-premium bg-dark text-white p-3 d-flex justify-content-between align-items-center">
@@ -108,25 +98,31 @@
       <!-- Selector de Tamaños de la Receta -->
       <div class="scale-section-premium mb-4 p-3 bg-light rounded-3">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="fw-bold text-dark"><i class="bi bi-aspect-ratio me-1 text-success"></i> Escala / Variante de Tamaño</span>
+          <span class="fw-bold text-dark"
+            ><i class="bi bi-aspect-ratio me-1 text-success"></i> Escala / Variante de Tamaño</span
+          >
           <span class="badge bg-success fs-7" *ngIf="selectedSize">{{ selectedSize.name | titlecase }}</span>
         </div>
         <div class="d-flex flex-wrap gap-2">
-          <button 
-            *ngFor="let size of selectedRecipe.sizes" 
-            type="button" 
-            class="btn btn-outline-success fw-semibold flex-grow-1" 
-            [class.active]="selectedSize?.name === size.name" 
+          <button
+            *ngFor="let size of selectedRecipe.sizes"
+            type="button"
+            class="btn btn-outline-success fw-semibold flex-grow-1"
+            [class.active]="selectedSize?.name === size.name"
             (click)="selectSize(size)"
           >
             {{ size.name | titlecase }}
-            <span *ngIf="size.priceModifier > 0" class="badge bg-success ms-1">+{{ size.priceModifier | currency }}</span>
+            <span *ngIf="size.priceModifier > 0" class="badge bg-success ms-1"
+              >+{{ size.priceModifier | currency }}</span
+            >
           </button>
         </div>
       </div>
 
       <!-- Tabla de Ingredientes -->
-      <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-list-check me-1 text-success"></i> Materias Primas Requeridas</h5>
+      <h5 class="fw-bold mb-3 text-dark">
+        <i class="bi bi-list-check me-1 text-success"></i> Materias Primas Requeridas
+      </h5>
       <div class="table-responsive rounded-3 border">
         <table class="table table-striped align-middle mb-0">
           <thead class="table-dark">
@@ -141,11 +137,11 @@
             <tr *ngFor="let ri of selectedSize.ingredients">
               <td class="fw-semibold text-dark">{{ ri.ingredient?.name || 'Insumo' }}</td>
               <td class="text-center font-mono text-success fw-bold">
-                {{ ri.quantity | number:'1.0-4' }} ({{ ri.ingredient?.measurementUnit || 'u' }})
+                {{ ri.quantity | number: '1.0-4' }} ({{ ri.ingredient?.measurementUnit || 'u' }})
               </td>
-              <td class="text-end font-mono">{{ (ri.ingredient?.costPrice || 0) | currency }}</td>
+              <td class="text-end font-mono">{{ ri.ingredient?.costPrice || 0 | currency }}</td>
               <td class="text-end font-mono fw-semibold">
-                {{ (ri.quantity * (ri.ingredient?.costPrice || 0)) | currency }}
+                {{ ri.quantity * (ri.ingredient?.costPrice || 0) | currency }}
               </td>
             </tr>
           </tbody>
@@ -156,7 +152,9 @@
     <!-- Footer Modal con Resumen de Costo -->
     <div class="modal-footer-premium p-3 bg-light d-flex justify-content-between align-items-center border-top">
       <div>
-        <span class="text-muted d-block fs-8 uppercase">Costo Estimado Producción ({{ selectedSize?.name | titlecase }})</span>
+        <span class="text-muted d-block fs-8 uppercase"
+          >Costo Estimado Producción ({{ selectedSize?.name | titlecase }})</span
+        >
         <span class="fs-4 fw-bold text-success font-mono">{{ getSelectedSizeTotalCost() | currency }}</span>
       </div>
       <button class="btn btn-dark fw-bold" (click)="closeRecipeModal()">Entendido</button>

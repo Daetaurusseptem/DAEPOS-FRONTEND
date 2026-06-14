@@ -4,12 +4,12 @@
   --glow-primary: rgba(99, 102, 241, 0.12);
   --glow-secondary: rgba(16, 185, 129, 0.12);
   --glow-tertiary: rgba(245, 158, 11, 0.12);
-  
+
   display: flex;
   flex-direction: column;
   gap: 24px;
   padding: 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* Glassmorphism base cards */
@@ -23,7 +23,7 @@
 
 /* Font helpers */
 .font-mono {
-  font-family: monospace !important;
+  font-family: var(--font-mono) !important;
 }
 
 /* Header de Página */
@@ -164,10 +164,18 @@
   transition: all 0.3s ease;
 }
 
-.accent-primary .kpi-glow { background: var(--glow-primary); }
-.accent-secondary .kpi-glow { background: var(--glow-secondary); }
-.accent-tertiary .kpi-glow { background: var(--glow-tertiary); }
-.accent-period .kpi-glow { background: rgba(99, 102, 241, 0.08); }
+.accent-primary .kpi-glow {
+  background: var(--glow-primary);
+}
+.accent-secondary .kpi-glow {
+  background: var(--glow-secondary);
+}
+.accent-tertiary .kpi-glow {
+  background: var(--glow-tertiary);
+}
+.accent-period .kpi-glow {
+  background: rgba(99, 102, 241, 0.08);
+}
 
 .kpi-card:hover {
   transform: translateY(-2px);
@@ -307,7 +315,7 @@
 }
 
 .checkmark-premium:after {
-  content: "";
+  content: '';
   position: absolute;
   display: none;
 }
@@ -339,7 +347,8 @@
   }
 }
 
-.chart-section, .table-section {
+.chart-section,
+.table-section {
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -597,7 +606,7 @@
     display: block !important;
     background: white !important;
     color: black !important;
-    font-family: 'Inter', sans-serif !important;
+    font-family: var(--font-ui) !important;
     padding: 30px !important;
     box-sizing: border-box;
   }

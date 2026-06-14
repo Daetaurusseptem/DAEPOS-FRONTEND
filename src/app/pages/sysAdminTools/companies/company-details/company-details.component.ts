@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-company-details',
   templateUrl: './company-details.component.html',
-  styleUrls: ['./company-details.component.css']
+  styleUrls: ['./company-details.component.css'],
 })
 export class CompanyDetailsComponent implements OnInit {
   company!: Company;
@@ -25,11 +25,11 @@ export class CompanyDetailsComponent implements OnInit {
     private companyService: CompanyService,
     private sysadminService: SysadminService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {  
+    this.activatedRoute.params.subscribe((params) => {
       this.id = params['id'];
       if (this.id) {
         this.loadCompanyData();
@@ -40,14 +40,15 @@ export class CompanyDetailsComponent implements OnInit {
   loadCompanyData() {
     this.loading = true;
     this.loadingInvoices = true;
-    
+
     // 1. Obtener datos básicos de la empresa
-    this.companyService.getCompany(this.id)
-      .pipe(map(item => item.company))
+    this.companyService
+      .getCompany(this.id)
+      .pipe(map((item) => item.company))
       .subscribe({
         next: (company) => {
           this.company = company!;
-          
+
           // 2. Cargar telemetría SaaS
           this.sysadminService.getCompanyTelemetry(this.id).subscribe({
             next: (resp) => {
@@ -56,7 +57,7 @@ export class CompanyDetailsComponent implements OnInit {
               }
               this.loading = false;
             },
-            error: () => this.loading = false
+            error: () => (this.loading = false),
           });
 
           // 3. Cargar facturas de Stripe
@@ -67,18 +68,18 @@ export class CompanyDetailsComponent implements OnInit {
               }
               this.loadingInvoices = false;
             },
-            error: () => this.loadingInvoices = false
+            error: () => (this.loadingInvoices = false),
           });
 
           // 4. Cargar Tiers Disponibles
-          this.sysadminService.getPlans().subscribe(resp => {
+          this.sysadminService.getPlans().subscribe((resp) => {
             if (resp.ok) this.availablePlans = resp.plans;
           });
         },
         error: () => {
           this.loading = false;
           this.loadingInvoices = false;
-        }
+        },
       });
   }
 
@@ -91,7 +92,7 @@ export class CompanyDetailsComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, Asignar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.showLoading();
@@ -102,7 +103,7 @@ export class CompanyDetailsComponent implements OnInit {
           },
           error: (err) => {
             Swal.fire('Error', err.error?.msg || 'No se pudo asignar el plan', 'error');
-          }
+          },
         });
       }
     });
@@ -116,23 +117,29 @@ export class CompanyDetailsComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Sí, entrar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#007bff'
+      confirmButtonColor: '#007bff',
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
           title: 'Conectando...',
           allowOutsideClick: false,
-          didOpen: () => { Swal.showLoading(); }
+          didOpen: () => {
+            Swal.showLoading();
+          },
         });
-        
+
         this.sysadminService.impersonateCompany(this.id).subscribe({
           next: () => {
             Swal.close();
             // Redirección manejada en el servicio
           },
           error: (err) => {
-            Swal.fire('Error', err.error?.msg || 'No se pudo iniciar la sesión remota. Verifica que tengan un administrador asignado.', 'error');
-          }
+            Swal.fire(
+              'Error',
+              err.error?.msg || 'No se pudo iniciar la sesión remota. Verifica que tengan un administrador asignado.',
+              'error',
+            );
+          },
         });
       }
     });
@@ -141,7 +148,7 @@ export class CompanyDetailsComponent implements OnInit {
   suspendCompany() {
     const isCurrentlyActive = this.telemetry?.isActive;
     const actionWord = isCurrentlyActive ? 'Suspender' : 'Reactivar';
-    const warningText = isCurrentlyActive 
+    const warningText = isCurrentlyActive
       ? 'Esto bloqueará el acceso a todos los usuarios, gerentes y cajeros de esta empresa inmediatamente. (Soft Delete)'
       : 'Esto reactivará el acceso para todos los usuarios de la empresa.';
 
@@ -152,7 +159,7 @@ export class CompanyDetailsComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: `Sí, ${actionWord}`,
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: isCurrentlyActive ? '#dc3545' : '#198754'
+      confirmButtonColor: isCurrentlyActive ? '#dc3545' : '#198754',
     }).then((result) => {
       if (result.isConfirmed) {
         if (isCurrentlyActive) {
@@ -162,11 +169,15 @@ export class CompanyDetailsComponent implements OnInit {
               Swal.fire('Suspendida', 'La empresa ha sido suspendida exitosamente.', 'success');
               this.loadCompanyData();
             },
-            error: () => Swal.fire('Error', 'No se pudo suspender la empresa.', 'error')
+            error: () => Swal.fire('Error', 'No se pudo suspender la empresa.', 'error'),
           });
         } else {
           // Reactivar (necesitaría endpoint si se requiere, de momento informamos)
-          Swal.fire('Aviso', 'La reactivación manual debe hacerse actualizando la base de datos o el endpoint respectivo.', 'info');
+          Swal.fire(
+            'Aviso',
+            'La reactivación manual debe hacerse actualizando la base de datos o el endpoint respectivo.',
+            'info',
+          );
         }
       }
     });

@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-company-list',
   templateUrl: './company-list.component.html',
-  styleUrls: ['./company-list.component.css']
+  styleUrls: ['./company-list.component.css'],
 })
 export class CompanyListComponent implements OnInit {
   empresas: Company[] = [];
@@ -18,7 +18,7 @@ export class CompanyListComponent implements OnInit {
   constructor(
     private companyService: CompanyService,
     private sysadminService: SysadminService,
-    private utilitiesService: UtilitiesService
+    private utilitiesService: UtilitiesService,
   ) {}
 
   ngOnInit(): void {
@@ -27,10 +27,9 @@ export class CompanyListComponent implements OnInit {
 
   loadCompanies() {
     this.loadingCompanies = true;
-    this.companyService.getCompanies()
-      .pipe(
-        map(item => item.companies)
-      )
+    this.companyService
+      .getCompanies()
+      .pipe(map((item) => item.companies))
       .subscribe({
         next: (empresas) => {
           this.empresas = empresas!;
@@ -38,7 +37,7 @@ export class CompanyListComponent implements OnInit {
         },
         error: () => {
           this.loadingCompanies = false;
-        }
+        },
       });
   }
 
@@ -61,37 +60,35 @@ export class CompanyListComponent implements OnInit {
       confirmButtonColor: '#d33',
       confirmButtonText: 'Sí, desactivar',
       cancelButtonText: 'Cancelar',
-      allowEnterKey: false
-    })
-    .then(resp => {
-      if(resp.isConfirmed) {
+      allowEnterKey: false,
+    }).then((resp) => {
+      if (resp.isConfirmed) {
         Swal.fire({
           title: 'Procesando...',
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
-          }
+          },
         });
-        this.companyService.deleteCompany(id)
-        .subscribe({
+        this.companyService.deleteCompany(id).subscribe({
           next: (resp: any) => {
-            if(resp.ok) {
+            if (resp.ok) {
               Swal.fire({
                 title: 'Empresa Desactivada',
                 icon: 'success',
-                confirmButtonColor: '#000'
+                confirmButtonColor: '#000',
               });
               this.loadCompanies(); // Recargar lista
             }
-          }, 
+          },
           error: (err) => {
             Swal.fire({
               title: 'Error al desactivar',
               icon: 'error',
               text: err.error?.error || err.error?.msg || 'Error desconocido',
-              confirmButtonColor: '#000'
+              confirmButtonColor: '#000',
             });
-          }
+          },
         });
       }
     });
@@ -106,7 +103,7 @@ export class CompanyListComponent implements OnInit {
       confirmButtonText: 'Sí, asistir cliente',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#000000',
-      cancelButtonColor: '#737373'
+      cancelButtonColor: '#737373',
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
@@ -114,7 +111,7 @@ export class CompanyListComponent implements OnInit {
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
-          }
+          },
         });
 
         this.sysadminService.impersonateCompany(company._id!).subscribe({
@@ -128,9 +125,9 @@ export class CompanyListComponent implements OnInit {
               title: 'Error de conexión',
               text: err.error?.msg || 'No se pudo iniciar el modo de soporte.',
               icon: 'error',
-              confirmButtonColor: '#000'
+              confirmButtonColor: '#000',
             });
-          }
+          },
         });
       }
     });
@@ -143,7 +140,7 @@ export class CompanyListComponent implements OnInit {
     subscriptionStatus: 'active',
     planType: 'basic',
     currentPeriodEnd: '',
-    manualOverride: false
+    manualOverride: false,
   };
 
   openSubscriptionModal(company: any) {
@@ -152,7 +149,7 @@ export class CompanyListComponent implements OnInit {
       subscriptionStatus: company.subscriptionStatus || 'trialing',
       planType: company.planType || 'basic',
       currentPeriodEnd: company.currentPeriodEnd ? new Date(company.currentPeriodEnd).toISOString().split('T')[0] : '',
-      manualOverride: company.manualOverride || false
+      manualOverride: company.manualOverride || false,
     };
     this.showSubscriptionModal = true;
   }
@@ -165,7 +162,8 @@ export class CompanyListComponent implements OnInit {
   updateSubscription() {
     if (!this.selectedCompany) return;
 
-    this.sysadminService.updateCompanySubscriptionManual(this.selectedCompany._id, this.subscriptionFormData)
+    this.sysadminService
+      .updateCompanySubscriptionManual(this.selectedCompany._id, this.subscriptionFormData)
       .subscribe({
         next: (res) => {
           Swal.fire('Actualizado', 'La suscripción de la empresa ha sido actualizada.', 'success');
@@ -174,7 +172,7 @@ export class CompanyListComponent implements OnInit {
         },
         error: (err) => {
           Swal.fire('Error', 'No se pudo actualizar la suscripción.', 'error');
-        }
+        },
       });
   }
 }

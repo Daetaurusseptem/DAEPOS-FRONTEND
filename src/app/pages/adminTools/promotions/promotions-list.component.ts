@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-promotions-list',
   templateUrl: './promotions-list.component.html',
-  styleUrls: ['./promotions-list.component.css']
+  styleUrls: ['./promotions-list.component.css'],
 })
 export class PromotionsListComponent implements OnInit {
   promotions: Promotion[] = [];
@@ -33,7 +33,7 @@ export class PromotionsListComponent implements OnInit {
     private promotionService: PromotionService,
     private authService: AuthService,
     private branchService: BranchService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
   ) {
     this.companyId = this.authService.companyId || (this.authService.company as any)?._id || '';
   }
@@ -65,7 +65,7 @@ export class PromotionsListComponent implements OnInit {
       endDate: ['', Validators.required],
       usageLimit: [null, [Validators.min(1)]],
       targetBranches: [defaultBranches],
-      targetCategories: [[]]
+      targetCategories: [[]],
     });
   }
 
@@ -76,7 +76,7 @@ export class PromotionsListComponent implements OnInit {
           this.branches = resp.branches || [];
         }
       },
-      error: (err: any) => console.error('Error loading branches for select:', err)
+      error: (err: any) => console.error('Error loading branches for select:', err),
     });
   }
 
@@ -85,7 +85,7 @@ export class PromotionsListComponent implements OnInit {
       next: (resp: any) => {
         this.categories = resp.categories || [];
       },
-      error: (err: any) => console.error('Error loading categories for select:', err)
+      error: (err: any) => console.error('Error loading categories for select:', err),
     });
   }
 
@@ -107,7 +107,7 @@ export class PromotionsListComponent implements OnInit {
         console.error(err);
         this.isLoading = false;
         Swal.fire('Error', 'No se pudieron obtener las promociones.', 'error');
-      }
+      },
     });
   }
 
@@ -138,7 +138,7 @@ export class PromotionsListComponent implements OnInit {
       endDate: '',
       usageLimit: null,
       targetBranches: defaultBranches,
-      targetCategories: []
+      targetCategories: [],
     });
     this.showModal = true;
   }
@@ -146,7 +146,7 @@ export class PromotionsListComponent implements OnInit {
   openEditModal(promotion: Promotion) {
     this.isEditMode = true;
     this.editingPromotionId = promotion._id || '';
-    
+
     // Format dates to YYYY-MM-DD for HTML input
     const formatHTMLDate = (d: any) => {
       if (!d) return '';
@@ -157,8 +157,12 @@ export class PromotionsListComponent implements OnInit {
       return `${year}-${month}-${day}`;
     };
 
-    const branchIds = promotion.targetBranches ? promotion.targetBranches.map((b: any) => typeof b === 'object' ? b._id : b) : [];
-    const categoryIds = promotion.targetCategories ? promotion.targetCategories.map((c: any) => typeof c === 'object' ? c._id : c) : [];
+    const branchIds = promotion.targetBranches
+      ? promotion.targetBranches.map((b: any) => (typeof b === 'object' ? b._id : b))
+      : [];
+    const categoryIds = promotion.targetCategories
+      ? promotion.targetCategories.map((c: any) => (typeof c === 'object' ? c._id : c))
+      : [];
 
     this.promotionForm.patchValue({
       code: promotion.code,
@@ -170,7 +174,7 @@ export class PromotionsListComponent implements OnInit {
       endDate: formatHTMLDate(promotion.endDate),
       usageLimit: promotion.usageLimit || null,
       targetBranches: branchIds,
-      targetCategories: categoryIds
+      targetCategories: categoryIds,
     });
     this.showModal = true;
   }
@@ -207,7 +211,7 @@ export class PromotionsListComponent implements OnInit {
         },
         error: (err) => {
           Swal.fire('Error', err.error?.message || 'No se pudo actualizar la promoción.', 'error');
-        }
+        },
       });
     } else {
       this.promotionService.createPromotion(rawData, this.companyId).subscribe({
@@ -220,7 +224,7 @@ export class PromotionsListComponent implements OnInit {
         },
         error: (err) => {
           Swal.fire('Error', err.error?.message || 'No se pudo crear la promoción.', 'error');
-        }
+        },
       });
     }
   }
@@ -234,20 +238,20 @@ export class PromotionsListComponent implements OnInit {
       },
       error: (err) => {
         Swal.fire('Error', 'No se pudo cambiar el estado de la promoción.', 'error');
-      }
+      },
     });
   }
 
   deletePromotion(id: string) {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: "¡No podrás revertir esto!",
+      text: '¡No podrás revertir esto!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.promotionService.deletePromotion(id).subscribe({
@@ -257,7 +261,7 @@ export class PromotionsListComponent implements OnInit {
           },
           error: (err) => {
             Swal.fire('Error', 'No se pudo eliminar la promoción.', 'error');
-          }
+          },
         });
       }
     });
@@ -270,9 +274,9 @@ export class PromotionsListComponent implements OnInit {
 
   getBranchNames(branchIds: any[]): string {
     if (!branchIds || branchIds.length === 0) return 'Todas las Sucursales';
-    const names = branchIds.map(id => {
+    const names = branchIds.map((id) => {
       const bId = typeof id === 'object' ? id._id : id;
-      const b = this.branches.find(x => x._id === bId);
+      const b = this.branches.find((x) => x._id === bId);
       return b ? b.name : 'Sucursal';
     });
     return names.join(', ');
@@ -280,9 +284,9 @@ export class PromotionsListComponent implements OnInit {
 
   getCategoryNames(categoryIds: any[]): string {
     if (!categoryIds || categoryIds.length === 0) return 'Todas las Categorías';
-    const names = categoryIds.map(id => {
+    const names = categoryIds.map((id) => {
       const cId = typeof id === 'object' ? id._id : id;
-      const c = this.categories.find(x => x._id === cId);
+      const c = this.categories.find((x) => x._id === cId);
       return c ? c.name : 'Categoría';
     });
     return names.join(', ');

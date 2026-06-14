@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
@@ -6,14 +5,15 @@ import { AuthService } from 'src/app/services/auth.service';
 @Component({
   selector: 'app-expired-subscription',
   templateUrl: './expired-subscription.component.html',
-  styleUrls: ['./expired-subscription.component.css']
+  styleUrls: ['./expired-subscription.component.css'],
 })
 export class ExpiredSubscriptionComponent implements OnInit {
+  constructor(
+    private router: Router,
+    public authService: AuthService,
+  ) {}
 
-  constructor(private router: Router, public authService: AuthService) { }
-
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   get isCompanyAdmin(): boolean {
     const role = this.authService.usuario?.role;
@@ -31,4 +31,3 @@ export class ExpiredSubscriptionComponent implements OnInit {
     this.router.navigateByUrl('/login');
   }
 }
-

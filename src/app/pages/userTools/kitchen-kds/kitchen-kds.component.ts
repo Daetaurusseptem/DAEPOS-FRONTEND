@@ -3,13 +3,14 @@ import { PendingOrderService } from '../../../services/pending-order.service';
 import { AuthService } from '../../../services/auth.service';
 import { SocketService } from '../../../services/socket.service';
 import { InventoryService } from '../../../services/inventory.service';
+import { LoggerService } from '../../../services/logger.service';
 import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-kitchen-kds',
   templateUrl: './kitchen-kds.component.html',
-  styleUrls: ['./kitchen-kds.component.css']
+  styleUrls: ['./kitchen-kds.component.css'],
 })
 export class KitchenKdsComponent implements OnInit, OnDestroy {
   activeOrders: any[] = [];
@@ -17,15 +18,15 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
   depletedCompositeProducts: any[] = [];
   loading = true;
   isFullscreen = false;
-  
+
   // Theme Configuration
   themes: string[] = ['light', 'dark', 'high-contrast', 'blue-dark', 'terminal'];
   currentTheme: string = 'light';
-  
+
   // Layout & Zoom Configuration
   layouts: string[] = ['grid', 'dense', 'list'];
   currentLayout: string = 'grid';
-  
+
   zoomLevels: number[] = [75, 85, 100, 115, 125, 150];
   currentZoomValue: number = 100;
 
@@ -36,20 +37,21 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     private socketService: SocketService,
     private inventoryService: InventoryService,
-    private el: ElementRef
-  ) { }
+    private el: ElementRef,
+    private logger: LoggerService,
+  ) {}
 
   ngOnInit(): void {
     const savedTheme = localStorage.getItem('kdsTheme');
     if (savedTheme && this.themes.includes(savedTheme)) {
       this.currentTheme = savedTheme;
     }
-    
+
     const savedLayout = localStorage.getItem('kdsLayout');
     if (savedLayout && this.layouts.includes(savedLayout)) {
       this.currentLayout = savedLayout;
     }
-    
+
     const savedZoom = localStorage.getItem('kdsZoomVal');
     if (savedZoom) {
       const parsedZoom = parseInt(savedZoom, 10);
@@ -80,11 +82,11 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
     const branchId = this.authService.branch?._id || '';
     const companyId = this.authService.companyId || '';
 
-    console.log('--- DEBUG KDS LOAD ORDERS ---');
-    console.log('AuthService Branch:', this.authService.branch);
-    console.log('Branch ID extracted:', branchId);
-    console.log('AuthService CompanyId:', this.authService.companyId);
-    console.log('Company ID extracted:', companyId);
+    this.logger.log('--- DEBUG KDS LOAD ORDERS ---');
+    this.logger.log('AuthService Branch:', this.authService.branch);
+    this.logger.log('Branch ID extracted:', branchId);
+    this.logger.log('AuthService CompanyId:', this.authService.companyId);
+    this.logger.log('Company ID extracted:', companyId);
 
     if (!branchId || !companyId) {
       console.warn('Returning early because branchId or companyId is missing!');
@@ -96,31 +98,34 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
       next: (resp: any) => {
         if (resp.ok) {
           const allOrders = resp.pendingOrders || [];
-          
+
           // Filtrar órdenes activas en cocina
           this.activeOrders = allOrders.filter((o: any) => o.kitchenStatus === 'in_kitchen');
-          
+
           // Filtrar órdenes despachadas recientemente (para permitir recall/deshacer)
-          this.completedRecentOrders = allOrders.filter((o: any) => o.kitchenStatus === 'ready' || o.kitchenStatus === 'delivered');
+          this.completedRecentOrders = allOrders.filter(
+            (o: any) => o.kitchenStatus === 'ready' || o.kitchenStatus === 'delivered',
+          );
         }
         this.loading = false;
       },
       error: (err) => {
         console.error('Error al cargar comandas de cocina:', err);
         this.loading = false;
-      }
+      },
     });
-    
+
     // Cargar también las alertas de stock
     this.inventoryService.getInventory(companyId, '', 'product', branchId).subscribe({
       next: (res: any) => {
         if (res.ok && res.items) {
-          this.depletedCompositeProducts = res.items.filter((item: any) => 
-            item.product?.isComposite && item.theoreticalStock !== undefined && item.theoreticalStock <= 0
+          this.depletedCompositeProducts = res.items.filter(
+            (item: any) =>
+              item.product?.isComposite && item.theoreticalStock !== undefined && item.theoreticalStock <= 0,
           );
         }
       },
-      error: (err) => console.error('Error al cargar inventario para KDS:', err)
+      error: (err) => console.error('Error al cargar inventario para KDS:', err),
     });
   }
 
@@ -129,9 +134,9 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
       next: (resp: any) => {
         if (resp.ok) {
           // Remover localmente para respuesta inmediata de interfaz antes del siguiente poll
-          this.activeOrders = this.activeOrders.filter(o => o._id !== orderId);
+          this.activeOrders = this.activeOrders.filter((o) => o._id !== orderId);
           this.loadOrders();
-          
+
           Swal.fire({
             icon: 'success',
             title: 'Orden Despachada',
@@ -139,7 +144,7 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
             timer: 1000,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end'
+            position: 'top-end',
           });
         }
       },
@@ -147,9 +152,9 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'No se pudo despachar la comanda: ' + (err.error?.message || err.message)
+          text: 'No se pudo despachar la comanda: ' + (err.error?.message || err.message),
         });
-      }
+      },
     });
   }
 
@@ -165,7 +170,7 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
             timer: 1200,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end'
+            position: 'top-end',
           });
         }
       },
@@ -173,9 +178,9 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'No se pudo recuperar la comanda.'
+          text: 'No se pudo recuperar la comanda.',
         });
-      }
+      },
     });
   }
 
@@ -205,13 +210,18 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
     if (order.type !== 'delivery' || !order.deliveryDetails) return 'PARA LLEVAR';
     const details = order.deliveryDetails;
     const orderCode = details.orderId ? ` #${details.orderId}` : '';
-    
+
     switch (details.platform) {
-      case 'uber_eats': return `UBER EATS${orderCode}`;
-      case 'rappi': return `RAPPI${orderCode}`;
-      case 'didi_food': return `DIDI FOOD${orderCode}`;
-      case 'phone_order': return `TELÉFONO${orderCode}`;
-      default: return `DELIVERY${orderCode}`;
+      case 'uber_eats':
+        return `UBER EATS${orderCode}`;
+      case 'rappi':
+        return `RAPPI${orderCode}`;
+      case 'didi_food':
+        return `DIDI FOOD${orderCode}`;
+      case 'phone_order':
+        return `TELÉFONO${orderCode}`;
+      default:
+        return `DELIVERY${orderCode}`;
     }
   }
 
@@ -232,26 +242,38 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
     this.currentTheme = this.themes[nextIndex];
     localStorage.setItem('kdsTheme', this.currentTheme);
   }
-  
+
   getThemeIcon(): string {
     switch (this.currentTheme) {
-      case 'light': return 'fa-sun';
-      case 'dark': return 'fa-moon';
-      case 'high-contrast': return 'fa-adjust';
-      case 'blue-dark': return 'fa-tint';
-      case 'terminal': return 'fa-terminal';
-      default: return 'fa-sun';
+      case 'light':
+        return 'fa-sun';
+      case 'dark':
+        return 'fa-moon';
+      case 'high-contrast':
+        return 'fa-adjust';
+      case 'blue-dark':
+        return 'fa-tint';
+      case 'terminal':
+        return 'fa-terminal';
+      default:
+        return 'fa-sun';
     }
   }
 
   getThemeName(): string {
     switch (this.currentTheme) {
-      case 'light': return 'Claro';
-      case 'dark': return 'Oscuro';
-      case 'high-contrast': return 'Contraste';
-      case 'blue-dark': return 'Azul';
-      case 'terminal': return 'Terminal';
-      default: return 'Claro';
+      case 'light':
+        return 'Claro';
+      case 'dark':
+        return 'Oscuro';
+      case 'high-contrast':
+        return 'Contraste';
+      case 'blue-dark':
+        return 'Azul';
+      case 'terminal':
+        return 'Terminal';
+      default:
+        return 'Claro';
     }
   }
 
@@ -264,10 +286,14 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
 
   getLayoutIcon(): string {
     switch (this.currentLayout) {
-      case 'grid': return 'fa-th-large';
-      case 'dense': return 'fa-th';
-      case 'list': return 'fa-list';
-      default: return 'fa-th-large';
+      case 'grid':
+        return 'fa-th-large';
+      case 'dense':
+        return 'fa-th';
+      case 'list':
+        return 'fa-list';
+      default:
+        return 'fa-th-large';
     }
   }
 
@@ -289,7 +315,7 @@ export class KitchenKdsComponent implements OnInit, OnDestroy {
 
   toggleFullscreen(): void {
     const kdsContainer = this.el.nativeElement.querySelector('.kds-container');
-    
+
     if (!document.fullscreenElement) {
       if (kdsContainer && kdsContainer.requestFullscreen) {
         kdsContainer.requestFullscreen().catch((err: any) => {

@@ -3,10 +3,16 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h1 class="console-title mb-1">Panel Principal SaaS</h1>
-      <p class="console-subtitle text-muted mb-0">Consola operativa global y centro de asistencia para administradores de la plataforma</p>
+      <p class="console-subtitle text-muted mb-0">
+        Consola operativa global y centro de asistencia para administradores de la plataforma
+      </p>
     </div>
     <div class="d-flex gap-2">
-      <button class="btn btn-outline-dark font-monospace d-flex align-items-center gap-1.5" (click)="loadControlTowerData()" style="font-size: 0.8rem;">
+      <button
+        class="btn btn-outline-dark font-monospace d-flex align-items-center gap-1.5"
+        (click)="loadControlTowerData()"
+        style="font-size: 0.8rem"
+      >
         <i class="bi bi-arrow-clockwise"></i> ACTUALIZAR TELEMETRÍA
       </button>
     </div>
@@ -19,29 +25,51 @@
       <!-- Tarjetas de Telemetría -->
       <div class="row g-3 mb-4 animate__animated animate__fadeInUp">
         <div class="col-md-3">
-          <div class="metric-card" routerLink="/dashboard/sysadmin/transactions" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div
+            class="metric-card"
+            routerLink="/dashboard/sysadmin/transactions"
+            style="cursor: pointer; transition: transform 0.2s"
+            onmouseover="this.style.transform = 'translateY(-2px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
             <div class="metric-header">
               <span class="metric-label">VOLUMEN TRANSACCIONADO (GMV)</span>
               <i class="bi bi-wallet2 text-muted"></i>
             </div>
-            <div class="metric-value font-monospace">{{ metrics.gmv | currency:'MXN':'symbol':'1.2-2' }}</div>
-            <p class="metric-footer text-muted mb-0">Total procesado por inquilinos <i class="bi bi-arrow-right ms-1"></i></p>
+            <div class="metric-value font-monospace">{{ metrics.gmv | currency: 'MXN' : 'symbol' : '1.2-2' }}</div>
+            <p class="metric-footer text-muted mb-0">
+              Total procesado por inquilinos <i class="bi bi-arrow-right ms-1"></i>
+            </p>
           </div>
         </div>
 
         <div class="col-md-3">
-          <div class="metric-card" routerLink="/dashboard/sysadmin/companies" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div
+            class="metric-card"
+            routerLink="/dashboard/sysadmin/companies"
+            style="cursor: pointer; transition: transform 0.2s"
+            onmouseover="this.style.transform = 'translateY(-2px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
             <div class="metric-header">
               <span class="metric-label">COMERCIOS / EMPRESAS</span>
               <i class="bi bi-building text-muted"></i>
             </div>
             <div class="metric-value">{{ metrics.activeCompanies }}</div>
-            <p class="metric-footer text-muted mb-0">Inquilinos SaaS configurados <i class="bi bi-arrow-right ms-1"></i></p>
+            <p class="metric-footer text-muted mb-0">
+              Inquilinos SaaS configurados <i class="bi bi-arrow-right ms-1"></i>
+            </p>
           </div>
         </div>
 
         <div class="col-md-3">
-          <div class="metric-card" routerLink="/dashboard/sysadmin/transactions" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div
+            class="metric-card"
+            routerLink="/dashboard/sysadmin/transactions"
+            style="cursor: pointer; transition: transform 0.2s"
+            onmouseover="this.style.transform = 'translateY(-2px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
             <div class="metric-header">
               <span class="metric-label">TERMINALES / POS EN VIVO</span>
               <i class="bi bi-pc-display-horizontal text-muted"></i>
@@ -50,60 +78,108 @@
               {{ metrics.openRegisters }}
               <span class="live-pulse" *ngIf="metrics.openRegisters > 0"></span>
             </div>
-            <p class="metric-footer text-muted mb-0">Cajas abiertas operando hoy <i class="bi bi-arrow-right ms-1"></i></p>
+            <p class="metric-footer text-muted mb-0">
+              Cajas abiertas operando hoy <i class="bi bi-arrow-right ms-1"></i>
+            </p>
           </div>
         </div>
 
         <div class="col-md-3">
-          <div class="metric-card" [class.border-danger-subtle]="metrics.totalErrors > 0" routerLink="/dashboard/sysadmin/logs" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div
+            class="metric-card"
+            [class.border-danger-subtle]="metrics.totalErrors > 0"
+            routerLink="/dashboard/sysadmin/logs"
+            style="cursor: pointer; transition: transform 0.2s"
+            onmouseover="this.style.transform = 'translateY(-2px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
             <div class="metric-header">
               <span class="metric-label">INCIDENTES REGISTRADOS</span>
               <i class="bi bi-exclamation-triangle text-danger" *ngIf="metrics.totalErrors > 0"></i>
               <i class="bi bi-shield-check text-success" *ngIf="metrics.totalErrors === 0"></i>
             </div>
-            <div class="metric-value" [class.text-danger]="metrics.totalErrors > 0" [class.text-success]="metrics.totalErrors === 0">
+            <div
+              class="metric-value"
+              [class.text-danger]="metrics.totalErrors > 0"
+              [class.text-success]="metrics.totalErrors === 0"
+            >
               {{ metrics.totalErrors }}
             </div>
-            <p class="metric-footer text-muted mb-0">Logs de error HTTP 500 activos <i class="bi bi-arrow-right ms-1"></i></p>
+            <p class="metric-footer text-muted mb-0">
+              Logs de error HTTP 500 activos <i class="bi bi-arrow-right ms-1"></i>
+            </p>
           </div>
         </div>
       </div>
 
       <!-- Live Activities Feed (Timeline) -->
       <div class="card animate__animated animate__fadeInUp mb-4 border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom border-light d-flex justify-content-between align-items-center py-3">
+        <div
+          class="card-header bg-white border-bottom border-light d-flex justify-content-between align-items-center py-3"
+        >
           <div class="d-flex align-items-center gap-3">
             <h2 class="h5 mb-0 fw-bold">Flujo de Actividad Reciente</h2>
-            <span class="badge bg-light text-primary tracking-wide text-uppercase font-monospace border" style="font-size: 0.65rem;">
+            <span
+              class="badge bg-light text-primary tracking-wide text-uppercase font-monospace border"
+              style="font-size: 0.65rem"
+            >
               <i class="bi bi-broadcast pulse-icon me-1"></i> Actualización en vivo
             </span>
           </div>
-          <a routerLink="/dashboard/sysadmin/transactions" class="btn btn-sm btn-outline-primary font-monospace d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+          <a
+            routerLink="/dashboard/sysadmin/transactions"
+            class="btn btn-sm btn-outline-primary font-monospace d-flex align-items-center gap-1"
+            style="font-size: 0.75rem"
+          >
             BÚSQUEDA AVANZADA <i class="bi bi-arrow-right"></i>
           </a>
         </div>
         <div class="card-body p-4">
-          
           <div class="timeline-container">
-            <div *ngFor="let activity of liveFeed" class="timeline-item animate__animated animate__fadeIn" 
-                 data-bs-toggle="modal" data-bs-target="#forensicModal" (click)="openForensicModal(activity._id)">
-              <div class="timeline-icon text-white shadow-sm" 
-                   [ngClass]="{'bg-success': activity.paymentMethod === 'cash', 'bg-primary': activity.paymentMethod !== 'cash'}">
-                <i class="bi" [ngClass]="{'bi-cash-stack': activity.paymentMethod === 'cash', 'bi-credit-card': activity.paymentMethod !== 'cash'}"></i>
+            <div
+              *ngFor="let activity of liveFeed"
+              class="timeline-item animate__animated animate__fadeIn"
+              data-bs-toggle="modal"
+              data-bs-target="#forensicModal"
+              (click)="openForensicModal(activity._id)"
+            >
+              <div
+                class="timeline-icon text-white shadow-sm"
+                [ngClass]="{
+                  'bg-success': activity.paymentMethod === 'cash',
+                  'bg-primary': activity.paymentMethod !== 'cash',
+                }"
+              >
+                <i
+                  class="bi"
+                  [ngClass]="{
+                    'bi-cash-stack': activity.paymentMethod === 'cash',
+                    'bi-credit-card': activity.paymentMethod !== 'cash',
+                  }"
+                ></i>
               </div>
               <div class="timeline-content card border-light transaction-card">
                 <div class="card-body d-flex justify-content-between align-items-center py-2 px-3">
                   <div>
                     <h6 class="mb-0 fw-bold text-dark">{{ activity.company?.name || 'Inquilino del Sistema' }}</h6>
-                    <small class="text-muted d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem;">
-                      <span><i class="bi bi-person-circle text-secondary"></i> {{ activity.user?.name || activity.vendedor || 'Sistema' }}</span>
+                    <small class="text-muted d-flex align-items-center gap-2 mt-1" style="font-size: 0.8rem">
+                      <span
+                        ><i class="bi bi-person-circle text-secondary"></i>
+                        {{ activity.user?.name || activity.vendedor || 'Sistema' }}</span
+                      >
                       <span class="text-light-muted">&bull;</span>
-                      <span class="font-monospace text-secondary"><i class="bi bi-clock"></i> {{ activity.date | date:'HH:mm:ss' }}</span>
+                      <span class="font-monospace text-secondary"
+                        ><i class="bi bi-clock"></i> {{ activity.date | date: 'HH:mm:ss' }}</span
+                      >
                     </small>
                   </div>
                   <div class="text-end">
-                    <h5 class="mb-1 fw-bold text-dark font-monospace">{{ activity.total | currency:'MXN' }}</h5>
-                    <span class="badge rounded-pill bg-light text-secondary border font-monospace px-2" style="font-size: 0.65rem;">{{ activity.paymentMethod || 'cash' }}</span>
+                    <h5 class="mb-1 fw-bold text-dark font-monospace">{{ activity.total | currency: 'MXN' }}</h5>
+                    <span
+                      class="badge rounded-pill bg-light text-secondary border font-monospace px-2"
+                      style="font-size: 0.65rem"
+                      >{{ activity.paymentMethod || 'cash' }}</span
+                    >
                   </div>
                 </div>
               </div>
@@ -114,7 +190,6 @@
               <p class="mb-0">No se han registrado actividades recientes.</p>
             </div>
           </div>
-          
         </div>
       </div>
     </div>
@@ -125,10 +200,18 @@
         <div class="card-header d-flex justify-content-between align-items-center py-3">
           <h2 class="h5 mb-0 fw-bold">Logs de Excepciones e Incidentes (HTTP 500)</h2>
           <div class="d-flex gap-2">
-            <button class="btn btn-outline-danger btn-sm font-monospace d-flex align-items-center gap-1.5" (click)="loadSystemErrors()" style="font-size: 0.75rem;">
+            <button
+              class="btn btn-outline-danger btn-sm font-monospace d-flex align-items-center gap-1.5"
+              (click)="loadSystemErrors()"
+              style="font-size: 0.75rem"
+            >
               <i class="bi bi-arrow-clockwise"></i> ACTUALIZAR
             </button>
-            <a routerLink="/dashboard/sysadmin/logs" class="btn btn-sm btn-outline-primary font-monospace d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+            <a
+              routerLink="/dashboard/sysadmin/logs"
+              class="btn btn-sm btn-outline-primary font-monospace d-flex align-items-center gap-1"
+              style="font-size: 0.75rem"
+            >
               BÚSQUEDA AVANZADA <i class="bi bi-arrow-right"></i>
             </a>
           </div>
@@ -148,32 +231,50 @@
               <tbody>
                 <ng-container *ngFor="let err of errors">
                   <tr>
-                    <td class="font-monospace text-muted" style="font-size: 0.8rem;">
-                      {{ err.timestamp | date:'dd/MM HH:mm:ss' }}
+                    <td class="font-monospace text-muted" style="font-size: 0.8rem">
+                      {{ err.timestamp | date: 'dd/MM HH:mm:ss' }}
                     </td>
                     <td>
-                      <span class="badge font-monospace text-uppercase me-1" 
-                            [class.bg-danger]="err.method === 'POST' || err.method === 'DELETE'" 
-                            [class.bg-warning]="err.method === 'PUT'" 
-                            [class.bg-secondary]="err.method === 'GET'"
-                            style="font-size: 0.65rem; padding: 4px 6px;">
+                      <span
+                        class="badge font-monospace text-uppercase me-1"
+                        [class.bg-danger]="err.method === 'POST' || err.method === 'DELETE'"
+                        [class.bg-warning]="err.method === 'PUT'"
+                        [class.bg-secondary]="err.method === 'GET'"
+                        style="font-size: 0.65rem; padding: 4px 6px"
+                      >
                         {{ err.method }}
                       </span>
-                      <span class="font-monospace text-secondary text-truncate" style="font-size: 0.8rem; max-width: 120px; display: inline-block;">{{ err.route }}</span>
+                      <span
+                        class="font-monospace text-secondary text-truncate"
+                        style="font-size: 0.8rem; max-width: 120px; display: inline-block"
+                        >{{ err.route }}</span
+                      >
                     </td>
                     <td>
-                      <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ err.companyId?.name || 'Global / Sin Inquilino' }}</div>
+                      <div class="fw-bold text-dark" style="font-size: 0.85rem">
+                        {{ err.companyId?.name || 'Global / Sin Inquilino' }}
+                      </div>
                     </td>
                     <td>
-                      <div class="text-danger fw-semibold text-truncate" style="font-size: 0.85rem; max-width: 350px;" [title]="err.errorMessage">
+                      <div
+                        class="text-danger fw-semibold text-truncate"
+                        style="font-size: 0.85rem; max-width: 350px"
+                        [title]="err.errorMessage"
+                      >
                         {{ err.errorMessage }}
                       </div>
                     </td>
                     <td class="text-end">
-                      <button class="btn btn-light btn-sm d-inline-flex align-items-center justify-content-center p-0" 
-                              (click)="toggleExpandError(err._id)" 
-                              style="width: 32px; height: 32px; border-radius: 8px;">
-                        <i class="bi" [class.bi-chevron-down]="expandedErrorId !== err._id" [class.bi-chevron-up]="expandedErrorId === err._id"></i>
+                      <button
+                        class="btn btn-light btn-sm d-inline-flex align-items-center justify-content-center p-0"
+                        (click)="toggleExpandError(err._id)"
+                        style="width: 32px; height: 32px; border-radius: 8px"
+                      >
+                        <i
+                          class="bi"
+                          [class.bi-chevron-down]="expandedErrorId !== err._id"
+                          [class.bi-chevron-up]="expandedErrorId === err._id"
+                        ></i>
                       </button>
                     </td>
                   </tr>
@@ -183,10 +284,22 @@
                     <td colspan="5" class="bg-light p-4">
                       <div class="d-flex flex-column gap-2 animate__animated animate__fadeIn">
                         <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                          <span class="fw-bold text-secondary font-monospace" style="font-size: 0.78rem;">EXCEPCIÓN TÉCNICA DETALLADA</span>
+                          <span class="fw-bold text-secondary font-monospace" style="font-size: 0.78rem"
+                            >EXCEPCIÓN TÉCNICA DETALLADA</span
+                          >
                           <span class="badge bg-dark font-monospace">STATUS {{ err.status || 500 }}</span>
                         </div>
-                        <pre class="error-stack-container p-3 rounded font-monospace text-white bg-dark m-0" style="font-size: 0.75rem; max-height: 250px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4;">{{ err.stackTrace }}</pre>
+                        <pre
+                          class="error-stack-container p-3 rounded font-monospace text-white bg-dark m-0"
+                          style="
+                            font-size: 0.75rem;
+                            max-height: 250px;
+                            overflow-y: auto;
+                            white-space: pre-wrap;
+                            line-height: 1.4;
+                          "
+                          >{{ err.stackTrace }}</pre
+                        >
                       </div>
                     </td>
                   </tr>
@@ -201,7 +314,8 @@
 
                 <tr *ngIf="loadingErrors">
                   <td colspan="5" class="text-center py-5 text-muted">
-                    <span class="spinner-border spinner-border-sm text-dark me-2"></span> Cargando bitácora de excepciones...
+                    <span class="spinner-border spinner-border-sm text-dark me-2"></span> Cargando bitácora de
+                    excepciones...
                   </td>
                 </tr>
               </tbody>
@@ -209,35 +323,56 @@
           </div>
 
           <!-- Paginador de Errores -->
-          <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3 border-top" *ngIf="errorsPages > 1">
-            <span class="text-muted" style="font-size: 0.85rem;">Página {{ errorsPage }} de {{ errorsPages }} ({{ errorsTotal }} incidentes en total)</span>
+          <div
+            class="card-footer bg-white d-flex justify-content-between align-items-center py-3 border-top"
+            *ngIf="errorsPages > 1"
+          >
+            <span class="text-muted" style="font-size: 0.85rem"
+              >Página {{ errorsPage }} de {{ errorsPages }} ({{ errorsTotal }} incidentes en total)</span
+            >
             <div class="d-flex gap-2">
-              <button class="btn btn-outline-dark btn-sm px-3" [disabled]="errorsPage === 1" (click)="changeErrorsPage(errorsPage - 1)">ANTERIOR</button>
-              <button class="btn btn-outline-dark btn-sm px-3" [disabled]="errorsPage === errorsPages" (click)="changeErrorsPage(errorsPage + 1)">SIGUIENTE</button>
+              <button
+                class="btn btn-outline-dark btn-sm px-3"
+                [disabled]="errorsPage === 1"
+                (click)="changeErrorsPage(errorsPage - 1)"
+              >
+                ANTERIOR
+              </button>
+              <button
+                class="btn btn-outline-dark btn-sm px-3"
+                [disabled]="errorsPage === errorsPages"
+                (click)="changeErrorsPage(errorsPage + 1)"
+              >
+                SIGUIENTE
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- Modal Análisis Forense -->
 <div class="modal fade" id="forensicModal" tabindex="-1" aria-labelledby="forensicModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content border-0 shadow-lg" style="background-color: var(--bg-main);">
+    <div class="modal-content border-0 shadow-lg" style="background-color: var(--bg-main)">
       <div class="modal-header border-bottom border-light px-4 py-3 bg-white">
         <div>
-          <h5 class="modal-title fw-bold font-monospace d-flex align-items-center gap-2 text-dark mb-1" id="forensicModalLabel">
+          <h5
+            class="modal-title fw-bold font-monospace d-flex align-items-center gap-2 text-dark mb-1"
+            id="forensicModalLabel"
+          >
             <i class="bi bi-search text-primary"></i> EXPEDIENTE FORENSE DE TRANSACCIÓN
           </h5>
-          <small class="text-muted font-monospace" *ngIf="selectedForensicSale">Object ID: {{ selectedForensicSale._id }}</small>
+          <small class="text-muted font-monospace" *ngIf="selectedForensicSale"
+            >Object ID: {{ selectedForensicSale._id }}</small
+          >
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      
-      <div class="modal-body p-0" style="background-color: #f8f9fa;">
+
+      <div class="modal-body p-0" style="background-color: #f8f9fa">
         <!-- Spinner -->
         <div class="d-flex justify-content-center align-items-center py-5" *ngIf="loadingForensic">
           <div class="spinner-border text-primary" role="status">
@@ -247,20 +382,24 @@
         </div>
 
         <!-- Contenido Forense -->
-        <div class="container-fluid p-4 animate__animated animate__fadeIn" *ngIf="!loadingForensic && selectedForensicSale">
-          
+        <div
+          class="container-fluid p-4 animate__animated animate__fadeIn"
+          *ngIf="!loadingForensic && selectedForensicSale"
+        >
           <div class="row g-4">
             <!-- Columna Izquierda: Metadatos Contextuales -->
             <div class="col-lg-4">
               <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
-                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-geo-alt me-1"></i> Contexto Operativo</h6>
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem">
+                    <i class="bi bi-geo-alt me-1"></i> Contexto Operativo
+                  </h6>
                 </div>
                 <div class="card-body">
-                  <ul class="list-group list-group-flush font-monospace" style="font-size: 0.85rem;">
+                  <ul class="list-group list-group-flush font-monospace" style="font-size: 0.85rem">
                     <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-1">
                       <span class="text-muted">Timestamp Exacto:</span>
-                      <strong>{{ selectedForensicSale.date | date:'dd/MM/yyyy HH:mm:ss.SSS' }}</strong>
+                      <strong>{{ selectedForensicSale.date | date: 'dd/MM/yyyy HH:mm:ss.SSS' }}</strong>
                     </li>
                     <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-1">
                       <span class="text-muted">Inquilino (Company):</span>
@@ -269,17 +408,23 @@
                     <li class="list-group-item px-0 border-0 py-1 mt-2">
                       <span class="text-muted d-block">Sucursal / Origen:</span>
                       <strong>{{ selectedForensicSale.branch?.name }}</strong>
-                      <div class="text-muted" style="font-size: 0.7rem;">{{ selectedForensicSale.branch?.address }}</div>
+                      <div class="text-muted" style="font-size: 0.7rem">{{ selectedForensicSale.branch?.address }}</div>
                     </li>
                     <li class="list-group-item px-0 border-0 py-1 mt-2">
                       <span class="text-muted d-block">Operador (Issuer):</span>
-                      <strong><i class="bi bi-person-fill text-secondary"></i> {{ selectedForensicSale.user?.name }}</strong>
-                      <div class="text-muted" style="font-size: 0.7rem;">@{{ selectedForensicSale.user?.username }} ({{ selectedForensicSale.user?.role }})</div>
+                      <strong
+                        ><i class="bi bi-person-fill text-secondary"></i> {{ selectedForensicSale.user?.name }}</strong
+                      >
+                      <div class="text-muted" style="font-size: 0.7rem">
+                        @{{ selectedForensicSale.user?.username }} ({{ selectedForensicSale.user?.role }})
+                      </div>
                     </li>
                     <li class="list-group-item px-0 border-0 py-1 mt-2">
                       <span class="text-muted d-block">Punto de Venta (POS):</span>
                       <strong>{{ selectedForensicSale.cashRegister?.registerName }}</strong>
-                      <span class="badge rounded-pill bg-light text-dark border ms-2" style="font-size: 0.65rem;">{{ selectedForensicSale.cashRegister?.isPhysical ? 'Hardware Físico' : 'Instancia Lógica' }}</span>
+                      <span class="badge rounded-pill bg-light text-dark border ms-2" style="font-size: 0.65rem">{{
+                        selectedForensicSale.cashRegister?.isPhysical ? 'Hardware Físico' : 'Instancia Lógica'
+                      }}</span>
                     </li>
                   </ul>
                 </div>
@@ -290,28 +435,40 @@
             <div class="col-lg-4">
               <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
-                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-calculator me-1"></i> Liquidación Financiera</h6>
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem">
+                    <i class="bi bi-calculator me-1"></i> Liquidación Financiera
+                  </h6>
                 </div>
                 <div class="card-body text-center d-flex flex-column justify-content-center py-4">
-                  <h1 class="display-4 fw-bold font-monospace text-dark mb-0">{{ selectedForensicSale.total | currency:'MXN' }}</h1>
+                  <h1 class="display-4 fw-bold font-monospace text-dark mb-0">
+                    {{ selectedForensicSale.total | currency: 'MXN' }}
+                  </h1>
                   <div class="mt-2 mb-4">
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success fs-6 py-1 px-3 rounded-pill">
+                    <span
+                      class="badge bg-success bg-opacity-10 text-success border border-success fs-6 py-1 px-3 rounded-pill"
+                    >
                       <i class="bi bi-check-circle-fill me-1"></i> {{ selectedForensicSale.paymentMethod | uppercase }}
                     </span>
                   </div>
-                  
+
                   <div class="bg-light rounded p-3 text-start font-monospace mt-auto">
-                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.85rem;">
+                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.85rem">
                       <span>Importe Recibido:</span>
-                      <strong class="text-dark">{{ (selectedForensicSale.receivedAmount || selectedForensicSale.total) | currency:'MXN' }}</strong>
+                      <strong class="text-dark">{{
+                        selectedForensicSale.receivedAmount || selectedForensicSale.total | currency: 'MXN'
+                      }}</strong>
                     </div>
-                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem;">
+                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem">
                       <span>Cambio / Vuelto:</span>
-                      <strong class="text-dark">{{ (selectedForensicSale.change || 0) | currency:'MXN' }}</strong>
+                      <strong class="text-dark">{{ selectedForensicSale.change || 0 | currency: 'MXN' }}</strong>
                     </div>
-                    <div class="d-flex justify-content-between text-muted border-top pt-2 mt-2" style="font-size: 0.85rem;" *ngIf="selectedForensicSale.discount > 0">
+                    <div
+                      class="d-flex justify-content-between text-muted border-top pt-2 mt-2"
+                      style="font-size: 0.85rem"
+                      *ngIf="selectedForensicSale.discount > 0"
+                    >
                       <span>Descuentos (Merma):</span>
-                      <strong class="text-danger">- {{ selectedForensicSale.discount | currency:'MXN' }}</strong>
+                      <strong class="text-danger">- {{ selectedForensicSale.discount | currency: 'MXN' }}</strong>
                     </div>
                   </div>
                 </div>
@@ -322,57 +479,89 @@
             <div class="col-lg-4">
               <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
-                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-bezier2 me-1"></i> Trazabilidad Avanzada</h6>
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem">
+                    <i class="bi bi-bezier2 me-1"></i> Trazabilidad Avanzada
+                  </h6>
                 </div>
                 <div class="card-body">
                   <div class="mb-4">
-                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem;">Fragmentación del Pago</h6>
+                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem">
+                      Fragmentación del Pago
+                    </h6>
                     <ng-container *ngIf="selectedForensicSale.payments && selectedForensicSale.payments.length > 0">
-                      <ul class="list-group list-group-flush font-monospace" style="font-size: 0.8rem;">
-                        <li *ngFor="let p of selectedForensicSale.payments" class="list-group-item px-3 py-2 border rounded bg-light mb-2">
+                      <ul class="list-group list-group-flush font-monospace" style="font-size: 0.8rem">
+                        <li
+                          *ngFor="let p of selectedForensicSale.payments"
+                          class="list-group-item px-3 py-2 border rounded bg-light mb-2"
+                        >
                           <div class="d-flex justify-content-between fw-bold text-dark">
-                            <span><i class="bi" [ngClass]="{'bi-cash text-success': p.method==='cash', 'bi-credit-card text-primary': p.method!=='cash'}"></i> {{ p.method | uppercase }}</span>
-                            <span>{{ p.amount | currency:'MXN' }}</span>
+                            <span
+                              ><i
+                                class="bi"
+                                [ngClass]="{
+                                  'bi-cash text-success': p.method === 'cash',
+                                  'bi-credit-card text-primary': p.method !== 'cash',
+                                }"
+                              ></i>
+                              {{ p.method | uppercase }}</span
+                            >
+                            <span>{{ p.amount | currency: 'MXN' }}</span>
                           </div>
                           <div class="text-muted" *ngIf="p.reference">Auth/Ref: {{ p.reference }}</div>
-                          <div class="text-muted" style="font-size: 0.7rem;">{{ p.date | date:'HH:mm:ss.SSS' }}</div>
+                          <div class="text-muted" style="font-size: 0.7rem">{{ p.date | date: 'HH:mm:ss.SSS' }}</div>
                         </li>
                       </ul>
                     </ng-container>
                     <ng-container *ngIf="!selectedForensicSale.payments || selectedForensicSale.payments.length === 0">
                       <div class="p-3 bg-light rounded text-center border">
                         <i class="bi bi-shield-lock d-block text-muted mb-1 fs-4"></i>
-                        <span class="text-muted font-monospace" style="font-size: 0.75rem;">Pago consolidado de origen.<br>Sin fragmentación rastreable.</span>
+                        <span class="text-muted font-monospace" style="font-size: 0.75rem"
+                          >Pago consolidado de origen.<br />Sin fragmentación rastreable.</span
+                        >
                       </div>
                     </ng-container>
                   </div>
 
                   <div *ngIf="selectedForensicSale.customer" class="border-top pt-3">
-                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem;">Entidad Vinculada (Cliente)</h6>
+                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem">
+                      Entidad Vinculada (Cliente)
+                    </h6>
                     <div class="d-flex align-items-center p-3 bg-light rounded border">
-                      <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+                      <div
+                        class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                        style="width: 40px; height: 40px"
+                      >
                         <i class="bi bi-person-fill text-primary fs-5"></i>
                       </div>
-                      <div class="ms-3 font-monospace" style="font-size: 0.8rem;">
+                      <div class="ms-3 font-monospace" style="font-size: 0.8rem">
                         <strong class="text-dark d-block">{{ selectedForensicSale.customer.name }}</strong>
-                        <span class="text-muted">{{ selectedForensicSale.customer.email || 'Sin correo registrado' }}</span>
+                        <span class="text-muted">{{
+                          selectedForensicSale.customer.email || 'Sin correo registrado'
+                        }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div> <!-- End Row -->
+          </div>
+          <!-- End Row -->
 
           <!-- Payload Ticket Detallado -->
           <div class="card mt-4 border-0 shadow-sm bg-white forensic-card">
-            <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
-              <h6 class="fw-bold text-uppercase text-muted mb-0" style="letter-spacing: 1px; font-size: 0.8rem;"><i class="bi bi-receipt me-1"></i> Payload del Ticket (Productos Mapeados)</h6>
-              <span class="badge bg-light text-dark border font-monospace">{{ selectedForensicSale.productsSold?.length || 0 }} Ítems</span>
+            <div
+              class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center"
+            >
+              <h6 class="fw-bold text-uppercase text-muted mb-0" style="letter-spacing: 1px; font-size: 0.8rem">
+                <i class="bi bi-receipt me-1"></i> Payload del Ticket (Productos Mapeados)
+              </h6>
+              <span class="badge bg-light text-dark border font-monospace"
+                >{{ selectedForensicSale.productsSold?.length || 0 }} Ítems</span
+              >
             </div>
             <div class="table-responsive">
               <table class="table table-borderless mb-0 align-middle table-hover">
-                <thead class="bg-light font-monospace text-muted" style="font-size: 0.75rem;">
+                <thead class="bg-light font-monospace text-muted" style="font-size: 0.75rem">
                   <tr>
                     <th class="ps-4">PRODUCT REF</th>
                     <th class="text-center">QTY</th>
@@ -380,22 +569,29 @@
                     <th class="text-end pe-4">NET LINE SUBTOTAL</th>
                   </tr>
                 </thead>
-                <tbody class="font-monospace" style="font-size: 0.85rem;">
+                <tbody class="font-monospace" style="font-size: 0.85rem">
                   <ng-container *ngFor="let item of selectedForensicSale.productsSold">
                     <tr class="border-bottom border-light">
                       <td class="ps-4 py-3">
                         <div class="fw-bold text-dark">{{ item.product?.name || 'Objeto Borrado o Huérfano' }}</div>
-                        <div class="text-muted" style="font-size: 0.75rem;">Ref: {{ item.product?._id || 'N/A' }}</div>
-                        <div *ngIf="item.modifications && item.modifications.length > 0" class="mt-2 ps-2 border-start border-2 border-warning bg-light p-2 rounded">
-                          <div class="text-warning fw-bold mb-1" style="font-size: 0.65rem;">MODIFICADORES APLICADOS:</div>
-                          <div *ngFor="let mod of item.modifications" class="text-muted" style="font-size: 0.75rem;">
-                            <i class="bi bi-plus text-warning"></i> {{ mod.name }} ({{ mod.extraPrice | currency:'MXN' }})
+                        <div class="text-muted" style="font-size: 0.75rem">Ref: {{ item.product?._id || 'N/A' }}</div>
+                        <div
+                          *ngIf="item.modifications && item.modifications.length > 0"
+                          class="mt-2 ps-2 border-start border-2 border-warning bg-light p-2 rounded"
+                        >
+                          <div class="text-warning fw-bold mb-1" style="font-size: 0.65rem">
+                            MODIFICADORES APLICADOS:
+                          </div>
+                          <div *ngFor="let mod of item.modifications" class="text-muted" style="font-size: 0.75rem">
+                            <i class="bi bi-plus text-warning"></i> {{ mod.name }} ({{
+                              mod.extraPrice | currency: 'MXN'
+                            }})
                           </div>
                         </div>
                       </td>
                       <td class="text-center fw-bold">x{{ item.quantity }}</td>
-                      <td class="text-end text-muted">{{ item.unitPrice | currency:'MXN' }}</td>
-                      <td class="text-end fw-bold text-dark pe-4">{{ item.subtotal | currency:'MXN' }}</td>
+                      <td class="text-end text-muted">{{ item.unitPrice | currency: 'MXN' }}</td>
+                      <td class="text-end fw-bold text-dark pe-4">{{ item.subtotal | currency: 'MXN' }}</td>
                     </tr>
                   </ng-container>
                 </tbody>
@@ -407,19 +603,30 @@
           <div class="accordion mt-4 shadow-sm" id="accordionRaw">
             <div class="accordion-item border-0 rounded overflow-hidden">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed bg-dark text-white font-monospace py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRaw" aria-expanded="false" style="font-size: 0.85rem; box-shadow: none;">
+                <button
+                  class="accordion-button collapsed bg-dark text-white font-monospace py-3"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseRaw"
+                  aria-expanded="false"
+                  style="font-size: 0.85rem; box-shadow: none"
+                >
                   <i class="bi bi-braces text-warning me-2"></i> INSPECCIONAR OBJETO JSON NATIVO (DATABASE RAW DUMP)
                 </button>
               </h2>
               <div id="collapseRaw" class="accordion-collapse collapse" data-bs-parent="#accordionRaw">
                 <div class="accordion-body p-0 bg-dark">
-                  <pre class="m-0 p-4 text-success font-monospace" style="font-size: 0.75rem; max-height: 500px; overflow-y: auto;">{{ selectedForensicSale | json }}</pre>
+                  <pre
+                    class="m-0 p-4 text-success font-monospace"
+                    style="font-size: 0.75rem; max-height: 500px; overflow-y: auto"
+                    >{{ selectedForensicSale | json }}</pre
+                  >
                 </div>
               </div>
             </div>
           </div>
-
-        </div> <!-- End Contenido Forense -->
+        </div>
+        <!-- End Contenido Forense -->
       </div>
     </div>
   </div>

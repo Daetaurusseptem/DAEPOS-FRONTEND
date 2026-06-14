@@ -4,7 +4,7 @@
     <div>
       <h1 class="h2 text-white mb-1"><i class="bi bi-broadcast"></i> Supervisión de Cajas en Vivo</h1>
       <p class="text-muted mb-0">
-        Monitoreo en tiempo real de turnos y flujos de efectivo activos. 
+        Monitoreo en tiempo real de turnos y flujos de efectivo activos.
         <span class="last-update ms-2">
           <i class="bi bi-arrow-clockwise"></i> Act. hace unos segundos ({{ lastUpdated | date: 'mediumTime' }})
         </span>
@@ -15,9 +15,11 @@
       <!-- Sucursal Selector for Company Admin -->
       <div class="branch-select-container" *ngIf="isCompanyAdmin && branches.length > 0">
         <label class="text-muted d-block mb-1 small text-uppercase fw-semibold tracking-wider">Sucursal</label>
-        <select class="form-select branch-select bg-dark text-white border-secondary" 
-                [ngModel]="selectedBranchId" 
-                (ngModelChange)="onBranchChange($event)">
+        <select
+          class="form-select branch-select bg-dark text-white border-secondary"
+          [ngModel]="selectedBranchId"
+          (ngModelChange)="onBranchChange($event)"
+        >
           <option *ngFor="let branch of branches" [value]="branch._id">{{ branch.name }}</option>
         </select>
       </div>
@@ -53,7 +55,11 @@
         <div class="stat-icon bg-soft-danger"><i class="bi bi-box-arrow-right"></i></div>
         <div class="stat-content">
           <span class="stat-label">Cajas con Exceso de Efectivo (> $5k)</span>
-          <h2 class="stat-value" [class.text-warning]="getSaturatedRegistersCount() > 0" [class.text-white]="getSaturatedRegistersCount() === 0">
+          <h2
+            class="stat-value"
+            [class.text-warning]="getSaturatedRegistersCount() > 0"
+            [class.text-white]="getSaturatedRegistersCount() === 0"
+          >
             {{ getSaturatedRegistersCount() }}
           </h2>
         </div>
@@ -75,7 +81,7 @@
         <i class="bi bi-inboxes text-muted fs-1"></i>
       </div>
       <h3 class="h4 text-white">No hay turnos activos</h3>
-      <p class="text-muted mx-auto" style="max-width: 400px;">
+      <p class="text-muted mx-auto" style="max-width: 400px">
         Actualmente no hay ninguna caja física abierta ni cajeros operando turnos en esta sucursal.
       </p>
     </div>
@@ -84,13 +90,14 @@
     <div class="row g-4" *ngIf="activeRegisters.length > 0">
       <div class="col-12 col-md-6 col-xxl-4" *ngFor="let reg of activeRegisters">
         <div class="register-card glass-card" [class.saturated]="reg.expectedAmount >= 5000">
-          
           <!-- Card Header (Cajero & Station) -->
           <div class="register-card-header d-flex justify-content-between align-items-start gap-2 mb-3">
             <div class="d-flex align-items-center gap-3">
               <div class="user-avatar">
-                <img *ngIf="reg.user?.img" [src]="reg.user?.img" alt="Avatar">
-                <div *ngIf="!reg.user?.img" class="avatar-fallback">{{ (reg.user?.name || 'U').substring(0,1).toUpperCase() }}</div>
+                <img *ngIf="reg.user?.img" [src]="reg.user?.img" alt="Avatar" />
+                <div *ngIf="!reg.user?.img" class="avatar-fallback">
+                  {{ (reg.user?.name || 'U').substring(0, 1).toUpperCase() }}
+                </div>
               </div>
               <div>
                 <h3 class="h6 text-white mb-0">{{ reg.user?.name }}</h3>
@@ -101,7 +108,10 @@
             </div>
 
             <!-- Saturation Warning Badge -->
-            <span class="badge bg-danger-soft text-danger saturated-badge animate-pulse" *ngIf="reg.expectedAmount >= 5000">
+            <span
+              class="badge bg-danger-soft text-danger saturated-badge animate-pulse"
+              *ngIf="reg.expectedAmount >= 5000"
+            >
               <i class="bi bi-exclamation-triangle-fill"></i> EFECTIVO EXCESIVO
             </span>
           </div>
@@ -110,7 +120,9 @@
           <div class="register-card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <span class="text-muted-custom">Tiempo de Turno:</span>
-              <span class="text-white fw-medium"><i class="bi bi-clock"></i> {{ getShiftDuration(reg.startDate) }}</span>
+              <span class="text-white fw-medium"
+                ><i class="bi bi-clock"></i> {{ getShiftDuration(reg.startDate) }}</span
+              >
             </div>
 
             <div class="expected-cash-box p-3 rounded mb-3 bg-dark-soft border border-secondary-soft">
@@ -132,7 +144,7 @@
               </div>
               <div class="col-4 border-start border-secondary-soft">
                 <span class="text-muted-custom fs-8 d-block">Ventas Tarjeta</span>
-                <strong class="text-info fs-7">{{ (reg.payments.credit + reg.payments.debit) | currency }}</strong>
+                <strong class="text-info fs-7">{{ reg.payments.credit + reg.payments.debit | currency }}</strong>
               </div>
             </div>
           </div>
@@ -143,7 +155,6 @@
               <i class="bi bi-sliders2-vertical"></i> Auditoría Live & Acciones
             </button>
           </div>
-
         </div>
       </div>
     </div>
@@ -152,12 +163,15 @@
   <!-- Lateral Slide Drawer (Premium Auditor Panel) -->
   <div class="drawer-backdrop" *ngIf="showDrawer" (click)="closeDrawer()"></div>
   <div class="drawer glass-card" [class.show]="showDrawer" *ngIf="selectedRegister">
-    
     <!-- Drawer Header -->
-    <div class="drawer-header d-flex justify-content-between align-items-center border-bottom border-secondary-soft p-4">
+    <div
+      class="drawer-header d-flex justify-content-between align-items-center border-bottom border-secondary-soft p-4"
+    >
       <div>
         <h2 class="h5 text-white mb-0">Auditoría de Turno Activo</h2>
-        <span class="text-muted-custom fs-7">{{ selectedRegister.user?.name }} &bull; {{ selectedRegister.physicalRegister?.name }}</span>
+        <span class="text-muted-custom fs-7"
+          >{{ selectedRegister.user?.name }} &bull; {{ selectedRegister.physicalRegister?.name }}</span
+        >
       </div>
       <button class="btn-close-custom" (click)="closeDrawer()"><i class="bi bi-x-lg"></i></button>
     </div>
@@ -170,19 +184,22 @@
       <button class="drawer-tab-btn" [class.active]="drawerTab === 'expense'" (click)="drawerTab = 'expense'">
         <i class="bi bi-plus-slash-minus"></i> Retiro / Gasto
       </button>
-      <button class="drawer-tab-btn text-danger-hover" [class.active]="drawerTab === 'close'" (click)="drawerTab = 'close'">
+      <button
+        class="drawer-tab-btn text-danger-hover"
+        [class.active]="drawerTab === 'close'"
+        (click)="drawerTab = 'close'"
+      >
         <i class="bi bi-slash-circle-fill text-danger"></i> Forzar Cierre
       </button>
     </div>
 
     <!-- Drawer Body -->
     <div class="drawer-body p-4 flex-grow-1 overflow-y-auto">
-      
       <!-- Tab 1: Balance and Events -->
       <div *ngIf="drawerTab === 'summary'">
         <!-- Live Cash Balance Detail -->
         <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3">Balance de Flujo de Efectivo</h3>
-        
+
         <div class="expected-balance-panel p-3 mb-4 rounded bg-dark-soft border border-secondary-soft">
           <div class="d-flex justify-content-between mb-2">
             <span class="text-muted-custom">Fondo de Caja (Apertura)</span>
@@ -196,7 +213,9 @@
             <span>- Egresos / Gastos Registrados</span>
             <span>{{ getExpensesSum(selectedRegister.expenses) | currency }}</span>
           </div>
-          <div class="d-flex justify-content-between pt-2 border-top border-secondary-soft mt-2 fw-semibold fs-5 text-white">
+          <div
+            class="d-flex justify-content-between pt-2 border-top border-secondary-soft mt-2 fw-semibold fs-5 text-white"
+          >
             <span>Efectivo Esperado</span>
             <span class="text-success">{{ selectedRegister.expectedAmount | currency }}</span>
           </div>
@@ -220,7 +239,10 @@
 
         <!-- Event Timeline / Egresos Bitacora -->
         <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3">Bitácora de Egresos de Turno</h3>
-        <div class="timeline" *ngIf="selectedRegister.expenses && selectedRegister.expenses.length > 0; else noExpenses">
+        <div
+          class="timeline"
+          *ngIf="selectedRegister.expenses && selectedRegister.expenses.length > 0; else noExpenses"
+        >
           <div class="timeline-item d-flex gap-3 pb-3 position-relative" *ngFor="let exp of selectedRegister.expenses">
             <div class="timeline-dot bg-danger"></div>
             <div class="timeline-content bg-dark-soft p-3 rounded flex-grow-1 border border-secondary-soft">
@@ -245,19 +267,35 @@
       <!-- Tab 2: Register Expense / Withdrawal -->
       <div *ngIf="drawerTab === 'expense'">
         <div class="alert alert-info bg-primary-soft border-0 text-white fs-7 mb-4">
-          <i class="bi bi-info-circle-fill text-info"></i> Registra retiros parciales (ej. retiros de seguridad) o gastos operativos pagados directamente con efectivo de la caja del cajero.
+          <i class="bi bi-info-circle-fill text-info"></i> Registra retiros parciales (ej. retiros de seguridad) o
+          gastos operativos pagados directamente con efectivo de la caja del cajero.
         </div>
 
         <form (ngSubmit)="submitExpense()" class="d-flex flex-column gap-3">
           <div>
             <label class="form-label text-muted-custom fs-7">Tipo de Movimiento</label>
             <div class="d-flex gap-2">
-              <input type="radio" class="btn-check" name="expenseType" id="typeWithdrawal" value="withdrawal" [(ngModel)]="expenseType" checked>
+              <input
+                type="radio"
+                class="btn-check"
+                name="expenseType"
+                id="typeWithdrawal"
+                value="withdrawal"
+                [(ngModel)]="expenseType"
+                checked
+              />
               <label class="btn btn-outline-secondary w-50 fs-7" for="typeWithdrawal">
                 <i class="bi bi-shield-lock-fill text-danger me-1"></i> Retiro de Seguridad
               </label>
 
-              <input type="radio" class="btn-check" name="expenseType" id="typeExpense" value="expense" [(ngModel)]="expenseType">
+              <input
+                type="radio"
+                class="btn-check"
+                name="expenseType"
+                id="typeExpense"
+                value="expense"
+                [(ngModel)]="expenseType"
+              />
               <label class="btn btn-outline-secondary w-50 fs-7" for="typeExpense">
                 <i class="bi bi-receipt me-1"></i> Gasto Operativo
               </label>
@@ -268,19 +306,38 @@
             <label class="form-label text-muted-custom fs-7" for="expAmount">Monto del Movimiento ($)</label>
             <div class="input-group">
               <span class="input-group-text bg-dark border-secondary text-muted-custom">$</span>
-              <input type="number" id="expAmount" name="expenseAmount" class="form-control bg-dark text-white border-secondary" 
-                     placeholder="0.00" [(ngModel)]="expenseAmount" min="0.01" step="0.01" required>
+              <input
+                type="number"
+                id="expAmount"
+                name="expenseAmount"
+                class="form-control bg-dark text-white border-secondary"
+                placeholder="0.00"
+                [(ngModel)]="expenseAmount"
+                min="0.01"
+                step="0.01"
+                required
+              />
             </div>
           </div>
 
           <div>
             <label class="form-label text-muted-custom fs-7" for="expReason">Justificación / Motivo</label>
-            <textarea id="expReason" name="expenseReason" class="form-control bg-dark text-white border-secondary" 
-                      rows="3" placeholder="Ej. Retiro parcial de $2000 para caja fuerte, o Pago de proveedor de refrescos" 
-                      [(ngModel)]="expenseReason" required></textarea>
+            <textarea
+              id="expReason"
+              name="expenseReason"
+              class="form-control bg-dark text-white border-secondary"
+              rows="3"
+              placeholder="Ej. Retiro parcial de $2000 para caja fuerte, o Pago de proveedor de refrescos"
+              [(ngModel)]="expenseReason"
+              required
+            ></textarea>
           </div>
 
-          <button type="submit" class="btn btn-danger w-100 mt-3 p-2.5 fs-7" [disabled]="loading || expenseAmount <= 0 || !expenseReason.trim()">
+          <button
+            type="submit"
+            class="btn btn-danger w-100 mt-3 p-2.5 fs-7"
+            [disabled]="loading || expenseAmount <= 0 || !expenseReason.trim()"
+          >
             <i class="bi bi-check-circle"></i> Registrar Movimiento
           </button>
         </form>
@@ -289,7 +346,8 @@
       <!-- Tab 3: Close Session (Forced Closing) -->
       <div *ngIf="drawerTab === 'close'">
         <div class="alert alert-danger bg-danger-soft border-0 text-white fs-7 mb-4">
-          <i class="bi bi-exclamation-triangle-fill text-danger"></i> **Cierre Forzado por Administrador:** Esta acción cerrará permanentemente el turno del cajero en el sistema y generará el Corte Z final de sucursal.
+          <i class="bi bi-exclamation-triangle-fill text-danger"></i> **Cierre Forzado por Administrador:** Esta acción
+          cerrará permanentemente el turno del cajero en el sistema y generará el Corte Z final de sucursal.
         </div>
 
         <form (ngSubmit)="submitCloseRegister()" class="d-flex flex-column gap-3">
@@ -302,29 +360,63 @@
             <label class="form-label text-white fs-7 fw-medium" for="closeAmount">Efectivo Físico Contado ($)</label>
             <div class="input-group input-group-lg">
               <span class="input-group-text bg-dark border-secondary text-muted-custom">$</span>
-              <input type="number" id="closeAmount" name="closeActualAmount" class="form-control bg-dark text-white border-secondary text-success fw-bold" 
-                     placeholder="0.00" [(ngModel)]="closeActualAmount" min="0" step="0.01" required>
+              <input
+                type="number"
+                id="closeAmount"
+                name="closeActualAmount"
+                class="form-control bg-dark text-white border-secondary text-success fw-bold"
+                placeholder="0.00"
+                [(ngModel)]="closeActualAmount"
+                min="0"
+                step="0.01"
+                required
+              />
             </div>
-            <span class="text-muted-custom fs-8 d-block mt-1">Introduce el efectivo real que el supervisor/cajero cuenta físicamente en la caja.</span>
+            <span class="text-muted-custom fs-8 d-block mt-1"
+              >Introduce el efectivo real que el supervisor/cajero cuenta físicamente en la caja.</span
+            >
           </div>
 
-          <div class="arqueo-difference mt-2 p-3 rounded" [class.bg-success-soft]="closeActualAmount === selectedRegister.expectedAmount" [class.bg-danger-soft]="closeActualAmount < selectedRegister.expectedAmount" [class.bg-warning-soft]="closeActualAmount > selectedRegister.expectedAmount">
+          <div
+            class="arqueo-difference mt-2 p-3 rounded"
+            [class.bg-success-soft]="closeActualAmount === selectedRegister.expectedAmount"
+            [class.bg-danger-soft]="closeActualAmount < selectedRegister.expectedAmount"
+            [class.bg-warning-soft]="closeActualAmount > selectedRegister.expectedAmount"
+          >
             <div class="d-flex justify-content-between align-items-center">
               <span class="text-muted-custom fs-7">Diferencia de Arqueo:</span>
-              <strong class="fs-5" [class.text-success]="closeActualAmount === selectedRegister.expectedAmount" [class.text-danger]="closeActualAmount < selectedRegister.expectedAmount" [class.text-warning]="closeActualAmount > selectedRegister.expectedAmount">
-                {{ (closeActualAmount - selectedRegister.expectedAmount) | currency }}
+              <strong
+                class="fs-5"
+                [class.text-success]="closeActualAmount === selectedRegister.expectedAmount"
+                [class.text-danger]="closeActualAmount < selectedRegister.expectedAmount"
+                [class.text-warning]="closeActualAmount > selectedRegister.expectedAmount"
+              >
+                {{ closeActualAmount - selectedRegister.expectedAmount | currency }}
               </strong>
             </div>
-            <span class="d-block fs-8 text-muted-custom mt-1" *ngIf="closeActualAmount === selectedRegister.expectedAmount">La caja cuadra perfectamente ($0.00 de descuadre).</span>
-            <span class="d-block fs-8 text-danger mt-1" *ngIf="closeActualAmount < selectedRegister.expectedAmount">¡Faltante de efectivo en caja! El cajero debe responder por la diferencia.</span>
-            <span class="d-block fs-8 text-warning mt-1" *ngIf="closeActualAmount > selectedRegister.expectedAmount">Sobrante de efectivo detectado en la caja.</span>
+            <span
+              class="d-block fs-8 text-muted-custom mt-1"
+              *ngIf="closeActualAmount === selectedRegister.expectedAmount"
+              >La caja cuadra perfectamente ($0.00 de descuadre).</span
+            >
+            <span class="d-block fs-8 text-danger mt-1" *ngIf="closeActualAmount < selectedRegister.expectedAmount"
+              >¡Faltante de efectivo en caja! El cajero debe responder por la diferencia.</span
+            >
+            <span class="d-block fs-8 text-warning mt-1" *ngIf="closeActualAmount > selectedRegister.expectedAmount"
+              >Sobrante de efectivo detectado en la caja.</span
+            >
           </div>
 
           <div>
             <label class="form-label text-muted-custom fs-7" for="closeNotes">Observaciones o Notas de Cierre</label>
-            <textarea id="closeNotes" name="closeNotes" class="form-control bg-dark text-white border-secondary" 
-                      rows="3" placeholder="Añade justificaciones en caso de haber faltantes o sobrantes..." 
-                      [(ngModel)]="closeNotes"></textarea>
+            <textarea
+              id="closeNotes"
+              name="closeNotes"
+              class="form-control bg-dark text-white border-secondary"
+              rows="3"
+              placeholder="Añade justificaciones en caso de haber faltantes o sobrantes..."
+              [(ngModel)]="closeNotes"
+            ></textarea>
           </div>
 
           <button type="submit" class="btn btn-danger w-100 mt-3 p-3 fs-6 fw-semibold">
@@ -332,8 +424,6 @@
           </button>
         </form>
       </div>
-
     </div>
-
   </div>
 </div>

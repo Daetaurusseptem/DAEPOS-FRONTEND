@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-open-cash-register',
   templateUrl: './open-cash-register.component.html',
-  styleUrls: ['./open-cash-register.component.css']
+  styleUrls: ['./open-cash-register.component.css'],
 })
 export class OpenCashRegisterComponent implements OnInit {
   initialAmount: number = 0;
@@ -16,7 +16,7 @@ export class OpenCashRegisterComponent implements OnInit {
   companyId: string;
   userName: string = '';
   branchName: string = '';
-  
+
   physicalRegisters: any[] = [];
   selectedPhysicalRegisterId: string = '';
   loadingRegisters: boolean = true;
@@ -24,7 +24,7 @@ export class OpenCashRegisterComponent implements OnInit {
   constructor(
     private cashRegisterService: CashRegisterService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {
     this.userId = this.authService.usuario.id;
     this.companyId = this.authService.companyId;
@@ -48,7 +48,7 @@ export class OpenCashRegisterComponent implements OnInit {
         console.error('Error loading physical registers', err);
         this.loadingRegisters = false;
         Swal.fire('Error', 'No se pudieron cargar las cajas físicas configuradas.', 'error');
-      }
+      },
     });
   }
 
@@ -68,39 +68,37 @@ export class OpenCashRegisterComponent implements OnInit {
         title: 'Monto no válido',
         text: 'El monto inicial no puede ser negativo.',
         confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#dc3545'
+        confirmButtonColor: '#dc3545',
       });
       return;
     }
 
-    this.cashRegisterService.openCashRegister(
-      this.userId, 
-      this.selectedPhysicalRegisterId, 
-      this.initialAmount
-    ).subscribe({
-      next: (data) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Caja Abierta',
-          text: 'La caja ha sido abierta exitosamente.',
-          confirmButtonText: 'Continuar',
-          confirmButtonColor: '#28a745'
-        }).then(() => {
-          this.router.navigate(['dashboard/user']);
-        });
-      },
-      error: (error) => {
-        console.error('Error opening cash register', error);
-        const errorMsg = error.error?.message || 'Hubo un problema al abrir la caja.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al abrir caja',
-          text: errorMsg,
-          confirmButtonText: 'Aceptar',
-          confirmButtonColor: '#dc3545'
-        });
-      }
-    });
+    this.cashRegisterService
+      .openCashRegister(this.userId, this.selectedPhysicalRegisterId, this.initialAmount)
+      .subscribe({
+        next: (data) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Caja Abierta',
+            text: 'La caja ha sido abierta exitosamente.',
+            confirmButtonText: 'Continuar',
+            confirmButtonColor: '#28a745',
+          }).then(() => {
+            this.router.navigate(['dashboard/user']);
+          });
+        },
+        error: (error) => {
+          console.error('Error opening cash register', error);
+          const errorMsg = error.error?.message || 'Hubo un problema al abrir la caja.';
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al abrir caja',
+            text: errorMsg,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#dc3545',
+          });
+        },
+      });
   }
 
   logout() {
@@ -111,7 +109,7 @@ export class OpenCashRegisterComponent implements OnInit {
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
       confirmButtonText: 'Sí, salir',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.authService.logout();

@@ -1,84 +1,106 @@
 <div class="layout-wrapper">
-    <app-dashboard-sidebar [style.display]="isPosRoute ? 'none' : ''"></app-dashboard-sidebar>
+  <app-dashboard-sidebar [style.display]="isPosRoute ? 'none' : ''"></app-dashboard-sidebar>
 
-    <div class="layout-content" [class.collapsed]="isCollapsed" [style.margin-left]="isPosRoute ? '0' : ''">
-        <!-- Banner de soporte activo (Impersonación) -->
-        <div class="support-banner bg-dark text-white d-flex justify-content-between align-items-center px-4 py-2 border-bottom border-warning" 
-             *ngIf="sysadminService.isImpersonating()"
-             style="animation: slideDown 0.3s ease; border-bottom-width: 3px !important;">
-            <div class="d-flex align-items-center gap-2">
-                <span class="spinner-grow spinner-grow-sm text-warning" role="status" style="width: 10px; height: 10px;"></span>
-                <span class="fw-bold font-monospace tracking-wide" style="font-size: 0.75rem;">
-                    MODO SOPORTE ACTIVO &mdash; ASISTIENDO A: <span class="text-warning text-uppercase fw-bolder">{{ sysadminService.getImpersonatedCompanyName() }}</span>
-                </span>
-            </div>
-            <button class="btn btn-warning btn-sm fw-bold px-3 py-1 font-monospace d-flex align-items-center gap-1.5 shadow-sm" 
-                    style="font-size: 0.68rem; border-radius: 6px; color: #000; letter-spacing: 0.3px;" 
-                    (click)="exitImpersonation()">
-                <i class="bi bi-box-arrow-left"></i> SALIR DE SOPORTE
-            </button>
-        </div>
-
-        <!-- Banner de Periodo de Gracia (Soft Lock) para Company Admin -->
-        <div class="support-banner bg-danger text-white d-flex justify-content-center align-items-center px-4 py-2 border-bottom border-dark" 
-             *ngIf="authService.isGracePeriod && authService.role === 'companyAdmin'"
-             style="animation: slideDown 0.3s ease; border-bottom-width: 3px !important; z-index: 1000;">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-exclamation-triangle-fill text-warning"></i>
-                <span class="fw-bold tracking-wide" style="font-size: 0.85rem;">
-                    AVISO DE FACTURACIÓN: Hubo un problema con el cobro de tu suscripción (Stripe no pudo procesar el pago). Actualiza tu método de pago en "Facturación y Plan" para evitar la suspensión del servicio.
-                </span>
-            </div>
-        </div>
-
-        <!-- Encabezado Superior Stark con Centro de Notificaciones y Fecha Cajas -->
-        <header class="top-header d-flex justify-content-between align-items-center bg-white border-bottom px-4 py-2.5" [style.display]="isPosRoute ? 'none' : ''">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-outline-dark btn-sm rounded-circle d-md-none border-light-subtle shadow-none d-flex align-items-center justify-content-center" 
-                        style="width: 32px; height: 32px;"
-                        (click)="sidebarService.toggle()">
-                    <i class="bi bi-list"></i>
-                </button>
-                <span class="fw-semibold text-dark fs-6 tracking-tight">DaePoint <span class="text-secondary fw-normal">SaaS</span></span>
-            </div>
-            
-            <div class="d-flex align-items-center gap-3">
-                <!-- Fecha Actual sutil -->
-                <span class="text-muted d-none d-md-inline font-monospace" style="font-size: 0.72rem;">
-                    {{ currentDate | date:'dd MMM, yyyy' }}
-                </span>
-
-                <!-- Centro de Notificaciones -->
-                <app-notification-center></app-notification-center>
-                
-                <!-- Separador vertical -->
-                <div class="vr bg-light-subtle d-none d-md-block" style="height: 18px; width: 1px; background-color: #ddd;"></div>
-
-                <!-- Perfil del Usuario Stark -->
-                <div class="d-flex align-items-center gap-2 px-2.5 py-1 border border-light-subtle rounded-pill bg-light-subtle ps-2 pe-3" 
-                     *ngIf="authService.usuario">
-                    <div class="avatar-circle rounded-circle bg-dark text-white fw-bold d-flex align-items-center justify-content-center" 
-                         style="width: 28px; height: 28px; font-size: 0.78rem;">
-                        {{ authService.usuario.name.charAt(0).toUpperCase() }}
-                    </div>
-                    <div class="d-flex flex-column min-w-0" style="line-height: 1.15;">
-                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.72rem; max-width: 120px;">
-                            {{ authService.usuario.name }}
-                        </span>
-                        <span class="text-muted text-uppercase font-monospace" style="font-size: 0.52rem; letter-spacing: 0.5px;">
-                            {{ authService.usuario.role }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="content-area" [style.padding]="isPosRoute ? '0' : ''" [style.max-width]="isPosRoute ? '100%' : ''">
-            <app-spinner></app-spinner>
-            <router-outlet></router-outlet>
-        </main>
-        <app-footer [style.display]="isPosRoute ? 'none' : ''"></app-footer>
+  <div class="layout-content" [class.collapsed]="isCollapsed" [style.margin-left]="isPosRoute ? '0' : ''">
+    <!-- Banner de soporte activo (Impersonación) -->
+    <div
+      class="support-banner bg-dark text-white d-flex justify-content-between align-items-center px-4 py-2 border-bottom border-warning"
+      *ngIf="sysadminService.isImpersonating()"
+      style="animation: slideDown 0.3s ease; border-bottom-width: 3px !important"
+    >
+      <div class="d-flex align-items-center gap-2">
+        <span class="spinner-grow spinner-grow-sm text-warning" role="status" style="width: 10px; height: 10px"></span>
+        <span class="fw-bold font-monospace tracking-wide" style="font-size: 0.75rem">
+          MODO SOPORTE ACTIVO &mdash; ASISTIENDO A:
+          <span class="text-warning text-uppercase fw-bolder">{{ sysadminService.getImpersonatedCompanyName() }}</span>
+        </span>
+      </div>
+      <button
+        class="btn btn-warning btn-sm fw-bold px-3 py-1 font-monospace d-flex align-items-center gap-1.5 shadow-sm"
+        style="font-size: 0.68rem; border-radius: 6px; color: #000; letter-spacing: 0.3px"
+        (click)="exitImpersonation()"
+      >
+        <i class="bi bi-box-arrow-left"></i> SALIR DE SOPORTE
+      </button>
     </div>
+
+    <!-- Banner de Periodo de Gracia (Soft Lock) para Company Admin -->
+    <div
+      class="support-banner bg-danger text-white d-flex justify-content-center align-items-center px-4 py-2 border-bottom border-dark"
+      *ngIf="authService.isGracePeriod && authService.role === 'companyAdmin'"
+      style="animation: slideDown 0.3s ease; border-bottom-width: 3px !important; z-index: 1000"
+    >
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+        <span class="fw-bold tracking-wide" style="font-size: 0.85rem">
+          AVISO DE FACTURACIÓN: Hubo un problema con el cobro de tu suscripción (Stripe no pudo procesar el pago).
+          Actualiza tu método de pago en "Facturación y Plan" para evitar la suspensión del servicio.
+        </span>
+      </div>
+    </div>
+
+    <!-- Encabezado Superior Stark con Centro de Notificaciones y Fecha Cajas -->
+    <header
+      class="top-header d-flex justify-content-between align-items-center bg-white border-bottom px-4 py-2.5"
+      [style.display]="isPosRoute ? 'none' : ''"
+    >
+      <div class="d-flex align-items-center gap-3">
+        <button
+          class="btn btn-outline-dark btn-sm rounded-circle d-md-none border-light-subtle shadow-none d-flex align-items-center justify-content-center"
+          style="width: 32px; height: 32px"
+          (click)="sidebarService.toggle()"
+        >
+          <i class="bi bi-list"></i>
+        </button>
+        <span class="fw-semibold text-dark fs-6 tracking-tight"
+          >DaePoint <span class="text-secondary fw-normal">SaaS</span></span
+        >
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <!-- Fecha Actual sutil -->
+        <span class="text-muted d-none d-md-inline font-monospace" style="font-size: 0.72rem">
+          {{ currentDate | date: 'dd MMM, yyyy' }}
+        </span>
+
+        <!-- Centro de Notificaciones -->
+        <app-notification-center></app-notification-center>
+
+        <!-- Separador vertical -->
+        <div
+          class="vr bg-light-subtle d-none d-md-block"
+          style="height: 18px; width: 1px; background-color: #ddd"
+        ></div>
+
+        <!-- Perfil del Usuario Stark -->
+        <div
+          class="d-flex align-items-center gap-2 px-2.5 py-1 border border-light-subtle rounded-pill bg-light-subtle ps-2 pe-3"
+          *ngIf="authService.usuario"
+        >
+          <div
+            class="avatar-circle rounded-circle bg-dark text-white fw-bold d-flex align-items-center justify-content-center"
+            style="width: 28px; height: 28px; font-size: 0.78rem"
+          >
+            {{ authService.usuario.name.charAt(0).toUpperCase() }}
+          </div>
+          <div class="d-flex flex-column min-w-0" style="line-height: 1.15">
+            <span class="fw-bold text-dark text-truncate" style="font-size: 0.72rem; max-width: 120px">
+              {{ authService.usuario.name }}
+            </span>
+            <span class="text-muted text-uppercase font-monospace" style="font-size: 0.52rem; letter-spacing: 0.5px">
+              {{ authService.usuario.role }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content-area" [style.padding]="isPosRoute ? '0' : ''" [style.max-width]="isPosRoute ? '100%' : ''">
+      <app-spinner></app-spinner>
+      <router-outlet></router-outlet>
+    </main>
+    <app-footer [style.display]="isPosRoute ? 'none' : ''"></app-footer>
+  </div>
 </div>
 
 <modal-img></modal-img>

@@ -10,12 +10,12 @@ import { PagesComponent } from './pages.component';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./children-routes.module').then(m => m.childrenPagesRouting)
+    loadChildren: () => import('./children-routes.module').then((m) => m.childrenPagesRouting),
   },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class PagesRoutingModule { }
+export class PagesRoutingModule {}

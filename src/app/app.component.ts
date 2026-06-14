@@ -5,12 +5,15 @@ import { SpinnerService } from './services/spinner.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   title = 'daepoint-pos';
 
-  constructor(private router: Router, private spinnerService: SpinnerService) {
+  constructor(
+    private router: Router,
+    private spinnerService: SpinnerService,
+  ) {
     this.router.events.subscribe((event: Event) => {
       switch (true) {
         case event instanceof NavigationStart:

@@ -6,14 +6,13 @@ import { AuthService } from './auth.service';
 const urlPromotions = `${environment.apiUrl}/promotions`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PromotionService {
-
   constructor(
     private http: HttpClient,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   createPromotion(promotion: any, companyId: string) {
     return this.http.post<any>(`${urlPromotions}/company/${companyId}`, promotion, this.authService.headers);

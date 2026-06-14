@@ -6,14 +6,13 @@ import { AuthService } from './auth.service';
 const urlCustomers = `${environment.apiUrl}/customers`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CustomerService {
-
   constructor(
     private http: HttpClient,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   createCustomer(customer: any, companyId: string) {
     return this.http.post<any>(`${urlCustomers}/company/${companyId}`, customer, this.authService.headers);
@@ -22,15 +21,12 @@ export class CustomerService {
   getCustomers(companyId: string, search: string = '', page: number = 1, limit: number = 10) {
     return this.http.get<any>(
       `${urlCustomers}/company/${companyId}?search=${search}&page=${page}&limit=${limit}`,
-      this.authService.headers
+      this.authService.headers,
     );
   }
 
   searchCustomers(companyId: string, term: string) {
-    return this.http.get<any>(
-      `${urlCustomers}/company/${companyId}/search?term=${term}`,
-      this.authService.headers
-    );
+    return this.http.get<any>(`${urlCustomers}/company/${companyId}/search?term=${term}`, this.authService.headers);
   }
 
   getCustomerDetails(id: string) {

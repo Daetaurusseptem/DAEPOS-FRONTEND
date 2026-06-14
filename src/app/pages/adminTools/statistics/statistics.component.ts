@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx';
 @Component({
   selector: 'app-statistics',
   templateUrl: './statistics.component.html',
-  styleUrls: ['./statistics.component.css']
+  styleUrls: ['./statistics.component.css'],
 })
 export class StatisticsComponent implements OnInit {
   topSellingProducts: any[] = [];
@@ -25,7 +25,7 @@ export class StatisticsComponent implements OnInit {
     { value: 'valuation', label: 'Valoración / Variedad' },
     { value: 'profit', label: 'Ganancia Estimada' },
     { value: 'aov', label: 'Ticket Promedio (AOV)' },
-    { value: 'alerts', label: 'Alertas de Stock' }
+    { value: 'alerts', label: 'Alertas de Stock' },
   ];
 
   // Premium Monospace Grid Chart configuration
@@ -37,8 +37,8 @@ export class StatisticsComponent implements OnInit {
         display: true,
         labels: {
           color: '#a0aec0',
-          font: { family: 'monospace', size: 11, weight: 'bold' }
-        }
+          font: { family: 'monospace', size: 11, weight: 'bold' },
+        },
       },
       tooltip: {
         backgroundColor: 'rgba(17, 24, 39, 0.95)',
@@ -49,26 +49,26 @@ export class StatisticsComponent implements OnInit {
         borderColor: 'rgba(255, 255, 255, 0.08)',
         borderWidth: 1,
         padding: 10,
-        cornerRadius: 6
-      }
+        cornerRadius: 6,
+      },
     },
     scales: {
       x: {
         grid: { color: 'rgba(255, 255, 255, 0.03)' },
         ticks: {
           color: '#718096',
-          font: { family: 'monospace', size: 9 }
-        }
+          font: { family: 'monospace', size: 9 },
+        },
       },
       y: {
         beginAtZero: true,
         grid: { color: 'rgba(255, 255, 255, 0.03)' },
         ticks: {
           color: '#718096',
-          font: { family: 'monospace', size: 9 }
-        }
-      }
-    }
+          font: { family: 'monospace', size: 9 },
+        },
+      },
+    },
   };
   barChartLabels: string[] = [];
   barChartType: ChartType = 'bar';
@@ -76,21 +76,21 @@ export class StatisticsComponent implements OnInit {
   barChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
-      { 
-        data: [], 
-        label: 'Cantidad Vendida', 
+      {
+        data: [],
+        label: 'Cantidad Vendida',
         backgroundColor: 'rgba(99, 102, 241, 0.65)',
         borderColor: '#6366f1',
         borderWidth: 1,
-        borderRadius: 4
-      }
-    ]
+        borderRadius: 4,
+      },
+    ],
   };
 
   constructor(
     private statisticsService: StatisticsService,
     private fb: FormBuilder,
-    public authService: AuthService
+    public authService: AuthService,
   ) {
     this.companyId = this.authService.companyId!;
     Chart.register(...registerables);
@@ -107,7 +107,7 @@ export class StatisticsComponent implements OnInit {
     if (savedSlots) {
       this.kpiSlots = JSON.parse(savedSlots);
     }
-    
+
     const savedChartType = localStorage.getItem('chart_type_pref');
     if (savedChartType) {
       this.barChartType = savedChartType as ChartType;
@@ -122,41 +122,41 @@ export class StatisticsComponent implements OnInit {
   changeChartType(newType: ChartType): void {
     this.barChartType = newType;
     this.savePreferences();
-    
+
     // Configure options dynamically for Pie/Doughnut charts vs Cartesian (Bar/Line) charts
     if (newType === 'pie' || newType === 'doughnut') {
       this.barChartOptions = {
         ...this.barChartOptions,
         scales: {
           x: { display: false },
-          y: { display: false }
-        }
+          y: { display: false },
+        },
       };
     } else {
       this.barChartOptions = {
         ...this.barChartOptions,
         scales: {
-          x: { 
+          x: {
             display: true,
             grid: { color: 'rgba(255, 255, 255, 0.03)' },
             ticks: {
               color: '#718096',
-              font: { family: 'monospace', size: 9 }
-            }
+              font: { family: 'monospace', size: 9 },
+            },
           },
-          y: { 
+          y: {
             display: true,
             beginAtZero: true,
             grid: { color: 'rgba(255, 255, 255, 0.03)' },
             ticks: {
               color: '#718096',
-              font: { family: 'monospace', size: 9 }
-            }
-          }
-        }
+              font: { family: 'monospace', size: 9 },
+            },
+          },
+        },
       };
     }
-    
+
     this.loadData();
   }
 
@@ -170,7 +170,7 @@ export class StatisticsComponent implements OnInit {
           icon: this.isProductView ? 'bi-cart-check' : 'bi-box-seam',
           isCurrency: false,
           isString: false,
-          suffix: ''
+          suffix: '',
         };
       case 'star':
         return {
@@ -180,7 +180,7 @@ export class StatisticsComponent implements OnInit {
           icon: this.isProductView ? 'bi-award' : 'bi-lightning',
           isCurrency: false,
           isString: true,
-          suffix: ''
+          suffix: '',
         };
       case 'valuation':
         return {
@@ -190,27 +190,27 @@ export class StatisticsComponent implements OnInit {
           icon: this.isProductView ? 'bi-grid-3x3-gap' : 'bi-cash-coin',
           isCurrency: !this.isProductView,
           isString: this.isProductView,
-          suffix: this.isProductView ? ' Prod.' : ''
+          suffix: this.isProductView ? ' Prod.' : '',
         };
       case 'profit':
         return {
           label: 'Ganancia Bruta Est.',
-          value: this.isProductView ? (this.getTotalQuantity() * 15.50) : (this.getValuation() * 0.42),
+          value: this.isProductView ? this.getTotalQuantity() * 15.5 : this.getValuation() * 0.42,
           context: 'Margen de retorno (42%)',
           icon: 'bi-graph-up-arrow',
           isCurrency: true,
           isString: false,
-          suffix: ''
+          suffix: '',
         };
       case 'aov':
         return {
           label: 'Ticket Promedio (AOV)',
-          value: this.isProductView ? 142.50 : 38.20,
+          value: this.isProductView ? 142.5 : 38.2,
           context: 'Monto de orden promedio',
           icon: 'bi-receipt',
           isCurrency: true,
           isString: false,
-          suffix: ''
+          suffix: '',
         };
       case 'alerts':
         return {
@@ -220,7 +220,7 @@ export class StatisticsComponent implements OnInit {
           icon: 'bi-exclamation-triangle',
           isCurrency: false,
           isString: false,
-          suffix: ''
+          suffix: '',
         };
       default:
         return {
@@ -230,23 +230,23 @@ export class StatisticsComponent implements OnInit {
           icon: 'bi-dash-circle',
           isCurrency: false,
           isString: false,
-          suffix: ''
+          suffix: '',
         };
     }
   }
 
   getLowStockCountProducts(): number {
-    return this.topSellingProducts.filter(item => item.totalQuantity < 10).length;
+    return this.topSellingProducts.filter((item) => item.totalQuantity < 10).length;
   }
 
   getLowStockCountIngredients(): number {
-    return this.ingredientsStatistics.filter(item => item.totalStock < 3000).length;
+    return this.ingredientsStatistics.filter((item) => item.totalStock < 3000).length;
   }
 
   private initForm(): void {
     this.searchForm = this.fb.group({
       year: [this.year],
-      week: [this.week]
+      week: [this.week],
     });
   }
 
@@ -262,7 +262,7 @@ export class StatisticsComponent implements OnInit {
         this.topSellingProducts = data.sales || [];
         this.updateChartData();
       },
-      error: (error) => console.error('Error loading top selling products:', error)
+      error: (error) => console.error('Error loading top selling products:', error),
     });
   }
 
@@ -274,21 +274,29 @@ export class StatisticsComponent implements OnInit {
         this.ingredientsStatistics = data.ingredients || [];
         this.updateChartData();
       },
-      error: (error) => console.error('Error loading ingredients statistics:', error)
+      error: (error) => console.error('Error loading ingredients statistics:', error),
     });
   }
 
   private updateChartData(): void {
     const data = this.isProductView ? this.topSellingProducts : this.ingredientsStatistics;
-    this.barChartLabels = data.map(item => this.isProductView ? (item.product?.name || 'Desconocido') : (item.name || item._id));
+    this.barChartLabels = data.map((item) =>
+      this.isProductView ? item.product?.name || 'Desconocido' : item.name || item._id,
+    );
     this.barChartData.labels = this.barChartLabels;
-    this.barChartData.datasets[0].data = data.map(item => this.isProductView ? item.totalQuantity : item.totalStock);
+    this.barChartData.datasets[0].data = data.map((item) =>
+      this.isProductView ? item.totalQuantity : item.totalStock,
+    );
     this.barChartData.datasets[0].label = this.isProductView ? 'Cantidad Vendida' : 'Stock Total (Insumos)';
-    
+
     // Dynamic premium colors for neon chart appearance
-    this.barChartData.datasets[0].backgroundColor = this.isProductView ? 'rgba(99, 102, 241, 0.5)' : 'rgba(16, 185, 129, 0.5)';
+    this.barChartData.datasets[0].backgroundColor = this.isProductView
+      ? 'rgba(99, 102, 241, 0.5)'
+      : 'rgba(16, 185, 129, 0.5)';
     this.barChartData.datasets[0].borderColor = this.isProductView ? '#6366f1' : '#10b981';
-    this.barChartData.datasets[0].hoverBackgroundColor = this.isProductView ? 'rgba(99, 102, 241, 0.85)' : 'rgba(16, 185, 129, 0.85)';
+    this.barChartData.datasets[0].hoverBackgroundColor = this.isProductView
+      ? 'rgba(99, 102, 241, 0.85)'
+      : 'rgba(16, 185, 129, 0.85)';
     this.barChartData.datasets[0].hoverBorderColor = this.isProductView ? '#818cf8' : '#34d399';
   }
 
@@ -304,12 +312,12 @@ export class StatisticsComponent implements OnInit {
   getTopItemName(): string {
     const data = this.isProductView ? this.topSellingProducts : this.ingredientsStatistics;
     if (!data || data.length === 0) return 'N/A';
-    
+
     if (this.isProductView) {
-      const top = data.reduce((max, item) => (item.totalQuantity > max.totalQuantity) ? item : max, data[0]);
+      const top = data.reduce((max, item) => (item.totalQuantity > max.totalQuantity ? item : max), data[0]);
       return top.product?.name || 'Desconocido';
     } else {
-      const top = data.reduce((max, item) => (item.totalStock > max.totalStock) ? item : max, data[0]);
+      const top = data.reduce((max, item) => (item.totalStock > max.totalStock ? item : max), data[0]);
       return top.name || top._id || 'Desconocido';
     }
   }
@@ -317,12 +325,12 @@ export class StatisticsComponent implements OnInit {
   getTopItemQuantity(): number {
     const data = this.isProductView ? this.topSellingProducts : this.ingredientsStatistics;
     if (!data || data.length === 0) return 0;
-    
+
     if (this.isProductView) {
-      const top = data.reduce((max, item) => (item.totalQuantity > max.totalQuantity) ? item : max, data[0]);
+      const top = data.reduce((max, item) => (item.totalQuantity > max.totalQuantity ? item : max), data[0]);
       return top.totalQuantity || 0;
     } else {
-      const top = data.reduce((max, item) => (item.totalStock > max.totalStock) ? item : max, data[0]);
+      const top = data.reduce((max, item) => (item.totalStock > max.totalStock ? item : max), data[0]);
       return top.totalStock || 0;
     }
   }
@@ -378,27 +386,32 @@ export class StatisticsComponent implements OnInit {
   downloadExcel() {
     const data = this.isProductView ? this.topSellingProducts : this.ingredientsStatistics;
     const sheetName = this.isProductView ? 'Top Productos' : 'Estadísticas de Ingredientes';
-    
+
     // Datos principales
-    const mainHeader = this.isProductView ? 
-      ['#', 'Producto', 'Cantidad Vendida/Semana'] : 
-      ['#', 'Ingrediente', 'Stock Actual', 'Valor Total'];
-    const mainData = data.map((item, index) => this.isProductView ?
-      [index + 1, item.product?.name || 'Desconocido', item.totalQuantity] :
-      [index + 1, item._id, item.totalStock, item.totalValue]
+    const mainHeader = this.isProductView
+      ? ['#', 'Producto', 'Cantidad Vendida/Semana']
+      : ['#', 'Ingrediente', 'Stock Actual', 'Valor Total'];
+    const mainData = data.map((item, index) =>
+      this.isProductView
+        ? [index + 1, item.product?.name || 'Desconocido', item.totalQuantity]
+        : [index + 1, item._id, item.totalStock, item.totalValue],
     );
     mainData.unshift(mainHeader);
 
     const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([
-      [this.isProductView ? `Productos más vendidos - Semana ${this.week}, ${this.year}` : 'Estadísticas de Ingredientes'],
+      [
+        this.isProductView
+          ? `Productos más vendidos - Semana ${this.week}, ${this.year}`
+          : 'Estadísticas de Ingredientes',
+      ],
       [],
       ['Tabla de Datos:'],
-      ...mainData
+      ...mainData,
     ]);
 
-    ws['!cols'] = this.isProductView ? 
-      [{ wch: 10 }, { wch: 40 }, { wch: 20 }] : 
-      [{ wch: 10 }, { wch: 40 }, { wch: 20 }, { wch: 20 }];
+    ws['!cols'] = this.isProductView
+      ? [{ wch: 10 }, { wch: 40 }, { wch: 20 }]
+      : [{ wch: 10 }, { wch: 40 }, { wch: 20 }, { wch: 20 }];
 
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, sheetName);

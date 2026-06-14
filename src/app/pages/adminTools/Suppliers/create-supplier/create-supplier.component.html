@@ -1,36 +1,54 @@
 <div class="container mt-4">
-    <div class="card shadow">
-      <div class="card-header bg-primary text-white">
-        <h2 class="mb-0">Crear Proveedor</h2>
-      </div>
-      <div class="card-body">
-        <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()">
-          <div class="mb-3">
-            <label for="name" class="form-label">Nombre:</label>
-            <input type="text" class="form-control" formControlName="name" id="name" placeholder="Nombre del proveedor">
-          </div>
-          <div class="mb-3">
-            <label for="description" class="form-label">Descripción:</label>
-            <textarea class="form-control" formControlName="description" id="description" rows="3"></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email:</label>
-            <input type="email" class="form-control" formControlName="email" id="email" placeholder="Email del proveedor">
-          </div>
-          <div class="mb-3">
-            <label for="phone" class="form-label">Teléfono:</label>
-            <input type="tel" class="form-control" formControlName="phone" id="phone" placeholder="Teléfono del proveedor">
-          </div>
-          <div class="mb-3">
-            <label for="address" class="form-label">Dirección:</label>
-            <input type="text" class="form-control" formControlName="address" id="address" placeholder="Dirección del proveedor">
-          </div>
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Crear Proveedor</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre:</label>
+          <input type="text" class="form-control" formControlName="name" id="name" placeholder="Nombre del proveedor" />
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Descripción:</label>
+          <textarea class="form-control" formControlName="description" id="description" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email:</label>
+          <input
+            type="email"
+            class="form-control"
+            formControlName="email"
+            id="email"
+            placeholder="Email del proveedor"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Teléfono:</label>
+          <input
+            type="tel"
+            class="form-control"
+            formControlName="phone"
+            id="phone"
+            placeholder="Teléfono del proveedor"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Dirección:</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="address"
+            id="address"
+            placeholder="Dirección del proveedor"
+          />
+        </div>
 
-          <div class="d-flex justify-content-between">
-            <app-back-button></app-back-button>
-            <button type="submit" class="btn btn-primary" [disabled]="!supplierForm.valid">Crear Proveedor</button>
-          </div>
-        </form>
-      </div>
+        <div class="d-flex justify-content-between">
+          <app-back-button></app-back-button>
+          <button type="submit" class="btn btn-primary" [disabled]="!supplierForm.valid">Crear Proveedor</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>

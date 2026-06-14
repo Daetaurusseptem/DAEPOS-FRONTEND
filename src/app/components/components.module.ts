@@ -42,7 +42,7 @@ import { NotificationCenterComponent } from './notification-center/notification-
 
     CajaDetailComponent,
     BulkImportComponent,
-    NotificationCenterComponent
+    NotificationCenterComponent,
   ],
   exports: [
     NavbarComponent,
@@ -59,17 +59,8 @@ import { NotificationCenterComponent } from './notification-center/notification-
     AlphanumericKeyboardComponent,
     BulkImportComponent,
 
-    NotificationCenterComponent
+    NotificationCenterComponent,
   ],
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatToolbarModule,
-    MatIconModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterLink
-  ]
+  imports: [CommonModule, MatCardModule, MatToolbarModule, MatIconModule, FormsModule, ReactiveFormsModule, RouterLink],
 })
-export class ComponentsModule { }
-
+export class ComponentsModule {}

@@ -10,16 +10,15 @@ import { ImgService } from 'src/app/services/img.service';
 @Component({
   selector: 'app-manage-billing',
   templateUrl: './manage-billing.component.html',
-  styleUrls: ['./manage-billing.component.css']
+  styleUrls: ['./manage-billing.component.css'],
 })
 export class ManageBillingComponent implements OnInit {
-
   company!: Company;
   loading: boolean = false;
   planes: any[] = [];
   loadingPlanes: boolean = true;
   useStripe: boolean = environment.useStripe;
-  
+
   // Para Modo Manual
   globalSettings: any = null;
   myPayments: any[] = [];
@@ -32,8 +31,8 @@ export class ManageBillingComponent implements OnInit {
     public authService: AuthService,
     private billingService: BillingService,
     private manualPaymentService: ManualPaymentService,
-    private imgService: ImgService
-  ) { }
+    private imgService: ImgService,
+  ) {}
 
   ngOnInit(): void {
     this.company = this.authService.getCompany;
@@ -68,7 +67,7 @@ export class ManageBillingComponent implements OnInit {
       next: (resp) => {
         if (resp.ok) {
           // Filtrar por si hay algún producto sin default_price asignado
-          let productos = resp.productos.filter((p: any) => p.default_price);
+          const productos = resp.productos.filter((p: any) => p.default_price);
           // Ordenar por precio ascendente
           this.planes = productos.sort((a: any, b: any) => {
             const priceA = a.default_price?.unit_amount || 0;
@@ -81,7 +80,7 @@ export class ManageBillingComponent implements OnInit {
       error: (err: any) => {
         console.error(err);
         this.loadingPlanes = false;
-      }
+      },
     });
   }
 
@@ -95,15 +94,15 @@ export class ManageBillingComponent implements OnInit {
       },
       error: (err: any) => {
         this.loadingPlanes = false;
-      }
+      },
     });
   }
 
   cargarAjustesYPagos() {
-    this.manualPaymentService.getGlobalSettings().subscribe(resp => {
+    this.manualPaymentService.getGlobalSettings().subscribe((resp) => {
       if (resp.ok) this.globalSettings = resp.settings;
     });
-    this.manualPaymentService.getMyPayments().subscribe(resp => {
+    this.manualPaymentService.getMyPayments().subscribe((resp) => {
       if (resp.ok) this.myPayments = resp.payments;
     });
   }
@@ -120,7 +119,7 @@ export class ManageBillingComponent implements OnInit {
         this.loading = false;
         Swal.fire('Error', 'No se pudo iniciar el pago con Stripe', 'error');
         console.error(err);
-      }
+      },
     });
   }
 
@@ -134,8 +133,12 @@ export class ManageBillingComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        Swal.fire('Error', 'No se pudo abrir el portal de cliente. Verifica que tengas una suscripción activa.', 'error');
-      }
+        Swal.fire(
+          'Error',
+          'No se pudo abrir el portal de cliente. Verifica que tengas una suscripción activa.',
+          'error',
+        );
+      },
     });
   }
 
@@ -182,14 +185,14 @@ export class ManageBillingComponent implements OnInit {
             error: (err: any) => {
               Swal.fire('Error', 'Se creó el reporte pero no se pudo subir la imagen', 'error');
               this.loading = false;
-            }
+            },
           });
         }
       },
       error: (err: any) => {
         this.loading = false;
         Swal.fire('Error', 'No se pudo reportar el pago', 'error');
-      }
+      },
     });
   }
 }

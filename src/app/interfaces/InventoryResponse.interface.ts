@@ -1,4 +1,14 @@
-import { Category, InventoryItem, Product, Sale, Supplier, User, Company, CashRegister, Recipe, } from './models.interface';
+import {
+  Category,
+  InventoryItem,
+  Product,
+  Sale,
+  Supplier,
+  User,
+  Company,
+  CashRegister,
+  Recipe,
+} from './models.interface';
 import { StripeResponse } from './stripeProduct.interface';
 
 export interface InventoryResponse {
@@ -12,12 +22,12 @@ export interface InventoryResponse {
   users?: User[];
   sale?: Sale;
   sales?: Sale[];
-  product?: Product;  
-  products?: Product[];  
-  categories?: Category[];  
-  category?: Category;  
-  suppliers?: Supplier[];  
-  supplier?: Supplier;  
+  product?: Product;
+  products?: Product[];
+  categories?: Category[];
+  category?: Category;
+  suppliers?: Supplier[];
+  supplier?: Supplier;
   totalPages?: number;
   page?: number;
   limit?: number;

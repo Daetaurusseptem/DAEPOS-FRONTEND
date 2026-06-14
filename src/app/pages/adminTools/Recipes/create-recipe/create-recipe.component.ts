@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-create-recipe',
   templateUrl: './create-recipe.component.html',
-  styleUrls: ['./create-recipe.component.css']
+  styleUrls: ['./create-recipe.component.css'],
 })
 export class CreateRecipeComponent implements OnInit {
   createRecipeForm!: FormGroup;
@@ -24,14 +24,14 @@ export class CreateRecipeComponent implements OnInit {
     private rawMaterialsService: RawMaterialsService,
     private inventoryService: InventoryService,
     private authService: AuthService,
-    private router: Router
-  ) { }
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.createRecipeForm = this.fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
-      sizes: this.fb.array([])
+      sizes: this.fb.array([]),
     });
 
     // Add a default size
@@ -44,28 +44,31 @@ export class CreateRecipeComponent implements OnInit {
     const companyId = this.authService.companyId || this.authService.company?._id;
     if (!companyId) return;
 
-    this.rawMaterialsService.getCompanyRawMaterials(companyId)
-      .pipe(map(resp => resp.rawMaterials || []))
+    this.rawMaterialsService
+      .getCompanyRawMaterials(companyId)
+      .pipe(map((resp) => resp.rawMaterials || []))
       .subscribe({
         next: (items) => {
           this.rawMaterials = items;
-          
+
           // Map cost prices from branch inventory
           this.inventoryService.getInventory(companyId, '', 'raw_material').subscribe({
             next: (invResp: any) => {
               const invItems = invResp.items || [];
-              this.rawMaterials.forEach(rm => {
-                const matched = invItems.find((inv: any) => inv.rawMaterial === rm._id || inv.rawMaterial?._id === rm._id);
+              this.rawMaterials.forEach((rm) => {
+                const matched = invItems.find(
+                  (inv: any) => inv.rawMaterial === rm._id || inv.rawMaterial?._id === rm._id,
+                );
                 if (matched) {
                   rm.costPrice = matched.costPrice;
                 }
               });
-            }
+            },
           });
         },
         error: (err) => {
           console.error('Error fetching raw materials', err);
-        }
+        },
       });
   }
 
@@ -75,23 +78,27 @@ export class CreateRecipeComponent implements OnInit {
 
   addSize(name: string = '', priceModifier: number = 0): void {
     const ingredientsArray = new FormArray<any>([]);
-    
+
     // Si ya existe al menos un tamaño, clonar sus ingredientes para arrancar desde ahí
     if (this.sizesArray && this.sizesArray.length > 0) {
       const firstSizeIngredients = this.getIngredientsArray(0);
-      firstSizeIngredients.controls.forEach(ctrl => {
-        ingredientsArray.push(this.fb.group({
-          rawMaterial: [ctrl.get('rawMaterial')?.value || '', Validators.required],
-          quantity: [ctrl.get('quantity')?.value || null, [Validators.required, Validators.min(0.0001)]]
-        }));
+      firstSizeIngredients.controls.forEach((ctrl) => {
+        ingredientsArray.push(
+          this.fb.group({
+            rawMaterial: [ctrl.get('rawMaterial')?.value || '', Validators.required],
+            quantity: [ctrl.get('quantity')?.value || null, [Validators.required, Validators.min(0.0001)]],
+          }),
+        );
       });
     }
 
-    this.sizesArray.push(this.fb.group({
-      name: [name, Validators.required],
-      priceModifier: [priceModifier, [Validators.required, Validators.min(0)]],
-      ingredients: ingredientsArray
-    }));
+    this.sizesArray.push(
+      this.fb.group({
+        name: [name, Validators.required],
+        priceModifier: [priceModifier, [Validators.required, Validators.min(0)]],
+        ingredients: ingredientsArray,
+      }),
+    );
     this.collapsedSizes.push(false);
   }
 
@@ -113,10 +120,12 @@ export class CreateRecipeComponent implements OnInit {
   }
 
   addIngredient(sizeIndex: number): void {
-    this.getIngredientsArray(sizeIndex).push(this.fb.group({
-      rawMaterial: ['', Validators.required],
-      quantity: [null, [Validators.required, Validators.min(0.0001)]]
-    }));
+    this.getIngredientsArray(sizeIndex).push(
+      this.fb.group({
+        rawMaterial: ['', Validators.required],
+        quantity: [null, [Validators.required, Validators.min(0.0001)]],
+      }),
+    );
   }
 
   removeIngredient(sizeIndex: number, ingredientIndex: number): void {
@@ -133,11 +142,11 @@ export class CreateRecipeComponent implements OnInit {
 
   getRecipeTotalCost(sizeIndex: number): number {
     let total = 0;
-    this.getIngredientsArray(sizeIndex).controls.forEach(ctrl => {
+    this.getIngredientsArray(sizeIndex).controls.forEach((ctrl) => {
       const selectedId = ctrl.get('rawMaterial')?.value;
       const quantity = ctrl.get('quantity')?.value || 0;
       if (selectedId) {
-        const material = this.rawMaterials.find(m => m._id === selectedId);
+        const material = this.rawMaterials.find((m) => m._id === selectedId);
         if (material) {
           total += quantity * (material.costPrice || 0);
         }
@@ -148,8 +157,8 @@ export class CreateRecipeComponent implements OnInit {
 
   getIngredientUnit(rawMaterialId: string): string {
     if (!rawMaterialId) return 'u';
-    const material = this.rawMaterials.find(m => m._id === rawMaterialId);
-    return material ? (material.measurementUnit || 'u') : 'u';
+    const material = this.rawMaterials.find((m) => m._id === rawMaterialId);
+    return material ? material.measurementUnit || 'u' : 'u';
   }
 
   onSubmit(): void {
@@ -164,7 +173,7 @@ export class CreateRecipeComponent implements OnInit {
     }
 
     let hasEmptyIngredients = false;
-    this.sizesArray.controls.forEach(sizeCtrl => {
+    this.sizesArray.controls.forEach((sizeCtrl) => {
       const ingredients = sizeCtrl.get('ingredients') as FormArray;
       if (ingredients.length === 0) {
         hasEmptyIngredients = true;
@@ -185,27 +194,27 @@ export class CreateRecipeComponent implements OnInit {
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí',
-      cancelButtonText: 'No'
+      cancelButtonText: 'No',
     }).then((result) => {
       if (result.isConfirmed) {
         const formVal = this.createRecipeForm.value;
-        
+
         const formattedSizes = formVal.sizes.map((size: any, idx: number) => ({
           name: size.name,
           priceModifier: idx === 0 ? 0 : size.priceModifier,
           ingredients: size.ingredients.map((rm: any) => ({
             ingredient: rm.rawMaterial,
-            quantity: rm.quantity
-          }))
+            quantity: rm.quantity,
+          })),
         }));
 
         const newRecipe = {
           name: formVal.name,
           description: formVal.description,
           sizes: formattedSizes,
-          company: companyId
+          company: companyId,
         };
-        
+
         this.recipeService.createRecipe(newRecipe, companyId).subscribe({
           next: (resp) => {
             Swal.fire('Receta creada', 'La receta ha sido creada correctamente.', 'success');
@@ -214,7 +223,7 @@ export class CreateRecipeComponent implements OnInit {
           error: (error) => {
             console.error('Error al crear la receta', error);
             Swal.fire('Error', 'Hubo un error al crear la receta.', 'error');
-          }
+          },
         });
       }
     });

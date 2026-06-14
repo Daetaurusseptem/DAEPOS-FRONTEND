@@ -5,12 +5,12 @@ import { CashRegisterService } from 'src/app/services/cash-register.service';
 @Component({
   selector: 'app-user-cajas',
   templateUrl: './user-cajas.component.html',
-  styleUrls: ['./user-cajas.component.css']
+  styleUrls: ['./user-cajas.component.css'],
 })
 export class UserCajasComponent implements OnInit {
   userId!: string;
   cashRegisters: any[] = [];
-  
+
   // Pagination and Filtering
   currentPage = 1;
   limit = 10;
@@ -23,7 +23,7 @@ export class UserCajasComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cashRegisterService: CashRegisterService
+    private cashRegisterService: CashRegisterService,
   ) {}
 
   ngOnInit(): void {
@@ -34,7 +34,7 @@ export class UserCajasComponent implements OnInit {
   loadHistory(page: number = 1): void {
     this.currentPage = page;
     this.loading = true;
-    
+
     const filters: any = { page: this.currentPage, limit: this.limit };
     if (this.filterDate) {
       filters.date = this.filterDate;
@@ -50,7 +50,7 @@ export class UserCajasComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -68,5 +68,4 @@ export class UserCajasComponent implements OnInit {
       this.loadHistory(page);
     }
   }
-
 }

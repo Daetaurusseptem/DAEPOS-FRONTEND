@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   background-color: var(--bg-ghost);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* Contenedor del Login */
@@ -175,7 +175,7 @@ label {
 
 .demo-btn {
   padding: 8px 4px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 600;
   background: var(--text-main, #111);
   color: #fff;
@@ -196,7 +196,7 @@ label {
 .btn-ghost-muted {
   padding: 8px 4px;
   font-size: 11px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 600;
   background: transparent;
   color: var(--text-muted, #666);

@@ -7,14 +7,13 @@ import { Observable } from 'rxjs';
 const urlBase = `${environment.apiUrl}/notifications`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationService {
-
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-  ) { }
+  ) {}
 
   getMyNotifications(): Observable<any> {
     return this.http.get<any>(`${urlBase}`, this.authService.headers);

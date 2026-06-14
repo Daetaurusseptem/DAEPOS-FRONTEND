@@ -24,21 +24,18 @@
             <td>{{ product.quantity }}</td>
             <td>
               <ul *ngIf="product.modifications && product.modifications.length > 0">
-                <li *ngFor="let mod of product.modifications">
-                  {{ mod.name }} ({{ mod.extraPrice | currency }})
-                </li>
+                <li *ngFor="let mod of product.modifications">{{ mod.name }} ({{ mod.extraPrice | currency }})</li>
               </ul>
             </td>
             <td>
               {{
-                (product.unitPrice + getModificationsTotalPrice(product.modifications)) * product.quantity
-                | currency
+                (product.unitPrice + getModificationsTotalPrice(product.modifications)) * product.quantity | currency
               }}
             </td>
           </tr>
         </tbody>
       </table>
-      
+
       <!-- SECCIÓN DINÁMICA DE CLIENTE FRECUENTE Y CRM -->
       <div class="card p-3 my-3 bg-light loyalty-container" *ngIf="branchSettings.enabled">
         <h6 class="d-flex justify-content-between align-items-center mb-3">
@@ -57,67 +54,104 @@
           </label>
           <div class="input-group">
             <span class="input-group-text"><i class="fa fa-search"></i></span>
-            <input type="text" 
-                   class="form-control form-control-sm search-input" 
-                   [placeholder]="branchSettings.identifierType === 'phone' ? 'Ej. 5512345678' : 'Escriba o escanee tarjeta...'" 
-                   [value]="searchCustomerTerm"
-                   (input)="searchCustomer($any($event.target).value)">
+            <input
+              type="text"
+              class="form-control form-control-sm search-input"
+              [placeholder]="
+                branchSettings.identifierType === 'phone' ? 'Ej. 5512345678' : 'Escriba o escanee tarjeta...'
+              "
+              [value]="searchCustomerTerm"
+              (input)="searchCustomer($any($event.target).value)"
+            />
           </div>
 
           <!-- Resultados de búsqueda rápidos -->
-          <div class="search-results shadow border rounded bg-white mt-1 w-100 position-absolute z-3" *ngIf="searchResultsCustomers.length > 0">
+          <div
+            class="search-results shadow border rounded bg-white mt-1 w-100 position-absolute z-3"
+            *ngIf="searchResultsCustomers.length > 0"
+          >
             <div class="list-group list-group-flush">
-              <button type="button" 
-                      class="list-group-item list-group-item-action py-2 d-flex justify-content-between align-items-center text-start"
-                      *ngFor="let customer of searchResultsCustomers"
-                      (click)="selectCustomer(customer)">
+              <button
+                type="button"
+                class="list-group-item list-group-item-action py-2 d-flex justify-content-between align-items-center text-start"
+                *ngFor="let customer of searchResultsCustomers"
+                (click)="selectCustomer(customer)"
+              >
                 <div>
                   <strong class="text-dark d-block">{{ customer.name }}</strong>
                   <div class="text-muted small">
                     <span *ngIf="customer.phone"><i class="fa fa-phone me-1"></i>{{ customer.phone }}</span>
-                    <span *ngIf="customer.cardNumber" class="ms-2"><i class="fa fa-credit-card me-1"></i>{{ customer.cardNumber }}</span>
+                    <span *ngIf="customer.cardNumber" class="ms-2"
+                      ><i class="fa fa-credit-card me-1"></i>{{ customer.cardNumber }}</span
+                    >
                   </div>
                 </div>
-                <span class="badge" [ngClass]="{
-                  'bg-warning text-dark': customer.tier === 'gold',
-                  'bg-secondary text-white': customer.tier === 'silver',
-                  'bg-dark text-white': customer.tier === 'bronze'
-                }">{{ customer.tier | uppercase }} ({{ customer.loyaltyPoints }} pts)</span>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-warning text-dark': customer.tier === 'gold',
+                    'bg-secondary text-white': customer.tier === 'silver',
+                    'bg-dark text-white': customer.tier === 'bronze',
+                  }"
+                  >{{ customer.tier | uppercase }} ({{ customer.loyaltyPoints }} pts)</span
+                >
               </button>
             </div>
           </div>
         </div>
 
         <!-- Si hay cliente seleccionado -->
-        <div *ngIf="selectedCustomer" class="selected-customer-pill p-2 rounded border border-success bg-white d-flex justify-content-between align-items-center">
+        <div
+          *ngIf="selectedCustomer"
+          class="selected-customer-pill p-2 rounded border border-success bg-white d-flex justify-content-between align-items-center"
+        >
           <div>
             <div class="d-flex align-items-center gap-2">
               <strong class="text-success">{{ selectedCustomer.name }}</strong>
-              <span class="badge rounded-pill" [ngClass]="{
-                'bg-warning text-dark': selectedCustomer.tier === 'gold',
-                'bg-secondary text-white': selectedCustomer.tier === 'silver',
-                'bg-dark text-white': selectedCustomer.tier === 'bronze'
-              }">{{ selectedCustomer.tier | uppercase }}</span>
+              <span
+                class="badge rounded-pill"
+                [ngClass]="{
+                  'bg-warning text-dark': selectedCustomer.tier === 'gold',
+                  'bg-secondary text-white': selectedCustomer.tier === 'silver',
+                  'bg-dark text-white': selectedCustomer.tier === 'bronze',
+                }"
+                >{{ selectedCustomer.tier | uppercase }}</span
+              >
             </div>
             <div class="text-muted small d-flex gap-3 mt-1">
-              <span><i class="fa fa-star me-1 text-primary"></i><strong>{{ selectedCustomer.loyaltyPoints }} Puntos</strong></span>
-              <span>Saldo: <strong>{{ selectedCustomer.loyaltyPoints * (branchSettings.pointsRedeemRate || 0.1) | currency }}</strong></span>
+              <span
+                ><i class="fa fa-star me-1 text-primary"></i
+                ><strong>{{ selectedCustomer.loyaltyPoints }} Puntos</strong></span
+              >
+              <span
+                >Saldo:
+                <strong>{{
+                  selectedCustomer.loyaltyPoints * (branchSettings.pointsRedeemRate || 0.1) | currency
+                }}</strong></span
+              >
             </div>
           </div>
-          <button type="button" class="btn btn-outline-danger btn-sm rounded-circle py-1 px-2 border-0" (click)="removeSelectedCustomer()">
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm rounded-circle py-1 px-2 border-0"
+            (click)="removeSelectedCustomer()"
+          >
             <i class="fa fa-times"></i>
           </button>
         </div>
 
         <!-- Checkbox para canjear puntos (solo si el cliente tiene puntos) -->
         <div class="form-check form-switch mt-2" *ngIf="selectedCustomer && selectedCustomer.loyaltyPoints > 0">
-          <input class="form-check-input check-success" 
-                 type="checkbox" 
-                 id="redeemPoints" 
-                 [checked]="redeemPointsChecked"
-                 (change)="toggleRedeemPoints($event)">
+          <input
+            class="form-check-input check-success"
+            type="checkbox"
+            id="redeemPoints"
+            [checked]="redeemPointsChecked"
+            (change)="toggleRedeemPoints($event)"
+          />
           <label class="form-check-label text-dark fw-medium small" for="redeemPoints">
-            Canjear puntos disponibles (Ahorra {{ selectedCustomer.loyaltyPoints * (branchSettings.pointsRedeemRate || 0.1) | currency }} M.N.)
+            Canjear puntos disponibles (Ahorra
+            {{ selectedCustomer.loyaltyPoints * (branchSettings.pointsRedeemRate || 0.1) | currency }} M.N.)
           </label>
         </div>
       </div>
@@ -125,32 +159,45 @@
       <!-- SECCIÓN DINÁMICA DE CUPONES / PROMOCIONES -->
       <div class="card p-3 my-3 bg-light promo-container">
         <h6 class="mb-3 text-dark"><i class="fa fa-tag me-1 text-primary"></i> Cupones y Promociones</h6>
-        
+
         <!-- Si no hay cupón aplicado -->
         <div *ngIf="!appliedPromotion" class="d-flex gap-2">
-          <input type="text" 
-                 class="form-control form-control-sm coupon-input text-uppercase fw-bold" 
-                 placeholder="Ej. HOT10" 
-                 [value]="couponCode"
-                 (input)="couponCode = $any($event.target).value"
-                 (keyup.enter)="applyCoupon()">
+          <input
+            type="text"
+            class="form-control form-control-sm coupon-input text-uppercase fw-bold"
+            placeholder="Ej. HOT10"
+            [value]="couponCode"
+            (input)="couponCode = $any($event.target).value"
+            (keyup.enter)="applyCoupon()"
+          />
           <button type="button" class="btn btn-primary btn-sm px-3 rounded-pill" (click)="applyCoupon()">
             Aplicar
           </button>
         </div>
 
         <!-- Si hay cupón aplicado -->
-        <div *ngIf="appliedPromotion" class="applied-coupon p-2 rounded border border-primary bg-white d-flex justify-content-between align-items-center">
+        <div
+          *ngIf="appliedPromotion"
+          class="applied-coupon p-2 rounded border border-primary bg-white d-flex justify-content-between align-items-center"
+        >
           <div>
             <div class="d-flex align-items-center gap-2">
               <strong class="text-primary"><i class="fa fa-check-circle me-1"></i>{{ appliedPromotion.code }}</strong>
               <span class="badge bg-primary text-white">
-                {{ appliedPromotion.type === 'percentage' ? '-' + appliedPromotion.value + '%' : '-' + (appliedPromotion.value | currency) }}
+                {{
+                  appliedPromotion.type === 'percentage'
+                    ? '-' + appliedPromotion.value + '%'
+                    : '-' + (appliedPromotion.value | currency)
+                }}
               </span>
             </div>
             <p class="text-muted mb-0 small mt-1">{{ appliedPromotion.description }}</p>
           </div>
-          <button type="button" class="btn btn-outline-danger btn-sm rounded-circle py-1 px-2 border-0" (click)="removeCoupon()">
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm rounded-circle py-1 px-2 border-0"
+            (click)="removeCoupon()"
+          >
             <i class="fa fa-times"></i>
           </button>
         </div>
@@ -170,10 +217,12 @@
           <span>Descuento Puntos:</span>
           <span>-{{ pointsDiscount | currency }}</span>
         </div>
-        <hr class="my-2">
+        <hr class="my-2" />
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="mb-0 fw-bold">Total a Cobrar:</h5>
-          <h4 class="mb-0 text-primary fw-bold"><strong>{{ totalAmount | currency }}</strong></h4>
+          <h4 class="mb-0 text-primary fw-bold">
+            <strong>{{ totalAmount | currency }}</strong>
+          </h4>
         </div>
       </div>
 
@@ -181,50 +230,101 @@
       <div class="quick-register-backdrop z-3" *ngIf="showQuickRegister">
         <div class="quick-register-card card shadow-lg p-4">
           <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-            <h5 class="mb-0 text-dark fw-bold"><i class="fa fa-user-plus me-2 text-primary"></i>Registro Rápido de Cliente</h5>
+            <h5 class="mb-0 text-dark fw-bold">
+              <i class="fa fa-user-plus me-2 text-primary"></i>Registro Rápido de Cliente
+            </h5>
             <button type="button" class="btn-close border-0 bg-transparent text-muted" (click)="closeQuickRegister()">
               <i class="fa fa-times fa-lg"></i>
             </button>
           </div>
-          
+
           <form [formGroup]="registerForm" (ngSubmit)="submitQuickRegister()">
             <div class="mb-3">
               <label for="regName" class="form-label small fw-semibold mb-1 text-muted">Nombre Completo *</label>
-              <input type="text" id="regName" class="form-control form-control-sm" formControlName="name" placeholder="Ej. Juan Pérez">
-              <div *ngIf="registerForm.get('name')!.invalid && registerForm.get('name')!.touched" class="text-danger small mt-1">
+              <input
+                type="text"
+                id="regName"
+                class="form-control form-control-sm"
+                formControlName="name"
+                placeholder="Ej. Juan Pérez"
+              />
+              <div
+                *ngIf="registerForm.get('name')!.invalid && registerForm.get('name')!.touched"
+                class="text-danger small mt-1"
+              >
                 <small>El nombre es obligatorio.</small>
               </div>
             </div>
 
-            <div class="mb-3" *ngIf="branchSettings.identifierType === 'phone' || branchSettings.identifierType === 'both'">
+            <div
+              class="mb-3"
+              *ngIf="branchSettings.identifierType === 'phone' || branchSettings.identifierType === 'both'"
+            >
               <label for="regPhone" class="form-label small fw-semibold mb-1 text-muted">Teléfono celular *</label>
-              <input type="text" id="regPhone" class="form-control form-control-sm" formControlName="phone" placeholder="Ej. 10 dígitos">
-              <div *ngIf="registerForm.get('phone')!.invalid && registerForm.get('phone')!.touched" class="text-danger small mt-1">
+              <input
+                type="text"
+                id="regPhone"
+                class="form-control form-control-sm"
+                formControlName="phone"
+                placeholder="Ej. 10 dígitos"
+              />
+              <div
+                *ngIf="registerForm.get('phone')!.invalid && registerForm.get('phone')!.touched"
+                class="text-danger small mt-1"
+              >
                 <small>El celular a 10 dígitos es obligatorio.</small>
               </div>
             </div>
 
-            <div class="mb-3" *ngIf="branchSettings.identifierType === 'physical_card' || branchSettings.identifierType === 'both'">
-              <label for="regCard" class="form-label small fw-semibold mb-1 text-muted">Número de Tarjeta de Puntos *</label>
-              <input type="text" id="regCard" class="form-control form-control-sm" formControlName="cardNumber" placeholder="Escanee o digite...">
-              <div *ngIf="registerForm.get('cardNumber')!.invalid && registerForm.get('cardNumber')!.touched" class="text-danger small mt-1">
+            <div
+              class="mb-3"
+              *ngIf="branchSettings.identifierType === 'physical_card' || branchSettings.identifierType === 'both'"
+            >
+              <label for="regCard" class="form-label small fw-semibold mb-1 text-muted"
+                >Número de Tarjeta de Puntos *</label
+              >
+              <input
+                type="text"
+                id="regCard"
+                class="form-control form-control-sm"
+                formControlName="cardNumber"
+                placeholder="Escanee o digite..."
+              />
+              <div
+                *ngIf="registerForm.get('cardNumber')!.invalid && registerForm.get('cardNumber')!.touched"
+                class="text-danger small mt-1"
+              >
                 <small>El número de tarjeta es obligatorio para esta sucursal.</small>
               </div>
             </div>
 
             <div class="mb-3">
               <label for="regRfc" class="form-label small fw-semibold mb-1 text-muted">RFC (Facturación)</label>
-              <input type="text" id="regRfc" class="form-control form-control-sm text-uppercase" formControlName="rfc" placeholder="Ej. XAXX010101000">
+              <input
+                type="text"
+                id="regRfc"
+                class="form-control form-control-sm text-uppercase"
+                formControlName="rfc"
+                placeholder="Ej. XAXX010101000"
+              />
             </div>
 
             <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
-              <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-pill" (click)="closeQuickRegister()">Cancelar</button>
-              <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill" [disabled]="registerForm.invalid">Registrar</button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm px-4 rounded-pill"
+                (click)="closeQuickRegister()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill" [disabled]="registerForm.invalid">
+                Registrar
+              </button>
             </div>
           </form>
         </div>
       </div>
-      
+
       <form [formGroup]="confirmSaleForm" (ngSubmit)="confirmSale()">
         <div class="mb-4">
           <label for="paymentMethod" class="form-label fs-8 text-muted fw-bold mb-1">Método de Pago</label>
@@ -233,44 +333,78 @@
             <option value="credit">Tarjeta de Crédito/Débito</option>
           </select>
         </div>
-        
+
         <div class="mb-4" *ngIf="paymentMethod!.value === 'cash'">
           <label for="receivedAmount" class="form-label fs-8 text-muted fw-bold mb-1">Cantidad Recibida ($)</label>
           <div class="input-group">
             <span class="input-group-text">$</span>
-            <input type="number" id="receivedAmount" class="form-control premium-input font-monospace" formControlName="receivedAmount" 
-                   (click)="onInputClick('receivedAmount', true)" [readOnly]="branchSettings.enableVirtualKeyboard" placeholder="0.00">
+            <input
+              type="number"
+              id="receivedAmount"
+              class="form-control premium-input font-monospace"
+              formControlName="receivedAmount"
+              (click)="onInputClick('receivedAmount', true)"
+              [readOnly]="branchSettings.enableVirtualKeyboard"
+              placeholder="0.00"
+            />
           </div>
-          <div *ngIf="receivedAmount!.invalid && (receivedAmount!.dirty || receivedAmount!.touched)" class="text-danger small mt-1">
+          <div
+            *ngIf="receivedAmount!.invalid && (receivedAmount!.dirty || receivedAmount!.touched)"
+            class="text-danger small mt-1"
+          >
             <small *ngIf="receivedAmount!.errors?.['required']">Este campo es requerido.</small>
             <small *ngIf="receivedAmount!.errors?.['min']">La cantidad debe ser mayor a 0.</small>
             <small *ngIf="receivedAmount!.errors?.['pattern']">Formato inválido.</small>
             <small *ngIf="receivedAmount!.errors?.['insufficientAmount']">La cantidad es insuficiente.</small>
           </div>
         </div>
-        
+
         <div class="mb-4" *ngIf="paymentMethod!.value === 'credit'">
           <label for="paymentReference" class="form-label fs-8 text-muted fw-bold mb-1">Referencia de Pago</label>
-          <input type="text" id="paymentReference" class="form-control premium-input" formControlName="paymentReference"
-                 placeholder="Ej. TRANS-8472" (click)="onInputClick('paymentReference', false)" [readOnly]="branchSettings.enableVirtualKeyboard">
-          <div *ngIf="paymentReference!.invalid && (paymentReference!.dirty || paymentReference!.touched)" class="text-danger small mt-1">
+          <input
+            type="text"
+            id="paymentReference"
+            class="form-control premium-input"
+            formControlName="paymentReference"
+            placeholder="Ej. TRANS-8472"
+            (click)="onInputClick('paymentReference', false)"
+            [readOnly]="branchSettings.enableVirtualKeyboard"
+          />
+          <div
+            *ngIf="paymentReference!.invalid && (paymentReference!.dirty || paymentReference!.touched)"
+            class="text-danger small mt-1"
+          >
             <small *ngIf="paymentReference!.errors?.['required']">Este campo es requerido.</small>
           </div>
         </div>
-        
+
         <div class="mb-4" *ngIf="paymentMethod!.value === 'cash'">
           <label for="change" class="form-label fs-8 text-muted fw-bold mb-1">Cambio ($)</label>
           <div class="input-group">
             <span class="input-group-text">$</span>
-            <input type="text" id="change" class="form-control premium-input font-monospace text-success fw-bold" formControlName="change" readonly>
+            <input
+              type="text"
+              id="change"
+              class="form-control premium-input font-monospace text-success fw-bold"
+              formControlName="change"
+              readonly
+            />
           </div>
         </div>
-        
+
         <div class="d-flex justify-content-between gap-3 mt-4">
-          <button [disabled]="!confirmSaleForm.valid" type="submit" class="btn btn-dark btn-lg flex-grow-1 py-3 fs-7 fw-bold smooth-transition">
+          <button
+            [disabled]="!confirmSaleForm.valid"
+            type="submit"
+            class="btn btn-dark btn-lg flex-grow-1 py-3 fs-7 fw-bold smooth-transition"
+          >
             <i class="bi bi-check-circle-fill me-1"></i> Confirmar Venta
           </button>
-          <button type="button" class="btn btn-outline-dark btn-lg py-3 px-4 fs-7 smooth-transition" (click)="generarComanda()">
+          <button
+            type="button"
+            class="btn btn-outline-dark btn-lg py-3 px-4 fs-7 smooth-transition"
+            (click)="generarComanda()"
+          >
             <i class="bi bi-printer me-1"></i> Comanda
           </button>
         </div>
@@ -281,11 +415,12 @@
 
 <dialog #keyboardDialog class="keyboard-dialog" (click)="onBackdropClick($event)">
   <div class="keyboard-dialog-content card p-3">
-    <app-alphanumeric-keyboard 
-      [value]="currentInputValue" 
+    <app-alphanumeric-keyboard
+      [value]="currentInputValue"
       [numericOnly]="isNumeric"
       (valueChange)="onKeyboardInput($event)"
-      (confirm)="closeKeyboard()">
+      (confirm)="closeKeyboard()"
+    >
     </app-alphanumeric-keyboard>
   </div>
 </dialog>

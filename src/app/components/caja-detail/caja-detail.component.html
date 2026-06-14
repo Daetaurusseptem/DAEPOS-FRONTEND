@@ -9,16 +9,21 @@
   </div>
 
   <div *ngIf="caja" class="glass-card main-detail-card overflow-hidden">
-    
     <!-- Detail Card Header -->
-    <div class="detail-header p-4 border-bottom border-secondary-soft d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div
+      class="detail-header p-4 border-bottom border-secondary-soft d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3"
+    >
       <div class="d-flex align-items-center gap-3">
         <div class="user-avatar-lg">
-          <img *ngIf="caja.user?.img" [src]="caja.user?.img" alt="Avatar">
-          <div *ngIf="!caja.user?.img" class="avatar-fallback-lg">{{ (caja.user?.name || 'U').substring(0,1).toUpperCase() }}</div>
+          <img *ngIf="caja.user?.img" [src]="caja.user?.img" alt="Avatar" />
+          <div *ngIf="!caja.user?.img" class="avatar-fallback-lg">
+            {{ (caja.user?.name || 'U').substring(0, 1).toUpperCase() }}
+          </div>
         </div>
         <div>
-          <span class="text-muted-custom fs-8-5 d-block text-uppercase fw-semibold tracking-wider">Detalles de Turno / Arqueo</span>
+          <span class="text-muted-custom fs-8-5 d-block text-uppercase fw-semibold tracking-wider"
+            >Detalles de Turno / Arqueo</span
+          >
           <h1 class="h3 text-white mb-0">{{ caja.user?.name }}</h1>
           <span class="badge bg-secondary-soft text-muted-custom mt-1">
             <i class="bi bi-laptop"></i> {{ caja.physicalRegister?.name || 'Estación de Cobro' }}
@@ -28,18 +33,27 @@
 
       <!-- Live / Closed State Badge -->
       <div class="d-flex align-items-center gap-2">
-        <span *ngIf="!caja.closed" class="badge bg-primary-soft text-indigo border border-primary-soft p-2 fs-7 animate-pulse">
+        <span
+          *ngIf="!caja.closed"
+          class="badge bg-primary-soft text-indigo border border-primary-soft p-2 fs-7 animate-pulse"
+        >
           <span class="live-bullet me-1"></span> CERRANDO EN POS (EN CURSO)
         </span>
-        
+
         <div class="d-flex flex-column align-items-end" *ngIf="caja.closed">
           <span class="badge bg-secondary-soft text-muted-custom p-2 fs-7" *ngIf="caja.difference === 0">
             <i class="bi bi-check-circle-fill text-success me-1"></i> ARQUEO CUADRADO
           </span>
-          <span class="badge bg-danger-soft text-danger p-2 fs-7" *ngIf="caja.difference !== undefined && caja.difference < 0">
+          <span
+            class="badge bg-danger-soft text-danger p-2 fs-7"
+            *ngIf="caja.difference !== undefined && caja.difference < 0"
+          >
             <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> FALTANTE: {{ caja.difference | currency }}
           </span>
-          <span class="badge bg-warning-soft text-warning p-2 fs-7" *ngIf="caja.difference !== undefined && caja.difference > 0">
+          <span
+            class="badge bg-warning-soft text-warning p-2 fs-7"
+            *ngIf="caja.difference !== undefined && caja.difference > 0"
+          >
             <i class="bi bi-plus-circle-fill text-warning me-1"></i> SOBRANTE: +{{ caja.difference | currency }}
           </span>
           <span class="text-muted-custom fs-8-5 mt-1">Cerrado el {{ caja.endDate | date: 'short' }}</span>
@@ -62,15 +76,13 @@
 
     <!-- Details Card Body -->
     <div class="p-4">
-      
       <!-- Tab 1: Balance, Arqueo & Payments distribution -->
       <div *ngIf="activeTab === 'balance'">
         <div class="row g-4 mb-4">
-          
           <!-- Arqueo Comparison Dashboard -->
           <div class="col-12 col-lg-7">
             <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3">Balance del Turno</h3>
-            
+
             <div class="row g-3">
               <div class="col-6 col-md-4">
                 <div class="p-3 bg-dark-soft rounded border border-secondary-soft">
@@ -81,7 +93,9 @@
               <div class="col-6 col-md-4">
                 <div class="p-3 bg-dark-soft rounded border border-secondary-soft">
                   <span class="text-muted-custom fs-8-5 d-block">Egresos / Gastos</span>
-                  <strong class="text-danger fs-5 font-monospace">- {{ getExpensesSum(caja.expenses) | currency }}</strong>
+                  <strong class="text-danger fs-5 font-monospace"
+                    >- {{ getExpensesSum(caja.expenses) | currency }}</strong
+                  >
                 </div>
               </div>
               <div class="col-12 col-md-4">
@@ -95,15 +109,27 @@
             <!-- Corte Z Custody breakdown (Fondo remanente vs Depósito retirado) -->
             <div class="row g-3 mt-1" *ngIf="caja.closed">
               <div class="col-6">
-                <div class="p-3 bg-dark-soft rounded border border-secondary-soft" style="border-left: 3px solid #ffc107 !important;">
-                  <span class="text-muted-custom fs-8-5 d-block"><i class="bi bi-wallet2 text-warning me-1"></i> Fondo en Gaveta (Cambio)</span>
+                <div
+                  class="p-3 bg-dark-soft rounded border border-secondary-soft"
+                  style="border-left: 3px solid #ffc107 !important"
+                >
+                  <span class="text-muted-custom fs-8-5 d-block"
+                    ><i class="bi bi-wallet2 text-warning me-1"></i> Fondo en Gaveta (Cambio)</span
+                  >
                   <strong class="text-warning fs-5 font-monospace">{{ caja.remanenteFloatAmount | currency }}</strong>
                 </div>
               </div>
               <div class="col-6">
-                <div class="p-3 bg-dark-soft rounded border border-secondary-soft" style="border-left: 3px solid #0d6efd !important;">
-                  <span class="text-muted-custom fs-8-5 d-block"><i class="bi bi-safe2 text-primary me-1"></i> Retirado para Bóveda</span>
-                  <strong class="text-primary fs-5 font-monospace">{{ caja.depositWithdrawalAmount | currency }}</strong>
+                <div
+                  class="p-3 bg-dark-soft rounded border border-secondary-soft"
+                  style="border-left: 3px solid #0d6efd !important"
+                >
+                  <span class="text-muted-custom fs-8-5 d-block"
+                    ><i class="bi bi-safe2 text-primary me-1"></i> Retirado para Bóveda</span
+                  >
+                  <strong class="text-primary fs-5 font-monospace">{{
+                    caja.depositWithdrawalAmount | currency
+                  }}</strong>
                 </div>
               </div>
             </div>
@@ -117,9 +143,16 @@
                 </div>
               </div>
               <div class="col-12 col-md-6">
-                <div class="p-4 rounded counted-card border border-secondary-soft text-center" [class.perfect]="caja.difference === 0" [class.deficit]="caja.difference !== undefined && caja.difference < 0" [class.surplus]="caja.difference !== undefined && caja.difference > 0">
+                <div
+                  class="p-4 rounded counted-card border border-secondary-soft text-center"
+                  [class.perfect]="caja.difference === 0"
+                  [class.deficit]="caja.difference !== undefined && caja.difference < 0"
+                  [class.surplus]="caja.difference !== undefined && caja.difference > 0"
+                >
                   <span class="text-muted-custom fs-8-5 d-block mb-1">Efectivo Declarado (Entregado)</span>
-                  <h2 class="text-white font-monospace mb-0 fw-bold" *ngIf="caja.closed">{{ caja.actualAmount | currency }}</h2>
+                  <h2 class="text-white font-monospace mb-0 fw-bold" *ngIf="caja.closed">
+                    {{ caja.actualAmount | currency }}
+                  </h2>
                   <h2 class="text-muted-custom font-monospace mb-0 fw-bold" *ngIf="!caja.closed">Activo</h2>
                 </div>
               </div>
@@ -132,9 +165,14 @@
             </div>
 
             <!-- Cortes X Audit Log (Huella de auditoría en vivo) -->
-            <div class="p-3 rounded bg-dark-soft border border-secondary-soft mt-3" *ngIf="caja.cortesX && caja.cortesX.length > 0">
+            <div
+              class="p-3 rounded bg-dark-soft border border-secondary-soft mt-3"
+              *ngIf="caja.cortesX && caja.cortesX.length > 0"
+            >
               <h4 class="h6 text-white text-uppercase tracking-wider fs-8 mb-2">
-                <i class="bi bi-clock-history text-indigo me-1"></i> Auditoría: Cortes X Generados ({{ caja.cortesX.length }})
+                <i class="bi bi-clock-history text-indigo me-1"></i> Auditoría: Cortes X Generados ({{
+                  caja.cortesX.length
+                }})
               </h4>
               <div class="table-responsive">
                 <table class="table table-sm table-dark mb-0 fs-8 border border-secondary-soft">
@@ -147,20 +185,20 @@
                   <tbody>
                     <tr *ngFor="let cx of caja.cortesX">
                       <td class="text-muted-custom">{{ cx.timestamp | date: 'medium' }}</td>
-                      <td class="text-end font-monospace text-success fw-semibold">{{ cx.expectedAmount | currency }}</td>
+                      <td class="text-end font-monospace text-success fw-semibold">
+                        {{ cx.expectedAmount | currency }}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
-
           </div>
 
           <!-- Payment Methods Distributions -->
           <div class="col-12 col-lg-5">
             <h3 class="h6 text-white text-uppercase tracking-wider fs-8 mb-3">Distribución de Pagos</h3>
             <div class="payment-methods-card p-4 rounded bg-dark-soft border border-secondary-soft">
-              
               <!-- Cash -->
               <div class="mb-3">
                 <div class="d-flex justify-content-between fs-7-5 mb-1">
@@ -168,8 +206,10 @@
                   <strong class="text-white font-monospace">{{ caja.payments.cash | currency }}</strong>
                 </div>
                 <div class="progress-bar-bg">
-                  <div class="progress-bar-fill bg-success" 
-                       [style.width]="(subtotalVentas > 0 ? (caja.payments.cash / subtotalVentas * 100) : 0) + '%'"></div>
+                  <div
+                    class="progress-bar-fill bg-success"
+                    [style.width]="(subtotalVentas > 0 ? (caja.payments.cash / subtotalVentas) * 100 : 0) + '%'"
+                  ></div>
                 </div>
               </div>
 
@@ -180,8 +220,10 @@
                   <strong class="text-white font-monospace">{{ caja.payments.credit | currency }}</strong>
                 </div>
                 <div class="progress-bar-bg">
-                  <div class="progress-bar-fill bg-info" 
-                       [style.width]="(subtotalVentas > 0 ? (caja.payments.credit / subtotalVentas * 100) : 0) + '%'"></div>
+                  <div
+                    class="progress-bar-fill bg-info"
+                    [style.width]="(subtotalVentas > 0 ? (caja.payments.credit / subtotalVentas) * 100 : 0) + '%'"
+                  ></div>
                 </div>
               </div>
 
@@ -192,11 +234,12 @@
                   <strong class="text-white font-monospace">{{ caja.payments.debit | currency }}</strong>
                 </div>
                 <div class="progress-bar-bg">
-                  <div class="progress-bar-fill bg-primary" 
-                       [style.width]="(subtotalVentas > 0 ? (caja.payments.debit / subtotalVentas * 100) : 0) + '%'"></div>
+                  <div
+                    class="progress-bar-fill bg-primary"
+                    [style.width]="(subtotalVentas > 0 ? (caja.payments.debit / subtotalVentas) * 100 : 0) + '%'"
+                  ></div>
                 </div>
               </div>
-
             </div>
 
             <!-- General Info Panel -->
@@ -211,13 +254,15 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
       <!-- Tab 2: Sales List -->
       <div *ngIf="activeTab === 'sales'">
-        <div class="text-center py-4 bg-dark-soft rounded text-muted-custom border border-secondary-soft fs-7-5" *ngIf="!caja.sales || caja.sales.length === 0">
+        <div
+          class="text-center py-4 bg-dark-soft rounded text-muted-custom border border-secondary-soft fs-7-5"
+          *ngIf="!caja.sales || caja.sales.length === 0"
+        >
           No se registraron ventas en esta sesión de caja.
         </div>
 
@@ -225,7 +270,7 @@
           <table class="table custom-sales-table mb-0">
             <thead>
               <tr>
-                <th scope="col" style="width: 250px;">Folio de Venta (ID)</th>
+                <th scope="col" style="width: 250px">Folio de Venta (ID)</th>
                 <th scope="col">Hora</th>
                 <th scope="col">Productos</th>
                 <th scope="col" class="text-end">Total Pagado</th>
@@ -235,7 +280,11 @@
             <tbody>
               <ng-container *ngFor="let sale of caja.sales">
                 <!-- Main Sale Row -->
-                <tr (click)="toggleSaleExpand(sale._id)" class="clickable-sale-row" [class.expanded]="expandedSales[sale._id]">
+                <tr
+                  (click)="toggleSaleExpand(sale._id)"
+                  class="clickable-sale-row"
+                  [class.expanded]="expandedSales[sale._id]"
+                >
                   <td>
                     <span class="text-white font-monospace fs-7-5">{{ sale._id }}</span>
                   </td>
@@ -244,7 +293,12 @@
                   </td>
                   <td>
                     <span class="text-white fs-7-5 max-products-preview">
-                      {{ sale.productsSold ? (sale.productsSold[0]?.product?.name + (sale.productsSold.length > 1 ? ' y ' + (sale.productsSold.length - 1) + ' más' : '')) : 'Venta' }}
+                      {{
+                        sale.productsSold
+                          ? sale.productsSold[0]?.product?.name +
+                            (sale.productsSold.length > 1 ? ' y ' + (sale.productsSold.length - 1) + ' más' : '')
+                          : 'Venta'
+                      }}
                     </span>
                   </td>
                   <td class="text-end font-monospace text-success fs-7-5 fw-semibold">
@@ -252,7 +306,11 @@
                   </td>
                   <td class="text-center">
                     <button class="btn btn-ghost-light btn-sm rounded-circle px-2">
-                      <i class="bi" [class.bi-chevron-down]="!expandedSales[sale._id]" [class.bi-chevron-up]="expandedSales[sale._id]"></i>
+                      <i
+                        class="bi"
+                        [class.bi-chevron-down]="!expandedSales[sale._id]"
+                        [class.bi-chevron-up]="expandedSales[sale._id]"
+                      ></i>
                     </button>
                   </td>
                 </tr>
@@ -261,8 +319,10 @@
                 <tr *ngIf="expandedSales[sale._id]" class="expanded-row-detail">
                   <td colspan="5" class="p-3 bg-dark-deep border-start border-indigo">
                     <div class="expanded-content-panel p-3 rounded bg-dark-soft border border-secondary-soft">
-                      <h4 class="h6 text-white text-uppercase tracking-wider fs-8-5 mb-3"><i class="bi bi-basket-fill text-indigo"></i> Desglose de Artículos Vendidos</h4>
-                      
+                      <h4 class="h6 text-white text-uppercase tracking-wider fs-8-5 mb-3">
+                        <i class="bi bi-basket-fill text-indigo"></i> Desglose de Artículos Vendidos
+                      </h4>
+
                       <div class="table-responsive">
                         <table class="table table-sm table-dark custom-nested-table mb-0">
                           <thead>
@@ -276,19 +336,32 @@
                           </thead>
                           <tbody>
                             <tr *ngFor="let prod of sale.productsSold">
-                              <td><strong class="text-white fs-7-5">{{ prod.product?.name }}</strong></td>
-                              <td class="text-center font-monospace fs-7-5 text-white">{{ prod.quantity }}</td>
-                              <td class="text-end font-monospace fs-7-5 text-muted-custom">{{ prod.unitPrice | currency }}</td>
                               <td>
-                                <ul class="mb-0 list-unstyled text-muted-custom fs-8-5" *ngIf="prod.modifications?.length > 0">
+                                <strong class="text-white fs-7-5">{{ prod.product?.name }}</strong>
+                              </td>
+                              <td class="text-center font-monospace fs-7-5 text-white">{{ prod.quantity }}</td>
+                              <td class="text-end font-monospace fs-7-5 text-muted-custom">
+                                {{ prod.unitPrice | currency }}
+                              </td>
+                              <td>
+                                <ul
+                                  class="mb-0 list-unstyled text-muted-custom fs-8-5"
+                                  *ngIf="prod.modifications?.length > 0"
+                                >
                                   <li *ngFor="let mod of prod.modifications">
                                     <span class="badge bg-secondary-soft text-muted-custom me-1">+{{ mod.name }}</span>
                                     <strong class="text-white font-monospace">{{ mod.extraPrice | currency }}</strong>
                                   </li>
                                 </ul>
-                                <span class="text-muted-custom fs-8-5" *ngIf="!prod.modifications || prod.modifications.length === 0">&mdash;</span>
+                                <span
+                                  class="text-muted-custom fs-8-5"
+                                  *ngIf="!prod.modifications || prod.modifications.length === 0"
+                                  >&mdash;</span
+                                >
                               </td>
-                              <td class="text-end font-monospace text-success fs-7-5 fw-semibold">{{ prod.subtotal | currency }}</td>
+                              <td class="text-end font-monospace text-success fs-7-5 fw-semibold">
+                                {{ prod.subtotal | currency }}
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -304,7 +377,10 @@
 
       <!-- Tab 3: Expenses list (Includes audit status & verifications) -->
       <div *ngIf="activeTab === 'expenses'">
-        <div class="text-center py-4 bg-dark-soft rounded text-muted-custom border border-secondary-soft fs-7-5" *ngIf="!caja.expenses || caja.expenses.length === 0">
+        <div
+          class="text-center py-4 bg-dark-soft rounded text-muted-custom border border-secondary-soft fs-7-5"
+          *ngIf="!caja.expenses || caja.expenses.length === 0"
+        >
           No se registraron egresos ni retiros parciales de efectivo en este turno.
         </div>
 
@@ -313,7 +389,10 @@
             <div class="timeline-dot" [ngClass]="exp.type === 'withdrawal' ? 'bg-danger' : 'bg-warning'"></div>
             <div class="timeline-content bg-dark-soft p-3 rounded flex-grow-1 border border-secondary-soft">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="badge" [ngClass]="exp.type === 'withdrawal' ? 'bg-danger-soft text-danger' : 'bg-warning-soft text-warning'">
+                <span
+                  class="badge"
+                  [ngClass]="exp.type === 'withdrawal' ? 'bg-danger-soft text-danger' : 'bg-warning-soft text-warning'"
+                >
                   {{ exp.type === 'withdrawal' ? 'Retiro Parcial (Safe Drop)' : 'Gasto de Operación' }}
                 </span>
                 <span class="text-muted-custom fs-8">{{ exp.timestamp | date: 'medium' }}</span>
@@ -322,14 +401,22 @@
               <strong class="text-danger fs-5">- {{ exp.amount | currency }}</strong>
 
               <!-- Safe Drop Deposit Audit Details -->
-              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3 pt-3 border-top border-secondary-soft fs-8" *ngIf="exp.type === 'withdrawal'">
+              <div
+                class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3 pt-3 border-top border-secondary-soft fs-8"
+                *ngIf="exp.type === 'withdrawal'"
+              >
                 <div class="mb-2 mb-md-0">
-                  <span class="d-block text-muted-custom">Folio Sobre / Referencia: <strong class="text-white">{{ exp.depositReference || 'Sin registrar' }}</strong></span>
+                  <span class="d-block text-muted-custom"
+                    >Folio Sobre / Referencia:
+                    <strong class="text-white">{{ exp.depositReference || 'Sin registrar' }}</strong></span
+                  >
                   <span class="d-block text-muted-custom mt-1" *ngIf="exp.auditStatus === 'verified'">
-                    <i class="bi bi-person-check-fill text-success"></i> Conciliado por supervisor el {{ exp.auditedAt | date: 'short' }}
+                    <i class="bi bi-person-check-fill text-success"></i> Conciliado por supervisor el
+                    {{ exp.auditedAt | date: 'short' }}
                   </span>
                   <span class="d-block text-muted-custom mt-1" *ngIf="exp.auditStatus === 'rejected'">
-                    <i class="bi bi-person-x-fill text-danger"></i> Discrepancia reportada el {{ exp.auditedAt | date: 'short' }}
+                    <i class="bi bi-person-x-fill text-danger"></i> Discrepancia reportada el
+                    {{ exp.auditedAt | date: 'short' }}
                   </span>
                 </div>
 
@@ -338,24 +425,35 @@
                   <button class="btn btn-success btn-sm py-1 px-3 fs-8" (click)="verifyDeposit(exp._id, 'verified')">
                     <i class="bi bi-check-circle-fill me-1"></i> Aprobar Depósito
                   </button>
-                  <button class="btn btn-outline-danger btn-sm py-1 px-3 fs-8" (click)="verifyDeposit(exp._id, 'rejected')">
+                  <button
+                    class="btn btn-outline-danger btn-sm py-1 px-3 fs-8"
+                    (click)="verifyDeposit(exp._id, 'rejected')"
+                  >
                     <i class="bi bi-x-circle-fill me-1"></i> Reportar Faltante
                   </button>
                 </div>
 
                 <div *ngIf="exp.auditStatus !== 'pending'">
-                  <span class="badge p-2 fs-8-5" [ngClass]="exp.auditStatus === 'verified' ? 'bg-success-soft text-success border border-success-soft' : 'bg-danger-soft text-danger border border-danger-soft'">
-                    <i class="bi" [ngClass]="exp.auditStatus === 'verified' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                  <span
+                    class="badge p-2 fs-8-5"
+                    [ngClass]="
+                      exp.auditStatus === 'verified'
+                        ? 'bg-success-soft text-success border border-success-soft'
+                        : 'bg-danger-soft text-danger border border-danger-soft'
+                    "
+                  >
+                    <i
+                      class="bi"
+                      [ngClass]="exp.auditStatus === 'verified' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"
+                    ></i>
                     {{ exp.auditStatus === 'verified' ? 'CONCILIADO EN BÓVEDA' : 'CON DISCREPANCIA' }}
                   </span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- Detail Card Footer Actions -->
@@ -368,6 +466,5 @@
         <i class="bi bi-printer-fill text-indigo me-1"></i> Imprimir Comprobante de Arqueo
       </button>
     </div>
-
   </div>
 </div>

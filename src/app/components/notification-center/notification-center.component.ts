@@ -7,7 +7,7 @@ import { SocketService } from 'src/app/services/socket.service';
 @Component({
   selector: 'app-notification-center',
   templateUrl: './notification-center.component.html',
-  styleUrls: ['./notification-center.component.css']
+  styleUrls: ['./notification-center.component.css'],
 })
 export class NotificationCenterComponent implements OnInit, OnDestroy {
   notifications: any[] = [];
@@ -20,8 +20,8 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private socketService: SocketService,
     private router: Router,
-    private elementRef: ElementRef
-  ) { }
+    private elementRef: ElementRef,
+  ) {}
 
   ngOnInit(): void {
     // Carga inicial
@@ -33,7 +33,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
         // Añadir al principio de la lista
         this.notifications = [newNotif, ...this.notifications];
         this.updateUnreadCount();
-      }
+      },
     });
   }
 
@@ -44,7 +44,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
   }
 
   updateUnreadCount(): void {
-    this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+    this.unreadCount = this.notifications.filter((n) => !n.isRead).length;
   }
 
   toggleDropdown(): void {
@@ -62,7 +62,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
           this.notifications = resp.notifications || [];
           this.updateUnreadCount();
         }
-      }
+      },
     });
   }
 
@@ -72,7 +72,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
 
   getFilteredNotifications(): any[] {
     if (this.activeFilter === 'unread') {
-      return this.notifications.filter(n => !n.isRead);
+      return this.notifications.filter((n) => !n.isRead);
     }
     return this.notifications;
   }
@@ -84,7 +84,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
         next: () => {
           notif.isRead = true;
           this.updateUnreadCount();
-        }
+        },
       });
     }
 
@@ -102,10 +102,10 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
     this.notificationService.markAllAsRead().subscribe({
       next: (resp: any) => {
         if (resp.ok) {
-          this.notifications.forEach(n => n.isRead = true);
+          this.notifications.forEach((n) => (n.isRead = true));
           this.updateUnreadCount();
         }
-      }
+      },
     });
   }
 

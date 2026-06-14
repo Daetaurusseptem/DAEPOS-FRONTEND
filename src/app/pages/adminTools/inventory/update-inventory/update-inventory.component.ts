@@ -10,10 +10,9 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-update-inventory',
   templateUrl: './update-inventory.component.html',
-  styleUrls: ['./update-inventory.component.css']
+  styleUrls: ['./update-inventory.component.css'],
 })
 export class UpdateInventoryComponent implements OnInit {
-
   inventoryId!: string;
   inventoryItem!: InventoryItem;
   inventoryForm: FormGroup;
@@ -22,7 +21,7 @@ export class UpdateInventoryComponent implements OnInit {
     private inventoryService: InventoryService,
     private fb: FormBuilder,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
   ) {
     this.inventoryForm = this.fb.group({
       name: ['', Validators.required],
@@ -33,12 +32,12 @@ export class UpdateInventoryComponent implements OnInit {
       measurement: ['unit', Validators.required],
       expirationDate: ['', Validators.required],
       receivedDate: ['', Validators.required],
-      modifications: this.fb.array([])
+      modifications: this.fb.array([]),
     });
   }
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(params => {
+    this.activatedRoute.params.subscribe((params) => {
       this.inventoryId = params['id'];
       this.loadInventoryItem();
     });
@@ -49,9 +48,10 @@ export class UpdateInventoryComponent implements OnInit {
   }
 
   loadInventoryItem() {
-    this.inventoryService.getInventoryItemById(this.inventoryId)
-      .pipe(map(response => response.inventoryItem || response.item))
-      .subscribe(item => {
+    this.inventoryService
+      .getInventoryItemById(this.inventoryId)
+      .pipe(map((response) => response.inventoryItem || response.item))
+      .subscribe((item) => {
         if (!item) return;
         this.inventoryItem = item;
 
@@ -86,21 +86,25 @@ export class UpdateInventoryComponent implements OnInit {
 
   setModifications(modifications: any[]) {
     this.modifications.clear();
-    modifications.forEach(mod => {
-      this.modifications.push(this.fb.group({
-        name: [mod.name, Validators.required],
-        extraPrice: [mod.extraPrice, [Validators.required, Validators.min(0)]],
-        isExclusive: [mod.isExclusive || false, Validators.required]
-      }));
+    modifications.forEach((mod) => {
+      this.modifications.push(
+        this.fb.group({
+          name: [mod.name, Validators.required],
+          extraPrice: [mod.extraPrice, [Validators.required, Validators.min(0)]],
+          isExclusive: [mod.isExclusive || false, Validators.required],
+        }),
+      );
     });
   }
 
   addModification() {
-    this.modifications.push(this.fb.group({
-      name: ['', Validators.required],
-      extraPrice: [0, [Validators.required, Validators.min(0)]],
-      isExclusive: [false, Validators.required]
-    }));
+    this.modifications.push(
+      this.fb.group({
+        name: ['', Validators.required],
+        extraPrice: [0, [Validators.required, Validators.min(0)]],
+        isExclusive: [false, Validators.required],
+      }),
+    );
   }
 
   removeModification(index: number) {
@@ -115,8 +119,8 @@ export class UpdateInventoryComponent implements OnInit {
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Sí, actualizar',
-        cancelButtonText: 'Cancelar'
-      }).then(response => {
+        cancelButtonText: 'Cancelar',
+      }).then((response) => {
         if (response.isConfirmed) {
           const updatedItem = {
             ...this.inventoryForm.value,
@@ -131,7 +135,7 @@ export class UpdateInventoryComponent implements OnInit {
             error: (err) => {
               console.error('Error al actualizar inventario', err);
               Swal.fire('Error', 'Hubo un problema al actualizar el inventario', 'error');
-            }
+            },
           });
         }
       });

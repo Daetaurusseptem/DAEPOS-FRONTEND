@@ -1,7 +1,7 @@
 /* Cajas Historial Page Premium light-mode Stylesheet */
 
 .history-dashboard {
-  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-ui);
   color: #1f2937;
   min-height: 80vh;
 }
@@ -24,7 +24,7 @@
   font-weight: 500;
   background-color: #ffffff !important;
   border: 1px solid #d1d5db !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   color: #1f2937 !important;
   transition: border-color 0.2s ease;
 }
@@ -87,7 +87,8 @@
   color: #4b5563;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
   border-radius: 10px;
   padding: 10px 14px;
   font-size: 0.875rem;
@@ -97,7 +98,8 @@
   transition: all 0.2s ease;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: #0070f3 !important;
   box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.15) !important;
 }
@@ -199,8 +201,13 @@
 }
 
 @keyframes bullet-glow {
-  0% { opacity: 0.6; }
-  100% { opacity: 1; transform: scale(1.1); }
+  0% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 .animate-pulse {
@@ -208,13 +215,17 @@
 }
 
 @keyframes warning-pulse {
-  0% { opacity: 0.8; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Font formatting */
 .font-monospace {
-  font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  font-family: var(--font-mono) !important;
   letter-spacing: -0.02em;
 }
 

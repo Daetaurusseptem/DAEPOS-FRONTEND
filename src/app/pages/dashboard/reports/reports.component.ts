@@ -11,24 +11,24 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
-  styleUrls: ['./reports.component.css']
+  styleUrls: ['./reports.component.css'],
 })
 export class ReportsComponent implements OnInit {
   reportForm!: FormGroup;
   reportType: 'commercial' | 'inventory' | 'audit' = 'commercial';
-  
+
   // Scopes & Roles
   companyId!: string;
   isCompanyAdmin: boolean = false;
   branches: Branch[] = [];
   selectedBranchId: string = '';
-  
+
   // Data State
   loading: boolean = false;
   commercialData: any[] = [];
   inventoryData: any[] = [];
   auditData: any[] = [];
-  
+
   // Custom Modular Sections (Widgets Choice)
   includeSummary: boolean = true;
   includeDetails: boolean = true;
@@ -47,7 +47,7 @@ export class ReportsComponent implements OnInit {
     private statisticsService: StatisticsService,
     public authService: AuthService,
     private branchService: BranchService,
-    private cashRegisterService: CashRegisterService
+    private cashRegisterService: CashRegisterService,
   ) {
     this.companyId = this.authService.companyId!;
     const role = this.authService.usuario?.role || '';
@@ -70,11 +70,11 @@ export class ReportsComponent implements OnInit {
   initForm(): void {
     const currentWeek = this.getWeekNumber(new Date());
     const currentYear = new Date().getFullYear();
-    
+
     this.reportForm = this.fb.group({
       year: [currentYear],
       week: [currentWeek],
-      branchId: [this.selectedBranchId]
+      branchId: [this.selectedBranchId],
     });
   }
 
@@ -91,7 +91,7 @@ export class ReportsComponent implements OnInit {
           this.fetchReportData();
         }
       },
-      error: () => Swal.fire('Error', 'No se pudieron cargar las sucursales', 'error')
+      error: () => Swal.fire('Error', 'No se pudieron cargar las sucursales', 'error'),
     });
   }
 
@@ -108,11 +108,11 @@ export class ReportsComponent implements OnInit {
   fetchReportData(): void {
     const { year, week, branchId } = this.reportForm.value;
     const activeBranchId = this.isCompanyAdmin ? branchId : this.selectedBranchId;
-    
+
     if (!activeBranchId) return;
-    
+
     this.loading = true;
-    
+
     if (this.reportType === 'commercial') {
       this.statisticsService.getTopSellingProductsByWeek(year, week, this.companyId, activeBranchId).subscribe({
         next: (resp) => {
@@ -122,7 +122,7 @@ export class ReportsComponent implements OnInit {
         error: (err) => {
           this.loading = false;
           console.error(err);
-        }
+        },
       });
     } else if (this.reportType === 'inventory') {
       this.statisticsService.getIngredientsStatisticsByWeek(year, week, this.companyId, activeBranchId).subscribe({
@@ -133,7 +133,7 @@ export class ReportsComponent implements OnInit {
         error: (err) => {
           this.loading = false;
           console.error(err);
-        }
+        },
       });
     } else if (this.reportType === 'audit') {
       // Load registers history
@@ -147,23 +147,33 @@ export class ReportsComponent implements OnInit {
         error: (err) => {
           this.loading = false;
           console.error(err);
-        }
+        },
       });
     }
   }
 
   // Helper getters for report totals
   getCommercialRevenue(): number {
-    return this.commercialData.reduce((sum, item) => sum + ((item.totalQuantity || 0) * (item.product?.sellingPrice || 120)), 0);
+    return this.commercialData.reduce(
+      (sum, item) => sum + (item.totalQuantity || 0) * (item.product?.sellingPrice || 120),
+      0,
+    );
   }
 
   getCommercialCost(): number {
-    return this.commercialData.reduce((sum, item) => sum + ((item.totalQuantity || 0) * (item.product?.costPrice || 60)), 0);
+    return this.commercialData.reduce(
+      (sum, item) => sum + (item.totalQuantity || 0) * (item.product?.costPrice || 60),
+      0,
+    );
   }
 
   getAOV(): number {
     if (this.commercialData.length === 0) return 0;
-    return this.getCommercialRevenue() / (this.commercialData.reduce((sum, item) => sum + (item.totalQuantity || 0), 0) || 1) * 1.5;
+    return (
+      (this.getCommercialRevenue() /
+        (this.commercialData.reduce((sum, item) => sum + (item.totalQuantity || 0), 0) || 1)) *
+      1.5
+    );
   }
 
   getInventoryValue(): number {
@@ -171,11 +181,11 @@ export class ReportsComponent implements OnInit {
   }
 
   getLowStockCount(): number {
-    return this.inventoryData.filter(item => item.totalStock < 3000).length;
+    return this.inventoryData.filter((item) => item.totalStock < 3000).length;
   }
 
   getAuditDiscrepancies(): number {
-    return this.auditData.filter(item => Math.abs((item.actualAmount || 0) - (item.expectedAmount || 0)) > 0).length;
+    return this.auditData.filter((item) => Math.abs((item.actualAmount || 0) - (item.expectedAmount || 0)) > 0).length;
   }
 
   getAuditTotalSales(): number {
@@ -186,9 +196,9 @@ export class ReportsComponent implements OnInit {
   generateExcel(): void {
     if (this.loading) return;
 
-    let wsData: any[] = [];
+    const wsData: any[] = [];
     const { year, week } = this.reportForm.value;
-    const branchName = this.branches.find(b => b._id === this.selectedBranchId)?.name || 'Sucursal Seleccionada';
+    const branchName = this.branches.find((b) => b._id === this.selectedBranchId)?.name || 'Sucursal Seleccionada';
 
     // 1. Report Title & Metadata Header
     wsData.push(['DAEPOS ANALYTICAL REPORT ENGINE']);
@@ -228,56 +238,48 @@ export class ReportsComponent implements OnInit {
     if (this.includeDetails) {
       wsData.push(['--- DESGLOSE DETALLADO ---']);
       if (this.reportType === 'commercial') {
-        let headers = ['Producto', 'Cantidad Vendida', 'Precio Venta Prom.'];
+        const headers = ['Producto', 'Cantidad Vendida', 'Precio Venta Prom.'];
         if (this.includeMargins) {
           headers.push('Costo Prom.', 'Ganancia Bruta');
         }
         wsData.push(headers);
 
-        this.commercialData.forEach(item => {
-          let row = [
-            item.product?.name || 'Desconocido',
-            item.totalQuantity,
-            item.product?.sellingPrice || 120
-          ];
+        this.commercialData.forEach((item) => {
+          const row = [item.product?.name || 'Desconocido', item.totalQuantity, item.product?.sellingPrice || 120];
           if (this.includeMargins) {
             row.push(item.product?.costPrice || 60);
-            row.push((item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60))));
+            row.push(item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60)));
           }
           wsData.push(row);
         });
       } else if (this.reportType === 'inventory') {
-        let headers = ['Insumo / Ingrediente', 'Existencias Disponibles', 'Costo Unitario'];
+        const headers = ['Insumo / Ingrediente', 'Existencias Disponibles', 'Costo Unitario'];
         if (this.includeLowStock) {
           headers.push('Estado Crítico');
         }
         wsData.push(headers);
 
-        this.inventoryData.forEach(item => {
-          let row = [
-            item.name || item._id,
-            item.totalStock,
-            item.totalValue / (item.totalStock || 1)
-          ];
+        this.inventoryData.forEach((item) => {
+          const row = [item.name || item._id, item.totalStock, item.totalValue / (item.totalStock || 1)];
           if (this.includeLowStock) {
             row.push(item.totalStock < 3000 ? 'ALERTA STOCK' : 'ESTABLE');
           }
           wsData.push(row);
         });
       } else if (this.reportType === 'audit') {
-        let headers = ['Cajero', 'Fecha Cierre', 'Monto Esperado', 'Monto Real'];
+        const headers = ['Cajero', 'Fecha Cierre', 'Monto Esperado', 'Monto Real'];
         if (this.includeDiscrepancies) {
           headers.push('Diferencia');
         }
         wsData.push(headers);
 
-        this.auditData.forEach(item => {
-          let diff = (item.actualAmount || 0) - (item.expectedAmount || 0);
-          let row = [
+        this.auditData.forEach((item) => {
+          const diff = (item.actualAmount || 0) - (item.expectedAmount || 0);
+          const row = [
             item.user?.name || 'Cajero Demo',
             new Date(item.closedAt || item.date).toLocaleDateString(),
             item.expectedAmount || 0,
-            item.actualAmount || 0
+            item.actualAmount || 0,
           ];
           if (this.includeDiscrepancies) {
             row.push(diff === 0 ? 'SIN DIFERENCIA' : `$${diff.toFixed(2)}`);
@@ -295,12 +297,12 @@ export class ReportsComponent implements OnInit {
     // Download file
     const fileName = `Reporte_${this.reportType}_S${week}_${year}.xlsx`;
     XLSX.writeFile(wb, fileName);
-    
+
     Swal.fire({
       icon: 'success',
       title: 'Reporte Generado',
       text: `El reporte se descargó exitosamente como: ${fileName}`,
-      confirmButtonColor: '#6366f1'
+      confirmButtonColor: '#6366f1',
     });
   }
 
@@ -312,7 +314,7 @@ export class ReportsComponent implements OnInit {
   // Utilities
   getBranchName(): string {
     if (this.isCompanyAdmin) {
-      const selected = this.branches.find(b => b._id === this.selectedBranchId);
+      const selected = this.branches.find((b) => b._id === this.selectedBranchId);
       return selected ? selected.name : 'Sucursal Seleccionada';
     } else {
       return this.authService.branch?.name || 'Mi Sucursal';
@@ -329,7 +331,7 @@ export class ReportsComponent implements OnInit {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+    const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
     return weekNo;
   }
 }

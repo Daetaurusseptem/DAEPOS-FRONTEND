@@ -5,10 +5,9 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-sysadmin-subscriptions',
   templateUrl: './sysadmin-subscriptions.component.html',
-  styleUrls: ['./sysadmin-subscriptions.component.css']
+  styleUrls: ['./sysadmin-subscriptions.component.css'],
 })
 export class SysadminSubscriptionsComponent implements OnInit {
-
   companies: any[] = [];
   total: number = 0;
   page: number = 1;
@@ -20,16 +19,16 @@ export class SysadminSubscriptionsComponent implements OnInit {
     trialing: 0,
     pastDue: 0,
     canceled: 0,
-    mrr: 0
+    mrr: 0,
   };
 
   loading: boolean = false;
-  
+
   // Filters
   filters = {
     query: '',
     status: '',
-    planId: ''
+    planId: '',
   };
 
   plans: any[] = [];
@@ -39,12 +38,10 @@ export class SysadminSubscriptionsComponent implements OnInit {
   overrideData = {
     status: '',
     currentPeriodEnd: '',
-    manualOverride: false
+    manualOverride: false,
   };
 
-  constructor(
-    private sysadminService: SysadminService
-  ) {}
+  constructor(private sysadminService: SysadminService) {}
 
   ngOnInit(): void {
     this.loadPlans();
@@ -57,7 +54,7 @@ export class SysadminSubscriptionsComponent implements OnInit {
         if (resp.ok) {
           this.plans = resp.plans;
         }
-      }
+      },
     });
   }
 
@@ -66,7 +63,7 @@ export class SysadminSubscriptionsComponent implements OnInit {
     const params = {
       page: this.page,
       limit: this.limit,
-      ...this.filters
+      ...this.filters,
     };
 
     this.sysadminService.searchSubscriptions(params).subscribe({
@@ -88,7 +85,7 @@ export class SysadminSubscriptionsComponent implements OnInit {
         console.error('Error fetching subscriptions', err);
         this.companies = [];
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -101,7 +98,7 @@ export class SysadminSubscriptionsComponent implements OnInit {
     this.filters = {
       query: '',
       status: '',
-      planId: ''
+      planId: '',
     };
     this.onFilterChange();
   }

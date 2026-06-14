@@ -95,7 +95,7 @@
   cursor: pointer;
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
-  font-family: 'Geist', 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .tab-item-btn:hover {

@@ -5,7 +5,7 @@ import { ReceiptPrinterService } from 'src/app/services/receipt-printer.service'
 @Component({
   selector: 'app-manage-printers',
   templateUrl: './manage-printers.component.html',
-  styleUrls: ['./manage-printers.component.css']
+  styleUrls: ['./manage-printers.component.css'],
 })
 export class ManagePrintersComponent implements OnInit {
   printersForm!: FormGroup;
@@ -13,14 +13,14 @@ export class ManagePrintersComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private receiptPrinterService: ReceiptPrinterService
+    private receiptPrinterService: ReceiptPrinterService,
   ) {}
 
   ngOnInit(): void {
     this.printersForm = this.fb.group({
       name: ['', Validators.required],
       paperSize: ['', Validators.required],
-      type: ['', Validators.required]
+      type: ['', Validators.required],
     });
     this.loadPrinters();
   }

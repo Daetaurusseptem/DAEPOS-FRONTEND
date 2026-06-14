@@ -41,7 +41,9 @@
 }
 
 .hover-shadow:hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.04),
+    0 2px 6px rgba(0, 0, 0, 0.02) !important;
   border-color: #000000 !important;
   transform: translateY(-2px);
 }

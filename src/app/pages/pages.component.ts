@@ -8,7 +8,7 @@ import { SysadminService } from '../services/sysadmin.service';
 @Component({
   selector: 'app-pages',
   templateUrl: './pages.component.html',
-  styleUrls: ['./pages.component.css']
+  styleUrls: ['./pages.component.css'],
 })
 export class PagesComponent {
   isCollapsed: boolean = true;
@@ -16,13 +16,13 @@ export class PagesComponent {
   isPosRoute: boolean = false;
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private spinnerService: SpinnerService,
     public sidebarService: SidebarService,
     public authService: AuthService,
-    public sysadminService: SysadminService
+    public sysadminService: SysadminService,
   ) {
-    this.sidebarService.isCollapsed$.subscribe(collapsed => {
+    this.sidebarService.isCollapsed$.subscribe((collapsed) => {
       this.isCollapsed = collapsed;
     });
 

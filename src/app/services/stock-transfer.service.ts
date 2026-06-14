@@ -7,14 +7,13 @@ import { Observable } from 'rxjs';
 const urlBase = `${environment.apiUrl}/stock-transfers`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StockTransferService {
-
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-  ) { }
+  ) {}
 
   createTransfer(transferData: any): Observable<any> {
     return this.http.post<any>(`${urlBase}`, transferData, this.authService.headers);

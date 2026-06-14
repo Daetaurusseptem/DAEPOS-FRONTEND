@@ -6,10 +6,9 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-manual-payments',
   templateUrl: './manual-payments.component.html',
-  styleUrls: ['./manual-payments.component.css']
+  styleUrls: ['./manual-payments.component.css'],
 })
 export class ManualPaymentsComponent implements OnInit {
-
   pagos: any[] = [];
   planes: any[] = [];
   loading: boolean = true;
@@ -24,13 +23,13 @@ export class ManualPaymentsComponent implements OnInit {
     reminderDate: '',
     customMaxBranches: undefined,
     customMaxUsers: undefined,
-    customMaxRegisters: undefined
+    customMaxRegisters: undefined,
   };
 
   constructor(
     private manualPaymentService: ManualPaymentService,
-    private sysadminService: SysadminService
-  ) { }
+    private sysadminService: SysadminService,
+  ) {}
 
   ngOnInit(): void {
     this.cargarPlanes();
@@ -47,7 +46,7 @@ export class ManualPaymentsComponent implements OnInit {
 
   cargarPagos() {
     this.loading = true;
-    this.manualPaymentService.getAllPayments(this.filtroStatus === 'all' ? '' : this.filtroStatus).subscribe(resp => {
+    this.manualPaymentService.getAllPayments(this.filtroStatus === 'all' ? '' : this.filtroStatus).subscribe((resp) => {
       if (resp.ok) {
         this.pagos = resp.payments;
       }
@@ -57,11 +56,11 @@ export class ManualPaymentsComponent implements OnInit {
 
   abrirAprobarModal(pago: any) {
     this.selectedPago = pago;
-    
+
     // Sugerir fecha a un mes
     const nextMonth = new Date();
     nextMonth.setMonth(nextMonth.getMonth() + 1);
-    
+
     this.formAprobar = {
       newEndDate: nextMonth.toISOString().split('T')[0],
       assignedPlanId: pago.planRequested?._id || '',
@@ -69,12 +68,12 @@ export class ManualPaymentsComponent implements OnInit {
       reminderDate: '',
       customMaxBranches: undefined,
       customMaxUsers: undefined,
-      customMaxRegisters: undefined
+      customMaxRegisters: undefined,
     };
   }
 
   onPlanSelectChange() {
-    const selected = this.planes.find(p => p._id === this.formAprobar.assignedPlanId);
+    const selected = this.planes.find((p) => p._id === this.formAprobar.assignedPlanId);
     if (selected) {
       this.formAprobar.customMaxBranches = selected.maxBranches;
       this.formAprobar.customMaxUsers = selected.maxUsers;
@@ -87,7 +86,7 @@ export class ManualPaymentsComponent implements OnInit {
       Swal.fire('Atención', 'Debes asignar un plan obligatoriamente', 'warning');
       return;
     }
-    
+
     this.manualPaymentService.approvePayment(this.selectedPago._id, this.formAprobar).subscribe({
       next: (resp) => {
         if (resp.ok) {
@@ -98,7 +97,7 @@ export class ManualPaymentsComponent implements OnInit {
       },
       error: (err) => {
         Swal.fire('Error', 'No se pudo aprobar el pago', 'error');
-      }
+      },
     });
   }
 
@@ -110,7 +109,7 @@ export class ManualPaymentsComponent implements OnInit {
       inputPlaceholder: 'Ej. El comprobante está borroso o el monto no coincide...',
       showCancelButton: true,
       confirmButtonText: 'Rechazar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.manualPaymentService.rejectPayment(pago._id, result.value).subscribe({
@@ -118,7 +117,7 @@ export class ManualPaymentsComponent implements OnInit {
             Swal.fire('Rechazado', 'El pago ha sido rechazado.', 'success');
             this.cargarPagos();
           },
-          error: () => Swal.fire('Error', 'No se pudo rechazar', 'error')
+          error: () => Swal.fire('Error', 'No se pudo rechazar', 'error'),
         });
       }
     });

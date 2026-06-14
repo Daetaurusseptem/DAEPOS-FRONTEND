@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { CashRegisterService } from 'src/app/services/cash-register.service';
@@ -11,9 +11,9 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-user-home',
   templateUrl: './user-home.component.html',
-  styleUrls: ['./user-home.component.css']
+  styleUrls: ['./user-home.component.css'],
 })
-export class UserHomeComponent {
+export class UserHomeComponent implements OnDestroy {
   isOpenCashRegister: boolean = false;
   shiftExpired: boolean = false;
   shiftWarning: boolean = false;
@@ -22,15 +22,22 @@ export class UserHomeComponent {
   branchName: string = '';
   companyId: string = '';
   branchId: string = '';
-  
+  private shiftTimer: any = null;
+  private shiftStartDate: Date | null = null;
+  private shiftMaxHours: number = 12;
+
   // Datos para Entregas
   pendingDeliveries: any[] = [];
   suppliers: any[] = [];
   allCompanyProducts: any[] = [];
-  
+
   // Variables para Recepción Imprevista
   showUnplannedRestockModal: boolean = false;
-  unplannedRestock: { supplier: string; notes: string; payFromRegister: boolean } = { supplier: '', notes: '', payFromRegister: true };
+  unplannedRestock: { supplier: string; notes: string; payFromRegister: boolean } = {
+    supplier: '',
+    notes: '',
+    payFromRegister: true,
+  };
   unplannedItems: any[] = [];
 
   constructor(
@@ -39,11 +46,12 @@ export class UserHomeComponent {
     private cashRegisterService: CashRegisterService,
     private supplierService: SupplierService,
     private productsService: ProductService,
-    private rawMaterialsService: RawMaterialsService
+    private rawMaterialsService: RawMaterialsService,
   ) {
     this.userName = this.authService.usuario?.name || 'Cajero';
     this.branchName = this.authService.branch?.name || 'Mi Sucursal';
-    this.companyId = (this.authService.usuario?.company as any)?._id || (this.authService.usuario?.company as any) || '';
+    this.companyId =
+      this.authService.companyId || (this.authService.usuario?.company as any)?._id || (this.authService.usuario?.company as any) || '';
     this.branchId = this.authService.branch?._id || '';
   }
 
@@ -65,7 +73,7 @@ export class UserHomeComponent {
             return r.status === 'pending' && r.branch?._id === this.branchId && expDate <= today;
           });
         }
-      }
+      },
     });
   }
 
@@ -73,14 +81,16 @@ export class UserHomeComponent {
     forkJoin({
       suppliers: this.supplierService.getCompanySuppliers(this.companyId),
       products: this.productsService.getCompanyProducts(this.companyId),
-      materials: this.rawMaterialsService.getCompanyRawMaterials(this.companyId)
+      materials: this.rawMaterialsService.getCompanyRawMaterials(this.companyId),
     }).subscribe({
       next: (res: any) => {
         this.suppliers = res.suppliers?.suppliers || [];
-        const prods = (res.products?.products || []).map((p: any) => ({ ...p, itemType: 'Product' }));
+        const prods = (res.products?.products || [])
+          .filter((p: any) => !p.isComposite)
+          .map((p: any) => ({ ...p, itemType: 'Product' }));
         const mats = (res.materials?.rawMaterials || []).map((m: any) => ({ ...m, itemType: 'RawMaterial' }));
         this.allCompanyProducts = [...prods, ...mats];
-      }
+      },
     });
   }
 
@@ -90,28 +100,46 @@ export class UserHomeComponent {
       next: (resp) => {
         if (resp && resp._id) {
           this.isOpenCashRegister = true;
-          
-          // Calcular tiempo restante del turno
-          const startDate = new Date(resp.startDate);
-          const maxShiftDurationHours = this.authService.branch?.shiftSettings?.maxShiftDurationHours || 12;
-          
-          const msPassed = Date.now() - startDate.getTime();
-          const hoursPassed = msPassed / (1000 * 60 * 60);
-          this.hoursLeft = maxShiftDurationHours - hoursPassed;
 
-          if (this.hoursLeft <= 0) {
-            this.shiftExpired = true;
-            this.shiftWarning = false;
-          } else if (this.hoursLeft <= 2) { // Advertencia si quedan 2 horas o menos
-            this.shiftWarning = true;
-            this.shiftExpired = false;
-          }
+          // Calcular tiempo restante del turno
+          this.shiftStartDate = new Date(resp.startDate);
+          this.shiftMaxHours = this.authService.branch?.shiftSettings?.maxShiftDurationHours || 12;
+
+          this.recalculateShiftTimer();
+
+          // Refrescar cada 60 segundos
+          if (this.shiftTimer) clearInterval(this.shiftTimer);
+          this.shiftTimer = setInterval(() => this.recalculateShiftTimer(), 60000);
         } else {
           this.isOpenCashRegister = false;
         }
       },
-      error: () => this.isOpenCashRegister = false
+      error: () => (this.isOpenCashRegister = false),
     });
+  }
+
+  recalculateShiftTimer() {
+    if (!this.shiftStartDate) return;
+    const msPassed = Date.now() - this.shiftStartDate.getTime();
+    const hoursPassed = msPassed / (1000 * 60 * 60);
+    this.hoursLeft = this.shiftMaxHours - hoursPassed;
+
+    if (this.hoursLeft <= 0) {
+      this.shiftExpired = true;
+      this.shiftWarning = false;
+    } else if (this.hoursLeft <= 2) {
+      this.shiftWarning = true;
+      this.shiftExpired = false;
+    } else {
+      this.shiftWarning = false;
+      this.shiftExpired = false;
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.shiftTimer) {
+      clearInterval(this.shiftTimer);
+    }
   }
 
   openCashRegister() {
@@ -128,7 +156,7 @@ export class UserHomeComponent {
           title: 'Turno Expirado',
           text: 'El tiempo máximo de la caja ha vencido. Ya no puedes realizar nuevas ventas, pero puedes cobrar comandas pendientes o realizar tu corte de caja.',
           confirmButtonText: 'Entendido',
-          confirmButtonColor: '#000'
+          confirmButtonColor: '#000',
         });
         return;
       }
@@ -162,7 +190,7 @@ export class UserHomeComponent {
       Swal.fire('Sin Entregas', 'No hay entregas programadas pendientes para el día de hoy.', 'info');
       return;
     }
-    
+
     // Si hay más de una, seleccionar la primera para la demo o abrir una lista.
     // Simplificaremos abriendo la primera entrega pendiente.
     const restock = this.pendingDeliveries[0];
@@ -237,21 +265,22 @@ export class UserHomeComponent {
           }
           auditedItems.push({
             type: itemsToInspect[i].type || 'Product',
-            itemRef: typeof itemsToInspect[i].itemRef === 'object' ? itemsToInspect[i].itemRef._id : itemsToInspect[i].itemRef,
+            itemRef:
+              typeof itemsToInspect[i].itemRef === 'object' ? itemsToInspect[i].itemRef._id : itemsToInspect[i].itemRef,
             quantity: qty,
-            costPrice: itemsToInspect[i].costPrice || 0
+            costPrice: itemsToInspect[i].costPrice || 0,
           });
         }
         const payFromRegInput = document.getElementById('pay-from-register') as HTMLInputElement;
         return { items: auditedItems, payFromRegister: payFromRegInput.checked };
-      }
+      },
     }).then((result) => {
       if (result.isConfirmed && result.value) {
         Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const payload = {
           status: 'completed',
           payFromRegister: result.value.payFromRegister,
-          items: result.value.items
+          items: result.value.items,
         };
         this.supplierService.updateRestockStatus(restock._id, payload).subscribe({
           next: (resp: any) => {
@@ -262,7 +291,7 @@ export class UserHomeComponent {
           },
           error: (err) => {
             Swal.fire('Error', err.error?.message || 'No se pudo completar la recepción', 'error');
-          }
+          },
         });
       }
     });
@@ -271,12 +300,38 @@ export class UserHomeComponent {
   // Recepción Rápida (Modal Custom)
   openUnplannedRestock() {
     this.unplannedRestock = { supplier: '', notes: 'Recepción no programada en caja', payFromRegister: true };
-    this.unplannedItems = [{ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined, costPrice: 0 }];
+    this.unplannedItems = [
+      {
+        productId: '',
+        productName: '',
+        quantity: 1,
+        itemType: 'Product',
+        searchText: '',
+        showDropdown: false,
+        measurementUnit: '',
+        packs: undefined,
+        unitsPerPack: undefined,
+        costPrice: 0,
+        originalCostPrice: 0,
+      },
+    ];
     this.showUnplannedRestockModal = true;
   }
 
   addUnplannedItem() {
-    this.unplannedItems.push({ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined, costPrice: 0 });
+    this.unplannedItems.push({
+      productId: '',
+      productName: '',
+      quantity: 1,
+      itemType: 'Product',
+      searchText: '',
+      showDropdown: false,
+      measurementUnit: '',
+      packs: undefined,
+      unitsPerPack: undefined,
+      costPrice: 0,
+      originalCostPrice: 0,
+    });
   }
 
   removeUnplannedItem(idx: number) {
@@ -285,11 +340,14 @@ export class UserHomeComponent {
 
   getFilteredProductsForDropdown(idx: number): any[] {
     const text = this.unplannedItems[idx].searchText;
-    if (!text || text.length < 2) return [];
+    if (!text) return this.allCompanyProducts.slice(0, 50);
     const lowerText = text.toLowerCase();
-    return this.allCompanyProducts.filter(p => 
-      (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText))
-    ).slice(0, 50);
+    return this.allCompanyProducts
+      .filter(
+        (p) =>
+          (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText)),
+      )
+      .slice(0, 50);
   }
 
   selectProductForUnplannedRow(idx: number, prod: any) {
@@ -302,6 +360,7 @@ export class UserHomeComponent {
     this.unplannedItems[idx].packs = undefined;
     this.unplannedItems[idx].unitsPerPack = undefined;
     this.unplannedItems[idx].costPrice = prod.costPrice || 0; // Guardamos el costo para no distorsionar promedio
+    this.unplannedItems[idx].originalCostPrice = prod.costPrice || 0;
   }
 
   updateItemQuantityFromMultiplier(idx: number) {
@@ -316,7 +375,7 @@ export class UserHomeComponent {
       Swal.fire('Error', 'Selecciona un proveedor.', 'warning');
       return;
     }
-    const validItems = this.unplannedItems.filter(it => it.productId && it.quantity > 0);
+    const validItems = this.unplannedItems.filter((it) => it.productId && it.quantity > 0);
     if (validItems.length === 0) {
       Swal.fire('Error', 'Agrega al menos un producto válido a recibir.', 'warning');
       return;
@@ -331,16 +390,16 @@ export class UserHomeComponent {
       isRecurring: false,
       recurrence: 'none',
       notes: this.unplannedRestock.notes,
-      items: validItems.map(it => ({
+      items: validItems.map((it) => ({
         type: it.itemType,
         itemRef: it.productId,
         quantity: it.quantity,
-        costPrice: it.costPrice // Importante mandar el costo
-      }))
+        costPrice: it.costPrice, // Importante mandar el costo
+      })),
     };
 
     Swal.fire({ title: 'Registrando entrada...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    
+
     // Paso 1: Crear el schedule
     this.supplierService.createRestockSchedule(payload).subscribe({
       next: (resp: any) => {
@@ -349,25 +408,37 @@ export class UserHomeComponent {
           const updatePayload = {
             status: 'completed',
             payFromRegister: this.unplannedRestock.payFromRegister,
-            items: payload.items
+            items: payload.items,
           };
           this.supplierService.updateRestockStatus(resp.restock._id, updatePayload).subscribe({
             next: (updateResp: any) => {
               if (updateResp.ok) {
-                Swal.fire('¡Éxito!', 'La entrada no programada fue registrada y el inventario se ha actualizado.', 'success');
+                Swal.fire(
+                  '¡Éxito!',
+                  'La entrada no programada fue registrada y el inventario se ha actualizado.',
+                  'success',
+                );
                 this.showUnplannedRestockModal = false;
               }
             },
-            error: (err) => Swal.fire('Error', 'Se creó el registro pero falló la actualización de inventario.', 'error')
+            error: (err) =>
+              Swal.fire('Error', 'Se creó el registro pero falló la actualización de inventario.', 'error'),
           });
         }
       },
-      error: (err) => Swal.fire('Error', err.error?.message || 'No se pudo crear el registro.', 'error')
+      error: (err) => Swal.fire('Error', err.error?.message || 'No se pudo crear el registro.', 'error'),
     });
   }
 
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
+    const activeEl = document.activeElement as HTMLElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT')) {
+      return;
+    }
+    if (this.showUnplannedRestockModal) {
+      return;
+    }
     if (event.key === 'a') {
       this.openCashRegister();
     } else if (event.key === 's' && this.isOpenCashRegister) {

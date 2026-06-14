@@ -5,15 +5,15 @@ import { Category, UserRole } from 'src/app/interfaces/models.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { CompanyService } from 'src/app/services/company.service';
+import { LoggerService } from '../../../../services/logger.service';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-company-category',
   templateUrl: './create-company-category.component.html',
-  styleUrls: ['./create-company-catregory.component.css']
+  styleUrls: ['./create-company-catregory.component.css'],
 })
 export class CreateCompanyCategoryComponent {
-
   userRole!: UserRole;
   companies!: Category[];
   companyId!: string;
@@ -21,14 +21,15 @@ export class CreateCompanyCategoryComponent {
   category: Category = {
     name: '',
     description: '',
-    companyId: ''
-  }
+    companyId: '',
+  };
 
   constructor(
     private categoryService: CategoryService,
     private companiesService: CompanyService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private logger: LoggerService,
   ) {
     this.getRole();
     this.getCompanyId();
@@ -44,12 +45,12 @@ export class CreateCompanyCategoryComponent {
     }
 
     if (form.valid) {
-      console.log(form.value);
+      this.logger.log(form.value);
       this.categoryService.createCategory(this.category, this.authService.companyId!).subscribe({
         next: (createdCompany) => {
           Swal.fire({
             text: 'Categoría creada correctamente',
-            icon: 'success'
+            icon: 'success',
           }).then(() => {
             if (this.userRole === 'admin') {
               this.router.navigateByUrl('/dashboard/admin/categories');
@@ -62,15 +63,15 @@ export class CreateCompanyCategoryComponent {
           Swal.fire({
             title: 'Error',
             text: 'La categoría no pudo ser creada',
-            icon: 'error'
+            icon: 'error',
           });
-        }
+        },
       });
     } else {
       Swal.fire({
         title: 'Formulario no válido',
         text: 'Por favor, completa todos los campos requeridos.',
-        icon: 'warning'
+        icon: 'warning',
       });
     }
   }
@@ -80,8 +81,7 @@ export class CreateCompanyCategoryComponent {
       this.companyId = this.authService.companyId!;
       this.category.companyId = this.companyId;
     } else {
-      console.log('No se encontró el ID de la compañía');
+      this.logger.log('No se encontró el ID de la compañía');
     }
   }
-
 }

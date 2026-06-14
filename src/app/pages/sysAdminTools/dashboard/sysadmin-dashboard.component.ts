@@ -2,18 +2,18 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SysadminService } from 'src/app/services/sysadmin.service';
 import { Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { 
-  ISysadminMetrics, 
-  IActivityFeedItem, 
-  ISystemError, 
-  ISystemErrorsResponse, 
-  IGlobalMetricsResponse 
+import {
+  ISysadminMetrics,
+  IActivityFeedItem,
+  ISystemError,
+  ISystemErrorsResponse,
+  IGlobalMetricsResponse,
 } from 'src/app/interfaces/sysadmin.interface';
 
 @Component({
   selector: 'app-sysadmin-dashboard',
   templateUrl: './sysadmin-dashboard.component.html',
-  styleUrls: ['./sysadmin-dashboard.component.css']
+  styleUrls: ['./sysadmin-dashboard.component.css'],
 })
 export class SysadminDashboardComponent implements OnInit, OnDestroy {
   // Metrics & Live Feed
@@ -21,7 +21,7 @@ export class SysadminDashboardComponent implements OnInit, OnDestroy {
     gmv: 0,
     activeCompanies: 0,
     totalErrors: 0,
-    openRegisters: 0
+    openRegisters: 0,
   };
   liveFeed: IActivityFeedItem[] = [];
   autoRefreshSub?: Subscription;
@@ -34,25 +34,23 @@ export class SysadminDashboardComponent implements OnInit, OnDestroy {
   loadingErrors: boolean = false;
   expandedErrorId?: string;
 
-  constructor(
-    private sysadminService: SysadminService
-  ) {}
+  constructor(private sysadminService: SysadminService) {}
 
   ngOnInit(): void {
     this.loadSystemErrors();
 
     // Auto-refresh control tower metrics every 20 seconds, avoiding race conditions
-    this.autoRefreshSub = timer(0, 20000).pipe(
-      switchMap(() => this.sysadminService.getGlobalMetrics())
-    ).subscribe({
-      next: (resp: IGlobalMetricsResponse) => {
-        if (resp.ok) {
-          this.metrics = resp.metrics;
-          this.liveFeed = resp.liveFeed || [];
-        }
-      },
-      error: (err) => console.error('Error fetching global metrics:', err)
-    });
+    this.autoRefreshSub = timer(0, 20000)
+      .pipe(switchMap(() => this.sysadminService.getGlobalMetrics()))
+      .subscribe({
+        next: (resp: IGlobalMetricsResponse) => {
+          if (resp.ok) {
+            this.metrics = resp.metrics;
+            this.liveFeed = resp.liveFeed || [];
+          }
+        },
+        error: (err) => console.error('Error fetching global metrics:', err),
+      });
   }
 
   ngOnDestroy(): void {
@@ -69,7 +67,7 @@ export class SysadminDashboardComponent implements OnInit, OnDestroy {
           this.metrics = resp.metrics;
           this.liveFeed = resp.liveFeed || [];
         }
-      }
+      },
     });
   }
 
@@ -87,7 +85,7 @@ export class SysadminDashboardComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.loadingErrors = false;
-      }
+      },
     });
   }
 
@@ -110,7 +108,7 @@ export class SysadminDashboardComponent implements OnInit, OnDestroy {
     if (!saleId) return;
     this.loadingForensic = true;
     this.selectedForensicSale = null;
-    
+
     this.sysadminService.getSaleForensics(saleId).subscribe({
       next: (resp) => {
         if (resp.ok) {
@@ -121,7 +119,7 @@ export class SysadminDashboardComponent implements OnInit, OnDestroy {
       error: () => {
         this.loadingForensic = false;
         // Handle error visually if needed
-      }
+      },
     });
   }
 }

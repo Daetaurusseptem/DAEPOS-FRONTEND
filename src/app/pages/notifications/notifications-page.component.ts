@@ -7,7 +7,7 @@ import { SocketService } from 'src/app/services/socket.service';
 @Component({
   selector: 'app-notifications-page',
   templateUrl: './notifications-page.component.html',
-  styleUrls: ['./notifications-page.component.css']
+  styleUrls: ['./notifications-page.component.css'],
 })
 export class NotificationsPageComponent implements OnInit, OnDestroy {
   notifications: any[] = [];
@@ -19,19 +19,19 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
   constructor(
     private notificationService: NotificationService,
     private socketService: SocketService,
-    private router: Router
-  ) { }
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.loadNotifications();
-    
+
     // Escuchar notificaciones en tiempo real vía Socket.IO
     this.socketSub = this.socketService.onEvent<any>('new-notification').subscribe({
       next: (newNotif) => {
         // Añadir al principio de la lista
         this.notifications = [newNotif, ...this.notifications];
-        this.unreadCount = this.notifications.filter(n => !n.isRead).length;
-      }
+        this.unreadCount = this.notifications.filter((n) => !n.isRead).length;
+      },
     });
   }
 
@@ -43,19 +43,19 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
 
   loadNotifications(showSpinner: boolean = true): void {
     if (showSpinner) this.isLoading = true;
-    
+
     this.notificationService.getMyNotifications().subscribe({
       next: (resp: any) => {
         if (resp.ok) {
           this.notifications = resp.notifications || [];
-          this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+          this.unreadCount = this.notifications.filter((n) => !n.isRead).length;
         }
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading notifications page:', err);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -65,7 +65,7 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
 
   getFilteredNotifications(): any[] {
     if (this.activeFilter === 'unread') {
-      return this.notifications.filter(n => !n.isRead);
+      return this.notifications.filter((n) => !n.isRead);
     }
     return this.notifications;
   }
@@ -80,9 +80,9 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
         next: (resp: any) => {
           if (resp.ok) {
             notif.isRead = true;
-            this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+            this.unreadCount = this.notifications.filter((n) => !n.isRead).length;
           }
-        }
+        },
       });
     }
   }
@@ -93,10 +93,10 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
     this.notificationService.markAllAsRead().subscribe({
       next: (resp: any) => {
         if (resp.ok) {
-          this.notifications.forEach(n => n.isRead = true);
+          this.notifications.forEach((n) => (n.isRead = true));
           this.unreadCount = 0;
         }
-      }
+      },
     });
   }
 
@@ -105,8 +105,8 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
       this.notificationService.markAsRead(notif._id).subscribe({
         next: () => {
           notif.isRead = true;
-          this.unreadCount = this.notifications.filter(n => !n.isRead).length;
-        }
+          this.unreadCount = this.notifications.filter((n) => !n.isRead).length;
+        },
       });
     }
 

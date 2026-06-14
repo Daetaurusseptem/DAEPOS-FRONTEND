@@ -1,32 +1,26 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
-import { UsersService } from '../services/users.service';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { LoggerService } from '../services/logger.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AdminGuard implements CanActivate {
-  constructor(
-    private authService:AuthService,
-    private router:Router
-    ){}
-canActivate(
-route: ActivatedRouteSnapshot,
-state: RouterStateSnapshot):  boolean  {
-  console.log(this.authService.role);
-    if (this.authService.role === 'admin' || this.authService.role === 'sysadmin' || this.authService.role === 'companyAdmin') {
-      return true;
-    } else if (this.authService.role === 'user') {
-      this.router.navigateByUrl('/dashboard');
-      return false;
-    } else {
-      this.router.navigateByUrl('/login');
-      return false;
-    }
+export const adminGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const logger = inject(LoggerService);
 
+  logger.log(authService.role);
 
-
-}
-}
+  if (
+    authService.role === 'admin' ||
+    authService.role === 'sysadmin' ||
+    authService.role === 'companyAdmin'
+  ) {
+    return true;
+  } else if (authService.role === 'user') {
+    router.navigateByUrl('/dashboard');
+    return false;
+  } else {
+    router.navigateByUrl('/login');
+    return false;
+  }
+};

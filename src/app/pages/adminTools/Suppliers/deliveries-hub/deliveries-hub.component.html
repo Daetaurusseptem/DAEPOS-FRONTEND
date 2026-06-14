@@ -1,17 +1,22 @@
 <div class="deliveries-wrapper p-4 animate__animated animate__fadeIn">
-  
   <!-- Cabecera -->
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
       <h2 class="fw-bold text-dark mb-1 tracking-tight">Panel Central de Entregas</h2>
-      <p class="text-muted mb-0">Monitorea y recibe de forma consolidada todos los reabastecimientos agendados de tus proveedores.</p>
+      <p class="text-muted mb-0">
+        Monitorea y recibe de forma consolidada todos los reabastecimientos agendados de tus proveedores.
+      </p>
     </div>
-    
+
     <div class="d-flex flex-wrap gap-2">
       <button class="btn btn-outline-dark btn-sm rounded-pill px-3 bg-white" routerLink="/dashboard/admin/suppliers">
         <i class="bi bi-truck me-1"></i> Fichas de Proveedores
       </button>
-      <button class="btn btn-dark btn-sm rounded-pill px-3 text-white border-0 fw-semibold" (click)="openScheduleModal()" style="background-color: #000 !important;">
+      <button
+        class="btn btn-dark btn-sm rounded-pill px-3 text-white border-0 fw-semibold"
+        (click)="openScheduleModal()"
+        style="background-color: #000 !important"
+      >
         <i class="bi bi-calendar-plus me-1"></i> Agendar Entrega
       </button>
     </div>
@@ -23,7 +28,9 @@
       <div class="card border border-light-subtle shadow-sm rounded-4 bg-white h-100 transition-all hover-shadow">
         <div class="card-body p-4">
           <span class="stat-label text-warning fw-semibold">📅 Entregas para Hoy</span>
-          <h3 class="stat-value price-mono mt-2 mb-0">{{ kpiPendingToday }} <span class="fs-6 fw-normal text-muted">pedidos</span></h3>
+          <h3 class="stat-value price-mono mt-2 mb-0">
+            {{ kpiPendingToday }} <span class="fs-6 fw-normal text-muted">pedidos</span>
+          </h3>
           <span class="text-muted small mt-1 d-block">Reabastecimientos agendados para el día de hoy</span>
         </div>
       </div>
@@ -32,7 +39,9 @@
       <div class="card border border-light-subtle shadow-sm rounded-4 bg-white h-100 transition-all hover-shadow">
         <div class="card-body p-4">
           <span class="stat-label text-danger fw-semibold">⚠️ Entregas Retrasadas</span>
-          <h3 class="stat-value price-mono mt-2 mb-0 text-danger">{{ kpiOverdue }} <span class="fs-6 fw-normal text-muted">pedidos</span></h3>
+          <h3 class="stat-value price-mono mt-2 mb-0 text-danger">
+            {{ kpiOverdue }} <span class="fs-6 fw-normal text-muted">pedidos</span>
+          </h3>
           <span class="text-muted small mt-1 d-block">Entregas pendientes con fecha de arribo vencida</span>
         </div>
       </div>
@@ -41,7 +50,7 @@
       <div class="card border border-light-subtle shadow-sm rounded-4 bg-white h-100 transition-all hover-shadow">
         <div class="card-body p-4">
           <span class="stat-label text-success fw-semibold">💰 Valor Programado Pendiente</span>
-          <h3 class="stat-value price-mono mt-2 mb-0 text-success">${{ kpiWeeklyInvestment | number:'1.2-2' }}</h3>
+          <h3 class="stat-value price-mono mt-2 mb-0 text-success">${{ kpiWeeklyInvestment | number: '1.2-2' }}</h3>
           <span class="text-muted small mt-1 d-block">Monto estimado de compra de los artículos pendientes</span>
         </div>
       </div>
@@ -55,7 +64,12 @@
         <!-- Filtrar por Sucursal -->
         <div class="col-md-3">
           <label class="form-label small fw-semibold text-secondary mb-1">Sucursal Destino</label>
-          <select class="form-select border-light-subtle rounded-3" [(ngModel)]="selectedBranch" (change)="applyFilters()" [disabled]="authService.role !== 'companyAdmin'">
+          <select
+            class="form-select border-light-subtle rounded-3"
+            [(ngModel)]="selectedBranch"
+            (change)="applyFilters()"
+            [disabled]="authService.role !== 'companyAdmin'"
+          >
             <option value="" *ngIf="authService.role === 'companyAdmin'">Todas las sucursales</option>
             <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
           </select>
@@ -65,26 +79,31 @@
         <div class="col-md-3 position-relative">
           <label class="form-label small fw-semibold text-secondary mb-1">Proveedor</label>
           <div class="autocomplete-container position-relative">
-            <input type="text" 
-                   class="form-control border-light-subtle rounded-3" 
-                   placeholder="🔍 Buscar proveedor..." 
-                   [(ngModel)]="supplierFilterSearchText" 
-                   (focus)="showFilterSupplierDropdown = true"
-                   (blur)="showFilterSupplierDropdown = false">
-            
+            <input
+              type="text"
+              class="form-control border-light-subtle rounded-3"
+              placeholder="🔍 Buscar proveedor..."
+              [(ngModel)]="supplierFilterSearchText"
+              (focus)="showFilterSupplierDropdown = true"
+              (blur)="showFilterSupplierDropdown = false"
+            />
+
             <!-- Botón para limpiar selección rápida -->
-            <button class="btn-clear-select border-0 bg-transparent text-secondary position-absolute end-0 top-50 translate-middle-y me-2" 
-                    *ngIf="selectedSupplier" 
-                    (mousedown)="selectSupplierInFilter(null)"
-                    style="z-index: 10;">
+            <button
+              class="btn-clear-select border-0 bg-transparent text-secondary position-absolute end-0 top-50 translate-middle-y me-2"
+              *ngIf="selectedSupplier"
+              (mousedown)="selectSupplierInFilter(null)"
+              style="z-index: 10"
+            >
               <i class="bi bi-x-circle-fill"></i>
             </button>
-            
-            <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" 
-                style="max-height: 200px; display: block; z-index: 1050; position: absolute;" 
-                *ngIf="showFilterSupplierDropdown && filteredSuppliersForFilter.length > 0">
-              <li *ngFor="let s of filteredSuppliersForFilter" 
-                  (mousedown)="selectSupplierInFilter(s)">
+
+            <ul
+              class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto"
+              style="max-height: 200px; display: block; z-index: 1050; position: absolute"
+              *ngIf="showFilterSupplierDropdown && filteredSuppliersForFilter.length > 0"
+            >
+              <li *ngFor="let s of filteredSuppliersForFilter" (mousedown)="selectSupplierInFilter(s)">
                 <a class="dropdown-item py-2 fw-medium text-dark cursor-pointer" role="button">
                   {{ s.name }}
                 </a>
@@ -96,7 +115,11 @@
         <!-- Filtrar por Estatus -->
         <div class="col-md-3">
           <label class="form-label small fw-semibold text-secondary mb-1">Estatus del Reabastecimiento</label>
-          <select class="form-select border-light-subtle rounded-3" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <select
+            class="form-select border-light-subtle rounded-3"
+            [(ngModel)]="selectedStatus"
+            (change)="applyFilters()"
+          >
             <option value="all">Todos los estatus</option>
             <option value="pending">Pendiente</option>
             <option value="completed">Completado</option>
@@ -106,7 +129,10 @@
 
         <!-- Botón de Limpiar -->
         <div class="col-md-3 d-flex align-items-end h-100">
-          <button class="btn btn-outline-dark rounded-pill w-100 py-2 border-light-subtle d-flex align-items-center justify-content-center gap-1.5 bg-light-subtle" (click)="resetFilters()">
+          <button
+            class="btn btn-outline-dark rounded-pill w-100 py-2 border-light-subtle d-flex align-items-center justify-content-center gap-1.5 bg-light-subtle"
+            (click)="resetFilters()"
+          >
             <i class="bi bi-eraser-fill text-muted"></i> Limpiar Filtros
           </button>
         </div>
@@ -141,48 +167,59 @@
               <small class="text-muted">{{ r.supplier?.contactInfo?.phone || 'Sin teléfono' }}</small>
             </td>
             <td class="price-mono fw-semibold text-dark">
-              <i class="bi bi-calendar-event me-1 text-muted"></i> {{ r.expectedDate | date:'dd/MM/yyyy' }}
+              <i class="bi bi-calendar-event me-1 text-muted"></i> {{ r.expectedDate | date: 'dd/MM/yyyy' }}
             </td>
             <td>
               <span class="badge rounded-2 bg-light text-secondary border border-light-subtle px-2.5 py-1.5 small">
                 <i class="bi bi-shop me-1 text-muted"></i> {{ r.branch?.name || 'Sucursal Centro' }}
               </span>
             </td>
-            <td class="fw-medium text-secondary" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            <td
+              class="fw-medium text-secondary"
+              style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
+            >
               {{ r.itemsSummary || 'Sin artículos detallados' }}
             </td>
             <td>
-              <span class="badge rounded-pill px-3 py-1.5 small d-inline-flex align-items-center gap-1 fw-medium"
-                    [class.bg-info-soft]="r.isRecurring"
-                    [class.text-info]="r.isRecurring"
-                    [class.bg-light]="!r.isRecurring"
-                    [class.text-secondary]="!r.isRecurring">
+              <span
+                class="badge rounded-pill px-3 py-1.5 small d-inline-flex align-items-center gap-1 fw-medium"
+                [class.bg-info-soft]="r.isRecurring"
+                [class.text-info]="r.isRecurring"
+                [class.bg-light]="!r.isRecurring"
+                [class.text-secondary]="!r.isRecurring"
+              >
                 <i class="bi bi-arrow-repeat" *ngIf="r.isRecurring"></i>
                 {{ r.isRecurring ? getRecurrenceLabel(r.recurrence) : 'Única vez' }}
               </span>
             </td>
             <td class="text-center">
-              <span class="badge rounded-pill px-2.5 py-1.5 small fw-semibold"
-                    [class.bg-warning-soft]="r.status === 'pending'"
-                    [class.text-warning]="r.status === 'pending'"
-                    [class.bg-success-soft]="r.status === 'completed'"
-                    [class.text-success]="r.status === 'completed'"
-                    [class.bg-danger-soft]="r.status === 'cancelled'"
-                    [class.text-danger]="r.status === 'cancelled'">
-                {{ r.status === 'pending' ? 'Pendiente' : (r.status === 'completed' ? 'Completado' : 'Cancelado') }}
+              <span
+                class="badge rounded-pill px-2.5 py-1.5 small fw-semibold"
+                [class.bg-warning-soft]="r.status === 'pending'"
+                [class.text-warning]="r.status === 'pending'"
+                [class.bg-success-soft]="r.status === 'completed'"
+                [class.text-success]="r.status === 'completed'"
+                [class.bg-danger-soft]="r.status === 'cancelled'"
+                [class.text-danger]="r.status === 'cancelled'"
+              >
+                {{ r.status === 'pending' ? 'Pendiente' : r.status === 'completed' ? 'Completado' : 'Cancelado' }}
               </span>
             </td>
             <td class="text-end">
               <div class="d-flex gap-2 justify-content-end">
-                <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5 text-white border-0 fw-semibold" 
-                        *ngIf="r.status === 'pending' && canVerifyRestock" 
-                        (click)="openInspectModal(r)"
-                        style="background-color: #000 !important;">
+                <button
+                  class="btn btn-dark btn-sm rounded-pill px-3 py-1.5 text-white border-0 fw-semibold"
+                  *ngIf="r.status === 'pending' && canVerifyRestock"
+                  (click)="openInspectModal(r)"
+                  style="background-color: #000 !important"
+                >
                   <i class="bi bi-shield-check me-1"></i> Recibir
                 </button>
-                <button class="btn btn-outline-danger btn-sm border-light-subtle rounded-3 p-2 d-flex align-items-center justify-content-center" 
-                        *ngIf="r.status === 'pending'" 
-                        (click)="deleteRestock(r._id)">
+                <button
+                  class="btn btn-outline-danger btn-sm border-light-subtle rounded-3 p-2 d-flex align-items-center justify-content-center"
+                  *ngIf="r.status === 'pending'"
+                  (click)="deleteRestock(r._id)"
+                >
                   <i class="bi bi-trash3-fill"></i>
                 </button>
               </div>
@@ -195,69 +232,103 @@
 
   <!-- MODAL: Recibir e Inspeccionar Entrega (Audit & Cash Register integration) -->
   <div class="custom-modal-backdrop" *ngIf="showInspectModal && selectedRestockForInspect">
-    <div class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__fadeInDown animate__faster" style="max-width: 600px; width: 100%;">
+    <div
+      class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__fadeInDown animate__faster"
+      style="max-width: 600px; width: 100%"
+    >
       <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
         <div>
           <h5 class="fw-bold mb-0">Verificación e Inspección Física</h5>
-          <small class="text-muted">Recepción de mercancía a: <strong>{{ selectedRestockForInspect.branch?.name || 'Sucursal Centro' }}</strong></small>
+          <small class="text-muted"
+            >Recepción de mercancía a:
+            <strong>{{ selectedRestockForInspect.branch?.name || 'Sucursal Centro' }}</strong></small
+          >
         </div>
         <button class="btn-close" (click)="closeInspectModal()"></button>
       </div>
-      
+
       <div class="card-body p-4">
         <div class="alert alert-light border border-light-subtle d-flex align-items-start gap-2 mb-3">
           <i class="bi bi-info-circle text-primary fs-5 mt-0.5"></i>
           <small class="text-muted">
-            Inspecciona cada artículo. Marca la casilla para confirmar su arribo y ajusta la cantidad física y costo unitario real.
+            Inspecciona cada artículo. Marca la casilla para confirmar su arribo y ajusta la cantidad física y costo
+            unitario real.
           </small>
         </div>
 
         <!-- Checklist de Productos -->
         <h6 class="fw-bold text-dark mb-3">Auditoría Física:</h6>
         <div class="inspect-list border border-light-subtle rounded-3 overflow-hidden mb-3">
-          <div *ngFor="let it of inspectedItems; let i = index" class="inspect-item d-flex flex-column p-3 border-bottom border-light-subtle bg-white gap-2">
+          <div
+            *ngFor="let it of inspectedItems; let i = index"
+            class="inspect-item d-flex flex-column p-3 border-bottom border-light-subtle bg-white gap-2"
+          >
             <div class="d-flex align-items-center justify-content-between">
               <div class="form-check d-flex align-items-center gap-2">
-                <input class="form-check-input" type="checkbox" id="hub-check-{{i}}" [(ngModel)]="it.verified">
-                <label class="form-check-label fw-semibold text-dark fs-6 animate__animated animate__fadeIn" for="hub-check-{{i}}">
+                <input class="form-check-input" type="checkbox" id="hub-check-{{ i }}" [(ngModel)]="it.verified" />
+                <label
+                  class="form-check-label fw-semibold text-dark fs-6 animate__animated animate__fadeIn"
+                  for="hub-check-{{ i }}"
+                >
                   {{ it.name }}
-                  <span class="badge bg-light text-secondary border border-light-subtle ms-1 price-mono" style="font-size: 0.7rem;" *ngIf="it.agreedCost !== null && it.agreedCost !== undefined">
-                    Pactado: ${{ it.agreedCost | number:'1.2-2' }}
+                  <span
+                    class="badge bg-light text-secondary border border-light-subtle ms-1 price-mono"
+                    style="font-size: 0.7rem"
+                    *ngIf="it.agreedCost !== null && it.agreedCost !== undefined"
+                  >
+                    Pactado: ${{ it.agreedCost | number: '1.2-2' }}
                   </span>
                 </label>
               </div>
-              <span class="badge" [class.bg-success-soft]="it.verified" [class.text-success]="it.verified" [class.bg-light]="!it.verified" [class.text-secondary]="!it.verified">
+              <span
+                class="badge"
+                [class.bg-success-soft]="it.verified"
+                [class.text-success]="it.verified"
+                [class.bg-light]="!it.verified"
+                [class.text-secondary]="!it.verified"
+              >
                 {{ it.verified ? 'Recibido' : 'Omitido' }}
               </span>
             </div>
-            
+
             <div class="d-flex gap-3 mt-1 animate__animated animate__fadeIn" *ngIf="it.verified">
               <div class="flex-grow-1">
                 <label class="small fw-semibold text-secondary mb-1">Cant. Recibida Físicamente</label>
-                <input type="number" class="form-control form-control-sm price-mono" [(ngModel)]="it.quantity" min="1">
+                <input
+                  type="number"
+                  class="form-control form-control-sm price-mono"
+                  [(ngModel)]="it.quantity"
+                  min="1"
+                />
               </div>
               <div class="flex-grow-1">
                 <label class="small fw-semibold text-secondary mb-1">Costo Unitario Facturado ($)</label>
-                <input type="number" 
-                       class="form-control form-control-sm price-mono" 
-                       [class.border-warning]="hasPriceVariance(it)"
-                       [class.bg-warning-soft]="hasPriceVariance(it)"
-                       [(ngModel)]="it.costPrice" 
-                       min="0" 
-                       step="0.01">
+                <input
+                  type="number"
+                  class="form-control form-control-sm price-mono"
+                  [class.border-warning]="hasPriceVariance(it)"
+                  [class.bg-warning-soft]="hasPriceVariance(it)"
+                  [(ngModel)]="it.costPrice"
+                  min="0"
+                  step="0.01"
+                />
               </div>
             </div>
 
             <!-- Campo de Justificación de Desviación de Costo (Last-mile Override) -->
             <div class="mt-2 px-1 animate__animated animate__fadeIn" *ngIf="hasPriceVariance(it)">
-              <div class="alert alert-warning-soft border border-warning-subtle py-1.5 px-3 rounded-2 text-warning-dark small mb-2 d-flex align-items-center gap-1.5">
+              <div
+                class="alert alert-warning-soft border border-warning-subtle py-1.5 px-3 rounded-2 text-warning-dark small mb-2 d-flex align-items-center gap-1.5"
+              >
                 <i class="bi bi-exclamation-triangle-fill"></i>
                 <span>Costo superior al pactado. Requiere nota de justificación.</span>
               </div>
-              <input type="text" 
-                     class="form-control form-control-sm border-warning" 
-                     placeholder="Motivo del incremento (ej: flete extraordinario)..." 
-                     [(ngModel)]="it.varianceNote">
+              <input
+                type="text"
+                class="form-control form-control-sm border-warning"
+                placeholder="Motivo del incremento (ej: flete extraordinario)..."
+                [(ngModel)]="it.varianceNote"
+              />
             </div>
           </div>
         </div>
@@ -265,20 +336,40 @@
         <!-- Integración Financiera -->
         <div class="card border border-light-subtle rounded-3 p-3 bg-light-subtle mb-3">
           <div class="form-check form-switch mb-0">
-            <input class="form-check-input" type="checkbox" id="hubPayFromRegisterSwitch" [(ngModel)]="payFromRegister">
-            <label class="form-check-label fw-semibold" for="hubPayFromRegisterSwitch">¿Pagar esta entrega desde Caja Chica (Turno Activo)?</label>
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="hubPayFromRegisterSwitch"
+              [(ngModel)]="payFromRegister"
+            />
+            <label class="form-check-label fw-semibold" for="hubPayFromRegisterSwitch"
+              >¿Pagar esta entrega desde Caja Chica (Turno Activo)?</label
+            >
           </div>
-          <small class="text-muted d-block mt-1">Si se marca, se restará el costo total real de la caja chica de la sucursal de destino.</small>
+          <small class="text-muted d-block mt-1"
+            >Si se marca, se restará el costo total real de la caja chica de la sucursal de destino.</small
+          >
         </div>
 
         <!-- Registro al Vuelo -->
-        <button class="btn btn-outline-dark btn-sm rounded-pill w-100 py-2 border-light-subtle d-flex align-items-center justify-content-center gap-1.5 mb-4" (click)="openQuickProductModal()">
+        <button
+          class="btn btn-outline-dark btn-sm rounded-pill w-100 py-2 border-light-subtle d-flex align-items-center justify-content-center gap-1.5 mb-4"
+          (click)="openQuickProductModal()"
+        >
           <i class="bi bi-plus-circle-fill text-muted"></i> Registrar Producto no Catalogado al Vuelo
         </button>
 
         <div class="d-flex gap-2 justify-content-end">
-          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeInspectModal()">Cancelar</button>
-          <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="completeInspection()">Completar Recepción</button>
+          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeInspectModal()">
+            Cancelar
+          </button>
+          <button
+            class="btn btn-dark rounded-pill px-4 border-0"
+            style="background-color: #000 !important"
+            (click)="completeInspection()"
+          >
+            Completar Recepción
+          </button>
         </div>
       </div>
     </div>
@@ -286,7 +377,10 @@
 
   <!-- MODAL: Agendar Reabastecimiento -->
   <div class="custom-modal-backdrop" *ngIf="showScheduleModal">
-    <div class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__fadeInDown animate__faster" style="max-width: 500px; width: 100%;">
+    <div
+      class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__fadeInDown animate__faster"
+      style="max-width: 500px; width: 100%"
+    >
       <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
         <h5 class="fw-bold mb-0">Agendar Reabastecimiento</h5>
         <button class="btn-close" (click)="closeScheduleModal()"></button>
@@ -296,18 +390,21 @@
         <div class="mb-3 position-relative">
           <label class="form-label fw-semibold">Proveedor *</label>
           <div class="autocomplete-container position-relative">
-            <input type="text" 
-                   class="form-control" 
-                   placeholder="🔍 Buscar y seleccionar proveedor..." 
-                   [(ngModel)]="supplierModalSearchText" 
-                   (focus)="showModalSupplierDropdown = true"
-                   (blur)="showModalSupplierDropdown = false">
-            
-            <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" 
-                style="max-height: 180px; display: block; z-index: 1050; position: absolute;" 
-                *ngIf="showModalSupplierDropdown && filteredSuppliersForModal.length > 0">
-              <li *ngFor="let s of filteredSuppliersForModal" 
-                  (mousedown)="onSupplierSelectedInModal(s)">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="🔍 Buscar y seleccionar proveedor..."
+              [(ngModel)]="supplierModalSearchText"
+              (focus)="showModalSupplierDropdown = true"
+              (blur)="showModalSupplierDropdown = false"
+            />
+
+            <ul
+              class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto"
+              style="max-height: 180px; display: block; z-index: 1050; position: absolute"
+              *ngIf="showModalSupplierDropdown && filteredSuppliersForModal.length > 0"
+            >
+              <li *ngFor="let s of filteredSuppliersForModal" (mousedown)="onSupplierSelectedInModal(s)">
                 <a class="dropdown-item py-2 fw-medium text-dark cursor-pointer" role="button">
                   {{ s.name }}
                 </a>
@@ -325,38 +422,53 @@
 
         <div class="mb-3">
           <label class="form-label fw-semibold">Fecha Prometida de Entrega *</label>
-          <input type="date" class="form-control" [(ngModel)]="newRestock.expectedDate">
+          <input type="date" class="form-control" [(ngModel)]="newRestock.expectedDate" />
         </div>
 
         <!-- Constructor de artículos interactivo -->
-        <div class="mb-3" *ngIf="newRestock.supplier" style="position: relative; z-index: 10;">
+        <div class="mb-3" *ngIf="newRestock.supplier" style="position: relative; z-index: 10">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label fw-semibold mb-0">Productos a Recibir *</label>
-            <button class="btn btn-outline-dark btn-xs rounded-pill px-2 py-0.5" style="font-size: 0.75rem;" (click)="addRestockItemRow()">
+            <button
+              class="btn btn-outline-dark btn-xs rounded-pill px-2 py-0.5"
+              style="font-size: 0.75rem"
+              (click)="addRestockItemRow()"
+            >
               <i class="bi bi-plus-circle"></i> Agregar Artículo
             </button>
           </div>
-          
-          <div class="d-flex flex-column gap-2 mb-2" style="padding-right: 4px;">
-            <div *ngFor="let item of restockItemsList; let idx = index" class="d-flex flex-column gap-2 mb-3 bg-white border border-light-subtle rounded-4 p-3 animate__animated animate__fadeIn shadow-sm" [style.z-index]="1000 - idx" style="position: relative;">
-              
+
+          <div class="d-flex flex-column gap-2 mb-2" style="padding-right: 4px">
+            <div
+              *ngFor="let item of restockItemsList; let idx = index"
+              class="d-flex flex-column gap-2 mb-3 bg-white border border-light-subtle rounded-4 p-3 animate__animated animate__fadeIn shadow-sm"
+              [style.z-index]="1000 - idx"
+              style="position: relative"
+            >
               <!-- Línea 1: Producto y Botón Eliminar -->
               <div class="d-flex gap-2 align-items-center">
                 <div class="position-relative flex-grow-1">
-                  <input type="text" 
-                         class="form-control border-light-subtle bg-light" 
-                         placeholder="🔍 Buscar producto a recibir..." 
-                         [(ngModel)]="item.searchText"
-                         (focus)="item.showDropdown = true"
-                         (blur)="item.showDropdown = false">
-                  
-                  <ul class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto" 
-                      style="max-height: 150px; display: block; z-index: 1050; position: absolute;" 
-                      *ngIf="item.showDropdown && getFilteredProductsForDropdown(idx).length > 0">
-                    <li *ngFor="let prod of getFilteredProductsForDropdown(idx)" 
-                        (mousedown)="selectProductForRestockRow(idx, prod)">
-                      <a class="dropdown-item py-2 text-dark cursor-pointer text-truncate" style="font-size: 0.9rem;">
-                        <span class="fw-bold">{{ prod.name }}</span> <small class="text-muted">({{ prod.brand || 'S/M' }})</small>
+                  <input
+                    type="text"
+                    class="form-control border-light-subtle bg-light"
+                    placeholder="🔍 Buscar producto a recibir..."
+                    [(ngModel)]="item.searchText"
+                    (focus)="item.showDropdown = true"
+                    (blur)="item.showDropdown = false"
+                  />
+
+                  <ul
+                    class="dropdown-menu show w-100 border border-light-subtle rounded-3 shadow mt-1 overflow-auto"
+                    style="max-height: 150px; display: block; z-index: 1050; position: absolute"
+                    *ngIf="item.showDropdown && getFilteredProductsForDropdown(idx).length > 0"
+                  >
+                    <li
+                      *ngFor="let prod of getFilteredProductsForDropdown(idx)"
+                      (mousedown)="selectProductForRestockRow(idx, prod)"
+                    >
+                      <a class="dropdown-item py-2 text-dark cursor-pointer text-truncate" style="font-size: 0.9rem">
+                        <span class="fw-bold">{{ prod.name }}</span>
+                        <small class="text-muted">({{ prod.brand || 'S/M' }})</small>
                       </a>
                     </li>
                   </ul>
@@ -367,35 +479,66 @@
               </div>
 
               <!-- Línea 2: Multiplicador y Total -->
-              <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-1 pt-3 border-top border-light-subtle">
-                
+              <div
+                class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-1 pt-3 border-top border-light-subtle"
+              >
                 <!-- Multiplicador -->
-                <div class="d-flex align-items-center gap-1 bg-light px-3 py-1.5 rounded-pill border border-light-subtle">
-                  <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 70px; font-weight: 600;" placeholder="Cajas" [(ngModel)]="item.packs" (input)="updateItemQuantityFromMultiplier(idx)">
+                <div
+                  class="d-flex align-items-center gap-1 bg-light px-3 py-1.5 rounded-pill border border-light-subtle"
+                >
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center border-0 bg-transparent px-1"
+                    style="width: 70px; font-weight: 600"
+                    placeholder="Cajas"
+                    [(ngModel)]="item.packs"
+                    (input)="updateItemQuantityFromMultiplier(idx)"
+                  />
                   <span class="text-muted small fw-bold">✕</span>
-                  <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-1" style="width: 80px; font-weight: 600;" placeholder="Cant." [(ngModel)]="item.unitsPerPack" (input)="updateItemQuantityFromMultiplier(idx)">
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center border-0 bg-transparent px-1"
+                    style="width: 80px; font-weight: 600"
+                    placeholder="Cant."
+                    [(ngModel)]="item.unitsPerPack"
+                    (input)="updateItemQuantityFromMultiplier(idx)"
+                  />
                 </div>
-                
+
                 <!-- Total Final -->
-                <div class="input-group shadow-sm" style="min-width: 180px; flex: 1; max-width: 220px;">
+                <div class="input-group shadow-sm" style="min-width: 180px; flex: 1; max-width: 220px">
                   <span class="input-group-text bg-dark border-dark text-white fw-bold px-3">Total</span>
-                  <input type="number" class="form-control text-end fw-bold" placeholder="0" [(ngModel)]="item.quantity" min="1">
-                  <span class="input-group-text bg-white text-dark fw-bold px-2">{{ item.measurementUnit || '...' }}</span>
+                  <input
+                    type="number"
+                    class="form-control text-end fw-bold"
+                    placeholder="0"
+                    [(ngModel)]="item.quantity"
+                    min="1"
+                  />
+                  <span class="input-group-text bg-white text-dark fw-bold px-2">{{
+                    item.measurementUnit || '...'
+                  }}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="alert alert-light border border-light-subtle py-2 px-3 small text-muted mb-3" *ngIf="!newRestock.supplier">
-          <i class="bi bi-info-circle me-1 text-primary"></i> Selecciona un proveedor primero para detallar los productos a recibir.
+        <div
+          class="alert alert-light border border-light-subtle py-2 px-3 small text-muted mb-3"
+          *ngIf="!newRestock.supplier"
+        >
+          <i class="bi bi-info-circle me-1 text-primary"></i> Selecciona un proveedor primero para detallar los
+          productos a recibir.
         </div>
 
         <!-- Recurrencia -->
         <div class="card border border-light-subtle rounded-3 p-3 bg-light-subtle mb-3">
           <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="recurringSwitch" [(ngModel)]="newRestock.isRecurring">
-            <label class="form-check-label fw-semibold" for="recurringSwitch">¿Es una entrega periódica / recurrente?</label>
+            <input class="form-check-input" type="checkbox" id="recurringSwitch" [(ngModel)]="newRestock.isRecurring" />
+            <label class="form-check-label fw-semibold" for="recurringSwitch"
+              >¿Es una entrega periódica / recurrente?</label
+            >
           </div>
           <div class="mb-2" *ngIf="newRestock.isRecurring">
             <label class="form-label small fw-semibold text-secondary">Frecuencia de Repetición</label>
@@ -409,34 +552,54 @@
 
         <div class="mb-3">
           <label class="form-label fw-semibold">Notas Adicionales</label>
-          <textarea class="form-control" rows="2" placeholder="Notas de la entrega..." [(ngModel)]="newRestock.notes"></textarea>
+          <textarea
+            class="form-control"
+            rows="2"
+            placeholder="Notas de la entrega..."
+            [(ngModel)]="newRestock.notes"
+          ></textarea>
         </div>
 
         <div class="d-flex gap-2 justify-content-end mt-4">
-          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeScheduleModal()">Cancelar</button>
-          <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="saveRestockSchedule()">Agendar Entrega</button>
+          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeScheduleModal()">
+            Cancelar
+          </button>
+          <button
+            class="btn btn-dark rounded-pill px-4 border-0"
+            style="background-color: #000 !important"
+            (click)="saveRestockSchedule()"
+          >
+            Agendar Entrega
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- MODAL SECUNDARIO: Registro Rápido al Vuelo ( pending_verification ) -->
-  <div class="custom-modal-backdrop" style="z-index: 2100;" *ngIf="showQuickProductModal">
-    <div class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__zoomIn animate__faster" style="max-width: 450px; width: 100%;">
+  <div class="custom-modal-backdrop" style="z-index: 2100" *ngIf="showQuickProductModal">
+    <div
+      class="custom-modal-card card border-0 shadow-lg rounded-4 animate__animated animate__zoomIn animate__faster"
+      style="max-width: 450px; width: 100%"
+    >
       <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
         <h5 class="fw-bold mb-0">Registro Rápido de Producto</h5>
         <button class="btn-close" (click)="closeQuickProductModal()"></button>
       </div>
       <div class="card-body p-4">
-        
         <div class="mb-3">
           <label class="form-label fw-semibold">Nombre del Producto *</label>
-          <input type="text" class="form-control" placeholder="Ej: Café Orgánico Chiapas" [(ngModel)]="quickProduct.name">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej: Café Orgánico Chiapas"
+            [(ngModel)]="quickProduct.name"
+          />
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-semibold">Marca *</label>
-          <input type="text" class="form-control" placeholder="Ej: Nescafé" [(ngModel)]="quickProduct.brand">
+          <input type="text" class="form-control" placeholder="Ej: Nescafé" [(ngModel)]="quickProduct.brand" />
         </div>
 
         <div class="mb-3">
@@ -447,11 +610,18 @@
         </div>
 
         <div class="d-flex gap-2 justify-content-end mt-4">
-          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeQuickProductModal()">Cancelar</button>
-          <button class="btn btn-dark rounded-pill px-4 border-0" style="background-color: #000 !important;" (click)="saveQuickProduct()">Registrar y Vincular</button>
+          <button class="btn btn-outline-dark rounded-pill px-4 border-light-subtle" (click)="closeQuickProductModal()">
+            Cancelar
+          </button>
+          <button
+            class="btn btn-dark rounded-pill px-4 border-0"
+            style="background-color: #000 !important"
+            (click)="saveQuickProduct()"
+          >
+            Registrar y Vincular
+          </button>
         </div>
       </div>
     </div>
   </div>
-
 </div>

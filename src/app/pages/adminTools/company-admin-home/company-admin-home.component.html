@@ -8,21 +8,39 @@
     <div class="row align-items-center g-3">
       <div class="col-md-7">
         <div class="d-flex align-items-center gap-3">
-          <div class="avatar-corporate d-flex align-items-center justify-content-center rounded-4 shadow" style="width: 56px; height: 56px; background: #0f172a;">
+          <div
+            class="avatar-corporate d-flex align-items-center justify-content-center rounded-4 shadow"
+            style="width: 56px; height: 56px; background: #0f172a"
+          >
             <i class="bi bi-shield-lock-fill text-white fs-3"></i>
           </div>
           <div>
-            <h1 class="h3 fw-extrabold text-dark mb-1">{{ getGreeting() }}, {{ admin?.name || admin?.username || 'Administrador' }}</h1>
-            <p class="text-secondary small mb-0">Consola de Control Corporativo y Auditoría Multisucursal para <span class="fw-semibold text-primary">{{ company.name }}</span></p>
+            <h1 class="h3 fw-extrabold text-dark mb-1">
+              {{ getGreeting() }}, {{ admin?.name || admin?.username || 'Administrador' }}
+            </h1>
+            <p class="text-secondary small mb-0">
+              Consola de Control Corporativo y Auditoría Multisucursal para
+              <span class="fw-semibold text-primary">{{ company.name }}</span>
+            </p>
           </div>
         </div>
       </div>
       <div class="col-md-5 d-flex justify-content-md-end justify-content-start gap-2">
-        <div class="company-badge d-flex align-items-center gap-3 bg-white p-2 border border-light-subtle rounded-pill shadow-sm pe-4">
-          <img [src]="company.img || 'assets/img/no-img.webp'" class="rounded-circle border" width="40" height="40" alt="Logo">
+        <div
+          class="company-badge d-flex align-items-center gap-3 bg-white p-2 border border-light-subtle rounded-pill shadow-sm pe-4"
+        >
+          <img
+            [src]="company.img || 'assets/img/no-img.webp'"
+            class="rounded-circle border"
+            width="40"
+            height="40"
+            alt="Logo"
+          />
           <div class="d-flex flex-column">
             <span class="small fw-bold text-dark lh-1">{{ company.name }}</span>
-            <span class="text-muted text-uppercase font-mono mt-0.5" style="font-size: 0.65rem; letter-spacing: 0.05em;">Corporate Hub</span>
+            <span class="text-muted text-uppercase font-mono mt-0.5" style="font-size: 0.65rem; letter-spacing: 0.05em"
+              >Corporate Hub</span
+            >
           </div>
         </div>
       </div>
@@ -30,30 +48,52 @@
   </header>
 
   <!-- Alerta de Inventario Crítico Consolidado (Notificación del Sistema) -->
-  <div *ngIf="summary.lowStockCount > 0" class="alert alert-warning border border-warning-subtle shadow-sm rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3 animate__animated animate__fadeIn">
+  <div
+    *ngIf="summary.lowStockCount > 0"
+    class="alert alert-warning border border-warning-subtle shadow-sm rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3 animate__animated animate__fadeIn"
+  >
     <div class="d-flex align-items-center gap-3">
-      <div class="d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-2" style="width: 38px; height: 38px;">
+      <div
+        class="d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-2"
+        style="width: 38px; height: 38px"
+      >
         <i class="bi bi-exclamation-triangle-fill fs-5"></i>
       </div>
       <div>
-        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">Alerta de Inventario Crítico</h6>
-        <p class="text-secondary small mb-0">Existen {{ summary.lowStockCount }} productos con existencias por debajo del límite mínimo.</p>
+        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem">Alerta de Inventario Crítico</h6>
+        <p class="text-secondary small mb-0">
+          Existen {{ summary.lowStockCount }} productos con existencias por debajo del límite mínimo.
+        </p>
       </div>
     </div>
-    <button routerLink="/dashboard/admin/inventory" class="btn btn-warning btn-sm px-4 py-2 fw-semibold text-dark border-0 rounded-2" style="background-color: #f59e0b !important;">
+    <button
+      routerLink="/dashboard/admin/inventory"
+      class="btn btn-warning btn-sm px-4 py-2 fw-semibold text-dark border-0 rounded-2"
+      style="background-color: #f59e0b !important"
+    >
       Abastecer Inventario
     </button>
   </div>
 
   <!-- Upsell: Alerta de Sucursales Inactivas -->
-  <div *ngIf="inactiveBranchesCount > 0" class="alert alert-info border border-info-subtle shadow-sm rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3 animate__animated animate__fadeIn">
+  <div
+    *ngIf="inactiveBranchesCount > 0"
+    class="alert alert-info border border-info-subtle shadow-sm rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3 animate__animated animate__fadeIn"
+  >
     <div class="d-flex align-items-center gap-3">
-      <div class="d-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-2" style="width: 38px; height: 38px;">
+      <div
+        class="d-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-2"
+        style="width: 38px; height: 38px"
+      >
         <i class="bi bi-shop fs-5"></i>
       </div>
       <div>
-        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">Tienes {{ inactiveBranchesCount }} sucursal(es) inactiva(s)</h6>
-        <p class="text-secondary small mb-0">¿Estás listo para reactivarlas y expandir tus operaciones? Revisa las opciones de tu plan actual.</p>
+        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem">
+          Tienes {{ inactiveBranchesCount }} sucursal(es) inactiva(s)
+        </h6>
+        <p class="text-secondary small mb-0">
+          ¿Estás listo para reactivarlas y expandir tus operaciones? Revisa las opciones de tu plan actual.
+        </p>
       </div>
     </div>
     <button routerLink="/dashboard/admin/billing" class="btn btn-outline-info btn-sm px-4 py-2 fw-semibold rounded-2">
@@ -64,19 +104,27 @@
   <!-- Fila 1: KPIs Consolidados Corporativos -->
   <div class="row g-4 mb-4">
     <div class="col-md-3 col-sm-6">
-      <a [routerLink]="['/dashboard/admin/statistics']" class="kpi-glass-card sales text-decoration-none d-flex flex-column h-100">
+      <a
+        [routerLink]="['/dashboard/admin/statistics']"
+        class="kpi-glass-card sales text-decoration-none d-flex flex-column h-100"
+      >
         <div class="kpi-header">
           <span class="kpi-title">Ventas Globales (Hoy)</span>
           <div class="kpi-icon-wrapper"><i class="bi bi-cash-stack"></i></div>
         </div>
         <div class="kpi-body">
           <h2 class="kpi-value">{{ summary.totalSalesToday | currency }}</h2>
-          <span class="kpi-badge"><i class="bi bi-circle-fill me-1.5 text-success" style="font-size: 0.4rem;"></i> Monitoreo en vivo</span>
+          <span class="kpi-badge"
+            ><i class="bi bi-circle-fill me-1.5 text-success" style="font-size: 0.4rem"></i> Monitoreo en vivo</span
+          >
         </div>
       </a>
     </div>
     <div class="col-md-3 col-sm-6">
-      <a [routerLink]="['/dashboard/admin/branches']" class="kpi-glass-card branches text-decoration-none d-flex flex-column h-100">
+      <a
+        [routerLink]="['/dashboard/admin/branches']"
+        class="kpi-glass-card branches text-decoration-none d-flex flex-column h-100"
+      >
         <div class="kpi-header">
           <span class="kpi-title">Sucursales Activas</span>
           <div class="kpi-icon-wrapper"><i class="bi bi-shop-window"></i></div>
@@ -88,7 +136,10 @@
       </a>
     </div>
     <div class="col-md-3 col-sm-6">
-      <a [routerLink]="['/dashboard/admin/live-registers']" class="kpi-glass-card registers text-decoration-none d-flex flex-column h-100">
+      <a
+        [routerLink]="['/dashboard/admin/live-registers']"
+        class="kpi-glass-card registers text-decoration-none d-flex flex-column h-100"
+      >
         <div class="kpi-header">
           <span class="kpi-title">Cajas Operando</span>
           <div class="kpi-icon-wrapper"><i class="bi bi-cpu"></i></div>
@@ -100,7 +151,11 @@
       </a>
     </div>
     <div class="col-md-3 col-sm-6">
-      <a [routerLink]="['/dashboard/admin/inventory']" class="kpi-glass-card alerts text-decoration-none d-flex flex-column h-100" [class.danger]="summary.lowStockCount > 0">
+      <a
+        [routerLink]="['/dashboard/admin/inventory']"
+        class="kpi-glass-card alerts text-decoration-none d-flex flex-column h-100"
+        [class.danger]="summary.lowStockCount > 0"
+      >
         <div class="kpi-header">
           <span class="kpi-title">Alertas de Stock</span>
           <div class="kpi-icon-wrapper"><i class="bi bi-exclamation-triangle"></i></div>
@@ -108,7 +163,12 @@
         <div class="kpi-body">
           <h2 class="kpi-value">{{ summary.lowStockCount }}</h2>
           <span class="kpi-badge" [class.danger]="summary.lowStockCount > 0">
-            <i class="bi" [class.bi-exclamation-triangle-fill]="summary.lowStockCount > 0" [class.bi-check-circle-fill]="summary.lowStockCount === 0" style="margin-right: 6px;"></i>
+            <i
+              class="bi"
+              [class.bi-exclamation-triangle-fill]="summary.lowStockCount > 0"
+              [class.bi-check-circle-fill]="summary.lowStockCount === 0"
+              style="margin-right: 6px"
+            ></i>
             {{ summary.lowStockCount > 0 ? 'Abastecer' : 'Sin Alertas' }}
           </span>
         </div>
@@ -118,64 +178,91 @@
 
   <!-- Fila 2: Diseño de Columnas UX Estratégico -->
   <div class="row g-4 mb-4">
-    
     <!-- Columna Izquierda (65%): Gestión Multisucursal y Auditoría Transaccional -->
     <div class="col-lg-8">
-      
       <!-- Panel 1: Rendimiento Comparativo de Sucursales -->
       <div class="glass-card mb-4">
         <div class="card-header border-0 bg-transparent p-4 pb-0">
           <div class="d-flex align-items-center gap-2">
-            <div class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <div
+              class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+            >
               <i class="bi bi-grid-1x2 text-dark fs-6"></i>
             </div>
             <div>
               <h5 class="fw-bold mb-0 text-dark">Rendimiento Operativo por Sucursal</h5>
-              <p class="text-secondary small mb-0">Comparativa analítica en tiempo real de los puntos de venta activos</p>
+              <p class="text-secondary small mb-0">
+                Comparativa analítica en tiempo real de los puntos de venta activos
+              </p>
             </div>
           </div>
         </div>
-        
+
         <div class="card-body p-4">
           <div *ngIf="branches.length === 0" class="text-center py-5 opacity-50">
             <i class="bi bi-shop display-4 d-block mb-3 text-secondary"></i>
             <p class="text-muted">Aún no has registrado ninguna sucursal corporativa</p>
-            <button routerLink="/dashboard/admin/branches/new" class="btn btn-outline-dark btn-sm rounded-pill mt-2">Registrar Sucursal</button>
+            <button routerLink="/dashboard/admin/branches/new" class="btn btn-outline-dark btn-sm rounded-pill mt-2">
+              Registrar Sucursal
+            </button>
           </div>
-          
+
           <div class="row g-3" *ngIf="branches.length > 0">
             <div class="col-md-6" *ngFor="let b of branches">
-              <div class="branch-ux-card p-4 border border-light-subtle rounded-3 transition-all bg-white shadow-sm position-relative">
+              <div
+                class="branch-ux-card p-4 border border-light-subtle rounded-3 transition-all bg-white shadow-sm position-relative"
+              >
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <div>
                     <h6 class="fw-bold mb-1 text-dark fs-5">{{ b.name }}</h6>
-                    <span class="text-muted small"><i class="bi bi-geo-alt me-1 text-secondary"></i> {{ b.address }}</span>
+                    <span class="text-muted small"
+                      ><i class="bi bi-geo-alt me-1 text-secondary"></i> {{ b.address }}</span
+                    >
                   </div>
                   <span class="badge rounded-pill bg-success-soft text-success px-3 py-1.5 small fw-semibold">
                     {{ b.isActive ? 'Activa' : 'Inactiva' }}
                   </span>
                 </div>
-                
+
                 <div class="d-flex flex-wrap gap-2 mb-4">
-                  <span class="badge bg-light text-secondary border border-light-subtle px-2.5 py-1.5 small rounded-2 fw-medium">
+                  <span
+                    class="badge bg-light text-secondary border border-light-subtle px-2.5 py-1.5 small rounded-2 fw-medium"
+                  >
                     {{ b.saleType === 'hospitality' ? 'Gastronómico' : 'Minorista' }}
                   </span>
-                  <span class="badge bg-light text-secondary border border-light-subtle px-2.5 py-1.5 small rounded-2 fw-medium" *ngIf="b.tel">
+                  <span
+                    class="badge bg-light text-secondary border border-light-subtle px-2.5 py-1.5 small rounded-2 fw-medium"
+                    *ngIf="b.tel"
+                  >
                     <i class="bi bi-telephone me-1 text-muted"></i> {{ b.tel }}
                   </span>
                 </div>
 
                 <div class="d-flex gap-2">
                   <!-- Botón Habilitado (Activa) -->
-                  <button *ngIf="b.isActive" class="btn btn-dark btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;" [routerLink]="['/dashboard/admin/branches', b._id]">
+                  <button
+                    *ngIf="b.isActive"
+                    class="btn btn-dark btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0"
+                    style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important"
+                    [routerLink]="['/dashboard/admin/branches', b._id]"
+                  >
                     Auditar Operaciones
                   </button>
                   <!-- Botón Deshabilitado (Inactiva) -->
-                  <button *ngIf="!b.isActive" class="btn btn-secondary btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0 opacity-50" disabled style="background-color: #64748b !important;">
+                  <button
+                    *ngIf="!b.isActive"
+                    class="btn btn-secondary btn-sm flex-grow-1 py-2 text-uppercase tracking-wider fw-semibold fs-7 border-0 opacity-50"
+                    disabled
+                    style="background-color: #64748b !important"
+                  >
                     <i class="bi bi-lock-fill me-1"></i> Sucursal Suspendida
                   </button>
 
-                  <button class="btn btn-light btn-sm px-3 py-2 border border-light-subtle text-muted" [routerLink]="['/dashboard/admin/branches/edit', b._id]">
+                  <button
+                    class="btn btn-light btn-sm px-3 py-2 border border-light-subtle text-muted"
+                    [routerLink]="['/dashboard/admin/branches/edit', b._id]"
+                  >
                     <i class="bi bi-gear-fill"></i>
                   </button>
                 </div>
@@ -189,7 +276,10 @@
       <div class="glass-card">
         <div class="card-header border-0 bg-transparent p-4 pb-0 d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
-            <div class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <div
+              class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+            >
               <i class="bi bi-clock-history text-dark fs-6"></i>
             </div>
             <div>
@@ -197,11 +287,15 @@
               <p class="text-secondary small mb-0">Historial transaccional consolidado en vivo a nivel corporativo</p>
             </div>
           </div>
-          <button routerLink="/dashboard/admin/statistics" class="btn btn-light btn-sm px-3 py-2 border border-light-subtle fw-semibold text-secondary" style="border-radius: 8px !important; font-size: 0.8rem;">
+          <button
+            routerLink="/dashboard/admin/statistics"
+            class="btn btn-light btn-sm px-3 py-2 border border-light-subtle fw-semibold text-secondary"
+            style="border-radius: 8px !important; font-size: 0.8rem"
+          >
             Ver Reporte Completo
           </button>
         </div>
-        
+
         <div class="card-body p-4">
           <div class="table-responsive rounded-3 border border-light shadow-sm bg-white">
             <table class="table table-hover align-middle mb-0">
@@ -217,7 +311,10 @@
               <tbody>
                 <tr *ngFor="let sale of summary.recentSales" class="border-bottom border-light-subtle">
                   <td class="ps-4 py-3">
-                    <span class="fw-bold text-dark"><i class="bi bi-shop me-2 text-primary"></i> {{ $any(sale).branch?.name || 'Sucursal Principal' }}</span>
+                    <span class="fw-bold text-dark"
+                      ><i class="bi bi-shop me-2 text-primary"></i>
+                      {{ $any(sale).branch?.name || 'Sucursal Principal' }}</span
+                    >
                   </td>
                   <td>
                     <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-2 font-mono">
@@ -230,7 +327,7 @@
                     </span>
                   </td>
                   <td class="text-center text-secondary small font-mono">
-                    {{ sale.date | date:'shortTime' }}
+                    {{ sale.date | date: 'shortTime' }}
                   </td>
                   <td class="pe-4 text-end">
                     <span class="fw-bold text-success font-mono fs-6">{{ sale.total | currency }}</span>
@@ -247,26 +344,33 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- Columna Derecha (35%): Controles de Administración Global y Tendencias Compactas -->
     <div class="col-lg-4">
-      
       <!-- Panel 1: Controles Maestros de Configuración Global -->
       <div class="glass-card mb-4">
         <div class="card-body p-4">
           <div class="d-flex align-items-center gap-2 mb-4">
-            <div class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <div
+              class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px"
+            >
               <i class="bi bi-sliders2 text-dark fs-6"></i>
             </div>
             <h5 class="fw-bold mb-0 text-dark">Controles Corporativos</h5>
           </div>
-          
+
           <div class="d-grid gap-3">
-            <button routerLink="/dashboard/admin/products" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn">
+            <button
+              routerLink="/dashboard/admin/products"
+              class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn"
+            >
               <div class="d-flex align-items-center">
-                <div class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <div
+                  class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px"
+                >
                   <i class="bi bi-box-seam-fill text-primary"></i>
                 </div>
                 <div class="d-flex flex-column">
@@ -276,9 +380,15 @@
               </div>
             </button>
 
-            <button routerLink="/dashboard/admin/branches/new" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn">
+            <button
+              routerLink="/dashboard/admin/branches/new"
+              class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn"
+            >
               <div class="d-flex align-items-center">
-                <div class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <div
+                  class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px"
+                >
                   <i class="bi bi-building-fill-add text-success"></i>
                 </div>
                 <div class="d-flex flex-column">
@@ -288,9 +398,15 @@
               </div>
             </button>
 
-            <button routerLink="/dashboard/admin/users" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn">
+            <button
+              routerLink="/dashboard/admin/users"
+              class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn"
+            >
               <div class="d-flex align-items-center">
-                <div class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <div
+                  class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px"
+                >
                   <i class="bi bi-people-fill text-info"></i>
                 </div>
                 <div class="d-flex flex-column">
@@ -300,9 +416,15 @@
               </div>
             </button>
 
-            <button routerLink="/dashboard/kitchen/kds" class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn">
+            <button
+              routerLink="/dashboard/kitchen/kds"
+              class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn"
+            >
               <div class="d-flex align-items-center">
-                <div class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <div
+                  class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px"
+                >
                   <i class="bi bi-fire-fill text-danger animate-pulse"></i>
                 </div>
                 <div class="d-flex flex-column">
@@ -312,7 +434,30 @@
               </div>
             </button>
 
-            <button *ngIf="isDemoUser()" (click)="restoreDemoDatabase()" class="btn btn-outline-danger text-start p-3 rounded-3 border-danger-subtle fw-semibold mt-2" style="background-color: #fef2f2; border-color: #fecaca; color: #dc2626;">
+            <button
+              (click)="openPosSettingsModal()"
+              class="btn btn-outline-dark text-start p-3 rounded-3 border-light-subtle premium-corporate-btn mt-2"
+            >
+              <div class="d-flex align-items-center">
+                <div
+                  class="corporate-btn-icon me-3 bg-light rounded-3 d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px"
+                >
+                  <i class="bi bi-shield-lock-fill text-warning"></i>
+                </div>
+                <div class="d-flex flex-column">
+                  <span class="fw-bold text-dark lh-sm">Seguridad POS</span>
+                  <span class="text-muted small">Cierre ciego y Control de PIN</span>
+                </div>
+              </div>
+            </button>
+
+            <button
+              *ngIf="isDemoUser()"
+              (click)="restoreDemoDatabase()"
+              class="btn btn-outline-danger text-start p-3 rounded-3 border-danger-subtle fw-semibold mt-2"
+              style="background-color: #fef2f2; border-color: #fecaca; color: #dc2626"
+            >
               <i class="bi bi-arrow-counterclockwise me-2 fs-5 align-middle"></i> Reestablecer Datos Demo
             </button>
           </div>
@@ -323,15 +468,20 @@
       <div class="glass-card mb-4">
         <div class="card-header border-0 bg-transparent p-4 pb-0 d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
-            <div class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <div
+              class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center"
+              style="width: 32px; height: 32px"
+            >
               <i class="bi bi-activity text-dark fs-6"></i>
             </div>
             <h6 class="fw-bold mb-0 text-dark">Tendencia Diaria</h6>
           </div>
-          <span class="badge bg-light text-dark border px-2 py-1 rounded font-mono" style="font-size: 0.6rem;">EN VIVO</span>
+          <span class="badge bg-light text-dark border px-2 py-1 rounded font-mono" style="font-size: 0.6rem"
+            >EN VIVO</span
+          >
         </div>
         <div class="card-body p-4">
-          <div class="chart-wrapper position-relative" style="height: 100px;">
+          <div class="chart-wrapper position-relative" style="height: 100px">
             <svg class="w-100 h-100" viewBox="0 0 200 80" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="widgetGrad" x1="0" y1="0" x2="0" y2="1">
@@ -339,11 +489,20 @@
                   <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.0"></stop>
                 </linearGradient>
               </defs>
-              <path d="M 0 70 Q 30 50 60 60 T 120 30 T 180 15 L 200 15 L 200 80 L 0 80 Z" fill="url(#widgetGrad)"></path>
-              <path d="M 0 70 Q 30 50 60 60 T 120 30 T 180 15 L 200 15" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"></path>
+              <path
+                d="M 0 70 Q 30 50 60 60 T 120 30 T 180 15 L 200 15 L 200 80 L 0 80 Z"
+                fill="url(#widgetGrad)"
+              ></path>
+              <path
+                d="M 0 70 Q 30 50 60 60 T 120 30 T 180 15 L 200 15"
+                fill="none"
+                stroke="#4f46e5"
+                stroke-width="2"
+                stroke-linecap="round"
+              ></path>
               <circle cx="180" cy="15" r="3" fill="#10b981" stroke="#ffffff" stroke-width="1"></circle>
             </svg>
-            <div class="d-flex justify-content-between mt-2 font-mono text-secondary" style="font-size: 0.55rem;">
+            <div class="d-flex justify-content-between mt-2 font-mono text-secondary" style="font-size: 0.55rem">
               <span>Apertura</span>
               <span>Mediodía</span>
               <span>Cierre</span>
@@ -351,9 +510,53 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
+  <!-- Modal Configuración de Seguridad POS -->
+  <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5);" *ngIf="isPosSettingsModalOpen">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 rounded-4 shadow-lg animate__animated animate__fadeInUp animate__faster">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title fw-bold">Configuración de Seguridad POS</h5>
+          <button type="button" class="btn-close" (click)="closePosSettingsModal()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-muted small mb-4">
+            Controla los lineamientos de seguridad para todas las cajas registradoras de tu empresa. Estas políticas ayudan a evitar robos y prevenir manipulación de efectivo.
+          </p>
 
+          <!-- Toggle Cierre Ciego -->
+          <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded-3">
+            <div>
+              <h6 class="fw-bold mb-1"><i class="bi bi-eye-slash-fill text-primary me-2"></i>Cierre Ciego</h6>
+              <p class="text-muted small mb-0" style="max-width: 250px;">
+                Los cajeros deberán contar e ingresar el efectivo final <strong class="text-dark">sin saber</strong> cuánto dinero espera el sistema. Ideal para evitar que ajusten sus conteos intencionalmente.
+              </p>
+            </div>
+            <div class="form-check form-switch fs-4 mb-0">
+              <input class="form-check-input cursor-pointer" type="checkbox" role="switch" [(ngModel)]="posSettingsForm.blindClosure" style="cursor: pointer;">
+            </div>
+          </div>
 
+          <!-- Toggle PIN Gerencial -->
+          <div class="d-flex justify-content-between align-items-center mb-2 p-3 bg-light rounded-3">
+            <div>
+              <h6 class="fw-bold mb-1"><i class="bi bi-person-badge-fill text-danger me-2"></i>PIN Gerencial para Riesgos</h6>
+              <p class="text-muted small mb-0" style="max-width: 250px;">
+                Si un cajero intenta cerrar caja con <strong>diferencias (descuadre)</strong> o intenta <strong>cancelar comandas</strong> ya enviadas a cocina, el sistema exigirá el PIN o las credenciales de un Gerente para autorizar.
+              </p>
+            </div>
+            <div class="form-check form-switch fs-4 mb-0">
+              <input class="form-check-input cursor-pointer" type="checkbox" role="switch" [(ngModel)]="posSettingsForm.requirePinForRisks" style="cursor: pointer;">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 pt-0">
+          <button type="button" class="btn btn-light rounded-pill px-4" (click)="closePosSettingsModal()">Cancelar</button>
+          <button type="button" class="btn btn-dark rounded-pill px-4" (click)="savePosSettings()">Guardar Cambios</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

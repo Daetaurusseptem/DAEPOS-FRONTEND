@@ -5,15 +5,15 @@ import { map } from 'rxjs';
 import { Supplier } from 'src/app/interfaces/models.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { SupplierService } from 'src/app/services/provider.service';
+import { LoggerService } from '../../../../services/logger.service';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-update-suppliers',
   templateUrl: './update-suppliers.component.html',
-  styleUrls: ['./update-suppliers.component.css']
+  styleUrls: ['./update-suppliers.component.css'],
 })
 export class UpdateSuppliersComponent implements OnInit {
-
   supplier!: Supplier;
   id: string = '';
 
@@ -31,8 +31,9 @@ export class UpdateSuppliersComponent implements OnInit {
     private router: Router,
     private supplierService: SupplierService,
     private authService: AuthService,
+    private logger: LoggerService,
   ) {
-    this.activatedRoute.params.subscribe(params => {
+    this.activatedRoute.params.subscribe((params) => {
       this.id = params['id'];
       this.getsupplier(this.id);
     });
@@ -41,31 +42,35 @@ export class UpdateSuppliersComponent implements OnInit {
   ngOnInit() {}
 
   getsupplier(id: string) {
-    return this.supplierService.getSupplier(id)
+    return this.supplierService
+      .getSupplier(id)
       .pipe(
-        map(item => {
-          console.log(item);
+        map((item) => {
+          this.logger.log(item);
           return item.supplier;
-        })
+        }),
       )
-      .subscribe(supplier => {
-        this.supplier = supplier!;
+      .subscribe(
+        (supplier) => {
+          this.supplier = supplier!;
 
-        this.supplierForm.setValue({
-          description: this.supplier.description,
-          email: this.supplier.contactInfo.email,
-          phone: this.supplier.contactInfo.phone,
-          address: this.supplier.contactInfo.address,
-          name: this.supplier.name,
-        });
-      }, error => {
-        console.error('Error al obtener el proveedor', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error al obtener el proveedor'
-        });
-      });
+          this.supplierForm.setValue({
+            description: this.supplier.description,
+            email: this.supplier.contactInfo.email,
+            phone: this.supplier.contactInfo.phone,
+            address: this.supplier.contactInfo.address,
+            name: this.supplier.name,
+          });
+        },
+        (error) => {
+          console.error('Error al obtener el proveedor', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al obtener el proveedor',
+          });
+        },
+      );
   }
 
   updateSupplier() {
@@ -78,39 +83,43 @@ export class UpdateSuppliersComponent implements OnInit {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, actualizar',
-        cancelButtonText: 'Cancelar'
-      }).then(resp => {
-        if (resp.isConfirmed) {
-          const obj = {
-            name: this.supplierForm.get('name')?.value,
-            description: this.supplierForm.get('description')?.value,
-            contactInfo: {
-              email: this.supplierForm.get('email')?.value,
-              phone: this.supplierForm.get('phone')?.value,
-              address: this.supplierForm.get('address')?.value,
-            }
-          };
-          this.supplierService.updateSupplier(this.supplier._id!, obj)
-            .subscribe(() => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Proveedor actualizado',
-                text: 'El proveedor ha sido actualizado exitosamente',
-              }).then(() => {
-                this.router.navigateByUrl('/dashboard/sysadmin/companies');
-              });
-            }, error => {
-              console.error('Error al actualizar el proveedor', error);
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error al actualizar el proveedor'
-              });
-            });
-        }
-      }).catch(r => {
-        console.error('Error en la actualización', r);
-      });
+        cancelButtonText: 'Cancelar',
+      })
+        .then((resp) => {
+          if (resp.isConfirmed) {
+            const obj = {
+              name: this.supplierForm.get('name')?.value,
+              description: this.supplierForm.get('description')?.value,
+              contactInfo: {
+                email: this.supplierForm.get('email')?.value,
+                phone: this.supplierForm.get('phone')?.value,
+                address: this.supplierForm.get('address')?.value,
+              },
+            };
+            this.supplierService.updateSupplier(this.supplier._id!, obj).subscribe(
+              () => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Proveedor actualizado',
+                  text: 'El proveedor ha sido actualizado exitosamente',
+                }).then(() => {
+                  this.router.navigateByUrl('/dashboard/sysadmin/companies');
+                });
+              },
+              (error) => {
+                console.error('Error al actualizar el proveedor', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Error al actualizar el proveedor',
+                });
+              },
+            );
+          }
+        })
+        .catch((r) => {
+          console.error('Error en la actualización', r);
+        });
     }
   }
 

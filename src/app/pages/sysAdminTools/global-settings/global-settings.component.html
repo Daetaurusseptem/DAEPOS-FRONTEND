@@ -11,35 +11,65 @@
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
           <h5 class="fw-bold mb-4">Instrucciones Bancarias (Modo Manual)</h5>
-          
+
           <form *ngIf="settings" (ngSubmit)="guardar()">
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label text-muted small fw-bold">Banco</label>
-                <input type="text" class="form-control rounded-pill" name="bankName" [(ngModel)]="settings.bankInstructions.bankName">
+                <input
+                  type="text"
+                  class="form-control rounded-pill"
+                  name="bankName"
+                  [(ngModel)]="settings.bankInstructions.bankName"
+                />
               </div>
               <div class="col-md-6">
                 <label class="form-label text-muted small fw-bold">Número de Cuenta</label>
-                <input type="text" class="form-control rounded-pill" name="accountNumber" [(ngModel)]="settings.bankInstructions.accountNumber">
+                <input
+                  type="text"
+                  class="form-control rounded-pill"
+                  name="accountNumber"
+                  [(ngModel)]="settings.bankInstructions.accountNumber"
+                />
               </div>
               <div class="col-md-6">
                 <label class="form-label text-muted small fw-bold">CLABE Interbancaria</label>
-                <input type="text" class="form-control rounded-pill" name="clabe" [(ngModel)]="settings.bankInstructions.clabe">
+                <input
+                  type="text"
+                  class="form-control rounded-pill"
+                  name="clabe"
+                  [(ngModel)]="settings.bankInstructions.clabe"
+                />
               </div>
               <div class="col-md-6">
                 <label class="form-label text-muted small fw-bold">Nombre del Titular / Empresa</label>
-                <input type="text" class="form-control rounded-pill" name="accountName" [(ngModel)]="settings.bankInstructions.accountName">
+                <input
+                  type="text"
+                  class="form-control rounded-pill"
+                  name="accountName"
+                  [(ngModel)]="settings.bankInstructions.accountName"
+                />
               </div>
               <div class="col-12">
                 <label class="form-label text-muted small fw-bold">Notas o Instrucciones Adicionales</label>
-                <textarea class="form-control rounded-4" rows="3" name="extraNotes" [(ngModel)]="settings.bankInstructions.extraNotes"></textarea>
+                <textarea
+                  class="form-control rounded-4"
+                  rows="3"
+                  name="extraNotes"
+                  [(ngModel)]="settings.bankInstructions.extraNotes"
+                ></textarea>
               </div>
-              
-              <hr class="my-4">
-              
+
+              <hr class="my-4" />
+
               <div class="col-md-12">
                 <label class="form-label text-muted small fw-bold">Email de Contacto / Soporte</label>
-                <input type="email" class="form-control rounded-pill" name="contactEmail" [(ngModel)]="settings.contactEmail">
+                <input
+                  type="email"
+                  class="form-control rounded-pill"
+                  name="contactEmail"
+                  [(ngModel)]="settings.contactEmail"
+                />
               </div>
 
               <div class="col-12 mt-4 text-end">
@@ -50,7 +80,6 @@
               </div>
             </div>
           </form>
-
         </div>
       </div>
     </div>

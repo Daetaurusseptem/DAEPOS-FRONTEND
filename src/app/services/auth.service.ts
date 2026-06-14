@@ -3,83 +3,96 @@ import { Injectable } from '@angular/core';
 
 import { UsuarioModel } from '../models/usuario.model';
 
-import { tap, Observable, of } from "rxjs";
-import { map, catchError } from "rxjs/operators";
+import { tap, Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Company } from '../interfaces/models.interface';
 import { SocketService } from './socket.service';
+import { LoggerService } from './logger.service';
 
 const url = environment.apiUrl;
 const urlAuth = `${url}/auth`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  public idUsuario!: string
+  public idUsuario!: string;
   usuario!: UsuarioModel;
   company!: Company;
   companyId!: string;
   branch?: any;
   isGracePeriod: boolean = false;
 
-
   constructor(
     private http: HttpClient,
     private router: Router,
     private activatedRouter: ActivatedRoute,
-    private socketService: SocketService
-  ){}
+    private socketService: SocketService,
+    private logger: LoggerService,
+  ) {}
 
-  login(formData: { usuario?: string, password?: string }) {
-    this.borrarLocalStorage()
+  login(formData: { usuario?: string; password?: string }) {
+    this.borrarLocalStorage();
 
-    return this.http.post(`${urlAuth}`, formData)
-      .pipe(
-        tap((resp: any) => {
-          this.guardarLocalStorage(resp.token, resp.menu)
-        })
-      );
+    return this.http.post(`${urlAuth}`, formData).pipe(
+      tap((resp: any) => {
+        this.guardarLocalStorage(resp.token, resp.menu);
+      }),
+    );
+  }
+
+  validateAdmin(formData: { username?: string; password?: string; companyId?: string }) {
+    return this.http.post(`${urlAuth}/validate-admin`, formData, this.headers);
   }
 
   validarToken(): Observable<boolean> {
-    return this.http.get(`${urlAuth}/renew`, this.headers)
-      .pipe(
-        map((resp: any) => {
-          console.log(resp);
-          this.idUsuario = resp.uid
-          const { name, username, img = '', role, email, _id, isDemo = false } = resp.usuario;
-          
-          this.company = resp.company;
-          this.branch = resp.branch;
-          this.isGracePeriod = resp.isGracePeriod || false;
+    return this.http.get(`${urlAuth}/renew`, this.headers).pipe(
+      map((resp: any) => {
+        this.logger.log(resp);
+        this.idUsuario = resp.uid;
+        const { name, username, img = '', role, email, _id, isDemo = false } = resp.usuario;
 
-          if (role == 'companyAdmin') {
-            this.companyId = resp.company?._id;
-          } else if (role == 'admin' || role == 'user' || role == 'kitchen') {
-            this.companyId = resp.company?._id;
-          }
-          
-          console.log('COMPAÑYYYYYY', this.companyId);
+        this.company = resp.company;
+        this.branch = resp.branch;
+        this.isGracePeriod = resp.isGracePeriod || false;
 
-          this.usuario = new UsuarioModel(_id, username, name, role, email, img, undefined, undefined, resp.usuario.permissions || [], isDemo);
+        if (role == 'companyAdmin') {
+          this.companyId = resp.company?._id;
+        } else if (role == 'admin' || role == 'user' || role == 'kitchen') {
+          this.companyId = resp.company?._id;
+        }
 
-          // Establecer conexión global a Socket.IO para notificaciones en tiempo real
-          const branchId = this.branch?._id || this.branch;
-          this.socketService.connect({
-            userId: _id,
-            companyId: this.companyId,
-            branchId: branchId,
-            role: role
-          });
+        this.logger.log('COMPAÑYYYYYY', this.companyId);
 
-          this.guardarLocalStorage(resp.token, resp.menu)
-          return true;
-        }),
-        catchError(error => of(false))
-      );
+        this.usuario = new UsuarioModel(
+          _id,
+          username,
+          name,
+          role,
+          email,
+          img,
+          undefined,
+          resp.company,
+          resp.usuario.permissions || [],
+          isDemo,
+        );
 
+        // Establecer conexión global a Socket.IO para notificaciones en tiempo real
+        const branchId = this.branch?._id || this.branch;
+        this.socketService.connect({
+          userId: _id,
+          companyId: this.companyId,
+          branchId: branchId,
+          role: role,
+        });
+
+        this.guardarLocalStorage(resp.token, resp.menu);
+        return true;
+      }),
+      catchError((error) => of(false)),
+    );
   }
 
   demoReset(): Observable<any> {
@@ -88,8 +101,8 @@ export class AuthService {
   get headers(): object {
     return {
       headers: {
-        'x-token': this.token
-      }
+        'x-token': this.token,
+      },
     };
   }
   get getCompany(): Company {
@@ -99,14 +112,14 @@ export class AuthService {
     return localStorage.getItem('token') || '';
   }
   get role() {
-    return this.usuario.role
+    return this.usuario.role;
   }
 
   get id(): string {
     return this.usuario!.id || '';
   }
   guardarLocalStorage(token: string, menu: any) {
-    var a = JSON.stringify(menu)
+    const a = JSON.stringify(menu);
     localStorage.setItem('token', token);
     localStorage.setItem('menu', a);
   }
@@ -120,7 +133,4 @@ export class AuthService {
     this.borrarLocalStorage();
     this.router.navigate(['']);
   }
-
-
-
 }

@@ -16,15 +16,15 @@ export interface RawMaterial {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RawMaterialsService {
   private url = `${environment.apiUrl}/raw-materials`;
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   createRawMaterial(data: RawMaterial, companyId: string): Observable<any> {
     return this.http.post<any>(`${this.url}/${companyId}`, data, this.authService.headers);

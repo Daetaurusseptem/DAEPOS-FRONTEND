@@ -10,10 +10,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 @Component({
   selector: 'products-list',
   templateUrl: './products-list.component.html',
-  styleUrls: ['./products-list.component.css']
+  styleUrls: ['./products-list.component.css'],
 })
 export class ProductsListComponent implements OnInit {
-
   companyId: any;
   products!: Product[];
   companyName!: string;
@@ -27,10 +26,10 @@ export class ProductsListComponent implements OnInit {
     private productService: ProductService,
     private authService: AuthService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
   ) {
     if (this.authService.usuario.role == 'sysadmin') {
-      this.activatedRoute.params.subscribe(params => {
+      this.activatedRoute.params.subscribe((params) => {
         this.companyId = params['id'];
       });
     } else if (this.authService.usuario.role == 'admin' || this.authService.usuario.role == 'companyAdmin') {
@@ -44,13 +43,12 @@ export class ProductsListComponent implements OnInit {
   }
 
   getProducts(idEmpresa: string, page: number = 1): void {
-    this.productService.searchProductCompany('', page, this.limit, idEmpresa)
-      .subscribe((response: any) => {
-        this.products = response.products!;
-        this.totalPages = response.totalPages!;
-        this.currentPage = page;
-        this.generateVisiblePages();
-      });
+    this.productService.searchProductCompany('', page, this.limit, idEmpresa).subscribe((response: any) => {
+      this.products = response.products!;
+      this.totalPages = response.totalPages!;
+      this.currentPage = page;
+      this.generateVisiblePages();
+    });
   }
 
   buscarProducto(term: string): void {
@@ -59,24 +57,18 @@ export class ProductsListComponent implements OnInit {
       this.getProducts(this.companyId);
     } else {
       // Llamamos al servicio de búsqueda
-      this.productService.searchProductCompany(term, 1, this.limit, this.companyId)
-        .subscribe((response: any) => {
-          this.products = response.products!;
-          this.totalPages = response.totalPages!;
-          this.currentPage = 1;
-        });
+      this.productService.searchProductCompany(term, 1, this.limit, this.companyId).subscribe((response: any) => {
+        this.products = response.products!;
+        this.totalPages = response.totalPages!;
+        this.currentPage = 1;
+      });
     }
   }
 
   initializeSearch(): void {
-    this.searchTerm$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(term => {
-        this.buscarProducto(term);
-      });
+    this.searchTerm$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((term) => {
+      this.buscarProducto(term);
+    });
   }
 
   crearProducto(): void {
@@ -94,18 +86,18 @@ export class ProductsListComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.productService.deleteProduct(id).subscribe(
           () => {
-            this.products = this.products.filter(product => product._id !== id);
+            this.products = this.products.filter((product) => product._id !== id);
             Swal.fire('Eliminado', 'El producto ha sido eliminado correctamente.', 'success');
           },
           (error: any) => {
             console.error('Error al eliminar producto', error);
             Swal.fire('Error', 'Hubo un problema al eliminar el producto.', 'error');
-          }
+          },
         );
       }
     });
@@ -129,7 +121,7 @@ export class ProductsListComponent implements OnInit {
     const pages = [];
     const maxVisible = 5;
     let start = Math.max(1, this.currentPage - 2);
-    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    const end = Math.min(this.totalPages, start + maxVisible - 1);
 
     if (end - start < maxVisible - 1) {
       start = Math.max(1, end - maxVisible + 1);

@@ -14,14 +14,18 @@
   max-width: 480px;
   background: var(--card-bg);
   border-radius: var(--radius-md) !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.02);
   padding: 2.5rem;
   transition: var(--transition);
 }
 
 .open-register-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.02);
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.02);
 }
 
 /* User Avatar & Header style */
@@ -132,8 +136,12 @@
 }
 
 @keyframes spinAnimation {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-registers-text {

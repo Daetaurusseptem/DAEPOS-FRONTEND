@@ -8,7 +8,7 @@ describe('BulkImportComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [BulkImportComponent]
+      declarations: [BulkImportComponent],
     });
     fixture = TestBed.createComponent(BulkImportComponent);
     component = fixture.componentInstance;

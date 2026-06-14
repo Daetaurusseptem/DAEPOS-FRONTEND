@@ -4,7 +4,9 @@
       <h1 class="h3 fw-bold text-dark font-monospace mb-1">
         <i class="bi bi-search me-2 text-primary"></i> Auditoría Global de Transacciones
       </h1>
-      <p class="text-muted font-monospace mb-0" style="font-size: 0.85rem;">Motor de búsqueda forense y análisis histórico multicompañía.</p>
+      <p class="text-muted font-monospace mb-0" style="font-size: 0.85rem">
+        Motor de búsqueda forense y análisis histórico multicompañía.
+      </p>
     </div>
   </div>
 
@@ -13,24 +15,40 @@
     <div class="card-body p-4">
       <div class="row g-2">
         <div class="col-md-3">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">EMPRESA / INQUILINO</label>
-          <select class="form-select font-monospace" [(ngModel)]="filters.companyId" (change)="onCompanyChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">EMPRESA / INQUILINO</label>
+          <select
+            class="form-select font-monospace"
+            [(ngModel)]="filters.companyId"
+            (change)="onCompanyChange()"
+            style="font-size: 0.85rem"
+          >
             <option value="">Todas las empresas</option>
             <option *ngFor="let company of companies" [value]="company._id">{{ company.name }}</option>
           </select>
         </div>
-        
+
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">SUCURSAL</label>
-          <select class="form-select font-monospace" [(ngModel)]="filters.branchId" (change)="onFilterChange()" [disabled]="!filters.companyId" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">SUCURSAL</label>
+          <select
+            class="form-select font-monospace"
+            [(ngModel)]="filters.branchId"
+            (change)="onFilterChange()"
+            [disabled]="!filters.companyId"
+            style="font-size: 0.85rem"
+          >
             <option value="">Todas</option>
             <option *ngFor="let branch of branches" [value]="branch._id">{{ branch.name }}</option>
           </select>
         </div>
 
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">MÉTODO DE PAGO</label>
-          <select class="form-select font-monospace" [(ngModel)]="filters.paymentMethod" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">MÉTODO DE PAGO</label>
+          <select
+            class="form-select font-monospace"
+            [(ngModel)]="filters.paymentMethod"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          >
             <option value="">Todos los métodos</option>
             <option value="cash">Efectivo</option>
             <option value="credit">Tarjeta (Crédito/Débito)</option>
@@ -39,17 +57,34 @@
         </div>
 
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">FECHA INICIO</label>
-          <input type="date" class="form-control font-monospace" [(ngModel)]="filters.startDate" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">FECHA INICIO</label>
+          <input
+            type="date"
+            class="form-control font-monospace"
+            [(ngModel)]="filters.startDate"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          />
         </div>
 
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">FECHA FIN</label>
-          <input type="date" class="form-control font-monospace" [(ngModel)]="filters.endDate" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">FECHA FIN</label>
+          <input
+            type="date"
+            class="form-control font-monospace"
+            [(ngModel)]="filters.endDate"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          />
         </div>
 
         <div class="col-md-1 d-flex align-items-end">
-          <button class="btn btn-light w-100 font-monospace text-muted border px-1" (click)="clearFilters()" style="font-size: 0.75rem;" title="Limpiar filtros">
+          <button
+            class="btn btn-light w-100 font-monospace text-muted border px-1"
+            (click)="clearFilters()"
+            style="font-size: 0.75rem"
+            title="Limpiar filtros"
+          >
             <i class="bi bi-x-circle d-block d-md-none me-1"></i> <span class="d-none d-md-inline">Limpiar</span>
           </button>
         </div>
@@ -63,16 +98,16 @@
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead class="bg-light">
-            <tr class="font-monospace text-muted" style="font-size: 0.75rem;">
-              <th class="ps-4 py-3" style="width: 20%;">FECHA (TIMESTAMP)</th>
-              <th style="width: 25%;">INQUILINO (EMPRESA)</th>
-              <th style="width: 20%;">OPERADOR</th>
-              <th style="width: 15%;">MÉTODO PAGO</th>
-              <th style="width: 10%;" class="text-end">TOTAL</th>
-              <th style="width: 10%;" class="text-center pe-4">ACCIÓN</th>
+            <tr class="font-monospace text-muted" style="font-size: 0.75rem">
+              <th class="ps-4 py-3" style="width: 20%">FECHA (TIMESTAMP)</th>
+              <th style="width: 25%">INQUILINO (EMPRESA)</th>
+              <th style="width: 20%">OPERADOR</th>
+              <th style="width: 15%">MÉTODO PAGO</th>
+              <th style="width: 10%" class="text-end">TOTAL</th>
+              <th style="width: 10%" class="text-center pe-4">ACCIÓN</th>
             </tr>
           </thead>
-          <tbody class="font-monospace" style="font-size: 0.85rem;">
+          <tbody class="font-monospace" style="font-size: 0.85rem">
             <!-- Loading -->
             <tr *ngIf="loading">
               <td colspan="6" class="text-center py-5">
@@ -94,24 +129,34 @@
             <!-- Data Rows -->
             <ng-container *ngIf="!loading">
               <tr *ngFor="let t of transactions" class="border-bottom border-light">
-                <td class="ps-4 text-muted">{{ t.date | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                <td class="ps-4 text-muted">{{ t.date | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
                 <td>
                   <div class="fw-bold text-dark">{{ t.company?.name || 'Huérfano' }}</div>
-                  <div class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-geo-alt"></i> {{ t.branch?.name || 'N/A' }}</div>
+                  <div class="text-muted" style="font-size: 0.7rem">
+                    <i class="bi bi-geo-alt"></i> {{ t.branch?.name || 'N/A' }}
+                  </div>
                 </td>
                 <td>
                   <div><i class="bi bi-person-fill text-secondary"></i> {{ t.user?.name || 'N/A' }}</div>
-                  <div class="text-muted" style="font-size: 0.7rem;">Rol: {{ t.user?.role || 'N/A' }}</div>
+                  <div class="text-muted" style="font-size: 0.7rem">Rol: {{ t.user?.role || 'N/A' }}</div>
                 </td>
                 <td>
-                  <span class="badge bg-light text-dark border px-2 py-1" [ngClass]="{'border-success text-success': t.paymentMethod === 'cash'}">
+                  <span
+                    class="badge bg-light text-dark border px-2 py-1"
+                    [ngClass]="{ 'border-success text-success': t.paymentMethod === 'cash' }"
+                  >
                     {{ t.paymentMethod | uppercase }}
                   </span>
                 </td>
-                <td class="text-end fw-bold text-dark">{{ t.total | currency:'MXN' }}</td>
+                <td class="text-end fw-bold text-dark">{{ t.total | currency: 'MXN' }}</td>
                 <td class="text-center pe-4">
-                  <button class="btn btn-sm btn-primary py-1 px-2 font-monospace" style="font-size: 0.75rem;" 
-                          data-bs-toggle="modal" data-bs-target="#forensicModal" (click)="openForensicModal(t._id)">
+                  <button
+                    class="btn btn-sm btn-primary py-1 px-2 font-monospace"
+                    style="font-size: 0.75rem"
+                    data-bs-toggle="modal"
+                    data-bs-target="#forensicModal"
+                    (click)="openForensicModal(t._id)"
+                  >
                     <i class="bi bi-search"></i> Inspeccionar
                   </button>
                 </td>
@@ -121,41 +166,56 @@
         </table>
       </div>
     </div>
-    
+
     <!-- Paginación -->
-    <div class="card-footer bg-white border-top border-light py-3 d-flex justify-content-between align-items-center font-monospace" *ngIf="totalPages > 0">
-      <div class="text-muted" style="font-size: 0.8rem;">
-        Mostrando página <strong>{{ page }}</strong> de <strong>{{ totalPages }}</strong> 
+    <div
+      class="card-footer bg-white border-top border-light py-3 d-flex justify-content-between align-items-center font-monospace"
+      *ngIf="totalPages > 0"
+    >
+      <div class="text-muted" style="font-size: 0.8rem">
+        Mostrando página <strong>{{ page }}</strong> de <strong>{{ totalPages }}</strong>
         <span class="mx-2">&bull;</span> {{ total }} resultados totales
       </div>
       <div>
-        <button class="btn btn-sm btn-outline-secondary me-2" [disabled]="page === 1 || loading" (click)="changePage(page - 1)">
+        <button
+          class="btn btn-sm btn-outline-secondary me-2"
+          [disabled]="page === 1 || loading"
+          (click)="changePage(page - 1)"
+        >
           <i class="bi bi-chevron-left"></i> Anterior
         </button>
-        <button class="btn btn-sm btn-outline-secondary" [disabled]="page === totalPages || loading" (click)="changePage(page + 1)">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          [disabled]="page === totalPages || loading"
+          (click)="changePage(page + 1)"
+        >
           Siguiente <i class="bi bi-chevron-right"></i>
         </button>
       </div>
     </div>
   </div>
-
 </div>
 
 <!-- Modal Análisis Forense (Reutilizado) -->
 <div class="modal fade" id="forensicModal" tabindex="-1" aria-labelledby="forensicModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content border-0 shadow-lg" style="background-color: var(--bg-main);">
+    <div class="modal-content border-0 shadow-lg" style="background-color: var(--bg-main)">
       <div class="modal-header border-bottom border-light px-4 py-3 bg-white">
         <div>
-          <h5 class="modal-title fw-bold font-monospace d-flex align-items-center gap-2 text-dark mb-1" id="forensicModalLabel">
+          <h5
+            class="modal-title fw-bold font-monospace d-flex align-items-center gap-2 text-dark mb-1"
+            id="forensicModalLabel"
+          >
             <i class="bi bi-search text-primary"></i> EXPEDIENTE FORENSE DE TRANSACCIÓN
           </h5>
-          <small class="text-muted font-monospace" *ngIf="selectedForensicSale">Object ID: {{ selectedForensicSale._id }}</small>
+          <small class="text-muted font-monospace" *ngIf="selectedForensicSale"
+            >Object ID: {{ selectedForensicSale._id }}</small
+          >
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      
-      <div class="modal-body p-0" style="background-color: #f8f9fa;">
+
+      <div class="modal-body p-0" style="background-color: #f8f9fa">
         <!-- Spinner -->
         <div class="d-flex justify-content-center align-items-center py-5" *ngIf="loadingForensic">
           <div class="spinner-border text-primary" role="status">
@@ -165,20 +225,24 @@
         </div>
 
         <!-- Contenido Forense -->
-        <div class="container-fluid p-4 animate__animated animate__fadeIn" *ngIf="!loadingForensic && selectedForensicSale">
-          
+        <div
+          class="container-fluid p-4 animate__animated animate__fadeIn"
+          *ngIf="!loadingForensic && selectedForensicSale"
+        >
           <div class="row g-4">
             <!-- Columna Izquierda: Metadatos Contextuales -->
             <div class="col-lg-4">
               <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
-                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-geo-alt me-1"></i> Contexto Operativo</h6>
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem">
+                    <i class="bi bi-geo-alt me-1"></i> Contexto Operativo
+                  </h6>
                 </div>
                 <div class="card-body">
-                  <ul class="list-group list-group-flush font-monospace" style="font-size: 0.85rem;">
+                  <ul class="list-group list-group-flush font-monospace" style="font-size: 0.85rem">
                     <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-1">
                       <span class="text-muted">Timestamp Exacto:</span>
-                      <strong>{{ selectedForensicSale.date | date:'dd/MM/yyyy HH:mm:ss.SSS' }}</strong>
+                      <strong>{{ selectedForensicSale.date | date: 'dd/MM/yyyy HH:mm:ss.SSS' }}</strong>
                     </li>
                     <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0 py-1">
                       <span class="text-muted">Inquilino (Company):</span>
@@ -187,17 +251,23 @@
                     <li class="list-group-item px-0 border-0 py-1 mt-2">
                       <span class="text-muted d-block">Sucursal / Origen:</span>
                       <strong>{{ selectedForensicSale.branch?.name }}</strong>
-                      <div class="text-muted" style="font-size: 0.7rem;">{{ selectedForensicSale.branch?.address }}</div>
+                      <div class="text-muted" style="font-size: 0.7rem">{{ selectedForensicSale.branch?.address }}</div>
                     </li>
                     <li class="list-group-item px-0 border-0 py-1 mt-2">
                       <span class="text-muted d-block">Operador (Issuer):</span>
-                      <strong><i class="bi bi-person-fill text-secondary"></i> {{ selectedForensicSale.user?.name }}</strong>
-                      <div class="text-muted" style="font-size: 0.7rem;">@{{ selectedForensicSale.user?.username }} ({{ selectedForensicSale.user?.role }})</div>
+                      <strong
+                        ><i class="bi bi-person-fill text-secondary"></i> {{ selectedForensicSale.user?.name }}</strong
+                      >
+                      <div class="text-muted" style="font-size: 0.7rem">
+                        @{{ selectedForensicSale.user?.username }} ({{ selectedForensicSale.user?.role }})
+                      </div>
                     </li>
                     <li class="list-group-item px-0 border-0 py-1 mt-2">
                       <span class="text-muted d-block">Punto de Venta (POS):</span>
                       <strong>{{ selectedForensicSale.cashRegister?.registerName }}</strong>
-                      <span class="badge rounded-pill bg-light text-dark border ms-2" style="font-size: 0.65rem;">{{ selectedForensicSale.cashRegister?.isPhysical ? 'Hardware Físico' : 'Instancia Lógica' }}</span>
+                      <span class="badge rounded-pill bg-light text-dark border ms-2" style="font-size: 0.65rem">{{
+                        selectedForensicSale.cashRegister?.isPhysical ? 'Hardware Físico' : 'Instancia Lógica'
+                      }}</span>
                     </li>
                   </ul>
                 </div>
@@ -208,28 +278,40 @@
             <div class="col-lg-4">
               <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
-                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-calculator me-1"></i> Liquidación Financiera</h6>
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem">
+                    <i class="bi bi-calculator me-1"></i> Liquidación Financiera
+                  </h6>
                 </div>
                 <div class="card-body text-center d-flex flex-column justify-content-center py-4">
-                  <h1 class="display-4 fw-bold font-monospace text-dark mb-0">{{ selectedForensicSale.total | currency:'MXN' }}</h1>
+                  <h1 class="display-4 fw-bold font-monospace text-dark mb-0">
+                    {{ selectedForensicSale.total | currency: 'MXN' }}
+                  </h1>
                   <div class="mt-2 mb-4">
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success fs-6 py-1 px-3 rounded-pill">
+                    <span
+                      class="badge bg-success bg-opacity-10 text-success border border-success fs-6 py-1 px-3 rounded-pill"
+                    >
                       <i class="bi bi-check-circle-fill me-1"></i> {{ selectedForensicSale.paymentMethod | uppercase }}
                     </span>
                   </div>
-                  
+
                   <div class="bg-light rounded p-3 text-start font-monospace mt-auto">
-                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.85rem;">
+                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.85rem">
                       <span>Importe Recibido:</span>
-                      <strong class="text-dark">{{ (selectedForensicSale.receivedAmount || selectedForensicSale.total) | currency:'MXN' }}</strong>
+                      <strong class="text-dark">{{
+                        selectedForensicSale.receivedAmount || selectedForensicSale.total | currency: 'MXN'
+                      }}</strong>
                     </div>
-                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem;">
+                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem">
                       <span>Cambio / Vuelto:</span>
-                      <strong class="text-dark">{{ (selectedForensicSale.change || 0) | currency:'MXN' }}</strong>
+                      <strong class="text-dark">{{ selectedForensicSale.change || 0 | currency: 'MXN' }}</strong>
                     </div>
-                    <div class="d-flex justify-content-between text-muted border-top pt-2 mt-2" style="font-size: 0.85rem;" *ngIf="selectedForensicSale.discount > 0">
+                    <div
+                      class="d-flex justify-content-between text-muted border-top pt-2 mt-2"
+                      style="font-size: 0.85rem"
+                      *ngIf="selectedForensicSale.discount > 0"
+                    >
                       <span>Descuentos (Merma):</span>
-                      <strong class="text-danger">- {{ selectedForensicSale.discount | currency:'MXN' }}</strong>
+                      <strong class="text-danger">- {{ selectedForensicSale.discount | currency: 'MXN' }}</strong>
                     </div>
                   </div>
                 </div>
@@ -240,57 +322,89 @@
             <div class="col-lg-4">
               <div class="card h-100 border-0 shadow-sm bg-white forensic-card">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
-                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-bezier2 me-1"></i> Trazabilidad Avanzada</h6>
+                  <h6 class="fw-bold text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.75rem">
+                    <i class="bi bi-bezier2 me-1"></i> Trazabilidad Avanzada
+                  </h6>
                 </div>
                 <div class="card-body">
                   <div class="mb-4">
-                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem;">Fragmentación del Pago</h6>
+                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem">
+                      Fragmentación del Pago
+                    </h6>
                     <ng-container *ngIf="selectedForensicSale.payments && selectedForensicSale.payments.length > 0">
-                      <ul class="list-group list-group-flush font-monospace" style="font-size: 0.8rem;">
-                        <li *ngFor="let p of selectedForensicSale.payments" class="list-group-item px-3 py-2 border rounded bg-light mb-2">
+                      <ul class="list-group list-group-flush font-monospace" style="font-size: 0.8rem">
+                        <li
+                          *ngFor="let p of selectedForensicSale.payments"
+                          class="list-group-item px-3 py-2 border rounded bg-light mb-2"
+                        >
                           <div class="d-flex justify-content-between fw-bold text-dark">
-                            <span><i class="bi" [ngClass]="{'bi-cash text-success': p.method==='cash', 'bi-credit-card text-primary': p.method!=='cash'}"></i> {{ p.method | uppercase }}</span>
-                            <span>{{ p.amount | currency:'MXN' }}</span>
+                            <span
+                              ><i
+                                class="bi"
+                                [ngClass]="{
+                                  'bi-cash text-success': p.method === 'cash',
+                                  'bi-credit-card text-primary': p.method !== 'cash',
+                                }"
+                              ></i>
+                              {{ p.method | uppercase }}</span
+                            >
+                            <span>{{ p.amount | currency: 'MXN' }}</span>
                           </div>
                           <div class="text-muted" *ngIf="p.reference">Auth/Ref: {{ p.reference }}</div>
-                          <div class="text-muted" style="font-size: 0.7rem;">{{ p.date | date:'HH:mm:ss.SSS' }}</div>
+                          <div class="text-muted" style="font-size: 0.7rem">{{ p.date | date: 'HH:mm:ss.SSS' }}</div>
                         </li>
                       </ul>
                     </ng-container>
                     <ng-container *ngIf="!selectedForensicSale.payments || selectedForensicSale.payments.length === 0">
                       <div class="p-3 bg-light rounded text-center border">
                         <i class="bi bi-shield-lock d-block text-muted mb-1 fs-4"></i>
-                        <span class="text-muted font-monospace" style="font-size: 0.75rem;">Pago consolidado de origen.<br>Sin fragmentación rastreable.</span>
+                        <span class="text-muted font-monospace" style="font-size: 0.75rem"
+                          >Pago consolidado de origen.<br />Sin fragmentación rastreable.</span
+                        >
                       </div>
                     </ng-container>
                   </div>
 
                   <div *ngIf="selectedForensicSale.customer" class="border-top pt-3">
-                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem;">Entidad Vinculada (Cliente)</h6>
+                    <h6 class="fw-bold text-dark font-monospace mb-2" style="font-size: 0.8rem">
+                      Entidad Vinculada (Cliente)
+                    </h6>
                     <div class="d-flex align-items-center p-3 bg-light rounded border">
-                      <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+                      <div
+                        class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                        style="width: 40px; height: 40px"
+                      >
                         <i class="bi bi-person-fill text-primary fs-5"></i>
                       </div>
-                      <div class="ms-3 font-monospace" style="font-size: 0.8rem;">
+                      <div class="ms-3 font-monospace" style="font-size: 0.8rem">
                         <strong class="text-dark d-block">{{ selectedForensicSale.customer.name }}</strong>
-                        <span class="text-muted">{{ selectedForensicSale.customer.email || 'Sin correo registrado' }}</span>
+                        <span class="text-muted">{{
+                          selectedForensicSale.customer.email || 'Sin correo registrado'
+                        }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div> <!-- End Row -->
+          </div>
+          <!-- End Row -->
 
           <!-- Payload Ticket Detallado -->
           <div class="card mt-4 border-0 shadow-sm bg-white forensic-card">
-            <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
-              <h6 class="fw-bold text-uppercase text-muted mb-0" style="letter-spacing: 1px; font-size: 0.8rem;"><i class="bi bi-receipt me-1"></i> Payload del Ticket (Productos Mapeados)</h6>
-              <span class="badge bg-light text-dark border font-monospace">{{ selectedForensicSale.productsSold?.length || 0 }} Ítems</span>
+            <div
+              class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center"
+            >
+              <h6 class="fw-bold text-uppercase text-muted mb-0" style="letter-spacing: 1px; font-size: 0.8rem">
+                <i class="bi bi-receipt me-1"></i> Payload del Ticket (Productos Mapeados)
+              </h6>
+              <span class="badge bg-light text-dark border font-monospace"
+                >{{ selectedForensicSale.productsSold?.length || 0 }} Ítems</span
+              >
             </div>
             <div class="table-responsive">
               <table class="table table-borderless mb-0 align-middle table-hover">
-                <thead class="bg-light font-monospace text-muted" style="font-size: 0.75rem;">
+                <thead class="bg-light font-monospace text-muted" style="font-size: 0.75rem">
                   <tr>
                     <th class="ps-4">PRODUCT REF</th>
                     <th class="text-center">QTY</th>
@@ -298,22 +412,29 @@
                     <th class="text-end pe-4">NET LINE SUBTOTAL</th>
                   </tr>
                 </thead>
-                <tbody class="font-monospace" style="font-size: 0.85rem;">
+                <tbody class="font-monospace" style="font-size: 0.85rem">
                   <ng-container *ngFor="let item of selectedForensicSale.productsSold">
                     <tr class="border-bottom border-light">
                       <td class="ps-4 py-3">
                         <div class="fw-bold text-dark">{{ item.product?.name || 'Objeto Borrado o Huérfano' }}</div>
-                        <div class="text-muted" style="font-size: 0.75rem;">Ref: {{ item.product?._id || 'N/A' }}</div>
-                        <div *ngIf="item.modifications && item.modifications.length > 0" class="mt-2 ps-2 border-start border-2 border-warning bg-light p-2 rounded">
-                          <div class="text-warning fw-bold mb-1" style="font-size: 0.65rem;">MODIFICADORES APLICADOS:</div>
-                          <div *ngFor="let mod of item.modifications" class="text-muted" style="font-size: 0.75rem;">
-                            <i class="bi bi-plus text-warning"></i> {{ mod.name }} ({{ mod.extraPrice | currency:'MXN' }})
+                        <div class="text-muted" style="font-size: 0.75rem">Ref: {{ item.product?._id || 'N/A' }}</div>
+                        <div
+                          *ngIf="item.modifications && item.modifications.length > 0"
+                          class="mt-2 ps-2 border-start border-2 border-warning bg-light p-2 rounded"
+                        >
+                          <div class="text-warning fw-bold mb-1" style="font-size: 0.65rem">
+                            MODIFICADORES APLICADOS:
+                          </div>
+                          <div *ngFor="let mod of item.modifications" class="text-muted" style="font-size: 0.75rem">
+                            <i class="bi bi-plus text-warning"></i> {{ mod.name }} ({{
+                              mod.extraPrice | currency: 'MXN'
+                            }})
                           </div>
                         </div>
                       </td>
                       <td class="text-center fw-bold">x{{ item.quantity }}</td>
-                      <td class="text-end text-muted">{{ item.unitPrice | currency:'MXN' }}</td>
-                      <td class="text-end fw-bold text-dark pe-4">{{ item.subtotal | currency:'MXN' }}</td>
+                      <td class="text-end text-muted">{{ item.unitPrice | currency: 'MXN' }}</td>
+                      <td class="text-end fw-bold text-dark pe-4">{{ item.subtotal | currency: 'MXN' }}</td>
                     </tr>
                   </ng-container>
                 </tbody>
@@ -325,19 +446,30 @@
           <div class="accordion mt-4 shadow-sm" id="accordionRaw">
             <div class="accordion-item border-0 rounded overflow-hidden">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed bg-dark text-white font-monospace py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRaw" aria-expanded="false" style="font-size: 0.85rem; box-shadow: none;">
+                <button
+                  class="accordion-button collapsed bg-dark text-white font-monospace py-3"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseRaw"
+                  aria-expanded="false"
+                  style="font-size: 0.85rem; box-shadow: none"
+                >
                   <i class="bi bi-braces text-warning me-2"></i> INSPECCIONAR OBJETO JSON NATIVO (DATABASE RAW DUMP)
                 </button>
               </h2>
               <div id="collapseRaw" class="accordion-collapse collapse" data-bs-parent="#accordionRaw">
                 <div class="accordion-body p-0 bg-dark">
-                  <pre class="m-0 p-4 text-success font-monospace" style="font-size: 0.75rem; max-height: 500px; overflow-y: auto;">{{ selectedForensicSale | json }}</pre>
+                  <pre
+                    class="m-0 p-4 text-success font-monospace"
+                    style="font-size: 0.75rem; max-height: 500px; overflow-y: auto"
+                    >{{ selectedForensicSale | json }}</pre
+                  >
                 </div>
               </div>
             </div>
           </div>
-
-        </div> <!-- End Contenido Forense -->
+        </div>
+        <!-- End Contenido Forense -->
       </div>
     </div>
   </div>

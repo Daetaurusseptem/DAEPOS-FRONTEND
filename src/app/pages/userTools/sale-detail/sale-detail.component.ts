@@ -6,11 +6,12 @@ import 'jspdf-autotable';
 import { Sale, User } from 'src/app/interfaces/models.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { HardwareConnectorService } from 'src/app/services/hardware-connector.service';
+import { LoggerService } from '../../../services/logger.service';
 
 @Component({
   selector: 'app-sale-detail',
   templateUrl: './sale-detail.component.html',
-  styleUrls: ['./sale-detail.component.css']
+  styleUrls: ['./sale-detail.component.css'],
 })
 export class SaleDetailComponent implements OnInit {
   saleId!: string;
@@ -22,8 +23,9 @@ export class SaleDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private salesService: SalesService,
     private authService: AuthService,
-    private hardwareConnector: HardwareConnectorService
-  ) { }
+    private hardwareConnector: HardwareConnectorService,
+    private logger: LoggerService,
+  ) {}
 
   ngOnInit(): void {
     this.saleId = this.route.snapshot.paramMap.get('saleId')!;
@@ -33,10 +35,10 @@ export class SaleDetailComponent implements OnInit {
   loadSale() {
     this.salesService.getSaleById(this.saleId).subscribe((response) => {
       this.sale = response.sale!;
-      console.log(this.sale);
+      this.logger.log(this.sale);
       this.usuario = response!.sale?.user as User;
       this.products = response.sale!.productsSold!;
-      console.log(this.products);
+      this.logger.log(this.products);
     });
   }
 
@@ -68,8 +70,8 @@ TOTAL: $${this.sale.total.toFixed(2)}
       ticketContent += `Metodo: EFECTIVO\nRecibido: $${this.sale.receivedAmount}\nCambio: $${this.sale.change}\n`;
     }
 
-    this.hardwareConnector.printReceipt(ticketContent).subscribe(res => {
-      console.log('Respuesta del conector de hardware:', res);
+    this.hardwareConnector.printReceipt(ticketContent).subscribe((res) => {
+      this.logger.log('Respuesta del conector de hardware:', res);
       alert(res.message || 'Comando de impresión enviado');
     });
   }
@@ -168,11 +170,11 @@ TOTAL: $${this.sale.total.toFixed(2)}
     document.body.appendChild(iframe);
 
     iframe.onload = () => {
-      console.log('Iframe loaded, attempting to print');
+      this.logger.log('Iframe loaded, attempting to print');
       try {
         iframe.contentWindow!.focus();
         iframe.contentWindow!.print();
-        console.log('Print command sent');
+        this.logger.log('Print command sent');
       } catch (e) {
         console.error('Print error: ', e);
       }

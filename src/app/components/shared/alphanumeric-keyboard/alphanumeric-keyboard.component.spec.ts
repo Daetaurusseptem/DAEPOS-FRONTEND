@@ -8,7 +8,7 @@ describe('AlphanumericKeyboardComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [AlphanumericKeyboardComponent]
+      declarations: [AlphanumericKeyboardComponent],
     });
     fixture = TestBed.createComponent(AlphanumericKeyboardComponent);
     component = fixture.componentInstance;

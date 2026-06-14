@@ -4,8 +4,8 @@ import { CanActivateFn } from '@angular/router';
 import { empresaAdminGuard } from './empresa-admin.guard';
 
 describe('empresaAdminGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => empresaAdminGuard(...guardParameters));
+  const executeGuard: CanActivateFn = (...guardParameters) =>
+    TestBed.runInInjectionContext(() => empresaAdminGuard(...guardParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({});

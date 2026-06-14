@@ -8,34 +8,36 @@
   --warning: #ff9f1c;
   --dark: #0a0a0a;
   --light: #ffffff;
-  
+
   --bg-main: #ffffff; /* Canvas White */
   --bg-ghost: #f2f2f2; /* Ghost Gray */
   --card-bg: #ffffff;
   --text-main: #0a0a0a; /* Rich Black */
   --text-muted: #737373; /* Midtone Gray */
   --border-color: #e5e5e5; /* Subtle Ash */
-  
+
   /* Radii */
-  --radius-sm: 10px;    /* buttons/inputs */
-  --radius-md: 14px;    /* cards */
-  --radius-lg: 9999px;  /* pill */
-  
+  --radius-sm: 10px; /* buttons/inputs */
+  --radius-md: 14px; /* cards */
+  --radius-lg: 9999px; /* pill */
+
   /* Shadows - Minimalist */
   --shadow-sm: 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
   --shadow-md: 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
-  
+
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import "~bootstrap/dist/css/bootstrap.min.css";
-@import "~@ng-select/ng-select/themes/default.theme.css";
+/* Fonts loaded in index.html, Bootstrap & ng-select loaded via angular.json */
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   background-color: var(--bg-main);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
@@ -82,13 +84,19 @@ body {
 .btn-primary:hover {
   background-color: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(67, 97, 238, 0.25);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
 }
 
 /* Custom Utilities */
-.text-muted { color: var(--text-muted) !important; }
-.pointer { cursor: pointer; }
-.oculto { display: none !important; }
+.text-muted {
+  color: var(--text-muted) !important;
+}
+.pointer {
+  cursor: pointer;
+}
+.oculto {
+  display: none !important;
+}
 .bg-gradient-primary {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
 }
@@ -132,13 +140,13 @@ body {
 
 .content-area .table tbody tr {
   background-color: var(--card-bg) !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
   transition: var(--transition) !important;
 }
 
 .content-area .table tbody tr:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   background-color: #fafafa !important;
 }
 
@@ -227,7 +235,7 @@ body {
 .page-item.active .page-link {
   background-color: var(--primary) !important;
   color: #fff !important;
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .page-item.disabled .page-link {
@@ -274,5 +282,6 @@ body {
     color: #000000 !important;
   }
 }
-.swal2-container { z-index: 10070 !important; }
-
+.swal2-container {
+  z-index: 10070 !important;
+}

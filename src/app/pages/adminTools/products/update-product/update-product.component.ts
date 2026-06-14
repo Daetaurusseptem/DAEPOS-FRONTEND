@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
 })
 export class UpdateProductComponent implements OnInit {
   product!: Product;
-  inventoryItem: any; 
+  inventoryItem: any;
   inventoryItems: any[] = [];
   isCompanyAdmin: boolean = false;
   id: string = '';
@@ -60,7 +60,7 @@ export class UpdateProductComponent implements OnInit {
     private productService: ProductService,
     private supplierService: SupplierService,
     private recipeService: RecipesService,
-    private modalService: ModalService
+    private modalService: ModalService,
   ) {
     this.isCompanyAdmin = this.authService.role === 'companyAdmin' || this.authService.role === 'sysadmin';
   }
@@ -78,27 +78,31 @@ export class UpdateProductComponent implements OnInit {
   }
 
   loadCompanies() {
-    this.companyService.getCompanies()
-      .pipe(map(res => res.companies))
-      .subscribe(empresas => this.empresas = empresas!);
+    this.companyService
+      .getCompanies()
+      .pipe(map((res) => res.companies))
+      .subscribe((empresas) => (this.empresas = empresas!));
   }
 
   loadCategories() {
-    this.categoryService.getCompanyCategories(this.authService.companyId)
-      .pipe(map(res => res.categories))
-      .subscribe(categories => this.Categories = categories!);
+    this.categoryService
+      .getCompanyCategories(this.authService.companyId)
+      .pipe(map((res) => res.categories))
+      .subscribe((categories) => (this.Categories = categories!));
   }
 
   loadSuppliers() {
-    this.supplierService.getCompanySuppliers(this.authService.companyId)
-      .pipe(map(res => res.suppliers))
-      .subscribe(suppliers => this.suppliers = suppliers!);
+    this.supplierService
+      .getCompanySuppliers(this.authService.companyId)
+      .pipe(map((res) => res.suppliers))
+      .subscribe((suppliers) => (this.suppliers = suppliers!));
   }
 
   loadRecipes() {
-    this.recipeService.getCompanyRecipes(this.authService.companyId)
-      .pipe(map(res => res.recipes))
-      .subscribe(recipes => this.recipes = recipes!);
+    this.recipeService
+      .getCompanyRecipes(this.authService.companyId)
+      .pipe(map((res) => res.recipes))
+      .subscribe((recipes) => (this.recipes = recipes!));
   }
 
   loadProductData() {
@@ -112,7 +116,7 @@ export class UpdateProductComponent implements OnInit {
 
         // Poblar formulario con datos combinados
         this.productForm.patchValue({
-          categories: this.product.categories?.map((c: any) => typeof c === 'object' ? c._id : c) || [],
+          categories: this.product.categories?.map((c: any) => (typeof c === 'object' ? c._id : c)) || [],
           name: this.product.name,
           description: this.product.description,
           brand: this.product.brand,
@@ -143,7 +147,7 @@ export class UpdateProductComponent implements OnInit {
           this.productForm.get('receivedDate')?.disable();
         }
       },
-      error: (err: any) => console.error('Error loading product', err)
+      error: (err: any) => console.error('Error loading product', err),
     });
   }
 
@@ -170,30 +174,20 @@ export class UpdateProductComponent implements OnInit {
         confirmButtonText: 'Sí, actualizar',
       }).then((result) => {
         if (result.isConfirmed) {
-          this.productService
-            .updateProduct(this.product._id!, this.productForm.value)
-            .subscribe({
-              next: (response: any) => {
-                Swal.fire(
-                  '¡Actualizado!',
-                  'El producto ha sido actualizado correctamente.',
-                  'success'
-                );
-                if (this.authService.role === 'admin') {
-                  this.router.navigateByUrl('/dashboard/admin/products');
-                } else if (this.authService.role === 'sysadmin') {
-                  this.router.navigateByUrl(`/dashboard/sysadmin/companies`);
-                }
-              },
-              error: (error: any) => {
-                console.error('Error al actualizar producto', error);
-                Swal.fire(
-                  '¡Error!',
-                  'Hubo un problema al actualizar el producto.',
-                  'error'
-                );
+          this.productService.updateProduct(this.product._id!, this.productForm.value).subscribe({
+            next: (response: any) => {
+              Swal.fire('¡Actualizado!', 'El producto ha sido actualizado correctamente.', 'success');
+              if (this.authService.role === 'admin') {
+                this.router.navigateByUrl('/dashboard/admin/products');
+              } else if (this.authService.role === 'sysadmin') {
+                this.router.navigateByUrl(`/dashboard/sysadmin/companies`);
               }
-            });
+            },
+            error: (error: any) => {
+              console.error('Error al actualizar producto', error);
+              Swal.fire('¡Error!', 'Hubo un problema al actualizar el producto.', 'error');
+            },
+          });
         }
       });
     }
@@ -204,10 +198,7 @@ export class UpdateProductComponent implements OnInit {
     return !!control && control.invalid && control.touched;
   }
 
-  abrirModal(
-    element: Product,
-    tipo: 'empresas' | 'usuarios' | 'productos'
-  ) {
+  abrirModal(element: Product, tipo: 'empresas' | 'usuarios' | 'productos') {
     const { _id } = element;
     this.modalService.abrirModal(element.img, tipo, _id!);
   }

@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
+import { LoggerService } from './logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MenuService {
-  public menu: any[]=[]
+  public menu: any[] = [];
 
-  constructor(){
-    this.cargarMenu()
+  constructor(private logger: LoggerService) {
+    this.cargarMenu();
   }
 
-  cargarMenu(){
-    this.menu = JSON.parse(localStorage.getItem('menu')!)
-   console.log(this.menu);
+  cargarMenu() {
+    const raw = localStorage.getItem('menu');
+    this.menu = raw ? JSON.parse(raw) : [];
   }
 }

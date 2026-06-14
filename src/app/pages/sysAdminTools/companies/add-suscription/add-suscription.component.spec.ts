@@ -8,7 +8,7 @@ describe('AddSuscriptionComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [AddSubscriptionComponent]
+      declarations: [AddSubscriptionComponent],
     });
     fixture = TestBed.createComponent(AddSubscriptionComponent);
     component = fixture.componentInstance;

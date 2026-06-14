@@ -7,11 +7,23 @@
       <form [formGroup]="categoryForm" (ngSubmit)="actualizarCategory()">
         <div class="mb-3">
           <label for="name" class="form-label">Nombre de categoría</label>
-          <input type="text" class="form-control" id="name" formControlName="name" placeholder="Introduce el nombre de la categoría">
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            placeholder="Introduce el nombre de la categoría"
+          />
         </div>
         <div class="mb-3">
           <label for="description" class="form-label">Descripción</label>
-          <textarea class="form-control" id="description" formControlName="description" rows="3" placeholder="Describe la categoría"></textarea>
+          <textarea
+            class="form-control"
+            id="description"
+            formControlName="description"
+            rows="3"
+            placeholder="Describe la categoría"
+          ></textarea>
         </div>
         <div *ngIf="categoryForm.invalid" class="alert alert-danger">
           <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0">Nombre inválido</p>

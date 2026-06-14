@@ -30,21 +30,8 @@ import { KitchenKdsComponent } from './kitchen-kds/kitchen-kds.component';
     SaleDetailComponent,
     KitchenKdsComponent,
   ],
-  exports: [
-    NewsaleComponent,
-    CashRegisterComponent,
-    OpenCashRegisterComponent,
-    KitchenKdsComponent,
-  ],
-  
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterLink,
-    AdminToolsModule,
-    ComponentsModule
-    
-  ]
+  exports: [NewsaleComponent, CashRegisterComponent, OpenCashRegisterComponent, KitchenKdsComponent],
+
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, AdminToolsModule, ComponentsModule],
 })
-export class UserToolsModule { }
+export class UserToolsModule {}

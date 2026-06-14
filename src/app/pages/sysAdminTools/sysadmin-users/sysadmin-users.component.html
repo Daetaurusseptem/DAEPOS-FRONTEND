@@ -5,7 +5,11 @@
       <h1 class="h3 mb-1 fw-bold text-dark">Directorio de Cuentas y Administradores</h1>
       <p class="text-muted mb-0">Gestión global de Inquilinos (Owners) y personal de Staff (Sysadmins)</p>
     </div>
-    <button *ngIf="activeTab === 'sysadmins'" class="btn btn-dark rounded-pill fw-bold px-4" routerLink="/dashboard/sysadmin/users/new">
+    <button
+      *ngIf="activeTab === 'sysadmins'"
+      class="btn btn-dark rounded-pill fw-bold px-4"
+      routerLink="/dashboard/sysadmin/users/new"
+    >
       <i class="bi bi-person-plus-fill me-2"></i> Crear Sysadmin
     </button>
   </div>
@@ -13,12 +17,22 @@
   <!-- Tabs -->
   <ul class="nav nav-pills mb-4 border-bottom pb-3">
     <li class="nav-item">
-      <button class="nav-link fw-bold" [class.active]="activeTab === 'owners'" [class.bg-dark]="activeTab === 'owners'" (click)="switchTab('owners')">
+      <button
+        class="nav-link fw-bold"
+        [class.active]="activeTab === 'owners'"
+        [class.bg-dark]="activeTab === 'owners'"
+        (click)="switchTab('owners')"
+      >
         <i class="bi bi-buildings me-2"></i> Owners (Dueños de Inquilinos)
       </button>
     </li>
     <li class="nav-item ms-2">
-      <button class="nav-link fw-bold" [class.active]="activeTab === 'sysadmins'" [class.bg-dark]="activeTab === 'sysadmins'" (click)="switchTab('sysadmins')">
+      <button
+        class="nav-link fw-bold"
+        [class.active]="activeTab === 'sysadmins'"
+        [class.bg-dark]="activeTab === 'sysadmins'"
+        (click)="switchTab('sysadmins')"
+      >
         <i class="bi bi-shield-lock me-2"></i> Staff Sysadmins
       </button>
     </li>
@@ -34,7 +48,7 @@
   <div class="card border-0 shadow-sm" *ngIf="!loading">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light text-muted small text-uppercase" style="letter-spacing: 0.5px;">
+        <thead class="bg-light text-muted small text-uppercase" style="letter-spacing: 0.5px">
           <tr>
             <th class="ps-4">Usuario</th>
             <th>Contacto</th>
@@ -47,7 +61,10 @@
           <tr *ngFor="let user of users">
             <td class="ps-4">
               <div class="d-flex align-items-center gap-3">
-                <div class="avatar bg-light text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold;">
+                <div
+                  class="avatar bg-light text-primary rounded-circle d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px; font-weight: bold"
+                >
                   {{ user.name?.charAt(0) | uppercase }}
                 </div>
                 <div>
@@ -67,22 +84,36 @@
               </span>
             </td>
             <td>
-              <span class="badge border" [ngClass]="user.active !== false ? 'border-success text-success bg-success-subtle' : 'border-danger text-danger bg-danger-subtle'">
+              <span
+                class="badge border"
+                [ngClass]="
+                  user.active !== false
+                    ? 'border-success text-success bg-success-subtle'
+                    : 'border-danger text-danger bg-danger-subtle'
+                "
+              >
                 <i class="bi" [ngClass]="user.active !== false ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
                 {{ user.active !== false ? 'ACTIVO' : 'BLOQUEADO' }}
               </span>
             </td>
             <td class="text-end pe-4">
               <!-- Edit/Reset Password -->
-              <button class="btn btn-sm btn-light text-primary me-2 shadow-sm rounded-circle" style="width: 35px; height: 35px;" routerLink="/dashboard/sysadmin/users/edit/{{user._id}}">
+              <button
+                class="btn btn-sm btn-light text-primary me-2 shadow-sm rounded-circle"
+                style="width: 35px; height: 35px"
+                routerLink="/dashboard/sysadmin/users/edit/{{ user._id }}"
+              >
                 <i class="bi bi-pencil-fill"></i>
               </button>
-              
+
               <!-- Soft Block / Unblock -->
-              <button class="btn btn-sm shadow-sm rounded-circle" style="width: 35px; height: 35px;" 
-                      [ngClass]="user.active !== false ? 'btn-light text-danger' : 'btn-dark text-white'"
-                      (click)="softBlockUser(user)"
-                      title="Activar / Desactivar">
+              <button
+                class="btn btn-sm shadow-sm rounded-circle"
+                style="width: 35px; height: 35px"
+                [ngClass]="user.active !== false ? 'btn-light text-danger' : 'btn-dark text-white'"
+                (click)="softBlockUser(user)"
+                title="Activar / Desactivar"
+              >
                 <i class="bi" [ngClass]="user.active !== false ? 'bi-shield-slash-fill' : 'bi-shield-check'"></i>
               </button>
             </td>

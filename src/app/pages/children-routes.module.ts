@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ExpiredSubscriptionComponent } from './billing/expired-subscription/expired-subscription.component';
 
-import { SysAdminGuard } from 'src/app/guards/sys-admin.guard';
-import { AuthGuardGuard } from 'src/app/guards/is-auth.guard';
-import { AdminGuard } from 'src/app/guards/admin-guard.guard';
+import { sysAdminGuard } from 'src/app/guards/sys-admin.guard';
+import { isAuthGuard } from 'src/app/guards/is-auth.guard';
+import { adminGuard } from 'src/app/guards/admin-guard.guard';
 import { CompanyAdminGuard } from 'src/app/guards/company-admin.guard';
 import { OverviewComponent } from './dashboard/overview/overview.component';
 import { ReportsComponent } from './dashboard/reports/reports.component';
@@ -39,7 +39,7 @@ import { CentralizedDeliveriesComponent } from './adminTools/Suppliers/deliverie
 import { CreateCompanyCategoryComponent } from './adminTools/Categories/create-company-catregory/create-company-category.component';
 import { AddInventoryComponent } from './adminTools/inventory/add-inventory/add-inventory.component';
 import { OpenCashRegisterComponent } from './userTools/open-cash-register/open-cash-register.component';
-import { CashRegisterGuard } from '../guards/cash-register.guard';
+import { cashRegisterGuard } from '../guards/cash-register.guard';
 import { UserHomeComponent } from './userTools/user-home/user-home.component';
 import { userGuard } from '../guards/user.guard';
 import { NewsaleComponent } from './userTools/newsale/newsale.component';
@@ -80,110 +80,132 @@ import { PromotionsListComponent } from './adminTools/promotions/promotions-list
 import { LiveRegistersComponent } from './adminTools/live-registers/live-registers.component';
 import { CajasHistorialComponent } from './adminTools/cajas-historial/cajas-historial.component';
 import { ManageBillingComponent } from './billing/manage-billing/manage-billing.component';
+import { PendingVerificationsComponent } from './adminTools/audits/pending-verifications/pending-verifications.component';
 
 const routes: Routes = [
   {
     path: '',
     component: PagesComponent,
-    canActivate: [AuthGuardGuard],
+    canActivate: [isAuthGuard],
     children: [
       { path: '', component: DashboardPageComponent, canActivate: [RoleGuard] },
       { path: 'overview', component: OverviewComponent },
       { path: 'reports', component: ReportsComponent },
       { path: 'notifications', component: NotificationsPageComponent },
       //SYSADMIN
-      { path: 'sysadmin/dashboard', canActivate: [SysAdminGuard], component: SysadminDashboardComponent },
-      { path: 'sysadmin/transactions', canActivate: [SysAdminGuard], component: SysadminTransactionsComponent },
-      { path: 'sysadmin/logs', canActivate: [SysAdminGuard], component: SysadminLogsComponent },
-      { path: 'sysadmin/subscriptions', canActivate: [SysAdminGuard], component: SysadminSubscriptionsComponent },
-      { path: 'sysadmin/subscriptions/:id', canActivate: [SysAdminGuard], component: SysadminSubscriptionDetailComponent },
-      { path: 'sysadmin/users', canActivate: [SysAdminGuard], component: SysadminUsersComponent },
-      { path: 'sysadmin/users/edit/:id', canActivate: [SysAdminGuard], component: UserEditComponent },
-      { path: 'sysadmin/users/new', canActivate: [SysAdminGuard], component: CreateUserReComponent },
-      { path: 'sysadmin/tiers', canActivate: [SysAdminGuard], component: TiersComponent },
-      { path: 'sysadmin/global-settings', canActivate: [SysAdminGuard], component: GlobalSettingsComponent },
-      { path: 'sysadmin/manual-payments', canActivate: [SysAdminGuard], component: ManualPaymentsComponent },
-      { path: 'sysadmin/companies', canActivate: [SysAdminGuard], component: CompanyListComponent },
-      { path: 'sysadmin/companies/new', canActivate: [SysAdminGuard], component: CreateCompanyComponent },
-      { path: 'sysadmin/companies/edit/:id', canActivate: [SysAdminGuard], component: EditCompanyComponent },
-      { path: 'sysadmin/companies/details/:id', canActivate: [SysAdminGuard], component: CompanyDetailsComponent },
-      { path: 'sysadmin/tiers', canActivate: [SysAdminGuard], component: TiersComponent },
-      { path: 'sysadmin/companies/subscriptions/select', canActivate: [SysAdminGuard], component: SelectSubscriptionsComponent },
-      { path: 'sysadmin/companies/subscription/:id', canActivate: [SysAdminGuard], component: AddSubscriptionComponent },
-      { path: 'sysadmin/suppliers', canActivate: [SysAdminGuard], component: SuppliersListComponent },
-      { path: 'sysadmin/suppliers/new/:id', canActivate: [SysAdminGuard], component: CreateSupplierComponent },
-      { path: 'sysadmin/suppliers/edit/:id', canActivate: [SysAdminGuard], component: UpdateSuppliersComponent },
-      { path: 'sysadmin/products', canActivate: [SysAdminGuard], component: ProductsListComponent },
-      { path: 'sysadmin/product/new', canActivate: [SysAdminGuard], component: CreateProductComponent },
-      { path: 'sysadmin/product/new/:id', canActivate: [SysAdminGuard], component: CreateProductComponent },
-      { path: 'sysadmin/product/edit/:id', canActivate: [SysAdminGuard], component: UpdateProductComponent },
-      { path: 'sysadmin/categories', canActivate: [SysAdminGuard], component: CategoriesListComponent },
-      { path: 'sysadmin/edit-category/:id', canActivate: [SysAdminGuard], component: EditCategoryComponent },
-      { path: 'sysadmin/categories/new/:id', canActivate: [SysAdminGuard], component: CreateCompanyCategoryComponent },
+      { path: 'sysadmin/dashboard', canActivate: [sysAdminGuard], component: SysadminDashboardComponent },
+      { path: 'sysadmin/transactions', canActivate: [sysAdminGuard], component: SysadminTransactionsComponent },
+      { path: 'sysadmin/logs', canActivate: [sysAdminGuard], component: SysadminLogsComponent },
+      { path: 'sysadmin/subscriptions', canActivate: [sysAdminGuard], component: SysadminSubscriptionsComponent },
+      {
+        path: 'sysadmin/subscriptions/:id',
+        canActivate: [sysAdminGuard],
+        component: SysadminSubscriptionDetailComponent,
+      },
+      { path: 'sysadmin/users', canActivate: [sysAdminGuard], component: SysadminUsersComponent },
+      { path: 'sysadmin/users/edit/:id', canActivate: [sysAdminGuard], component: UserEditComponent },
+      { path: 'sysadmin/users/new', canActivate: [sysAdminGuard], component: CreateUserReComponent },
+      { path: 'sysadmin/tiers', canActivate: [sysAdminGuard], component: TiersComponent },
+      { path: 'sysadmin/global-settings', canActivate: [sysAdminGuard], component: GlobalSettingsComponent },
+      { path: 'sysadmin/manual-payments', canActivate: [sysAdminGuard], component: ManualPaymentsComponent },
+      { path: 'sysadmin/companies', canActivate: [sysAdminGuard], component: CompanyListComponent },
+      { path: 'sysadmin/companies/new', canActivate: [sysAdminGuard], component: CreateCompanyComponent },
+      { path: 'sysadmin/companies/edit/:id', canActivate: [sysAdminGuard], component: EditCompanyComponent },
+      { path: 'sysadmin/companies/details/:id', canActivate: [sysAdminGuard], component: CompanyDetailsComponent },
+      { path: 'sysadmin/tiers', canActivate: [sysAdminGuard], component: TiersComponent },
+      {
+        path: 'sysadmin/companies/subscriptions/select',
+        canActivate: [sysAdminGuard],
+        component: SelectSubscriptionsComponent,
+      },
+      {
+        path: 'sysadmin/companies/subscription/:id',
+        canActivate: [sysAdminGuard],
+        component: AddSubscriptionComponent,
+      },
+      { path: 'sysadmin/suppliers', canActivate: [sysAdminGuard], component: SuppliersListComponent },
+      { path: 'sysadmin/suppliers/new/:id', canActivate: [sysAdminGuard], component: CreateSupplierComponent },
+      { path: 'sysadmin/suppliers/edit/:id', canActivate: [sysAdminGuard], component: UpdateSuppliersComponent },
+      { path: 'sysadmin/products', canActivate: [sysAdminGuard], component: ProductsListComponent },
+      { path: 'sysadmin/product/new', canActivate: [sysAdminGuard], component: CreateProductComponent },
+      { path: 'sysadmin/product/new/:id', canActivate: [sysAdminGuard], component: CreateProductComponent },
+      { path: 'sysadmin/product/edit/:id', canActivate: [sysAdminGuard], component: UpdateProductComponent },
+      { path: 'sysadmin/categories', canActivate: [sysAdminGuard], component: CategoriesListComponent },
+      { path: 'sysadmin/edit-category/:id', canActivate: [sysAdminGuard], component: EditCategoryComponent },
+      { path: 'sysadmin/categories/new/:id', canActivate: [sysAdminGuard], component: CreateCompanyCategoryComponent },
       //ADMIN
-      { path: 'admin', canActivate: [AdminGuard], component: CompanyAdminHomeComponent },
+      { path: 'admin', canActivate: [adminGuard], component: CompanyAdminHomeComponent },
+      { path: 'admin/audits/pending', canActivate: [adminGuard], component: PendingVerificationsComponent },
       { path: 'admin/billing', canActivate: [CompanyAdminGuard], component: ManageBillingComponent },
-      { path: 'admin/users', canActivate: [AdminGuard], component: UserListComponent },
-      { path: 'admin/users/new', canActivate: [AdminGuard], component: CreateUserReComponent },
-      { path: 'admin/users/edit/:id', canActivate: [AdminGuard], component: UserEditComponent },
-      { path: 'admin/users/:userId/cajas', component: UserCajasComponent, canActivate: [AdminGuard] },
+      { path: 'admin/users', canActivate: [adminGuard], component: UserListComponent },
+      { path: 'admin/users/new', canActivate: [adminGuard], component: CreateUserReComponent },
+      { path: 'admin/users/edit/:id', canActivate: [adminGuard], component: UserEditComponent },
+      { path: 'admin/users/:userId/cajas', component: UserCajasComponent, canActivate: [adminGuard] },
 
-      { path: 'admin/cajas/:cajaId', component: CajaDetailComponent, canActivate: [AdminGuard] },
-      { path: 'admin/products', canActivate: [AdminGuard], component: ProductsListComponent },
-      { path: 'admin/product/new', canActivate: [AdminGuard], component: CreateProductComponent },
-      { path: 'admin/product/edit/:id', canActivate: [AdminGuard], component: UpdateProductComponent },
-      { path: 'admin/suppliers', canActivate: [AdminGuard], component: SuppliersListComponent },
-      { path: 'admin/suppliers/deliveries', canActivate: [AdminGuard], component: CentralizedDeliveriesComponent },
-      { path: 'admin/suppliers/new/:id', canActivate: [AdminGuard], component: CreateSupplierComponent },
-      { path: 'admin/suppliers/edit/:id', canActivate: [AdminGuard], component: UpdateSuppliersComponent },
-      { path: 'admin/suppliers/details/:id', canActivate: [AdminGuard], component: SupplierDetailsComponent },
-      { path: 'admin/categories', canActivate: [AdminGuard], component: CategoriesListComponent },
-      { path: 'admin/edit-category/:id', canActivate: [AdminGuard], component: EditCategoryComponent },
-      { path: 'admin/categories/new/:id', canActivate: [AdminGuard], component: CreateCompanyCategoryComponent },
-      { path: 'admin/inventory', canActivate: [AdminGuard], component: InventoryStockListComponent },
-      { path: 'admin/items', canActivate: [AdminGuard], component: InventoryStockListComponent },
-      { path: 'admin/inventory/new', canActivate: [AdminGuard], component: AddInventoryComponent },
-      { path: 'admin/inventory/update/:id', canActivate: [AdminGuard], component: UpdateInventoryComponent },
-      { path: 'admin/inventory/transfers/new', canActivate: [AdminGuard], component: CreateStockTransferComponent },
-      { path: 'admin/inventory/transfers', canActivate: [AdminGuard], component: StockTransferListComponent },
-      { path: 'admin/recipes', canActivate: [AdminGuard], component: RecipeListComponent },
-      { path: 'admin/recipes/new', canActivate: [AdminGuard], component: CreateRecipeComponent },
-      { path: 'admin/recipes/edit/:id', canActivate: [AdminGuard], component: EditRecipeComponent },
+      { path: 'admin/cajas/:cajaId', component: CajaDetailComponent, canActivate: [adminGuard] },
+      { path: 'admin/products', canActivate: [adminGuard], component: ProductsListComponent },
+      { path: 'admin/product/new', canActivate: [adminGuard], component: CreateProductComponent },
+      { path: 'admin/product/edit/:id', canActivate: [adminGuard], component: UpdateProductComponent },
+      { path: 'admin/suppliers', canActivate: [adminGuard], component: SuppliersListComponent },
+      { path: 'admin/suppliers/deliveries', canActivate: [adminGuard], component: CentralizedDeliveriesComponent },
+      { path: 'admin/suppliers/new/:id', canActivate: [adminGuard], component: CreateSupplierComponent },
+      { path: 'admin/suppliers/edit/:id', canActivate: [adminGuard], component: UpdateSuppliersComponent },
+      { path: 'admin/suppliers/details/:id', canActivate: [adminGuard], component: SupplierDetailsComponent },
+      { path: 'admin/categories', canActivate: [adminGuard], component: CategoriesListComponent },
+      { path: 'admin/edit-category/:id', canActivate: [adminGuard], component: EditCategoryComponent },
+      { path: 'admin/categories/new/:id', canActivate: [adminGuard], component: CreateCompanyCategoryComponent },
+      { path: 'admin/inventory', canActivate: [adminGuard], component: InventoryStockListComponent },
+      { path: 'admin/items', canActivate: [adminGuard], component: InventoryStockListComponent },
+      { path: 'admin/inventory/new', canActivate: [adminGuard], component: AddInventoryComponent },
+      { path: 'admin/inventory/update/:id', canActivate: [adminGuard], component: UpdateInventoryComponent },
+      { path: 'admin/inventory/transfers/new', canActivate: [adminGuard], component: CreateStockTransferComponent },
+      { path: 'admin/inventory/transfers', canActivate: [adminGuard], component: StockTransferListComponent },
+      { path: 'admin/recipes', canActivate: [adminGuard], component: RecipeListComponent },
+      { path: 'admin/recipes/new', canActivate: [adminGuard], component: CreateRecipeComponent },
+      { path: 'admin/recipes/edit/:id', canActivate: [adminGuard], component: EditRecipeComponent },
       { path: 'admin/raw-materials', component: RawMaterialListComponent },
       { path: 'admin/ingredients', component: RawMaterialListComponent },
       { path: 'admin/raw-materials/new', component: CreateRawMaterialComponent },
       { path: 'admin/raw-materials/edit/:id', component: EditRawMaterialComponent },
       { path: 'admin/statistics', component: StatisticsComponent },
       { path: 'admin/manage-printers', component: ManagePrintersComponent },
-      { path: 'admin/branches', canActivate: [AdminGuard], component: BranchListComponent },
-      { path: 'admin/branches/new', canActivate: [AdminGuard], component: BranchFormComponent },
-      { path: 'admin/branches/:id', canActivate: [AdminGuard], component: BranchAdminHomeComponent },
-      { path: 'admin/branches/edit/:id', canActivate: [AdminGuard], component: BranchFormComponent },
-      { path: 'branch', canActivate: [AdminGuard], component: BranchAdminHomeComponent },
-      { path: 'admin/customers', canActivate: [AdminGuard], component: CustomersListComponent },
-      { path: 'admin/promotions', canActivate: [AdminGuard], component: PromotionsListComponent },
-      { path: 'admin/live-registers', canActivate: [AdminGuard], component: LiveRegistersComponent },
-      { path: 'admin/cajas-historial', canActivate: [AdminGuard], component: CajasHistorialComponent },
+      { path: 'admin/branches', canActivate: [adminGuard], component: BranchListComponent },
+      { path: 'admin/branches/new', canActivate: [adminGuard], component: BranchFormComponent },
+      { path: 'admin/branches/:id', canActivate: [adminGuard], component: BranchAdminHomeComponent },
+      { path: 'admin/branches/edit/:id', canActivate: [adminGuard], component: BranchFormComponent },
+      { path: 'branch', canActivate: [adminGuard], component: BranchAdminHomeComponent },
+      { path: 'admin/customers', canActivate: [adminGuard], component: CustomersListComponent },
+      { path: 'admin/promotions', canActivate: [adminGuard], component: PromotionsListComponent },
+      { path: 'admin/live-registers', canActivate: [adminGuard], component: LiveRegistersComponent },
+      { path: 'admin/cajas-historial', canActivate: [adminGuard], component: CajasHistorialComponent },
       //USER
       { path: 'user', canActivate: [userGuard], component: UserHomeComponent },
-      { path: 'user/new-sale', component: NewsaleComponent, canActivate: [AuthGuardGuard, userGuard] },
-      { path: 'user/open-cash-register', component: OpenCashRegisterComponent, canActivate: [AuthGuardGuard, userGuard] },
+      { path: 'user/new-sale', component: NewsaleComponent, canActivate: [isAuthGuard, userGuard] },
+      {
+        path: 'user/open-cash-register',
+        component: OpenCashRegisterComponent,
+        canActivate: [isAuthGuard, userGuard],
+      },
       { path: 'user/new-sale/confirm-sale', component: ConfirmSaleComponent },
       { path: 'user/sales-success', component: SuccessSaleComponent },
-      { path: 'user/close-register', component: CloseCashRegisterComponent, canActivate: [AuthGuardGuard, userGuard] },
-      { path: 'user/daily-sales', component: DailySalesComponent, canActivate: [AuthGuardGuard, userGuard] },
-      { path: 'user/sale-details/:saleId', component: SaleDetailComponent, canActivate: [AuthGuardGuard, userGuard] },
-      { path: 'user/inventory-available', component: InventoryAvailableComponent, canActivate: [AuthGuardGuard, userGuard] },
-      { path: 'kitchen/kds', component: KitchenKdsComponent, canActivate: [AuthGuardGuard, kitchenGuard] },
-      
+      { path: 'user/close-register', component: CloseCashRegisterComponent, canActivate: [isAuthGuard, userGuard] },
+      { path: 'user/daily-sales', component: DailySalesComponent, canActivate: [isAuthGuard, userGuard] },
+      { path: 'user/sale-details/:saleId', component: SaleDetailComponent, canActivate: [isAuthGuard, userGuard] },
+      {
+        path: 'user/inventory-available',
+        component: InventoryAvailableComponent,
+        canActivate: [isAuthGuard, userGuard],
+      },
+      { path: 'kitchen/kds', component: KitchenKdsComponent, canActivate: [isAuthGuard, kitchenGuard] },
+
       // BILLING / SUSCRIPCION (Para todos los roles que intenten acceder bloqueados)
       { path: 'billing/expired', component: ExpiredSubscriptionComponent },
-    ]
-  }
+    ],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class childrenPagesRouting { }
+export class childrenPagesRouting {}

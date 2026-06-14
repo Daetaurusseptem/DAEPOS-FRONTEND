@@ -2,7 +2,9 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h1 class="console-title mb-1">Onboarding Express</h1>
-      <p class="console-subtitle text-muted mb-0">Crea la Empresa, la Sucursal Principal y el usuario Administrador en un solo paso.</p>
+      <p class="console-subtitle text-muted mb-0">
+        Crea la Empresa, la Sucursal Principal y el usuario Administrador en un solo paso.
+      </p>
     </div>
     <div class="d-flex gap-2">
       <button class="btn btn-outline-dark d-flex align-items-center gap-1.5" routerLink="/dashboard/sysadmin/companies">
@@ -15,32 +17,74 @@
     <div class="card-body p-4">
       <form #onboardForm="ngForm" (ngSubmit)="submitExpressOnboarding(onboardForm)">
         <div class="row g-4">
-          
           <!-- Sección A: Empresa -->
           <div class="col-lg-4 border-end pe-lg-4">
             <div class="d-flex align-items-center gap-2 mb-4">
-              <span class="badge bg-dark text-white rounded-circle font-monospace" style="width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem;">1</span>
+              <span
+                class="badge bg-dark text-white rounded-circle font-monospace"
+                style="
+                  width: 26px;
+                  height: 26px;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 0.8rem;
+                "
+                >1</span
+              >
               <h4 class="mb-0 fw-bold fs-6 uppercase tracking-wider text-secondary">DATOS DE LA EMPRESA</h4>
             </div>
-            
+
             <div class="mb-3">
               <label for="companyName" class="form-label">Nombre Comercial</label>
-              <input type="text" class="form-control" id="companyName" [(ngModel)]="onboardingData.companyName" name="companyName" required placeholder="Ej. Farmacia San Jorge">
+              <input
+                type="text"
+                class="form-control"
+                id="companyName"
+                [(ngModel)]="onboardingData.companyName"
+                name="companyName"
+                required
+                placeholder="Ej. Farmacia San Jorge"
+              />
             </div>
 
             <div class="mb-3">
               <label for="companyEmail" class="form-label">Correo Corporativo</label>
-              <input type="email" class="form-control" id="companyEmail" [(ngModel)]="onboardingData.companyEmail" name="companyEmail" required placeholder="contacto@empresa.com">
+              <input
+                type="email"
+                class="form-control"
+                id="companyEmail"
+                [(ngModel)]="onboardingData.companyEmail"
+                name="companyEmail"
+                required
+                placeholder="contacto@empresa.com"
+              />
             </div>
 
             <div class="mb-3">
               <label for="companyTel" class="form-label">Teléfono</label>
-              <input type="text" class="form-control" id="companyTel" [(ngModel)]="onboardingData.companyTel" name="companyTel" required placeholder="10 dígitos">
+              <input
+                type="text"
+                class="form-control"
+                id="companyTel"
+                [(ngModel)]="onboardingData.companyTel"
+                name="companyTel"
+                required
+                placeholder="10 dígitos"
+              />
             </div>
 
             <div class="mb-3">
               <label for="companyAddress" class="form-label">Dirección Fiscal / Matriz</label>
-              <input type="text" class="form-control" id="companyAddress" [(ngModel)]="onboardingData.companyAddress" name="companyAddress" required placeholder="Calle, Número, Colonia">
+              <input
+                type="text"
+                class="form-control"
+                id="companyAddress"
+                [(ngModel)]="onboardingData.companyAddress"
+                name="companyAddress"
+                required
+                placeholder="Calle, Número, Colonia"
+              />
             </div>
 
             <div class="mb-3">
@@ -64,69 +108,154 @@
           <!-- Sección B: Sucursal Principal -->
           <div class="col-lg-4 border-end px-lg-4">
             <div class="d-flex align-items-center gap-2 mb-4">
-              <span class="badge bg-dark text-white rounded-circle font-monospace" style="width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem;">2</span>
+              <span
+                class="badge bg-dark text-white rounded-circle font-monospace"
+                style="
+                  width: 26px;
+                  height: 26px;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 0.8rem;
+                "
+                >2</span
+              >
               <h4 class="mb-0 fw-bold fs-6 uppercase tracking-wider text-secondary">SUCURSAL PRINCIPAL</h4>
             </div>
 
             <div class="mb-3">
               <label for="branchName" class="form-label">Nombre de la Sucursal</label>
-              <input type="text" class="form-control" id="branchName" [(ngModel)]="onboardingData.branchName" name="branchName" required placeholder="Ej. Sucursal Centro">
+              <input
+                type="text"
+                class="form-control"
+                id="branchName"
+                [(ngModel)]="onboardingData.branchName"
+                name="branchName"
+                required
+                placeholder="Ej. Sucursal Centro"
+              />
             </div>
 
             <div class="mb-3">
               <label for="branchAddress" class="form-label">Dirección de la Sucursal</label>
-              <input type="text" class="form-control" id="branchAddress" [(ngModel)]="onboardingData.branchAddress" name="branchAddress" placeholder="Dejar en blanco si es igual a la matriz">
+              <input
+                type="text"
+                class="form-control"
+                id="branchAddress"
+                [(ngModel)]="onboardingData.branchAddress"
+                name="branchAddress"
+                placeholder="Dejar en blanco si es igual a la matriz"
+              />
             </div>
 
             <div class="mb-3">
               <label for="branchTel" class="form-label">Teléfono de la Sucursal</label>
-              <input type="text" class="form-control" id="branchTel" [(ngModel)]="onboardingData.branchTel" name="branchTel" placeholder="Dejar en blanco si es el mismo">
+              <input
+                type="text"
+                class="form-control"
+                id="branchTel"
+                [(ngModel)]="onboardingData.branchTel"
+                name="branchTel"
+                placeholder="Dejar en blanco si es el mismo"
+              />
             </div>
-            
-            <div class="p-3 bg-light rounded border border-dashed mt-4 text-secondary" style="font-size: 0.85rem;">
+
+            <div class="p-3 bg-light rounded border border-dashed mt-4 text-secondary" style="font-size: 0.85rem">
               <i class="bi bi-info-circle me-1.5"></i>
-              El sistema generará la sucursal de manera automática y la enlazará al inventario y a los puntos de venta (cajas físicas).
+              El sistema generará la sucursal de manera automática y la enlazará al inventario y a los puntos de venta
+              (cajas físicas).
             </div>
           </div>
 
           <!-- Sección C: Dueño de la Empresa -->
           <div class="col-lg-4 ps-lg-4">
             <div class="d-flex align-items-center gap-2 mb-4">
-              <span class="badge bg-dark text-white rounded-circle font-monospace" style="width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem;">3</span>
+              <span
+                class="badge bg-dark text-white rounded-circle font-monospace"
+                style="
+                  width: 26px;
+                  height: 26px;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 0.8rem;
+                "
+                >3</span
+              >
               <h4 class="mb-0 fw-bold fs-6 uppercase tracking-wider text-secondary">CUENTA DEL DUEÑO / ADMIN</h4>
             </div>
 
             <div class="mb-3">
               <label for="name" class="form-label">Nombre Completo</label>
-              <input type="text" class="form-control" id="name" [(ngModel)]="onboardingData.name" name="name" required placeholder="Ej. Jaime Martínez">
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                [(ngModel)]="onboardingData.name"
+                name="name"
+                required
+                placeholder="Ej. Jaime Martínez"
+              />
             </div>
 
             <div class="mb-3">
               <label for="email" class="form-label">Correo del Administrador</label>
-              <input type="email" class="form-control" id="email" [(ngModel)]="onboardingData.email" name="email" required placeholder="admin@empresa.com">
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                [(ngModel)]="onboardingData.email"
+                name="email"
+                required
+                placeholder="admin@empresa.com"
+              />
             </div>
 
             <div class="mb-3">
               <label for="username" class="form-label">Nombre de Usuario</label>
-              <input type="text" class="form-control" id="username" [(ngModel)]="onboardingData.username" name="username" required placeholder="Para iniciar sesión">
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                [(ngModel)]="onboardingData.username"
+                name="username"
+                required
+                placeholder="Para iniciar sesión"
+              />
             </div>
 
             <div class="mb-3">
               <label for="password" class="form-label">Contraseña</label>
-              <input type="password" class="form-control" id="password" [(ngModel)]="onboardingData.password" name="password" required placeholder="Mínimo 6 caracteres">
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                [(ngModel)]="onboardingData.password"
+                name="password"
+                required
+                placeholder="Mínimo 6 caracteres"
+              />
             </div>
           </div>
-
         </div>
 
-        <hr class="my-4 border-light">
+        <hr class="my-4 border-light" />
 
         <div class="d-flex justify-content-end gap-3">
           <button type="button" class="btn btn-outline-dark px-4 py-2.5" routerLink="/dashboard/sysadmin/companies">
             CANCELAR
           </button>
-          <button type="submit" class="btn btn-dark px-5 py-2.5 d-flex align-items-center gap-2" [disabled]="!onboardForm.valid || submittingOnboarding">
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="submittingOnboarding"></span>
+          <button
+            type="submit"
+            class="btn btn-dark px-5 py-2.5 d-flex align-items-center gap-2"
+            [disabled]="!onboardForm.valid || submittingOnboarding"
+          >
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+              *ngIf="submittingOnboarding"
+            ></span>
             COMPLETAR ONBOARDING RÁPIDO
           </button>
         </div>

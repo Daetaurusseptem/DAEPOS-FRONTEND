@@ -8,7 +8,7 @@ describe('CloseCashRegisterComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CloseCashRegisterComponent]
+      declarations: [CloseCashRegisterComponent],
     });
     fixture = TestBed.createComponent(CloseCashRegisterComponent);
     component = fixture.componentInstance;

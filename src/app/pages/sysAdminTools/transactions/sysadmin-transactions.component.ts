@@ -7,10 +7,9 @@ import { IGlobalTransactionsResponse, IForensicSaleDetail } from 'src/app/interf
 @Component({
   selector: 'app-sysadmin-transactions',
   templateUrl: './sysadmin-transactions.component.html',
-  styleUrls: ['./sysadmin-transactions.component.css']
+  styleUrls: ['./sysadmin-transactions.component.css'],
 })
 export class SysadminTransactionsComponent implements OnInit {
-
   transactions: any[] = [];
   total: number = 0;
   page: number = 1;
@@ -18,14 +17,14 @@ export class SysadminTransactionsComponent implements OnInit {
   totalPages: number = 1;
 
   loading: boolean = false;
-  
+
   // Filters
   filters = {
     companyId: '',
     branchId: '',
     paymentMethod: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
   };
 
   companies: any[] = [];
@@ -38,7 +37,7 @@ export class SysadminTransactionsComponent implements OnInit {
   constructor(
     private sysadminService: SysadminService,
     private companyService: CompanyService,
-    private branchService: BranchService
+    private branchService: BranchService,
   ) {}
 
   ngOnInit(): void {
@@ -60,7 +59,7 @@ export class SysadminTransactionsComponent implements OnInit {
           this.companies = resp.data;
         }
       },
-      error: (err) => console.error('Error al cargar empresas', err)
+      error: (err) => console.error('Error al cargar empresas', err),
     });
   }
 
@@ -73,7 +72,7 @@ export class SysadminTransactionsComponent implements OnInit {
           if (resp.ok) {
             this.branches = resp.branches || [];
           }
-        }
+        },
       });
     }
     this.onFilterChange();
@@ -84,7 +83,7 @@ export class SysadminTransactionsComponent implements OnInit {
     const params = {
       page: this.page,
       limit: this.limit,
-      ...this.filters
+      ...this.filters,
     };
 
     this.sysadminService.searchGlobalTransactions(params).subscribe({
@@ -103,7 +102,7 @@ export class SysadminTransactionsComponent implements OnInit {
         console.error('Error fetching transactions', err);
         this.transactions = [];
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -118,7 +117,7 @@ export class SysadminTransactionsComponent implements OnInit {
       branchId: '',
       paymentMethod: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
     };
     this.onFilterChange();
   }
@@ -134,7 +133,7 @@ export class SysadminTransactionsComponent implements OnInit {
     if (!saleId) return;
     this.loadingForensic = true;
     this.selectedForensicSale = null;
-    
+
     this.sysadminService.getSaleForensics(saleId).subscribe({
       next: (resp) => {
         if (resp.ok) {
@@ -144,7 +143,7 @@ export class SysadminTransactionsComponent implements OnInit {
       },
       error: () => {
         this.loadingForensic = false;
-      }
+      },
     });
   }
 }

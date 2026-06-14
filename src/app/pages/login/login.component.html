@@ -3,7 +3,7 @@
     <div class="login-section">
       <!-- Ícono Moderno -->
       <div class="icon-container">
-        <img src="assets/svg/DAEPOS_LOGO_WITH_TEXT.svg" alt="DaePoint Logo" class="login-logo">
+        <img src="assets/svg/DAEPOS_LOGO_WITH_TEXT.svg" alt="DaePoint Logo" class="login-logo" />
       </div>
 
       <p class="login-description">Bienvenido al sistema avanzado de gestión de ventas.</p>
@@ -11,29 +11,50 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-container">
         <div class="form-group">
           <label for="username">Nombre de Usuario</label>
-          <input type="text" id="username" formControlName="username" class="form-input" placeholder="Ingresa tu usuario">
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            class="form-input"
+            placeholder="Ingresa tu usuario"
+          />
           <div class="error-message" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
-            <span *ngIf="loginForm.get('username')?.hasError('required')">El nombre de usuario es <strong>requerido</strong></span>
+            <span *ngIf="loginForm.get('username')?.hasError('required')"
+              >El nombre de usuario es <strong>requerido</strong></span
+            >
             <span *ngIf="loginForm.get('username')?.hasError('minlength')">Debe tener al menos 3 caracteres</span>
           </div>
         </div>
 
         <div class="form-group">
           <label for="password">Contraseña</label>
-          <input type="password" id="password" formControlName="password" class="form-input" placeholder="Ingresa tu contraseña">
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-input"
+            placeholder="Ingresa tu contraseña"
+          />
           <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-            <span *ngIf="loginForm.get('password')?.hasError('required')">La contraseña es <strong>requerida</strong></span>
+            <span *ngIf="loginForm.get('password')?.hasError('required')"
+              >La contraseña es <strong>requerida</strong></span
+            >
             <span *ngIf="loginForm.get('password')?.hasError('minlength')">Debe tener al menos 6 caracteres</span>
           </div>
         </div>
 
         <button type="submit" class="login-button" [disabled]="!loginForm.valid">Acceder</button>
       </form>
-      
+
       <!-- Panel de Acceso Rápido Demo -->
       <!-- Toggle Demo Envs Button -->
-      <div class="mt-4" style="text-align: center;">
-        <button type="button" class="btn-ghost-muted" style="border-style: none; text-decoration: underline;" (click)="toggleDemoEnv()">
+      <div class="mt-4" style="text-align: center">
+        <button
+          type="button"
+          class="btn-ghost-muted"
+          style="border-style: none; text-decoration: underline"
+          (click)="toggleDemoEnv()"
+        >
           {{ showDemoEnv ? 'Ocultar' : 'Mostrar' }} Entornos de Prueba
         </button>
       </div>
@@ -41,27 +62,37 @@
       <!-- Panel de Acceso Rápido Demo -->
       <div class="demo-credentials-container" *ngIf="showDemoEnv">
         <p class="demo-title">Entornos de Prueba</p>
-        
+
         <div class="demo-section">
           <span class="demo-section-label">SYSADMIN</span>
           <div class="demo-buttons-flex">
-            <button type="button" class="btn-ghost-muted" style="width: 100%;" (click)="autofill('sysadmin')">Sysadmin Principal</button>
+            <button type="button" class="btn-ghost-muted" style="width: 100%" (click)="autofill('sysadmin')">
+              Sysadmin Principal
+            </button>
           </div>
         </div>
 
         <div class="demo-section">
           <span class="demo-section-label">CEOs & DUEÑOS DE EMPRESA</span>
-          <div class="demo-buttons-flex" style="flex-wrap: wrap;">
-            <button type="button" class="demo-btn" (click)="autofill('ceo_alsea')" title="Empresa B2B Activa">Alsea (B2B)</button>
-            <button type="button" class="demo-btn" (click)="autofill('ceo_oxxo')" title="Empresa Stripe Activa">Oxxo (Stripe)</button>
-            <button type="button" class="btn-ghost-muted" (click)="autofill('ceo_floral')" title="Empresa Trialing">Floral (Trial)</button>
-            <button type="button" class="btn-ghost-muted" (click)="autofill('ceo_kiosko')" title="Empresa Cancelada">Kiosko (Past Due)</button>
+          <div class="demo-buttons-flex" style="flex-wrap: wrap">
+            <button type="button" class="demo-btn" (click)="autofill('ceo_alsea')" title="Empresa B2B Activa">
+              Alsea (B2B)
+            </button>
+            <button type="button" class="demo-btn" (click)="autofill('ceo_oxxo')" title="Empresa Stripe Activa">
+              Oxxo (Stripe)
+            </button>
+            <button type="button" class="btn-ghost-muted" (click)="autofill('ceo_floral')" title="Empresa Trialing">
+              Floral (Trial)
+            </button>
+            <button type="button" class="btn-ghost-muted" (click)="autofill('ceo_kiosko')" title="Empresa Cancelada">
+              Kiosko (Past Due)
+            </button>
           </div>
         </div>
 
         <div class="demo-section">
           <span class="demo-section-label">STAFF DE SUCURSAL (EMPRESA ALSEA)</span>
-          <div class="demo-buttons-flex" style="flex-wrap: wrap;">
+          <div class="demo-buttons-flex" style="flex-wrap: wrap">
             <button type="button" class="demo-btn" (click)="autofill('gerente_hosp')">Gerente Hosp.</button>
             <button type="button" class="btn-ghost-muted" (click)="autofill('cajero_hosp')">Cajero Hosp.</button>
             <button type="button" class="btn-ghost-muted" (click)="autofill('chef_hosp')">Chef KDS</button>
@@ -69,7 +100,7 @@
           </div>
         </div>
       </div>
-          
+
       <div class="login-links">
         <a href="#">¿Olvidaste tu contraseña?</a>
       </div>

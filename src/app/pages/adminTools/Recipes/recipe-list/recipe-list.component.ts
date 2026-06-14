@@ -3,18 +3,19 @@ import { Recipe } from 'src/app/interfaces/models.interface';
 import { RecipesService } from 'src/app/services/recipes.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { InventoryService } from 'src/app/services/inventory.service';
+import { LoggerService } from '../../../../services/logger.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-recipe-list',
   templateUrl: './recipe-list.component.html',
-  styleUrls: ['./recipe-list.component.css']
+  styleUrls: ['./recipe-list.component.css'],
 })
 export class RecipeListComponent implements OnInit {
   recipes: any[] = [];
   searchText: string = '';
-  
+
   // Modal detail control
   selectedRecipe: any = null;
   selectedSize: any = null;
@@ -23,7 +24,8 @@ export class RecipeListComponent implements OnInit {
     private recipeService: RecipesService,
     private authService: AuthService,
     private inventoryService: InventoryService,
-    private router: Router
+    private router: Router,
+    private logger: LoggerService,
   ) {}
 
   ngOnInit(): void {
@@ -37,11 +39,11 @@ export class RecipeListComponent implements OnInit {
     this.inventoryService.getInventory(companyId, '', 'raw_material').subscribe({
       next: (invResp: any) => {
         const invItems = invResp.items || [];
-        
+
         this.recipeService.getCompanyRecipes(companyId).subscribe({
           next: (resp: any) => {
             const loadedRecipes = resp.recipes || [];
-            
+
             // Populate cost prices dynamically for all ingredients in all sizes of each recipe
             loadedRecipes.forEach((recipe: any) => {
               if (recipe.sizes && recipe.sizes.length > 0) {
@@ -49,7 +51,10 @@ export class RecipeListComponent implements OnInit {
                   if (size.ingredients) {
                     size.ingredients.forEach((ri: any) => {
                       if (ri.ingredient) {
-                        const matched = invItems.find((inv: any) => inv.rawMaterial === ri.ingredient._id || inv.rawMaterial?._id === ri.ingredient._id);
+                        const matched = invItems.find(
+                          (inv: any) =>
+                            inv.rawMaterial === ri.ingredient._id || inv.rawMaterial?._id === ri.ingredient._id,
+                        );
                         if (matched) {
                           ri.ingredient.costPrice = matched.costPrice;
                         }
@@ -59,7 +64,7 @@ export class RecipeListComponent implements OnInit {
                 });
               }
             });
-            
+
             this.recipes = loadedRecipes;
           },
           error: (err) => {
@@ -67,23 +72,24 @@ export class RecipeListComponent implements OnInit {
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Error al obtener las recetas'
+              text: 'Error al obtener las recetas',
             });
-          }
+          },
         });
       },
       error: (err) => {
         console.error('Error fetching inventory raw materials', err);
-      }
+      },
     });
   }
 
   get filteredRecipes(): any[] {
     if (!this.searchText) return this.recipes;
     const search = this.searchText.toLowerCase();
-    return this.recipes.filter(recipe => 
-      recipe.name.toLowerCase().includes(search) || 
-      (recipe.description && recipe.description.toLowerCase().includes(search))
+    return this.recipes.filter(
+      (recipe) =>
+        recipe.name.toLowerCase().includes(search) ||
+        (recipe.description && recipe.description.toLowerCase().includes(search)),
     );
   }
 
@@ -93,7 +99,7 @@ export class RecipeListComponent implements OnInit {
     if (!baseSize.ingredients) return 0;
     return baseSize.ingredients.reduce((sum: number, ri: any) => {
       const cost = ri.ingredient?.costPrice || 0;
-      return sum + (ri.quantity * cost);
+      return sum + ri.quantity * cost;
     }, 0);
   }
 
@@ -119,7 +125,7 @@ export class RecipeListComponent implements OnInit {
     if (!this.selectedSize || !this.selectedSize.ingredients) return 0;
     return this.selectedSize.ingredients.reduce((sum: number, ri: any) => {
       const cost = ri.ingredient?.costPrice || 0;
-      return sum + (ri.quantity * cost);
+      return sum + ri.quantity * cost;
     }, 0);
   }
 
@@ -134,22 +140,18 @@ export class RecipeListComponent implements OnInit {
   deleteRecipe(id: string): void {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: "¡No podrás revertir esto!",
+      text: '¡No podrás revertir esto!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, bórrala!'
+      confirmButtonText: 'Sí, bórrala!',
     }).then((result) => {
       if (result.isConfirmed) {
         this.recipeService.deleteRecipe(id).subscribe({
           next: (r) => {
-            console.log('Receta eliminada', r);
-            Swal.fire(
-              '¡Eliminada!',
-              'La receta ha sido eliminada.',
-              'success'
-            );
+            this.logger.log('Receta eliminada', r);
+            Swal.fire('¡Eliminada!', 'La receta ha sido eliminada.', 'success');
             this.loadRecipes();
           },
           error: (error) => {
@@ -157,9 +159,9 @@ export class RecipeListComponent implements OnInit {
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Error al eliminar la receta'
+              text: 'Error al eliminar la receta',
             });
-          }
+          },
         });
       }
     });

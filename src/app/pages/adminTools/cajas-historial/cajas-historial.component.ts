@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-cajas-historial',
   templateUrl: './cajas-historial.component.html',
-  styleUrls: ['./cajas-historial.component.css']
+  styleUrls: ['./cajas-historial.component.css'],
 })
 export class CajasHistorialComponent implements OnInit {
   cashRegisters: CashRegister[] = [];
@@ -38,7 +38,7 @@ export class CajasHistorialComponent implements OnInit {
     private authService: AuthService,
     private branchService: BranchService,
     private usersService: UsersService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -63,7 +63,7 @@ export class CajasHistorialComponent implements OnInit {
         if (resp.ok && resp.branches.length > 0) {
           this.branches = resp.branches;
           const currentBranchId = this.authService.branch?._id || this.authService.branch;
-          if (currentBranchId && this.branches.some(b => b._id === currentBranchId)) {
+          if (currentBranchId && this.branches.some((b) => b._id === currentBranchId)) {
             this.selectedBranchId = currentBranchId;
           } else {
             this.selectedBranchId = this.branches[0]._id || '';
@@ -74,13 +74,13 @@ export class CajasHistorialComponent implements OnInit {
       },
       error: () => {
         Swal.fire('Error', 'No se pudieron cargar las sucursales', 'error');
-      }
+      },
     });
   }
 
   loadCashiers(): void {
     if (!this.selectedBranchId) return;
-    
+
     // Fetch users for filtering
     const adminId = this.authService.idUsuario;
     this.usersService.getAllNonAdminUsersOfCompany(adminId, 1, 100, '', this.selectedBranchId).subscribe({
@@ -89,7 +89,7 @@ export class CajasHistorialComponent implements OnInit {
       },
       error: () => {
         console.error('Error loading cashiers for filters');
-      }
+      },
     });
   }
 
@@ -99,7 +99,7 @@ export class CajasHistorialComponent implements OnInit {
 
     const filters: any = {
       page: this.currentPage,
-      limit: this.limit
+      limit: this.limit,
     };
 
     if (this.filterCashier) filters.userId = this.filterCashier;
@@ -120,7 +120,7 @@ export class CajasHistorialComponent implements OnInit {
       error: () => {
         this.loading = false;
         Swal.fire('Error', 'No se pudo cargar el historial de cajas', 'error');
-      }
+      },
     });
   }
 

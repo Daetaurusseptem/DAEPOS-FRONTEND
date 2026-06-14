@@ -8,7 +8,7 @@ describe('CompanyAdminHomeComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CompanyAdminHomeComponent]
+      declarations: [CompanyAdminHomeComponent],
     });
     fixture = TestBed.createComponent(CompanyAdminHomeComponent);
     component = fixture.componentInstance;

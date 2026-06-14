@@ -6,10 +6,9 @@ import { ISystemErrorsResponse } from 'src/app/interfaces/sysadmin.interface';
 @Component({
   selector: 'app-sysadmin-logs',
   templateUrl: './sysadmin-logs.component.html',
-  styleUrls: ['./sysadmin-logs.component.css']
+  styleUrls: ['./sysadmin-logs.component.css'],
 })
 export class SysadminLogsComponent implements OnInit {
-
   logs: any[] = [];
   total: number = 0;
   page: number = 1;
@@ -17,14 +16,14 @@ export class SysadminLogsComponent implements OnInit {
   totalPages: number = 1;
 
   loading: boolean = false;
-  
+
   // Filters
   filters = {
     companyId: '',
     status: '',
     method: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
   };
 
   companies: any[] = [];
@@ -34,7 +33,7 @@ export class SysadminLogsComponent implements OnInit {
 
   constructor(
     private sysadminService: SysadminService,
-    private companyService: CompanyService
+    private companyService: CompanyService,
   ) {}
 
   ngOnInit(): void {
@@ -55,7 +54,7 @@ export class SysadminLogsComponent implements OnInit {
           this.companies = resp.data;
         }
       },
-      error: (err) => console.error('Error al cargar empresas', err)
+      error: (err) => console.error('Error al cargar empresas', err),
     });
   }
 
@@ -64,7 +63,7 @@ export class SysadminLogsComponent implements OnInit {
     const params = {
       page: this.page,
       limit: this.limit,
-      ...this.filters
+      ...this.filters,
     };
 
     this.sysadminService.getSystemErrors(params).subscribe({
@@ -83,7 +82,7 @@ export class SysadminLogsComponent implements OnInit {
         console.error('Error fetching logs', err);
         this.logs = [];
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -98,7 +97,7 @@ export class SysadminLogsComponent implements OnInit {
       status: '',
       method: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
     };
     this.onFilterChange();
   }

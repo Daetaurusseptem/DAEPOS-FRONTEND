@@ -8,13 +8,13 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-cash-register',
   templateUrl: './cash-register.component.html',
-  styleUrls: ['./cash-register.component.css']
+  styleUrls: ['./cash-register.component.css'],
 })
 export class CashRegisterComponent implements OnInit {
   openCashRegisterForm!: FormGroup;
   showForm: boolean = false;
   isOpenCashRegister: boolean = false;
-  
+
   physicalRegisters: any[] = [];
   loadingRegisters: boolean = true;
 
@@ -22,13 +22,13 @@ export class CashRegisterComponent implements OnInit {
     private fb: FormBuilder,
     private cashRegisterService: CashRegisterService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
     this.openCashRegisterForm = this.fb.group({
       initialAmount: [0, [Validators.required, Validators.min(0)]],
-      physicalRegisterId: ['', Validators.required]
+      physicalRegisterId: ['', Validators.required],
     });
     this.checkOpenCashRegister();
     this.loadPhysicalRegisters();
@@ -43,7 +43,7 @@ export class CashRegisterComponent implements OnInit {
       },
       error: () => {
         this.loadingRegisters = false;
-      }
+      },
     });
   }
 
@@ -75,7 +75,7 @@ export class CashRegisterComponent implements OnInit {
       error: (error) => {
         console.error('Error opening cash register', error);
         Swal.fire('Error', error.error?.message || 'Error al abrir turno', 'error');
-      }
+      },
     });
   }
 

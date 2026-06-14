@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-inventory-stock-list',
   templateUrl: './inventory-list.component.html',
-  styleUrls: ['./inventory-list.component.css']
+  styleUrls: ['./inventory-list.component.css'],
 })
 export class InventoryStockListComponent implements OnInit {
   items: InventoryItem[] = [];
@@ -27,6 +27,7 @@ export class InventoryStockListComponent implements OnInit {
   selectedBranchId: string = '';
   userRole!: UserRole;
   itemType: 'product' | 'raw_material' = 'product';
+  selectedSupplierId: string = '';
   defaultSupplierId: string = '';
   systemSupplierId: string = '';
   suppliersList: any[] = [];
@@ -36,9 +37,13 @@ export class InventoryStockListComponent implements OnInit {
   pendingDeliveries: any[] = [];
   suppliers: any[] = [];
   allCompanyProducts: any[] = [];
-  
+
   showUnplannedRestockModal: boolean = false;
-  unplannedRestock: { supplier: string; notes: string; payFromRegister: boolean } = { supplier: '', notes: '', payFromRegister: true };
+  unplannedRestock: { supplier: string; notes: string; payFromRegister: boolean } = {
+    supplier: '',
+    notes: '',
+    payFromRegister: true,
+  };
   unplannedItems: any[] = [];
   // Filtros y ordenamiento
   stockFilter: 'all' | 'low' | 'normal' = 'all';
@@ -59,9 +64,9 @@ export class InventoryStockListComponent implements OnInit {
 
     // 1. Filtrado por Stock
     if (this.stockFilter === 'low') {
-      filtered = filtered.filter(item => item.stock < 10);
+      filtered = filtered.filter((item) => item.stock < 10);
     } else if (this.stockFilter === 'normal') {
-      filtered = filtered.filter(item => item.stock >= 10);
+      filtered = filtered.filter((item) => item.stock >= 10);
     }
 
     // 2. Ordenamiento por Stock
@@ -84,14 +89,15 @@ export class InventoryStockListComponent implements OnInit {
     private rawMaterialsService: RawMaterialsService,
     private route: ActivatedRoute,
   ) {
-    this.companyId = (this.authService.usuario?.company as any)?._id || (this.authService.usuario?.company as any) || '';
+    this.companyId =
+      (this.authService.usuario?.company as any)?._id || (this.authService.usuario?.company as any) || '';
   }
 
   ngOnInit(): void {
     this.userRole = this.authService.role;
 
     // Detectar si redirige con auto-filtro de stock bajo desde el Dashboard
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       if (params['filter'] === 'low') {
         this.stockFilter = 'low';
       }
@@ -119,7 +125,7 @@ export class InventoryStockListComponent implements OnInit {
             return r.status === 'pending' && branchMatch && expDate <= today;
           });
         }
-      }
+      },
     });
   }
 
@@ -127,14 +133,17 @@ export class InventoryStockListComponent implements OnInit {
     forkJoin({
       suppliers: this.supplierService.getCompanySuppliers(this.companyId),
       products: this.productsService.getCompanyProducts(this.companyId),
-      materials: this.rawMaterialsService.getCompanyRawMaterials(this.companyId)
+      materials: this.rawMaterialsService.getCompanyRawMaterials(this.companyId),
     }).subscribe({
       next: (res: any) => {
         this.suppliers = res.suppliers?.suppliers || [];
+        if (this.suppliers.length > 0 && this.suppliersList.length === 0) {
+          this.suppliersList = this.suppliers;
+        }
         const prods = (res.products?.products || []).map((p: any) => ({ ...p, itemType: 'Product' }));
         const mats = (res.materials?.rawMaterials || []).map((m: any) => ({ ...m, itemType: 'RawMaterial' }));
         this.allCompanyProducts = [...prods, ...mats];
-      }
+      },
     });
   }
 
@@ -147,7 +156,7 @@ export class InventoryStockListComponent implements OnInit {
         if (resp.ok) {
           this.branches = resp.branches;
         }
-      }
+      },
     });
   }
 
@@ -157,20 +166,20 @@ export class InventoryStockListComponent implements OnInit {
 
     let branchId = this.selectedBranchId;
     if (!branchId && this.userRole === 'admin') {
-       branchId = this.authService.branch?._id || this.authService.branch;
-     }
+      branchId = this.authService.branch?._id || this.authService.branch;
+    }
 
-    this.inventoryService.getInventory(companyId, this.searchTerm, this.itemType, branchId).subscribe({
+    this.inventoryService.getInventory(companyId, this.searchTerm, this.itemType, branchId, this.selectedSupplierId).subscribe({
       next: (data) => {
         this.items = data.items || [];
-        this.totalItems = data.totalItems as number || 0; 
+        this.totalItems = (data.totalItems as number) || 0;
         this.totalPages = data.totalPages || 1;
         this.currentPage = data.currentPage || 1;
         this.generateVisiblePages();
       },
       error: (error) => {
         console.error('Error al obtener items:', error);
-      }
+      },
     });
   }
 
@@ -202,20 +211,20 @@ export class InventoryStockListComponent implements OnInit {
       text: 'Esto eliminará definitivamente el stock seleccionado',
       showCancelButton: true,
       confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((res) => {
       if (res.isConfirmed) {
         this.inventoryService.deleteInventoryItem(idItem).subscribe({
           next: (response) => {
             if (response.ok === true) {
-              this.items = this.items.filter(item => item._id !== idItem);
+              this.items = this.items.filter((item) => item._id !== idItem);
               Swal.fire('Eliminado', 'Registro eliminado', 'success');
               this.loadItems();
             }
           },
           error: (error) => {
             console.error('Error eliminando item:', error);
-          }
+          },
         });
       }
     });
@@ -225,7 +234,7 @@ export class InventoryStockListComponent implements OnInit {
     const pages = [];
     const maxVisible = 5;
     let start = Math.max(1, this.currentPage - 2);
-    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    const end = Math.min(this.totalPages, start + maxVisible - 1);
 
     if (end - start < maxVisible - 1) {
       start = Math.max(1, end - maxVisible + 1);
@@ -243,9 +252,10 @@ export class InventoryStockListComponent implements OnInit {
     this.supplierService.getCompanySuppliers(companyId).subscribe({
       next: (resp) => {
         if (resp.ok && resp.suppliers && resp.suppliers.length > 0) {
+          this.suppliersList = resp.suppliers;
           this.defaultSupplierId = resp.suppliers[0]._id;
         }
-      }
+      },
     });
   }
 
@@ -258,12 +268,12 @@ export class InventoryStockListComponent implements OnInit {
     if (!companyId) return;
 
     const currentSupplierId = (item.supplier as any)?._id || item.supplier;
-    const currentSupplierName = this.suppliersList.find(s => s._id === currentSupplierId)?.name || '';
-    
+    const currentSupplierName = this.suppliersList.find((s) => s._id === currentSupplierId)?.name || '';
+
     // Generar opciones de proveedores para la lista desplegable personalizada
     let supplierOptionsHtml = '';
     let hasRealSuppliers = false;
-    this.suppliersList.forEach(supplier => {
+    this.suppliersList.forEach((supplier) => {
       if (supplier.name !== 'Ajustes Internos de Sistema') {
         supplierOptionsHtml += `<li class="list-group-item list-group-item-action py-2 px-2" style="font-size:0.85rem;" data-id="${supplier._id}">${supplier.name}</li>`;
         hasRealSuppliers = true;
@@ -277,7 +287,7 @@ export class InventoryStockListComponent implements OnInit {
     Swal.fire({
       title: 'Entrada Rápida / Reabastecer',
       customClass: {
-        htmlContainer: 'overflow-visible' // Clase para permitir que el dropdown sobresalga
+        htmlContainer: 'overflow-visible', // Clase para permitir que el dropdown sobresalga
       },
       html: `
         <style>
@@ -376,7 +386,7 @@ export class InventoryStockListComponent implements OnInit {
         const costInput = document.getElementById('swal-input-cost') as HTMLInputElement;
         const reasonInput = document.getElementById('swal-input-reason') as HTMLSelectElement;
         const supplierSearchInput = document.getElementById('swal-input-supplier-search') as HTMLInputElement;
-        
+
         const qty = parseInt(qtyInput.value, 10);
         const costPrice = parseFloat(costInput.value);
         const reason = reasonInput.value;
@@ -394,20 +404,20 @@ export class InventoryStockListComponent implements OnInit {
           Swal.showValidationMessage('El proveedor o referencia es obligatorio');
           return false;
         }
-        
-        const officialSupplier = this.suppliersList.find(s => s.name.toLowerCase() === typedSupplier.toLowerCase());
+
+        const officialSupplier = this.suppliersList.find((s) => s.name.toLowerCase() === typedSupplier.toLowerCase());
         let supplierId = 'informal';
         let informalName = '';
 
         if (officialSupplier) {
-           supplierId = officialSupplier._id;
+          supplierId = officialSupplier._id;
         } else {
-           supplierId = 'informal';
-           informalName = typedSupplier;
+          supplierId = 'informal';
+          informalName = typedSupplier;
         }
-        
+
         return { qty, costPrice, reason, supplierId, informalName };
-      }
+      },
     }).then((result) => {
       if (result.isConfirmed && result.value) {
         const { qty, costPrice, reason, supplierId, informalName } = result.value;
@@ -418,7 +428,7 @@ export class InventoryStockListComponent implements OnInit {
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
-          }
+          },
         });
 
         // 1. Crear Agenda de Reabastecimiento con Estatus 'pending'
@@ -427,80 +437,125 @@ export class InventoryStockListComponent implements OnInit {
         let detailNote = '';
 
         if (supplierId === 'informal') {
-          targetSupplierId = this.systemSupplierId || this.defaultSupplierId || (this.suppliersList.length > 0 ? this.suppliersList[0]._id : undefined);
+          targetSupplierId =
+            this.systemSupplierId ||
+            this.defaultSupplierId ||
+            (this.suppliersList.length > 0 ? this.suppliersList[0]._id : undefined);
+
+          if (!targetSupplierId) {
+            // Auto-crear proveedor del sistema como comodín
+            this.supplierService.createSupplier(
+              {
+                name: 'Ajustes Internos de Sistema',
+                description: 'Proveedor comodín para ajustes internos y recargas exprés sin proveedor asignado.',
+                contactInfo: { email: 'sistema@interno.com', phone: 'N/A', address: 'N/A' },
+              },
+              companyId,
+            ).subscribe({
+              next: (resp: any) => {
+                if (resp.ok && resp.supplier) {
+                  this.systemSupplierId = resp.supplier._id;
+                  this.suppliersList.push(resp.supplier);
+                  this.executeAdjustStock(companyId, item, qty, costPrice, reason, resp.supplier._id, informalName, userName);
+                } else {
+                  Swal.fire('Error', 'No se pudo crear el proveedor del sistema.', 'error');
+                }
+              },
+              error: () => {
+                Swal.fire('Error', 'No hay proveedores configurados. Crea al menos uno manualmente.', 'error');
+              },
+            });
+            return;
+          }
           summaryPrefix = `[Informal: ${informalName}]`;
           detailNote = `Proveedor informal o referencia: ${informalName}. `;
         }
 
-        const restockData = {
-          company: companyId,
-          supplier: targetSupplierId,
-          branch: (item.branch as any)?._id || item.branch,
-          expectedDate: new Date(),
-          itemsSummary: `${summaryPrefix} +${qty} unidades de ${item.name}`,
-          status: 'pending',
-          notes: `${detailNote}Reabastecimiento directo registrado por ${userName} (Rol: ${this.userRole}) bajo condiciones: "${reason}".`,
-          isRecurring: false,
-          recurrence: 'none',
-          items: [{
-            type: item.product ? 'Product' : 'RawMaterial',
-            itemRef: (item.product as any)?._id || item.product || (item.rawMaterial as any)?._id || item.rawMaterial,
-            quantity: qty,
-            costPrice: costPrice
-          }]
-        };
-
-        this.supplierService.createRestockSchedule(restockData).subscribe({
-          next: (createResp: any) => {
-            if (createResp.ok && createResp.restock?._id) {
-              // 2. Auto-completar el reabastecimiento para gatillar la lógica del backend
-              this.supplierService.updateRestockStatus(createResp.restock._id, { status: 'completed' }).subscribe({
-                next: (updateResp) => {
-                  if (updateResp.ok) {
-                    Swal.fire({
-                      title: '¡Reabastecimiento Exitoso!',
-                      text: `Se añadieron +${qty} unidades al stock de "${item.name}" con éxito.`,
-                      icon: 'success',
-                      confirmButtonColor: '#0f172a'
-                    });
-                    this.loadItems();
-                  } else {
-                    Swal.fire('Error', 'No se pudo completar la carga del stock en el servidor', 'error');
-                  }
-                },
-                error: (err) => Swal.fire('Error', err.error?.message || 'Error completando el stock', 'error')
-              });
-            } else {
-              Swal.fire('Error', 'No se pudo crear la orden de reabastecimiento', 'error');
-            }
-          },
-          error: (err) => Swal.fire('Error', err.error?.message || 'Error en el servidor al generar la orden', 'error')
-        });
+        this.executeAdjustStock(companyId, item, qty, costPrice, reason, targetSupplierId, informalName, userName);
       }
+    });
+  }
+
+  private executeAdjustStock(companyId: string, item: InventoryItem, qty: number, costPrice: number, reason: string, supplierId: string, informalName: string, userName: string) {
+    const summaryPrefix = supplierId === this.systemSupplierId || supplierId === this.defaultSupplierId
+      ? `[Informal: ${informalName}]` : 'Ajuste Rápido';
+    const detailNote = informalName ? `Proveedor informal o referencia: ${informalName}. ` : '';
+
+    const restockData = {
+      company: companyId,
+      supplier: supplierId,
+      branch: (item.branch as any)?._id || item.branch,
+      expectedDate: new Date(),
+      itemsSummary: `${summaryPrefix} +${qty} unidades de ${item.name}`,
+      status: 'pending',
+      notes: `${detailNote}Reabastecimiento directo registrado por ${userName} (Rol: ${this.userRole}) bajo condiciones: "${reason}".`,
+      isRecurring: false,
+      recurrence: 'none',
+      requiresAudit: true,
+      items: [
+        {
+          type: item.product ? 'Product' : 'RawMaterial',
+          itemRef: (item.product as any)?._id || item.product || (item.rawMaterial as any)?._id || item.rawMaterial,
+          quantity: qty,
+          costPrice: costPrice,
+        },
+      ],
+    };
+
+    this.supplierService.createRestockSchedule(restockData).subscribe({
+      next: (createResp: any) => {
+        if (createResp.ok && createResp.restock?._id) {
+          this.supplierService.updateRestockStatus(createResp.restock._id, { status: 'pending_audit' }).subscribe({
+            next: (updateResp) => {
+              if (updateResp.ok) {
+                Swal.fire({
+                  title: '¡Ajuste Registrado!',
+                  text: `Se añadieron +${qty} unidades al stock de "${item.name}". El movimiento pasará a auditoría operativa.`,
+                  icon: 'success',
+                  confirmButtonColor: '#0f172a',
+                });
+                this.loadItems();
+              } else {
+                Swal.fire('Error', 'No se pudo completar la carga del stock en el servidor', 'error');
+              }
+            },
+            error: (err) => Swal.fire('Error', err.error?.message || 'Error completando el stock', 'error'),
+          });
+        } else {
+          Swal.fire('Error', 'No se pudo crear la orden de reabastecimiento', 'error');
+        }
+      },
+      error: (err) => Swal.fire('Error', err.error?.message || 'Error en el servidor al generar la orden', 'error'),
     });
   }
 
   restockCompositeProduct(item: InventoryItem) {
     const productId = (item.product as any)?._id || item.product;
-    const branchId = (item.branch as any)?._id || item.branch || this.authService.branch?._id || this.authService.branch;
+    const branchId =
+      (item.branch as any)?._id || item.branch || this.authService.branch?._id || this.authService.branch;
     const companyId = this.authService.companyId || this.authService.company?._id;
-    
+
     if (!productId || !branchId) return;
 
     Swal.fire({
       title: 'Consultando Insumos...',
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     this.inventoryService.getRecipeStockDetails(productId, branchId).subscribe({
       next: (resp: any) => {
         if (resp.ok && resp.ingredients) {
           Swal.close();
-          const missingIngredients = resp.ingredients.filter((i: any) => i.currentStock <= 0);
-          
+          // Filter if stock is less than required quantity
+          const missingIngredients = resp.ingredients.filter((i: any) => i.currentStock < (i.reqQty || 1));
+
           if (missingIngredients.length === 0) {
-            Swal.fire('Todo en orden', 'Este producto tiene insumos suficientes, o la receta no fue encontrada.', 'info');
+            Swal.fire(
+              'Todo en orden',
+              'Este producto tiene insumos suficientes, o la receta no fue encontrada.',
+              'info',
+            );
             return;
           }
 
@@ -508,36 +563,56 @@ export class InventoryStockListComponent implements OnInit {
               <label class="form-label fw-bold text-secondary small mb-1">Producto</label>
               <div class="p-2 bg-light rounded border text-dark fw-bold">${item.name}</div>
             </div>
-            <p class="small text-muted text-start mb-3">Ingresa la cantidad a recargar (Caja Chica) para cada insumo agotado. Deja en 0 los que no desees recargar.</p>
+            <div class="alert alert-warning bg-warning-soft text-warning border-0 p-2 mb-3 small">
+              <i class="bi bi-info-circle-fill me-1"></i> Este ajuste sumará stock inmediato, pero quedará sujeto a revisión del gerente (Auditoría).
+            </div>
+            <div class="mb-3 text-start">
+              <label class="form-label fw-bold text-secondary small mb-1">Justificación del Ajuste *</label>
+              <textarea id="swal-restock-reason" class="form-control form-control-sm shadow-sm" rows="2" placeholder="Ej. Comprado en OXXO por emergencia, sobrante de caja, etc." required></textarea>
+            </div>
             <div class="table-responsive text-start">
-              <table class="table table-sm align-middle">
+              <table class="table table-sm align-middle mb-0">
                 <thead>
                   <tr class="fs-8 text-muted uppercase">
                     <th>Insumo</th>
-                    <th width="100">Stock</th>
-                    <th width="120">Añadir</th>
+                    <th width="80" class="text-center">Stock</th>
+                    <th width="140" class="text-center">Añadir</th>
                   </tr>
                 </thead>
                 <tbody>`;
 
           missingIngredients.forEach((ing: any, i: number) => {
             formHtml += `<tr>
-                <td class="fw-bold fs-7">${ing.name} <br><small class="text-muted fw-normal">(${ing.measurementUnit})</small></td>
-                <td class="text-danger fw-bold font-monospace">${ing.currentStock}</td>
-                <td><input type="number" id="restock-qty-${i}" class="form-control form-control-sm text-center fw-bold" min="0" value="0"></td>
+                <td class="fw-bold fs-7 lh-sm">${ing.name} <br><small class="text-muted fw-normal">(${ing.measurementUnit})</small></td>
+                <td class="text-danger fw-bold font-monospace text-center">${ing.currentStock}</td>
+                <td>
+                  <div class="d-flex align-items-center justify-content-center gap-0 bg-light px-1 py-1 rounded-pill border border-light-subtle mb-1">
+                    <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-0" style="width: 45px; font-size: 0.75rem; font-weight: 600;" placeholder="Cjs" oninput="let p=this.value; let u=this.nextElementSibling.nextElementSibling.value; if(p&&u) document.getElementById('restock-qty-${i}').value=p*u;">
+                    <span class="text-muted fw-bold mx-1" style="font-size: 0.7rem;">✕</span>
+                    <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-0" style="width: 55px; font-size: 0.75rem; font-weight: 600;" placeholder="Cant" oninput="let u=this.value; let p=this.previousElementSibling.previousElementSibling.value; if(p&&u) document.getElementById('restock-qty-${i}').value=p*u;">
+                  </div>
+                  <input type="number" id="restock-qty-${i}" class="form-control form-control-sm text-center fw-bold text-primary shadow-sm w-100" min="0" value="0">
+                </td>
               </tr>`;
           });
 
           formHtml += `</tbody></table></div>`;
 
           Swal.fire({
-            title: 'Recarga Exprés de Insumos',
+            title: 'Ajuste Operativo de Insumos',
             html: formHtml,
             showCancelButton: true,
-            confirmButtonText: 'Confirmar Recarga',
+            confirmButtonText: 'Confirmar Ajuste',
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#0f172a',
             preConfirm: () => {
+              const reasonInput = document.getElementById('swal-restock-reason') as HTMLTextAreaElement;
+              const reason = reasonInput.value.trim();
+              if (!reason) {
+                Swal.showValidationMessage('Debes ingresar una justificación para el ajuste.');
+                return false;
+              }
+
               const itemsToRestock: any[] = [];
               missingIngredients.forEach((ing: any, i: number) => {
                 const qtyInput = document.getElementById(`restock-qty-${i}`) as HTMLInputElement;
@@ -547,7 +622,7 @@ export class InventoryStockListComponent implements OnInit {
                     type: 'RawMaterial',
                     itemRef: ing.rawMaterialId,
                     quantity: qty,
-                    costPrice: 0
+                    costPrice: 0,
                   });
                 }
               });
@@ -556,67 +631,97 @@ export class InventoryStockListComponent implements OnInit {
                 Swal.showValidationMessage('No ingresaste cantidades para recargar.');
                 return false;
               }
-              return itemsToRestock;
-            }
+              return { items: itemsToRestock, reason };
+            },
           }).then((result) => {
             if (result.isConfirmed && result.value) {
-              const itemsToRestock = result.value;
-              this.processMultipleRestock(itemsToRestock, item.name, companyId!, branchId);
+              const itemsToRestock = result.value.items;
+              const reason = result.value.reason;
+              this.processMultipleRestock(itemsToRestock, item.name, companyId!, branchId, reason);
             }
           });
         }
       },
       error: () => {
         Swal.fire('Error', 'No se pudieron consultar los insumos de este producto.', 'error');
-      }
+      },
     });
   }
 
-  processMultipleRestock(itemsToRestock: any[], productName: string, companyId: string, branchId: string) {
+  processMultipleRestock(itemsToRestock: any[], productName: string, companyId: string, branchId: string, reason: string = '') {
     const userName = this.authService.usuario?.name || this.authService.usuario?.username || 'Sistema';
-    const targetSupplierId = this.systemSupplierId || this.defaultSupplierId || (this.suppliersList.length > 0 ? this.suppliersList[0]._id : undefined);
+    const targetSupplierId =
+      this.systemSupplierId ||
+      this.defaultSupplierId ||
+      (this.suppliersList.length > 0 ? this.suppliersList[0]._id : undefined);
 
     if (!targetSupplierId) {
-      Swal.fire('Error', 'No hay un proveedor de sistema configurado.', 'error');
+      // Auto-crear proveedor del sistema como comodín
+      this.supplierService.createSupplier(
+        {
+          name: 'Ajustes Internos de Sistema',
+          description: 'Proveedor comodín para ajustes internos y recargas exprés sin proveedor asignado.',
+          contactInfo: { email: 'sistema@interno.com', phone: 'N/A', address: 'N/A' },
+        },
+        companyId,
+      ).subscribe({
+        next: (resp: any) => {
+          if (resp.ok && resp.supplier) {
+            this.systemSupplierId = resp.supplier._id;
+            this.suppliersList.push(resp.supplier);
+            this.executeRestock(itemsToRestock, productName, companyId, branchId, resp.supplier._id, userName, reason);
+          } else {
+            Swal.fire('Error', 'No se pudo crear el proveedor del sistema.', 'error');
+          }
+        },
+        error: () => {
+          Swal.fire('Error', 'No hay proveedores configurados y no se pudo crear uno del sistema. Crea al menos un proveedor manualmente.', 'error');
+        },
+      });
       return;
     }
 
+    this.executeRestock(itemsToRestock, productName, companyId, branchId, targetSupplierId, userName, reason);
+  }
+
+  private executeRestock(itemsToRestock: any[], productName: string, companyId: string, branchId: string, supplierId: string, userName: string, reason: string = '') {
     Swal.fire({
       title: 'Procesando recarga...',
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     const restockData = {
       company: companyId,
-      supplier: targetSupplierId,
+      supplier: supplierId,
       branch: branchId,
       expectedDate: new Date(),
       itemsSummary: `Ajuste Rápido de ${itemsToRestock.length} insumo(s) para la receta de ${productName}`,
       status: 'pending',
-      notes: `Reabastecimiento directo exprés registrado por ${userName} (Caja Chica).`,
+      notes: reason ? `Ajuste reportado por ${userName}. Motivo: "${reason}"` : `Reabastecimiento directo exprés registrado por ${userName} (Caja Chica).`,
       isRecurring: false,
       recurrence: 'none',
-      items: itemsToRestock
+      requiresAudit: true,
+      items: itemsToRestock,
     };
 
     this.supplierService.createRestockSchedule(restockData).subscribe({
       next: (createResp: any) => {
         if (createResp.ok && createResp.restock?._id) {
-          this.supplierService.updateRestockStatus(createResp.restock._id, { status: 'completed' }).subscribe({
+          this.supplierService.updateRestockStatus(createResp.restock._id, { status: 'pending_audit' }).subscribe({
             next: (updateResp) => {
               if (updateResp.ok) {
-                Swal.fire('¡Éxito!', 'Los insumos han sido reabastecidos correctamente.', 'success');
+                Swal.fire('¡Éxito!', 'Los insumos se han ajustado correctamente. El ajuste pasará a auditoría operativa.', 'success');
                 this.loadItems();
               } else {
                 Swal.fire('Error', 'No se pudo completar el ajuste de stock.', 'error');
               }
             },
-            error: () => Swal.fire('Error', 'Error completando el stock', 'error')
+            error: () => Swal.fire('Error', 'Error completando el stock', 'error'),
           });
         }
       },
-      error: () => Swal.fire('Error', 'No se pudo generar el reabastecimiento en el servidor.', 'error')
+      error: () => Swal.fire('Error', 'No se pudo generar el reabastecimiento en el servidor.', 'error'),
     });
   }
 
@@ -624,7 +729,11 @@ export class InventoryStockListComponent implements OnInit {
 
   inspectScheduledDelivery() {
     if (this.pendingDeliveries.length === 0) {
-      Swal.fire('Sin Entregas', 'No hay entregas programadas pendientes para el día de hoy en la sucursal actual.', 'info');
+      Swal.fire(
+        'Sin Entregas',
+        'No hay entregas programadas pendientes para el día de hoy en la sucursal actual.',
+        'info',
+      );
       return;
     }
     const restock = this.pendingDeliveries[0];
@@ -699,21 +808,22 @@ export class InventoryStockListComponent implements OnInit {
           }
           auditedItems.push({
             type: itemsToInspect[i].type || 'Product',
-            itemRef: typeof itemsToInspect[i].itemRef === 'object' ? itemsToInspect[i].itemRef._id : itemsToInspect[i].itemRef,
+            itemRef:
+              typeof itemsToInspect[i].itemRef === 'object' ? itemsToInspect[i].itemRef._id : itemsToInspect[i].itemRef,
             quantity: qty,
-            costPrice: itemsToInspect[i].costPrice || 0
+            costPrice: itemsToInspect[i].costPrice || 0,
           });
         }
         const payFromRegInput = document.getElementById('pay-from-register') as HTMLInputElement;
         return { items: auditedItems, payFromRegister: payFromRegInput.checked };
-      }
+      },
     }).then((result) => {
       if (result.isConfirmed && result.value) {
         Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const payload = {
           status: 'completed',
           payFromRegister: result.value.payFromRegister,
-          items: result.value.items
+          items: result.value.items,
         };
         this.supplierService.updateRestockStatus(restock._id, payload).subscribe({
           next: (resp: any) => {
@@ -725,7 +835,7 @@ export class InventoryStockListComponent implements OnInit {
           },
           error: (err) => {
             Swal.fire('Error', err.error?.message || 'No se pudo completar la recepción', 'error');
-          }
+          },
         });
       }
     });
@@ -733,12 +843,36 @@ export class InventoryStockListComponent implements OnInit {
 
   openUnplannedRestock() {
     this.unplannedRestock = { supplier: '', notes: 'Recepción no programada', payFromRegister: true };
-    this.unplannedItems = [{ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined, costPrice: 0 }];
+    this.unplannedItems = [
+      {
+        productId: '',
+        productName: '',
+        quantity: 1,
+        itemType: 'Product',
+        searchText: '',
+        showDropdown: false,
+        measurementUnit: '',
+        packs: undefined,
+        unitsPerPack: undefined,
+        costPrice: 0,
+      },
+    ];
     this.showUnplannedRestockModal = true;
   }
 
   addUnplannedItem() {
-    this.unplannedItems.push({ productId: '', productName: '', quantity: 1, itemType: 'Product', searchText: '', showDropdown: false, measurementUnit: '', packs: undefined, unitsPerPack: undefined, costPrice: 0 });
+    this.unplannedItems.push({
+      productId: '',
+      productName: '',
+      quantity: 1,
+      itemType: 'Product',
+      searchText: '',
+      showDropdown: false,
+      measurementUnit: '',
+      packs: undefined,
+      unitsPerPack: undefined,
+      costPrice: 0,
+    });
   }
 
   removeUnplannedItem(idx: number) {
@@ -749,9 +883,12 @@ export class InventoryStockListComponent implements OnInit {
     const text = this.unplannedItems[idx].searchText;
     if (!text || text.length < 2) return [];
     const lowerText = text.toLowerCase();
-    return this.allCompanyProducts.filter(p => 
-      (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText))
-    ).slice(0, 50);
+    return this.allCompanyProducts
+      .filter(
+        (p) =>
+          (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText)),
+      )
+      .slice(0, 50);
   }
 
   selectProductForUnplannedRow(idx: number, prod: any) {
@@ -778,7 +915,7 @@ export class InventoryStockListComponent implements OnInit {
       Swal.fire('Error', 'Selecciona un proveedor.', 'warning');
       return;
     }
-    const validItems = this.unplannedItems.filter(it => it.productId && it.quantity > 0);
+    const validItems = this.unplannedItems.filter((it) => it.productId && it.quantity > 0);
     if (validItems.length === 0) {
       Swal.fire('Error', 'Agrega al menos un producto válido a recibir.', 'warning');
       return;
@@ -793,37 +930,42 @@ export class InventoryStockListComponent implements OnInit {
       isRecurring: false,
       recurrence: 'none',
       notes: this.unplannedRestock.notes,
-      items: validItems.map(it => ({
+      items: validItems.map((it) => ({
         type: it.itemType,
         itemRef: it.productId,
         quantity: it.quantity,
-        costPrice: it.costPrice
-      }))
+        costPrice: it.costPrice,
+      })),
     };
 
     Swal.fire({ title: 'Registrando entrada...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    
+
     this.supplierService.createRestockSchedule(payload).subscribe({
       next: (resp: any) => {
         if (resp.ok && resp.restock) {
           const updatePayload = {
             status: 'completed',
             payFromRegister: this.unplannedRestock.payFromRegister,
-            items: payload.items
+            items: payload.items,
           };
           this.supplierService.updateRestockStatus(resp.restock._id, updatePayload).subscribe({
             next: (updateResp: any) => {
               if (updateResp.ok) {
-                Swal.fire('¡Éxito!', 'La entrada no programada fue registrada y el inventario se ha actualizado.', 'success');
+                Swal.fire(
+                  '¡Éxito!',
+                  'La entrada no programada fue registrada y el inventario se ha actualizado.',
+                  'success',
+                );
                 this.showUnplannedRestockModal = false;
                 this.loadItems();
               }
             },
-            error: (err) => Swal.fire('Error', 'Se creó el registro pero falló la actualización de inventario.', 'error')
+            error: (err) =>
+              Swal.fire('Error', 'Se creó el registro pero falló la actualización de inventario.', 'error'),
           });
         }
       },
-      error: (err) => Swal.fire('Error', err.error?.message || 'No se pudo crear el registro.', 'error')
+      error: (err) => Swal.fire('Error', err.error?.message || 'No se pudo crear el registro.', 'error'),
     });
   }
 }

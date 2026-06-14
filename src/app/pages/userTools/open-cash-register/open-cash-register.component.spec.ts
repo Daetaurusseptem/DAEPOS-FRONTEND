@@ -8,7 +8,7 @@ describe('OpenCashRegisterComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [OpenCashRegisterComponent]
+      declarations: [OpenCashRegisterComponent],
     });
     fixture = TestBed.createComponent(OpenCashRegisterComponent);
     component = fixture.componentInstance;

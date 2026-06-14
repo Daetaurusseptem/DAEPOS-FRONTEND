@@ -7,17 +7,16 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'items-list',
   templateUrl: './inventory-list.component.html',
-  styleUrls: ['./inventory-list.component.css']
+  styleUrls: ['./inventory-list.component.css'],
 })
 export class InventoryListComponent implements OnInit {
-
   @Input() items: Product[] = [];
   userRole!: UserRole;
 
   constructor(
     private authService: AuthService,
-    private productService: ProductService
-  ) { }
+    private productService: ProductService,
+  ) {}
 
   ngOnInit(): void {
     this.getUserRole();
@@ -25,7 +24,7 @@ export class InventoryListComponent implements OnInit {
 
   getUserRole(): void {
     const role = this.authService.role;
-    this.userRole = (role === 'companyAdmin') ? 'admin' : role;
+    this.userRole = role === 'companyAdmin' ? 'admin' : role;
   }
 
   eliminarProduct(productId: string | undefined) {
@@ -41,26 +40,18 @@ export class InventoryListComponent implements OnInit {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.productService.deleteProduct(productId).subscribe({
           next: () => {
-            Swal.fire(
-              'Producto eliminado',
-              'El producto ha sido eliminado.',
-              'success'
-            );
-            this.items = this.items.filter(item => item._id !== productId);
+            Swal.fire('Producto eliminado', 'El producto ha sido eliminado.', 'success');
+            this.items = this.items.filter((item) => item._id !== productId);
           },
           error: (error) => {
             console.error('Error deleting product:', error);
-            Swal.fire(
-              'Error al eliminar',
-              'Hubo un problema al eliminar el producto.',
-              'error'
-            );
-          }
+            Swal.fire('Error al eliminar', 'Hubo un problema al eliminar el producto.', 'error');
+          },
         });
       }
     });

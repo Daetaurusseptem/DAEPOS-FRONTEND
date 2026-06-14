@@ -6,20 +6,20 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CompanyService } from 'src/app/services/company.service';
 import { UsersService } from 'src/app/services/users.service';
 import { BranchService } from 'src/app/services/branch.service';
+import { LoggerService } from '../../../services/logger.service';
 import Swal from 'sweetalert2';
-
 
 @Component({
   selector: 'app-create-user',
   templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.css']
+  styleUrls: ['./create-user.component.css'],
 })
 export class CreateUserReComponent {
   userRole!: UserRole;
   companies: Company[] = [];
   companyId: string = '';
   branches: Branch[] = [];
-  
+
   user: User = {
     name: '',
     email: '',
@@ -28,21 +28,22 @@ export class CreateUserReComponent {
     role: 'user',
     companyId: '',
     branch: '',
-    permissions: []
+    permissions: [],
   };
 
   availablePermissions = [
     { id: 'inventory_management', name: 'Gestión de Inventario' },
     { id: 'sales_reports', name: 'Ver Reportes de Ventas' },
-    { id: 'customer_management', name: 'Gestión de Clientes' }
+    { id: 'customer_management', name: 'Gestión de Clientes' },
   ];
-  
+
   constructor(
     private userService: UsersService,
     private companiesService: CompanyService,
     private authService: AuthService,
     private router: Router,
     private branchService: BranchService,
+    private logger: LoggerService,
   ) {
     this.getRole();
   }
@@ -55,7 +56,7 @@ export class CreateUserReComponent {
       this.user.permissions?.splice(idx, 1);
     }
   }
-  
+
   getRole() {
     this.userRole = this.authService.role;
     if (this.userRole === 'admin') {
@@ -70,7 +71,7 @@ export class CreateUserReComponent {
       this.getBranches();
     } else if (this.userRole === 'sysadmin') {
       this.user.role = 'admin';
-      this.companyId = ''; 
+      this.companyId = '';
       this.loadCompanies();
     } else {
       this.user.role = 'user';
@@ -82,7 +83,7 @@ export class CreateUserReComponent {
     this.companiesService.getCompanies().subscribe({
       next: (resp: any) => {
         this.companies = resp.companies || [];
-      }
+      },
     });
   }
 
@@ -96,7 +97,7 @@ export class CreateUserReComponent {
           if (resp.ok) {
             this.branches = resp.branches || [];
           }
-        }
+        },
       });
     }
   }
@@ -121,15 +122,15 @@ export class CreateUserReComponent {
         if (resp.ok) {
           this.branches = resp.branches;
         }
-      }
+      },
     });
   }
-  
+
   createUser(form: NgForm) {
     if (this.userRole === 'user') {
       return; // Un usuario con rol 'user' no puede crear otros usuarios
     }
-  
+
     if (form.valid) {
       if (this.userRole !== 'sysadmin') {
         this.user.companyId = this.authService.companyId!;
@@ -144,12 +145,12 @@ export class CreateUserReComponent {
           }
         }
       }
-  
+
       this.userService.createUser(this.user).subscribe({
         next: (createdUser: any) => {
           Swal.fire({
             text: 'Usuario creado correctamente',
-            icon: 'success'
+            icon: 'success',
           }).then(() => {
             if (this.userRole === 'admin' || this.userRole === 'companyAdmin') {
               this.router.navigateByUrl('/dashboard/admin/users');
@@ -159,12 +160,12 @@ export class CreateUserReComponent {
           });
         },
         error: (error: any) => {
-          console.log(error);
+          this.logger.log(error);
           Swal.fire({
             text: error.error?.msg || error.msg || 'Error al crear usuario',
-            icon: 'error'
+            icon: 'error',
           });
-        }
+        },
       });
     }
   }

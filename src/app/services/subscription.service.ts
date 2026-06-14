@@ -2,34 +2,27 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.development';
 import { InventoryResponse } from 'src/app/interfaces/InventoryResponse.interface';
-import { map } from "rxjs/operators";
+import { map } from 'rxjs/operators';
+import { LoggerService } from './logger.service';
 
-const apiURL = environment.apiUrl
+const apiURL = environment.apiUrl;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SubscriptionService {
+  constructor(private http: HttpClient, private logger: LoggerService) {}
 
-  constructor(
-                private http:HttpClient
-             ) { 
-
+  addSubscription() {
+    return 'a';
   }
 
-  addSubscription(){
-    return 'a'
-  }
-
-
-
-  getSubPlans(){
-    return this.http.get<InventoryResponse>(`${apiURL}/subs`)
-      .pipe(
-        map(item=>{
-          console.log(item);
-          return item.stripeResponse
-        })
-      )
+  getSubPlans() {
+    return this.http.get<InventoryResponse>(`${apiURL}/subs`).pipe(
+      map((item) => {
+        this.logger.log(item);
+        return item.stripeResponse;
+      }),
+    );
   }
 }

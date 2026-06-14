@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ComponentsModule } from './components/components.module';
@@ -12,19 +11,13 @@ import { ComponentsModule } from './components/components.module';
 import { MatCardModule } from '@angular/material/card';
 import { PagesModule } from './pages/pages.module';
 import { RouterLink } from '@angular/router';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgChartsModule } from 'ng2-charts';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
-
-
-
 @NgModule({
-  declarations: [
-    AppComponent
-    
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -33,15 +26,14 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     ComponentsModule,
     PagesModule,
     MatCardModule,
-    AppRoutingModule,
     RouterLink,
-    HttpClientModule,
     NgChartsModule,
-    NgxPaginationModule
+    NgxPaginationModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

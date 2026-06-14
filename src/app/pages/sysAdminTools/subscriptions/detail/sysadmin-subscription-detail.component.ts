@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-sysadmin-subscription-detail',
   templateUrl: './sysadmin-subscription-detail.component.html',
-  styleUrls: ['./sysadmin-subscription-detail.component.css']
+  styleUrls: ['./sysadmin-subscription-detail.component.css'],
 })
 export class SysadminSubscriptionDetailComponent implements OnInit {
   companyId: string = '';
@@ -21,14 +21,14 @@ export class SysadminSubscriptionDetailComponent implements OnInit {
   overrideData = {
     status: '',
     currentPeriodEnd: '',
-    manualOverride: false
+    manualOverride: false,
   };
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private sysadminService: SysadminService,
-    private manualPaymentService: ManualPaymentService
+    private manualPaymentService: ManualPaymentService,
   ) {}
 
   ngOnInit(): void {
@@ -48,8 +48,10 @@ export class SysadminSubscriptionDetailComponent implements OnInit {
           this.data = resp;
           this.overrideData = {
             status: this.data.company.subscriptionStatus || 'trialing',
-            currentPeriodEnd: this.data.company.currentPeriodEnd ? new Date(this.data.company.currentPeriodEnd).toISOString().split('T')[0] : '',
-            manualOverride: this.data.company.manualOverride || false
+            currentPeriodEnd: this.data.company.currentPeriodEnd
+              ? new Date(this.data.company.currentPeriodEnd).toISOString().split('T')[0]
+              : '',
+            manualOverride: this.data.company.manualOverride || false,
           };
         }
         this.loading = false;
@@ -61,7 +63,7 @@ export class SysadminSubscriptionDetailComponent implements OnInit {
         console.error('Error fetching details', err);
         this.loading = false;
         Swal.fire('Error', 'No se pudieron cargar los detalles', 'error');
-      }
+      },
     });
   }
 
@@ -76,20 +78,20 @@ export class SysadminSubscriptionDetailComponent implements OnInit {
       },
       error: () => {
         this.loadingPayments = false;
-      }
+      },
     });
   }
 
   submitOverride() {
     Swal.fire({
       title: '¿Confirmar Gestión B2B?',
-      text: "Si activas el control manual, las acciones automáticas de Stripe se pausarán. Al desactivarlo, el cliente regresará al estado de Stripe.",
+      text: 'Si activas el control manual, las acciones automáticas de Stripe se pausarán. Al desactivarlo, el cliente regresará al estado de Stripe.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#212529',
       cancelButtonColor: '#6c757d',
       confirmButtonText: 'Sí, aplicar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.sysadminService.overrideSubscription(this.companyId, this.overrideData).subscribe({
@@ -101,7 +103,7 @@ export class SysadminSubscriptionDetailComponent implements OnInit {
           },
           error: (err) => {
             Swal.fire('Error', err.error?.msg || 'Hubo un problema', 'error');
-          }
+          },
         });
       }
     });

@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-user-edit',
   templateUrl: './edit-user.component.html',
-  styleUrls: ['./edit-user.component.css']
+  styleUrls: ['./edit-user.component.css'],
 })
 export class UserEditComponent implements OnInit {
   user!: User;
@@ -23,7 +23,7 @@ export class UserEditComponent implements OnInit {
   availablePermissions = [
     { id: 'inventory_management', name: 'Gestión de Inventario' },
     { id: 'sales_reports', name: 'Ver Reportes de Ventas' },
-    { id: 'customer_management', name: 'Gestión de Clientes' }
+    { id: 'customer_management', name: 'Gestión de Clientes' },
   ];
 
   userForm: FormGroup = this.fb.group({
@@ -32,7 +32,7 @@ export class UserEditComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     password: [''], // Opcional, solo si desea cambiarla
     role: ['user', Validators.required],
-    branch: ['']
+    branch: [''],
   });
 
   constructor(
@@ -41,14 +41,14 @@ export class UserEditComponent implements OnInit {
     private authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
-    private branchService: BranchService
+    private branchService: BranchService,
   ) {
     this.userRole = this.authService.role;
     this.companyId = this.authService.companyId || '';
   }
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {
+    this.activatedRoute.params.subscribe((params) => {
       this.id = params['id'];
       this.getUser(this.id);
     });
@@ -67,7 +67,7 @@ export class UserEditComponent implements OnInit {
           if (resp.ok) {
             this.branches = resp.branches;
           }
-        }
+        },
       });
     }
   }
@@ -78,21 +78,18 @@ export class UserEditComponent implements OnInit {
         if (resp.ok) {
           this.branches = resp.branches;
         }
-      }
+      },
     });
   }
 
   getUser(id: string) {
-    const userOb$ = this.userRole === 'admin' 
-      ? this.userService.getUserByIdAdminCompany(id) 
-      : this.userService.getUserById(id);
+    const userOb$ =
+      this.userRole === 'admin' ? this.userService.getUserByIdAdminCompany(id) : this.userService.getUserById(id);
 
-    userOb$.pipe(
-      map(item => item.user)
-    ).subscribe({
+    userOb$.pipe(map((item) => item.user)).subscribe({
       next: (user) => {
         this.user = user!;
-        
+
         // Si no tiene permisos definidos, inicializar vacío
         if (!this.user.permissions) {
           this.user.permissions = [];
@@ -104,8 +101,10 @@ export class UserEditComponent implements OnInit {
         }
 
         // Extraer id de sucursal si viene poblada como objeto
-        const branchId = this.user.branch 
-          ? (typeof this.user.branch === 'object' ? (this.user.branch as any)._id : this.user.branch) 
+        const branchId = this.user.branch
+          ? typeof this.user.branch === 'object'
+            ? (this.user.branch as any)._id
+            : this.user.branch
           : '';
 
         this.userForm.patchValue({
@@ -113,13 +112,13 @@ export class UserEditComponent implements OnInit {
           username: this.user.username,
           email: this.user.email,
           role: this.user.role || 'user',
-          branch: branchId
+          branch: branchId,
         });
       },
       error: (err) => {
         console.error('Error al cargar el usuario:', err);
         Swal.fire('Error', 'No se pudo cargar el usuario', 'error');
-      }
+      },
     });
   }
 
@@ -138,7 +137,7 @@ export class UserEditComponent implements OnInit {
   updateUser() {
     if (this.userForm.valid) {
       const formValue = { ...this.userForm.value };
-      
+
       // Si la contraseña está vacía, no la enviamos para no sobreescribirla
       if (!formValue.password || formValue.password.trim() === '') {
         delete formValue.password;
@@ -146,7 +145,7 @@ export class UserEditComponent implements OnInit {
 
       const payload = {
         ...formValue,
-        permissions: this.user.permissions || []
+        permissions: this.user.permissions || [],
       };
 
       Swal.fire({
@@ -157,8 +156,8 @@ export class UserEditComponent implements OnInit {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, guardar',
-        cancelButtonText: 'Cancelar'
-      }).then(result => {
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
         if (result.isConfirmed) {
           this.userService.updateUser(this.user._id!, payload).subscribe({
             next: () => {
@@ -173,7 +172,7 @@ export class UserEditComponent implements OnInit {
             error: (err) => {
               console.error('Error al actualizar el usuario:', err);
               Swal.fire('Error', err.error?.msg || 'Hubo un problema al actualizar el usuario.', 'error');
-            }
+            },
           });
         }
       });

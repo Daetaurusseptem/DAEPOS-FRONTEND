@@ -44,7 +44,7 @@ import { ManageBillingComponent } from './billing/manage-billing/manage-billing.
     DashboardPageComponent,
     NotificationsPageComponent,
     ExpiredSubscriptionComponent,
-    ManageBillingComponent
+    ManageBillingComponent,
   ],
   imports: [
     CommonModule,
@@ -60,7 +60,7 @@ import { ManageBillingComponent } from './billing/manage-billing/manage-billing.
     NgxPaginationModule,
     UserToolsModule,
     MatPaginatorModule,
-    MatTableModule
-  ]
+    MatTableModule,
+  ],
 })
-export class PagesModule { }
+export class PagesModule {}

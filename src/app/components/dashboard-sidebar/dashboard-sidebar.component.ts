@@ -8,7 +8,7 @@ import { SidebarService } from 'src/app/services/sidebar.service';
 @Component({
   selector: 'app-dashboard-sidebar',
   templateUrl: './dashboard-sidebar.component.html',
-  styleUrls: ['./dashboard-sidebar.component.css']
+  styleUrls: ['./dashboard-sidebar.component.css'],
 })
 export class DashboardSidebarComponent implements OnInit {
   menuItems: any[] = [];
@@ -19,14 +19,14 @@ export class DashboardSidebarComponent implements OnInit {
     private menuService: MenuService,
     private authService: AuthService,
     private router: Router,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
   ) {
     this.usuario = this.authService.usuario;
   }
 
   ngOnInit(): void {
-    this.menuItems = this.menuService.menu.map(item => ({...item, isOpen: false}));
-    this.sidebarService.isCollapsed$.subscribe(collapsed => {
+    this.menuItems = this.menuService.menu.map((item) => ({ ...item, isOpen: false }));
+    this.sidebarService.isCollapsed$.subscribe((collapsed) => {
       this.isCollapsed = collapsed;
     });
   }

@@ -8,10 +8,20 @@
     <div class="header-actions">
       <!-- Segmented View Toggle (Style macOS/iOS) -->
       <div class="segmented-control">
-        <button type="button" class="segmented-btn" [class.active]="isProductView" (click)="!isProductView && toggleView()">
+        <button
+          type="button"
+          class="segmented-btn"
+          [class.active]="isProductView"
+          (click)="!isProductView && toggleView()"
+        >
           Ventas de Productos
         </button>
-        <button type="button" class="segmented-btn" [class.active]="!isProductView" (click)="isProductView && toggleView()">
+        <button
+          type="button"
+          class="segmented-btn"
+          [class.active]="!isProductView"
+          (click)="isProductView && toggleView()"
+        >
           Stock de Insumos
         </button>
       </div>
@@ -28,7 +38,11 @@
 
   <!-- Rejilla de Tarjetas KPI -->
   <div class="kpi-grid">
-    <div class="kpi-card glass-card" [ngClass]="'accent-' + (idx === 0 ? 'primary' : idx === 1 ? 'secondary' : idx === 2 ? 'tertiary' : 'period')" *ngFor="let slot of kpiSlots; let idx = index">
+    <div
+      class="kpi-card glass-card"
+      [ngClass]="'accent-' + (idx === 0 ? 'primary' : idx === 1 ? 'secondary' : idx === 2 ? 'tertiary' : 'period')"
+      *ngFor="let slot of kpiSlots; let idx = index"
+    >
       <div class="kpi-card-inner">
         <div class="kpi-info">
           <div class="kpi-card-header">
@@ -37,7 +51,11 @@
             </select>
           </div>
           <span class="kpi-label">{{ getSlotData(kpiSlots[idx]).label }}</span>
-          <h3 class="kpi-value star-name font-mono" [ngClass]="{ 'star-name truncate': getSlotData(kpiSlots[idx]).isString }" [title]="getSlotData(kpiSlots[idx]).isString ? getSlotData(kpiSlots[idx]).value : ''">
+          <h3
+            class="kpi-value star-name font-mono"
+            [ngClass]="{ 'star-name truncate': getSlotData(kpiSlots[idx]).isString }"
+            [title]="getSlotData(kpiSlots[idx]).isString ? getSlotData(kpiSlots[idx]).value : ''"
+          >
             <ng-container *ngIf="getSlotData(kpiSlots[idx]).isCurrency">
               {{ getSlotData(kpiSlots[idx]).value | currency }}
             </ng-container>
@@ -47,7 +65,9 @@
             <ng-container *ngIf="!getSlotData(kpiSlots[idx]).isCurrency && !getSlotData(kpiSlots[idx]).isString">
               {{ getSlotData(kpiSlots[idx]).value | number }}
             </ng-container>
-            <span class="kpi-value-suffix" *ngIf="getSlotData(kpiSlots[idx]).suffix">{{ getSlotData(kpiSlots[idx]).suffix }}</span>
+            <span class="kpi-value-suffix" *ngIf="getSlotData(kpiSlots[idx]).suffix">{{
+              getSlotData(kpiSlots[idx]).suffix
+            }}</span>
           </h3>
           <span class="kpi-context">{{ getSlotData(kpiSlots[idx]).context }}</span>
         </div>
@@ -67,7 +87,7 @@
           <label for="year" class="field-label">Año</label>
           <div class="field-input-wrap">
             <i class="bi bi-calendar-event field-icon"></i>
-            <input type="number" id="year" formControlName="year" class="field-input" placeholder="Ej: 2026">
+            <input type="number" id="year" formControlName="year" class="field-input" placeholder="Ej: 2026" />
           </div>
         </div>
 
@@ -75,7 +95,7 @@
           <label for="week" class="field-label">Semana</label>
           <div class="field-input-wrap">
             <i class="bi bi-hash field-icon"></i>
-            <input type="number" id="week" formControlName="week" class="field-input" placeholder="Ej: 21">
+            <input type="number" id="week" formControlName="week" class="field-input" placeholder="Ej: 21" />
           </div>
         </div>
       </div>
@@ -90,9 +110,7 @@
           </button>
         </div>
 
-        <button type="submit" class="btn-search-premium">
-          <i class="bi bi-search"></i> Filtrar Periodo
-        </button>
+        <button type="submit" class="btn-search-premium"><i class="bi bi-search"></i> Filtrar Periodo</button>
       </div>
     </form>
   </div>
@@ -104,19 +122,42 @@
       <div class="section-header-clean">
         <h4 class="section-title">Visualización Gráfica</h4>
         <div class="chart-type-toolbar">
-          <button type="button" class="btn-chart-type" [class.active]="barChartType === 'bar'" (click)="changeChartType('bar')">Barras</button>
-          <button type="button" class="btn-chart-type" [class.active]="barChartType === 'line'" (click)="changeChartType('line')">Líneas</button>
-          <button type="button" class="btn-chart-type" [class.active]="barChartType === 'pie'" (click)="changeChartType('pie')">Torta</button>
+          <button
+            type="button"
+            class="btn-chart-type"
+            [class.active]="barChartType === 'bar'"
+            (click)="changeChartType('bar')"
+          >
+            Barras
+          </button>
+          <button
+            type="button"
+            class="btn-chart-type"
+            [class.active]="barChartType === 'line'"
+            (click)="changeChartType('line')"
+          >
+            Líneas
+          </button>
+          <button
+            type="button"
+            class="btn-chart-type"
+            [class.active]="barChartType === 'pie'"
+            (click)="changeChartType('pie')"
+          >
+            Torta
+          </button>
         </div>
       </div>
       <div class="chart-container-premium">
-        <canvas baseChart 
-                [data]="barChartData" 
-                [labels]="barChartLabels" 
-                [options]="barChartOptions"
-                [legend]="barChartLegend"
-                [type]="barChartType"
-                class="premium-canvas">
+        <canvas
+          baseChart
+          [data]="barChartData"
+          [labels]="barChartLabels"
+          [options]="barChartOptions"
+          [legend]="barChartLegend"
+          [type]="barChartType"
+          class="premium-canvas"
+        >
         </canvas>
       </div>
     </div>
@@ -127,7 +168,7 @@
         <h4 class="section-title">Desglose de Datos</h4>
         <span class="section-indicator font-mono">Listado de Periodo</span>
       </div>
-      
+
       <div class="table-container-premium">
         <table class="table-premium">
           <thead>
@@ -139,14 +180,27 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of isProductView ? topSellingProducts : ingredientsStatistics; let i = index" class="table-row-interactive">
+            <tr
+              *ngFor="let item of isProductView ? topSellingProducts : ingredientsStatistics; let i = index"
+              class="table-row-interactive"
+            >
               <td class="col-num font-mono">{{ i + 1 }}</td>
               <td class="col-name">
-                <span class="name-text">{{ isProductView ? (item.product?.name || 'Desconocido') : (item.name || item._id) }}</span>
+                <span class="name-text">{{
+                  isProductView ? item.product?.name || 'Desconocido' : item.name || item._id
+                }}</span>
               </td>
               <td class="text-right font-mono">
-                <span class="badge-pill-premium" [class.badge-primary]="isProductView" [class.badge-secondary]="!isProductView">
-                  {{ isProductView ? (item.totalQuantity | number) : ((item.totalStock | number) + ' ' + (item.measurement === 'unit' ? 'u' : (item.measurement || 'u'))) }}
+                <span
+                  class="badge-pill-premium"
+                  [class.badge-primary]="isProductView"
+                  [class.badge-secondary]="!isProductView"
+                >
+                  {{
+                    isProductView
+                      ? (item.totalQuantity | number)
+                      : (item.totalStock | number) + ' ' + (item.measurement === 'unit' ? 'u' : item.measurement || 'u')
+                  }}
                 </span>
               </td>
               <td class="text-right font-mono text-highlight" *ngIf="!isProductView">
@@ -179,24 +233,30 @@
   <!-- Summary Section (KPIs) -->
   <div class="print-section">
     <h3 class="print-section-title">RESUMEN EJECUTIVO</h3>
-    
+
     <table class="print-summary-table">
       <tr>
-        <td><strong>Total {{ isProductView ? 'Unidades Vendidas' : 'Insumos en Stock' }}:</strong></td>
+        <td>
+          <strong>Total {{ isProductView ? 'Unidades Vendidas' : 'Insumos en Stock' }}:</strong>
+        </td>
         <td>{{ getTotalQuantity() | number }}</td>
-        <td><strong>{{ isProductView ? 'Producto Estrella' : 'Insumo Líder' }}:</strong></td>
+        <td>
+          <strong>{{ isProductView ? 'Producto Estrella' : 'Insumo Líder' }}:</strong>
+        </td>
         <td>{{ getTopItemName() }} ({{ getTopItemQuantity() | number }})</td>
       </tr>
       <tr>
-        <td><strong>{{ isProductView ? 'Variedad en Ventas' : 'Valoración del Inventario' }}:</strong></td>
+        <td>
+          <strong>{{ isProductView ? 'Variedad en Ventas' : 'Valoración del Inventario' }}:</strong>
+        </td>
         <td>
           <ng-container *ngIf="isProductView">{{ getValuation() }} productos</ng-container>
           <ng-container *ngIf="!isProductView">{{ getValuation() | currency }}</ng-container>
         </td>
         <td><strong>Ganancia Bruta Est.:</strong></td>
         <td>
-          <ng-container *ngIf="isProductView">{{ (getTotalQuantity() * 15.50) | currency }}</ng-container>
-          <ng-container *ngIf="!isProductView">{{ (getValuation() * 0.42) | currency }}</ng-container>
+          <ng-container *ngIf="isProductView">{{ getTotalQuantity() * 15.5 | currency }}</ng-container>
+          <ng-container *ngIf="!isProductView">{{ getValuation() * 0.42 | currency }}</ng-container>
         </td>
       </tr>
     </table>
@@ -205,7 +265,7 @@
   <!-- Detailed Table Section -->
   <div class="print-section">
     <h3 class="print-section-title">DESGLOSE DETALLADO</h3>
-    
+
     <!-- Table -->
     <table class="print-data-table">
       <thead>
@@ -219,9 +279,13 @@
       <tbody>
         <tr *ngFor="let item of isProductView ? topSellingProducts : ingredientsStatistics; let i = index">
           <td>{{ i + 1 }}</td>
-          <td>{{ isProductView ? (item.product?.name || 'Desconocido') : (item.name || item._id) }}</td>
+          <td>{{ isProductView ? item.product?.name || 'Desconocido' : item.name || item._id }}</td>
           <td class="text-right">
-            {{ isProductView ? (item.totalQuantity | number) : ((item.totalStock | number) + ' ' + (item.measurement === 'unit' ? 'u' : (item.measurement || 'u'))) }}
+            {{
+              isProductView
+                ? (item.totalQuantity | number)
+                : (item.totalStock | number) + ' ' + (item.measurement === 'unit' ? 'u' : item.measurement || 'u')
+            }}
           </td>
           <td class="text-right" *ngIf="!isProductView">{{ item.totalValue | currency }}</td>
         </tr>

@@ -24,10 +24,10 @@
 
 .form-title {
   letter-spacing: -0.025em;
-  font-family: 'Geist', 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
-.premium-input, 
+.premium-input,
 .premium-select {
   border-radius: 10px !important; /* Radius from DESIGN.md */
   border: 1px solid #e5e5e5 !important; /* Subtle Ash */
@@ -35,10 +35,12 @@
   font-size: 14px !important;
   color: #0a0a0a !important; /* Rich Black */
   background-color: #ffffff !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease !important;
 }
 
-.premium-input:focus, 
+.premium-input:focus,
 .premium-select:focus {
   border-color: #000000 !important;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;

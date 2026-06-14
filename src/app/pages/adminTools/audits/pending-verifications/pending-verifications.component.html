@@ -1,0 +1,286 @@
+<div class="container mt-4 animate__animated animate__fadeIn">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h3 fw-bold mb-1 text-dark">Auditoría Operativa</h2>
+      <p class="text-muted small">Revisa y concilia productos creados de emergencia (On-the-Fly)</p>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr class="text-secondary small font-mono">
+              <th class="ps-4 py-3">PRODUCTO TEMPORAL</th>
+              <th class="py-3">PROVEEDOR ORIGEN</th>
+              <th class="py-3 text-center">INVENTARIO REGISTRADO</th>
+              <th class="pe-4 py-3 text-end">ACCIONES DE RESOLUCIÓN</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of pendingProducts" class="border-bottom border-light-subtle">
+              <td class="ps-4 py-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-warning-soft text-warning rounded p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark">{{ p.name }}</h6>
+                    <small class="text-muted font-mono" *ngIf="p.inventoryItems?.length">Costo Registrado: {{ p.inventoryItems[0].costPrice | currency }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border"><i class="bi bi-truck me-1"></i> {{ p.supplier?.name || 'No Asignado' }}</span>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-danger-soft text-danger fw-bold border border-danger-subtle px-3 py-2 rounded-pill shadow-sm" *ngIf="p.inventoryItems?.length">
+                  {{ p.inventoryItems[0].stock }} {{ p.inventoryItems[0].measurement }}
+                </span>
+                <span class="text-muted small" *ngIf="!p.inventoryItems?.length">Sin stock</span>
+              </td>
+              <td class="pe-4 text-end">
+                <button class="btn btn-sm btn-outline-primary rounded-pill me-2 font-mono fw-bold" (click)="openMergeModal(p)">
+                  <i class="bi bi-intersect me-1"></i> Fusionar
+                </button>
+                <button class="btn btn-sm btn-dark rounded-pill font-mono fw-bold" (click)="openFormalizeModal(p)">
+                  <i class="bi bi-check-circle me-1"></i> Formalizar
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="pendingProducts.length === 0">
+              <td colspan="4" class="text-center py-5 text-muted">
+                <i class="bi bi-check-all fs-1 text-success opacity-50 d-block mb-3"></i>
+                <p class="mb-0 fw-bold">Todo está en orden</p>
+                <small>No hay productos pendientes de verificación en este momento.</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+    <div>
+      <h2 class="h3 fw-bold mb-1 text-dark">Ajustes de Cajeros (Recargas Exprés)</h2>
+      <p class="text-muted small">Justifica y asigna el costo real a las recargas de insumos hechas de emergencia.</p>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4 mb-5">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr class="text-secondary small font-mono">
+              <th class="ps-4 py-3">FECHA / DESCRIPCIÓN</th>
+              <th class="py-3 text-center">INSUMOS INYECTADOS</th>
+              <th class="pe-4 py-3 text-end">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let audit of pendingAudits" class="border-bottom border-light-subtle">
+              <td class="ps-4 py-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-danger-soft text-danger rounded p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-clock-history"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark">{{ audit.createdAt | date:'medium' }}</h6>
+                    <small class="text-muted">{{ audit.itemsSummary }}</small>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-primary-soft text-primary fw-bold border border-primary-subtle px-3 py-2 rounded-pill shadow-sm">
+                  {{ audit.items?.length || 0 }} Insumo(s)
+                </span>
+              </td>
+              <td class="pe-4 text-end">
+                <button class="btn btn-sm btn-dark rounded-pill font-mono fw-bold" (click)="openResolveAuditModal(audit)">
+                  <i class="bi bi-currency-dollar me-1"></i> Asignar Costos
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="pendingAudits.length === 0">
+              <td colspan="3" class="text-center py-5 text-muted">
+                <i class="bi bi-shield-check fs-1 text-success opacity-50 d-block mb-3"></i>
+                <p class="mb-0 fw-bold">Sin ajustes pendientes</p>
+                <small>No hay recargas de caja chica pendientes de auditoría.</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FUSIONAR (MERGE) -->
+<div class="modal" tabindex="-1" [ngClass]="{'d-block': showMergeModal, 'show': showMergeModal}" [style.background-color]="showMergeModal ? 'rgba(0,0,0,0.5)' : 'transparent'">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold"><i class="bi bi-intersect text-primary me-2"></i> Fusionar Producto</h5>
+        <button type="button" class="btn-close" (click)="closeMergeModal()"></button>
+      </div>
+      <div class="modal-body py-4">
+        <div class="alert alert-primary bg-primary-soft text-primary border-0 rounded-3 small mb-4">
+          <i class="bi bi-info-circle-fill me-2"></i> El inventario del producto temporal pasará a sumar al producto original. El temporal será eliminado.
+        </div>
+        
+        <label class="form-label text-muted small fw-bold">Producto Temporal (Origen)</label>
+        <div class="p-3 bg-light rounded-3 mb-4 fw-bold text-dark border">
+          {{ selectedProductForAudit?.name }}
+          <div class="small text-muted fw-normal font-mono" *ngIf="selectedProductForAudit?.inventoryItems?.length">
+            Aportará: +{{ selectedProductForAudit.inventoryItems[0].stock }} unidades
+          </div>
+        </div>
+
+        <label class="form-label text-muted small fw-bold">Selecciona Producto Existente (Destino)</label>
+        <ng-select [items]="activeProducts"
+                   bindLabel="name"
+                   bindValue="_id"
+                   [(ngModel)]="targetProductId"
+                   placeholder="Busca el producto real..."
+                   class="rounded-3 shadow-sm custom-ng-select">
+        </ng-select>
+      </div>
+      <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-light rounded-pill" (click)="closeMergeModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary rounded-pill px-4" (click)="confirmMerge()" [disabled]="!targetProductId">Confirmar Fusión</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORMALIZAR -->
+<div class="modal" tabindex="-1" [ngClass]="{'d-block': showFormalizeModal, 'show': showFormalizeModal}" [style.background-color]="showFormalizeModal ? 'rgba(0,0,0,0.5)' : 'transparent'">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold"><i class="bi bi-check-circle-fill text-success me-2"></i> Formalizar Producto Nuevo</h5>
+        <button type="button" class="btn-close" (click)="closeFormalizeModal()"></button>
+      </div>
+      <div class="modal-body py-4">
+        <div class="alert alert-success bg-success-soft text-success border-0 rounded-3 small mb-4">
+          <i class="bi bi-info-circle-fill me-2"></i> Completa los datos faltantes para incorporar definitivamente este producto al catálogo activo.
+        </div>
+        
+        <form>
+          <h6 class="text-uppercase text-muted font-mono small fw-bold mb-3">Catálogo</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre *</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="formalizeData.name" name="name" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Marca</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="formalizeData.brand" name="brand">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Categorías</label>
+              <ng-select [items]="categories" bindLabel="name" bindValue="_id" [multiple]="true" [(ngModel)]="formalizeData.categories" name="categories" class="rounded-3 shadow-sm"></ng-select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Proveedor</label>
+              <select class="form-select rounded-3" [(ngModel)]="formalizeData.supplier" name="supplier">
+                <option value="">Ninguno</option>
+                <option *ngFor="let s of suppliers" [value]="s._id">{{ s.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <h6 class="text-uppercase text-muted font-mono small fw-bold mb-3 mt-3">Inventario y Precios</h6>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Código Barras</label>
+              <input type="text" class="form-control rounded-3 font-mono" [(ngModel)]="formalizeData.barCode" name="barCode">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Costo (Promedio)</label>
+              <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0">$</span>
+                <input type="number" class="form-control border-start-0" [(ngModel)]="formalizeData.costPrice" name="costPrice">
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Precio de Venta</label>
+              <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0">$</span>
+                <input type="number" class="form-control border-start-0 text-success fw-bold" [(ngModel)]="formalizeData.sellingPrice" name="sellingPrice">
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-light rounded-pill" (click)="closeFormalizeModal()">Cancelar</button>
+        <button type="button" class="btn btn-dark rounded-pill px-4" (click)="confirmFormalize()" [disabled]="!formalizeData.name">Aprobar e Integrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RESOLVER AUDITORÍA DE INVENTARIO -->
+<div class="modal" tabindex="-1" [ngClass]="{'d-block': showResolveAuditModal, 'show': showResolveAuditModal}" [style.background-color]="showResolveAuditModal ? 'rgba(0,0,0,0.5)' : 'transparent'">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold"><i class="bi bi-currency-dollar text-success me-2"></i> Justificar Ajuste Exprés</h5>
+        <button type="button" class="btn-close" (click)="closeResolveAuditModal()"></button>
+      </div>
+      <div class="modal-body py-4">
+        <div class="alert alert-warning bg-warning-soft text-warning border-0 rounded-3 small mb-4">
+          <i class="bi bi-info-circle-fill me-2"></i> Estos insumos fueron inyectados al sistema por un cajero con costo $0 para no detener la operación. Asigna el costo real de adquisición para arreglar el costeo.
+        </div>
+        
+        <form>
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted small fw-bold">Proveedor / Origen Físico</label>
+              <select class="form-select rounded-3" [(ngModel)]="auditResolutionData.supplierId" name="auditSupplier">
+                <option value="">(Informal o Desconocido)</option>
+                <option *ngFor="let s of suppliers" [value]="s._id">{{ s.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted small fw-bold">Notas de Resolución</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="auditResolutionData.notes" name="auditNotes" placeholder="Ej. Comprado en Soriana de emergencia">
+            </div>
+          </div>
+
+          <h6 class="text-uppercase text-muted font-mono small fw-bold mb-3">Insumos Modificados</h6>
+          <div class="table-responsive border rounded-3">
+            <table class="table table-sm align-middle mb-0">
+              <thead class="bg-light">
+                <tr class="text-secondary font-mono small">
+                  <th class="ps-3 py-2">INSUMO</th>
+                  <th class="py-2 text-center">AGREGADOS</th>
+                  <th class="pe-3 py-2 text-end" style="width: 150px;">COSTO REAL ($)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of auditResolutionData.items; let i = index">
+                  <td class="ps-3 py-2 fw-bold text-dark">{{ item.itemName }}</td>
+                  <td class="text-center font-mono py-2 text-primary fw-bold">+{{ item.quantity }}</td>
+                  <td class="pe-3 py-2">
+                    <input type="number" class="form-control form-control-sm text-end" [(ngModel)]="item.newCostPrice" [name]="'cost_'+i" min="0" step="0.01">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer border-top-0 pt-0">
+        <button type="button" class="btn btn-light rounded-pill" (click)="closeResolveAuditModal()">Cancelar</button>
+        <button type="button" class="btn btn-dark rounded-pill px-4" (click)="confirmResolveAudit()">Aprobar Costos</button>
+      </div>
+    </div>
+  </div>
+</div>

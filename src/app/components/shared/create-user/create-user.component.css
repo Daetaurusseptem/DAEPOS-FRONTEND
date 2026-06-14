@@ -20,7 +20,7 @@
 }
 
 .card-header h2 {
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: var(--font-ui);
   font-weight: 700;
   letter-spacing: -0.03em;
   font-size: 1.5rem;
@@ -33,7 +33,7 @@
 }
 
 .form-label {
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: var(--font-ui);
   font-weight: 600;
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -109,7 +109,7 @@
   padding: 12px 28px !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   color: var(--light) !important;
   box-shadow: var(--shadow-sm) !important;
   transition: var(--transition) !important;

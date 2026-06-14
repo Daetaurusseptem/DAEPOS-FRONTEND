@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-company-admin-home',
   templateUrl: './company-admin-home.component.html',
-  styleUrls: ['./company-admin-home.component.css']
+  styleUrls: ['./company-admin-home.component.css'],
 })
 export class CompanyAdminHomeComponent implements OnInit {
   company!: Company;
@@ -27,9 +27,14 @@ export class CompanyAdminHomeComponent implements OnInit {
     transactionsToday: 0,
     lowStockCount: 0,
     activeRegisters: 0,
-    recentSales: []
+    recentSales: [],
   };
   isLoading: boolean = true;
+  isPosSettingsModalOpen: boolean = false;
+  posSettingsForm = {
+    blindClosure: true,
+    requirePinForRisks: true
+  };
 
   constructor(
     private userService: UsersService,
@@ -37,8 +42,9 @@ export class CompanyAdminHomeComponent implements OnInit {
     private statisticsService: StatisticsService,
     private branchService: BranchService,
     private supplierService: SupplierService,
-    private router: Router
-  ) { }
+    private companyService: CompanyService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.admin = this.authService.usuario;
@@ -49,7 +55,7 @@ export class CompanyAdminHomeComponent implements OnInit {
       this.router.navigate(['/dashboard/branch']);
       return;
     }
-    
+
     // Si ya tenemos la compañía en el authService, la usamos directamente
     if (this.authService.company) {
       this.company = this.authService.company;
@@ -59,7 +65,7 @@ export class CompanyAdminHomeComponent implements OnInit {
       // Solo intentamos buscar la compañía por adminId si el rol es companyAdmin
       this.getAdminCompany(this.admin.id);
     }
-    
+
     this.loadDashboardSummary();
   }
 
@@ -78,13 +84,14 @@ export class CompanyAdminHomeComponent implements OnInit {
             this.branches = resp.branches || [];
           }
         }
-      }
+      },
     });
   }
 
   getAdminCompany(id: string) {
-    return this.userService.getCompanyAdmin(id)
-      .pipe(map(item => item.company))
+    return this.userService
+      .getCompanyAdmin(id)
+      .pipe(map((item) => item.company))
       .subscribe({
         next: (company) => {
           this.company = company!;
@@ -95,7 +102,7 @@ export class CompanyAdminHomeComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al cargar la empresa del administrador:', err);
-        }
+        },
       });
   }
 
@@ -118,7 +125,7 @@ export class CompanyAdminHomeComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -140,7 +147,7 @@ export class CompanyAdminHomeComponent implements OnInit {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
-          this.upcomingRestocks = allRestocks.filter(r => {
+          this.upcomingRestocks = allRestocks.filter((r) => {
             if (r.status !== 'pending') return false;
             const expDate = new Date(r.expectedDate);
             const diffTime = expDate.getTime() - today.getTime();
@@ -148,7 +155,7 @@ export class CompanyAdminHomeComponent implements OnInit {
             return diffDays >= -1 && diffDays <= 3;
           });
         }
-      }
+      },
     });
   }
 
@@ -157,7 +164,7 @@ export class CompanyAdminHomeComponent implements OnInit {
   }
 
   get inactiveBranchesCount(): number {
-    return this.branches ? this.branches.filter(b => b.isActive === false).length : 0;
+    return this.branches ? this.branches.filter((b) => b.isActive === false).length : 0;
   }
 
   restoreDemoDatabase() {
@@ -169,7 +176,7 @@ export class CompanyAdminHomeComponent implements OnInit {
       confirmButtonText: 'Sí, Restaurar',
       cancelButtonColor: '#000',
       confirmButtonColor: '#d33',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
@@ -178,21 +185,69 @@ export class CompanyAdminHomeComponent implements OnInit {
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
-          }
+          },
         });
 
         this.authService.demoReset().subscribe({
           next: () => {
             Swal.close();
-            Swal.fire('¡Restauración Exitosa!', 'La base de datos del demo ha vuelto a su estado original.', 'success').then(() => {
+            Swal.fire(
+              '¡Restauración Exitosa!',
+              'La base de datos del demo ha vuelto a su estado original.',
+              'success',
+            ).then(() => {
               window.location.reload();
             });
           },
           error: (err) => {
             Swal.close();
             Swal.fire('Error', err.error?.msg || 'No se pudo completar la restauración', 'error');
-          }
+          },
         });
+      }
+    });
+  }
+
+  // POS Settings Logic
+  openPosSettingsModal() {
+    if (this.company && this.company.posSettings) {
+      this.posSettingsForm = {
+        blindClosure: this.company.posSettings.blindClosure ?? true,
+        requirePinForRisks: this.company.posSettings.requirePinForRisks ?? true,
+      };
+    }
+    this.isPosSettingsModalOpen = true;
+  }
+
+  closePosSettingsModal() {
+    this.isPosSettingsModalOpen = false;
+  }
+
+  savePosSettings() {
+    if (!this.company || !this.company._id) return;
+    Swal.fire({
+      title: 'Guardando configuración...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    
+    const settingsUpdate = { posSettings: this.posSettingsForm };
+    
+    this.companyService.updateCompanySettings(this.company._id, settingsUpdate).subscribe({
+      next: (res) => {
+        Swal.close();
+        Swal.fire('¡Éxito!', 'Configuración de seguridad actualizada.', 'success');
+        this.company.posSettings = { ...this.posSettingsForm };
+        if (this.authService.company) {
+          this.authService.company.posSettings = { ...this.posSettingsForm };
+        }
+        this.closePosSettingsModal();
+      },
+      error: (err) => {
+        Swal.close();
+        Swal.fire('Error', 'No se pudo actualizar la configuración.', 'error');
       }
     });
   }

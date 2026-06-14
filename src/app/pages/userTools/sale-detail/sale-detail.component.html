@@ -1,16 +1,15 @@
 <div class="container py-5">
   <div class="receipt-container">
-    
     <div class="receipt-card" *ngIf="sale; else loadingTpl">
       <!-- HEADER -->
       <div class="receipt-header">
         <div>
           <h2 class="receipt-title">Comprobante de Venta</h2>
-          <div class="receipt-subtitle">Folio: {{ sale._id | slice:-8 | uppercase }}</div>
+          <div class="receipt-subtitle">Folio: {{ sale._id | slice: -8 | uppercase }}</div>
         </div>
         <div>
-          <span class="status-badge" [ngClass]="{'credit': sale.paymentMethod === 'credit'}">
-            <i class="bi bi-check-circle-fill me-1"></i> 
+          <span class="status-badge" [ngClass]="{ credit: sale.paymentMethod === 'credit' }">
+            <i class="bi bi-check-circle-fill me-1"></i>
             {{ sale.paymentMethod === 'cash' ? 'Pagado en Efectivo' : 'Pagado con Tarjeta' }}
           </span>
         </div>
@@ -18,17 +17,18 @@
 
       <!-- BODY -->
       <div class="receipt-body">
-        
         <!-- Info Grid -->
         <div class="info-grid">
           <div class="info-item">
             <div class="info-label"><i class="bi bi-person-badge"></i> Atendido por</div>
             <div class="info-value">{{ usuario?.name || 'Cajero' }}</div>
           </div>
-          
+
           <div class="info-item">
             <div class="info-label"><i class="bi bi-calendar3"></i> Fecha y Hora</div>
-            <div class="info-value">{{ sale.date | date:'mediumDate' }} &bull; {{ sale.date | date:'shortTime' }}</div>
+            <div class="info-value">
+              {{ sale.date | date: 'mediumDate' }} &bull; {{ sale.date | date: 'shortTime' }}
+            </div>
           </div>
 
           <div class="info-item" *ngIf="sale.paymentMethod === 'cash'">
@@ -50,25 +50,28 @@
         <!-- Products List -->
         <div class="products-section">
           <div class="section-title"><i class="bi bi-basket-fill"></i> Artículos Vendidos</div>
-          
+
           <ul class="product-list">
             <li class="product-item" *ngFor="let item of products">
               <div class="prod-details">
                 <div class="prod-name">{{ item.product.name }}</div>
                 <ul class="prod-mods" *ngIf="item.modifications && item.modifications.length > 0">
                   <li *ngFor="let mod of item.modifications">
-                    <i class="bi bi-plus-circle text-muted" style="font-size: 0.7rem; margin-right: 4px;"></i> 
-                    {{ mod.name }} 
-                    <span *ngIf="mod.extraPrice > 0" class="text-success fw-bold">(+{{ mod.extraPrice | currency }})</span>
+                    <i class="bi bi-plus-circle text-muted" style="font-size: 0.7rem; margin-right: 4px"></i>
+                    {{ mod.name }}
+                    <span *ngIf="mod.extraPrice > 0" class="text-success fw-bold"
+                      >(+{{ mod.extraPrice | currency }})</span
+                    >
                   </li>
                 </ul>
               </div>
               <div class="prod-qty">x{{ item.quantity }}</div>
-              <div class="prod-price">{{ (item.unitPrice + getModificationsTotalPrice(item.modifications)) * item.quantity | currency }}</div>
+              <div class="prod-price">
+                {{ (item.unitPrice + getModificationsTotalPrice(item.modifications)) * item.quantity | currency }}
+              </div>
             </li>
           </ul>
         </div>
-        
       </div>
 
       <!-- FOOTER -->
@@ -77,21 +80,18 @@
           <div class="total-label">Total Cobrado</div>
           <div class="total-amount">{{ sale.total | currency }}</div>
         </div>
-        
+
         <div class="action-buttons">
           <app-back-button></app-back-button>
-          
+
           <div class="d-flex gap-2">
             <button class="btn btn-outline-dark" (click)="generarPDF()">
               <i class="bi bi-file-earmark-pdf"></i> PDF
             </button>
-            <button class="btn-print" (click)="printHardware()">
-              <i class="bi bi-printer"></i> Imprimir Ticket
-            </button>
+            <button class="btn-print" (click)="printHardware()"><i class="bi bi-printer"></i> Imprimir Ticket</button>
           </div>
         </div>
       </div>
-      
     </div>
 
     <!-- LOADING STATE -->
@@ -104,6 +104,5 @@
         </div>
       </div>
     </ng-template>
-
   </div>
 </div>

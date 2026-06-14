@@ -1,24 +1,24 @@
 /* navbar.component.css */
 #sidebar-wrapper {
-    min-height: 100vh;
-    margin-left: -15rem;
-    transition: margin 0.25s ease-out;
-  }
-  
-  #sidebar-wrapper .list-group {
-    width: 15rem;
-  }
-  
-  /* Mostrar la barra lateral cuando está expandida */
-  #sidebarMenu.collapsing {
-    margin-left: 0;
-  }
-  
-  #sidebarMenu.show {
-    margin-left: 0;
-  }
-  
-  /* Siempre muestra el sidebar en pantallas grandes */
+  min-height: 100vh;
+  margin-left: -15rem;
+  transition: margin 0.25s ease-out;
+}
+
+#sidebar-wrapper .list-group {
+  width: 15rem;
+}
+
+/* Mostrar la barra lateral cuando está expandida */
+#sidebarMenu.collapsing {
+  margin-left: 0;
+}
+
+#sidebarMenu.show {
+  margin-left: 0;
+}
+
+/* Siempre muestra el sidebar en pantallas grandes */
 @media (min-width: 992px) {
   #sidebarMenu {
     visibility: visible;
@@ -70,4 +70,3 @@ body {
     transform: translateX(-100%);
   }
 }
-

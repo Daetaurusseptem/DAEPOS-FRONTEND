@@ -9,7 +9,7 @@ import { Subscription, interval } from 'rxjs';
 @Component({
   selector: 'app-live-registers',
   templateUrl: './live-registers.component.html',
-  styleUrls: ['./live-registers.component.css']
+  styleUrls: ['./live-registers.component.css'],
 })
 export class LiveRegistersComponent implements OnInit, OnDestroy {
   activeRegisters: CashRegister[] = [];
@@ -39,7 +39,7 @@ export class LiveRegistersComponent implements OnInit, OnDestroy {
   constructor(
     private cashRegisterService: CashRegisterService,
     private authService: AuthService,
-    private branchService: BranchService
+    private branchService: BranchService,
   ) {}
 
   ngOnInit(): void {
@@ -77,7 +77,7 @@ export class LiveRegistersComponent implements OnInit, OnDestroy {
           this.branches = resp.branches;
           // Preselect first branch or current
           const currentBranchId = this.authService.branch?._id || this.authService.branch;
-          if (currentBranchId && this.branches.some(b => b._id === currentBranchId)) {
+          if (currentBranchId && this.branches.some((b) => b._id === currentBranchId)) {
             this.selectedBranchId = currentBranchId;
           } else {
             this.selectedBranchId = this.branches[0]._id || '';
@@ -87,7 +87,7 @@ export class LiveRegistersComponent implements OnInit, OnDestroy {
       },
       error: () => {
         Swal.fire('Error', 'No se pudieron cargar las sucursales', 'error');
-      }
+      },
     });
   }
 
@@ -99,17 +99,17 @@ export class LiveRegistersComponent implements OnInit, OnDestroy {
         this.activeRegisters = resp.activeRegisters || [];
         this.lastUpdated = new Date();
         this.loading = false;
-        
+
         // Sync selected register in drawer if it's currently open
         if (this.selectedRegister) {
-          const updated = this.activeRegisters.find(r => r._id === this.selectedRegister?._id);
+          const updated = this.activeRegisters.find((r) => r._id === this.selectedRegister?._id);
           this.selectedRegister = updated || null;
         }
       },
       error: () => {
         this.loading = false;
         Swal.fire('Error', 'No se pudieron cargar las cajas activas', 'error');
-      }
+      },
     });
   }
 
@@ -132,7 +132,7 @@ export class LiveRegistersComponent implements OnInit, OnDestroy {
   }
 
   getSaturatedRegistersCount(): number {
-    return this.activeRegisters.filter(reg => reg.expectedAmount >= 5000).length;
+    return this.activeRegisters.filter((reg) => reg.expectedAmount >= 5000).length;
   }
 
   getExpensesSum(expenses: any[] | undefined): number {
@@ -176,27 +176,24 @@ export class LiveRegistersComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
-    this.cashRegisterService.addExpense(
-      this.selectedRegister._id,
-      this.expenseAmount,
-      this.expenseReason,
-      this.expenseType
-    ).subscribe({
-      next: (resp) => {
-        this.loading = false;
-        if (resp.ok) {
-          Swal.fire('Registrado', 'El movimiento de efectivo ha sido cargado exitosamente', 'success');
-          this.loadActiveRegisters();
-          this.expenseAmount = 0;
-          this.expenseReason = '';
-          this.drawerTab = 'summary';
-        }
-      },
-      error: (err) => {
-        this.loading = false;
-        Swal.fire('Error', err.error?.message || 'No se pudo registrar el movimiento', 'error');
-      }
-    });
+    this.cashRegisterService
+      .addExpense(this.selectedRegister._id, this.expenseAmount, this.expenseReason, this.expenseType)
+      .subscribe({
+        next: (resp) => {
+          this.loading = false;
+          if (resp.ok) {
+            Swal.fire('Registrado', 'El movimiento de efectivo ha sido cargado exitosamente', 'success');
+            this.loadActiveRegisters();
+            this.expenseAmount = 0;
+            this.expenseReason = '';
+            this.drawerTab = 'summary';
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          Swal.fire('Error', err.error?.message || 'No se pudo registrar el movimiento', 'error');
+        },
+      });
   }
 
   submitCloseRegister(): void {
@@ -210,26 +207,24 @@ export class LiveRegistersComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Sí, Cerrar Caja',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6'
+      cancelButtonColor: '#3085d6',
     }).then((result) => {
       if (result.isConfirmed) {
         this.loading = true;
-        this.cashRegisterService.closeCashRegister(
-          this.selectedRegister!._id,
-          this.closeActualAmount,
-          this.closeNotes
-        ).subscribe({
-          next: () => {
-            this.loading = false;
-            Swal.fire('Cerrada', 'La caja se ha cerrado y el arqueo ha sido archivado', 'success');
-            this.closeDrawer();
-            this.loadActiveRegisters();
-          },
-          error: (err) => {
-            this.loading = false;
-            Swal.fire('Error', err.error?.message || 'No se pudo cerrar la caja', 'error');
-          }
-        });
+        this.cashRegisterService
+          .closeCashRegister(this.selectedRegister!._id, this.closeActualAmount, this.closeNotes)
+          .subscribe({
+            next: () => {
+              this.loading = false;
+              Swal.fire('Cerrada', 'La caja se ha cerrado y el arqueo ha sido archivado', 'success');
+              this.closeDrawer();
+              this.loadActiveRegisters();
+            },
+            error: (err) => {
+              this.loading = false;
+              Swal.fire('Error', err.error?.message || 'No se pudo cerrar la caja', 'error');
+            },
+          });
       }
     });
   }

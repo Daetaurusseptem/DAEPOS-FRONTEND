@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-success-sale',
   templateUrl: './success-sale.component.html',
-  styleUrls: ['./success-sale.component.css']
+  styleUrls: ['./success-sale.component.css'],
 })
 export class SuccessSaleComponent {
   constructor(private router: Router) {}

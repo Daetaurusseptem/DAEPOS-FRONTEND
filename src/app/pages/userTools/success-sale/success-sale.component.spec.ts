@@ -8,7 +8,7 @@ describe('SuccessSaleComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [SuccessSaleComponent]
+      declarations: [SuccessSaleComponent],
     });
     fixture = TestBed.createComponent(SuccessSaleComponent);
     component = fixture.componentInstance;

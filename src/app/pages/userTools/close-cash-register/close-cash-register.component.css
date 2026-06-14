@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 .container-design {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   color: #0a0a0a;
   background-color: #ffffff;
   min-height: 100vh;
@@ -92,7 +92,8 @@
   margin-bottom: 8px;
 }
 
-.design-input, .design-textarea {
+.design-input,
+.design-textarea {
   width: 100%;
   background: transparent;
   color: #0a0a0a;
@@ -103,7 +104,8 @@
   transition: border-color 0.2s ease;
   box-shadow: none;
 }
-.design-input:focus, .design-textarea:focus {
+.design-input:focus,
+.design-textarea:focus {
   outline: none;
   border-color: #000000;
 }
@@ -125,5 +127,5 @@
 }
 
 .font-mono {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
 }

@@ -9,13 +9,13 @@
   --kds-text-primary: #0a0a0a;
   --kds-text-secondary: #737373;
   --kds-heading: #000000;
-  
-  --kds-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+
+  --kds-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
   --kds-card-radius: 14px;
   --kds-btn-radius: 10px;
   --kds-pill-radius: 9999px;
   --kds-badge-radius: 26px;
-  
+
   /* Semantics */
   --kds-success-bg: #10c22b;
   --kds-success-text: #ffffff;
@@ -33,7 +33,7 @@
   --kds-text-primary: #ffffff;
   --kds-text-secondary: #a1a1a1;
   --kds-heading: #ffffff;
-  --kds-shadow: 0px 1px 3px rgba(255,255,255,0.05);
+  --kds-shadow: 0px 1px 3px rgba(255, 255, 255, 0.05);
 }
 
 .theme-high-contrast {
@@ -62,7 +62,7 @@
   --kds-text-primary: #f8fafc;
   --kds-text-secondary: #94a3b8;
   --kds-heading: #38bdf8; /* Light Sky Blue */
-  --kds-shadow: 0px 4px 6px rgba(0,0,0,0.3);
+  --kds-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .theme-terminal {
@@ -75,7 +75,7 @@
   --kds-text-primary: #00ff00;
   --kds-text-secondary: #00cc00;
   --kds-heading: #00ff00;
-  --kds-shadow: 0 0 8px rgba(0,255,0,0.4);
+  --kds-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
   --kds-success-bg: #00ff00;
   --kds-success-text: #000000;
 }
@@ -84,11 +84,13 @@
   background-color: var(--kds-bg);
   color: var(--kds-text-primary);
   /* Remove min-height: 100vh so it flows with the dashboard, unless fullscreen */
-  min-height: 100%; 
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  font-family: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: var(--font-ui);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* --- FULLSCREEN OVERRIDE --- */
@@ -101,9 +103,27 @@
 }
 
 /* Fallback for prefixed fullscreen pseudoclasses */
-.kds-container:-webkit-full-screen { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow-y: auto; }
-.kds-container:-moz-full-screen { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow-y: auto; }
-.kds-container:-ms-fullscreen { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow-y: auto; }
+.kds-container:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+.kds-container:-moz-full-screen {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+.kds-container:-ms-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
 
 /* --- ENCABEZADO --- */
 .kds-header {
@@ -183,7 +203,9 @@
   gap: 4px;
 }
 
-.btn-theme, .btn-fullscreen, .btn-logout {
+.btn-theme,
+.btn-fullscreen,
+.btn-logout {
   background-color: transparent;
   color: var(--kds-text-primary);
   border: 1px solid var(--kds-border);
@@ -202,7 +224,10 @@
   cursor: not-allowed;
 }
 
-.btn-theme:hover, .btn-fullscreen:hover, .btn-logout:hover, .btn-theme.active {
+.btn-theme:hover,
+.btn-fullscreen:hover,
+.btn-logout:hover,
+.btn-theme.active {
   background-color: var(--kds-surface);
   border-color: var(--kds-border-heavy);
 }
@@ -247,7 +272,9 @@
   display: flex;
   flex-direction: column;
   min-height: 300px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 /* --- ENCABEZADOS DE CARD SEGÚN PLATAFORMA --- */
@@ -531,13 +558,25 @@
 }
 
 @keyframes border-pulse-red {
-  0% { border-color: rgba(194, 43, 16, 0.4); }
-  50% { border-color: rgba(194, 43, 16, 1); }
-  100% { border-color: rgba(194, 43, 16, 0.4); }
+  0% {
+    border-color: rgba(194, 43, 16, 0.4);
+  }
+  50% {
+    border-color: rgba(194, 43, 16, 1);
+  }
+  100% {
+    border-color: rgba(194, 43, 16, 0.4);
+  }
 }
 
 @keyframes float-utensils {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }

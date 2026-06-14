@@ -4,12 +4,12 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StatisticsService {
   private baseUrl = `${environment.apiUrl}/statistics`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getSalesStatistics(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/sales`);
@@ -24,10 +24,7 @@ export class StatisticsService {
   }
 
   getTopSellingProductsByWeek(year: number, week: number, companyId: string, branchId?: string): Observable<any> {
-    let params = new HttpParams()
-      .set('year', year.toString())
-      .set('week', week.toString())
-      .set('companyId', companyId);
+    let params = new HttpParams().set('year', year.toString()).set('week', week.toString()).set('companyId', companyId);
 
     if (branchId) {
       params = params.set('branchId', branchId);
@@ -37,10 +34,7 @@ export class StatisticsService {
   }
 
   getIngredientsStatisticsByWeek(year: number, week: number, companyId: string, branchId?: string): Observable<any> {
-    let params = new HttpParams()
-      .set('year', year.toString())
-      .set('week', week.toString())
-      .set('companyId', companyId);
+    let params = new HttpParams().set('year', year.toString()).set('week', week.toString()).set('companyId', companyId);
 
     if (branchId) {
       params = params.set('branchId', branchId);

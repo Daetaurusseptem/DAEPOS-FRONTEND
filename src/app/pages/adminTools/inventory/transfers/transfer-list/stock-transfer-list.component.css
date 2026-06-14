@@ -1,26 +1,37 @@
 .table thead th {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 700;
-    color: #718096;
-    border-top: none;
-    padding-top: 1.25rem;
-    padding-bottom: 1.25rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #718096;
+  border-top: none;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
 }
 
 .table tbody td {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #edf2f7;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #edf2f7;
 }
 
 .badge-subtle {
-    font-weight: 600;
+  font-weight: 600;
 }
 
-.bg-danger-subtle { background-color: #fff5f5; color: #c53030; }
-.bg-success-subtle { background-color: #f0fff4; color: #2f855a; }
-.bg-info-subtle { background-color: #ebf8ff; color: #2b6cb0; }
+.bg-danger-subtle {
+  background-color: #fff5f5;
+  color: #c53030;
+}
+.bg-success-subtle {
+  background-color: #f0fff4;
+  color: #2f855a;
+}
+.bg-info-subtle {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+}
 
-.text-main { color: #2d3748; }
+.text-main {
+  color: #2d3748;
+}

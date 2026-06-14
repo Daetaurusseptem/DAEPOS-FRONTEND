@@ -1,7 +1,7 @@
 /* CSS Monocromático de Alta Gama para SaaS Control Tower */
 
 .console-title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 800;
   letter-spacing: -0.04em;
   font-size: 1.85rem;
@@ -9,7 +9,7 @@
 }
 
 .console-subtitle {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.9rem;
   color: var(--text-muted);
 }
@@ -29,7 +29,7 @@
 
 .nav-tabs-custom li {
   padding: 12px 4px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -145,12 +145,12 @@
 
 /* Onboarding Setup Steps */
 h4 {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   letter-spacing: 0.05em;
 }
 
 .form-label {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 600;
   font-size: 0.8rem;
   color: var(--text-muted);
@@ -182,7 +182,7 @@ h4 {
   background-color: #0f141c !important;
   border: 1px solid #1c2330 !important;
   color: #e3e6eb !important;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+  font-family: var(--font-mono) !important;
   font-size: 0.72rem !important;
 }
 
@@ -256,9 +256,15 @@ h4 {
 }
 
 @keyframes pulse-color {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .text-light-muted {
@@ -267,7 +273,7 @@ h4 {
 
 /* --- Forensic Modal --- */
 .forensic-card {
-  border: 1px solid rgba(0,0,0,0.05) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
 .forensic-card .card-header {

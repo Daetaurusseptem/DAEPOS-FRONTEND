@@ -1,33 +1,22 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { CashRegisterService } from '../services/cash-register.service';
 import { AuthService } from '../services/auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class CashRegisterGuard implements CanActivate {
+export const cashRegisterGuard: CanActivateFn = () => {
+  const cashRegisterService = inject(CashRegisterService);
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  constructor(
-    private cashRegisterService: CashRegisterService,
-    private authService: AuthService,
-    private router: Router
-  ) {}
-
-  canActivate(): Observable<boolean> | boolean {
-    const userId = this.authService.usuario.id;
-    return this.cashRegisterService.hasOpenCashRegister(userId).pipe(
-      map(hasOpen => {
-        if (hasOpen) {
-          
-          this.router.navigate(['/dashboard/user/home']);
-
-          return false;
-        }
-        return true;
-      })
-    );
-  }
-}
+  const userId = authService.usuario.id;
+  return cashRegisterService.hasOpenCashRegister(userId).pipe(
+    map((hasOpen) => {
+      if (hasOpen) {
+        router.navigate(['/dashboard/user/home']);
+        return false;
+      }
+      return true;
+    }),
+  );
+};

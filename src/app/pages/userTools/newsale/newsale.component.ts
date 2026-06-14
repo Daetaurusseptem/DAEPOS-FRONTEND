@@ -18,11 +18,12 @@ import { SocketService } from 'src/app/services/socket.service';
 import { SupplierService } from 'src/app/services/provider.service';
 import { Subscription } from 'rxjs';
 import { HardwareConnectorService } from 'src/app/services/hardware-connector.service';
+import { LoggerService } from '../../../services/logger.service';
 
 @Component({
   selector: 'app-newsale',
   templateUrl: './newsale.component.html',
-  styleUrls: ['./newsale.component.css']
+  styleUrls: ['./newsale.component.css'],
 })
 export class NewsaleComponent implements OnInit, OnDestroy {
   @ViewChild('keyboardDialog') keyboardDialog!: ElementRef<HTMLDialogElement>;
@@ -71,18 +72,18 @@ export class NewsaleComponent implements OnInit, OnDestroy {
   isNumeric: boolean = false;
   usuario = this.authService.usuario?.name || 'Usuario Desconocido';
   empresa: string = 'CAFETERÍA CAFÉLOT';
-  
+
   branchSettings: any = { enabled: false, enableVirtualKeyboard: false };
   searchCustomerTerm: string = '';
   searchResultsCustomers: any[] = [];
   selectedCustomer: any = null;
   redeemPointsChecked: boolean = false;
   pointsDiscount: number = 0;
-  
+
   couponCode: string = '';
   appliedPromotion: any = null;
   couponDiscount: number = 0;
-  
+
   showQuickRegister: boolean = false;
 
   // --- PROPIEDADES DE ÓRDENES PENDIENTES (FASE 2) ---
@@ -124,7 +125,8 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     private pendingOrderService: PendingOrderService,
     private socketService: SocketService,
     private supplierService: SupplierService,
-    private hardwareConnector: HardwareConnectorService
+    private hardwareConnector: HardwareConnectorService,
+    private logger: LoggerService,
   ) {
     if (this.authService.role == 'user') {
       this.companyId = authService.companyId!;
@@ -144,7 +146,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
           icon: 'warning',
           confirmButtonText: 'Ir a Inicio',
           confirmButtonColor: '#0f172a',
-          allowOutsideClick: false
+          allowOutsideClick: false,
         }).then(() => {
           this.router.navigate(['/dashboard/user']);
         });
@@ -185,12 +187,15 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     }
 
     // Inicializar Formulario de Cobro
-    this.confirmSaleForm = this.fb.group({
-      paymentMethod: ['cash', Validators.required],
-      receivedAmount: [0, [Validators.required, Validators.min(0.01), Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
-      paymentReference: [''],
-      change: [{value: '$0.00', disabled: true}]
-    }, { validators: this.amountValidator.bind(this) });
+    this.confirmSaleForm = this.fb.group(
+      {
+        paymentMethod: ['cash', Validators.required],
+        receivedAmount: [0, [Validators.required, Validators.min(0.01), Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+        paymentReference: [''],
+        change: [{ value: '$0.00', disabled: true }],
+      },
+      { validators: this.amountValidator.bind(this) },
+    );
 
     // Inicializar Formulario de Registro Rápido CRM
     this.registerForm = this.fb.group({
@@ -206,26 +211,30 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       }
       this.calculateChange();
     });
-    
+
     this.confirmSaleForm.get('paymentMethod')?.valueChanges.subscribe((method) => {
       const receivedControl = this.confirmSaleForm.get('receivedAmount');
       const referenceControl = this.confirmSaleForm.get('paymentReference');
-      
+
       if (method === 'cash') {
-        receivedControl?.setValidators([Validators.required, Validators.min(0.01), Validators.pattern(/^\d+(\.\d{1,2})?$/)]);
+        receivedControl?.setValidators([
+          Validators.required,
+          Validators.min(0.01),
+          Validators.pattern(/^\d+(\.\d{1,2})?$/),
+        ]);
         referenceControl?.clearValidators();
       } else {
         receivedControl?.clearValidators();
         referenceControl?.setValidators([Validators.required]);
       }
-      
+
       receivedControl?.updateValueAndValidity();
       referenceControl?.updateValueAndValidity();
       this.calculateChange();
     });
 
     this.searchForm = this.fb.group({
-      search: ['']
+      search: [''],
     });
     this.loadCategories();
     this.loadPendingOrders();
@@ -238,7 +247,9 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         if (res.ok && res.suppliers) {
           this.suppliersList = res.suppliers;
-          const sysSupp = this.suppliersList.find(s => s.name.toLowerCase().includes('ajuste') || s.name.toLowerCase().includes('sistema'));
+          const sysSupp = this.suppliersList.find(
+            (s) => s.name.toLowerCase().includes('ajuste') || s.name.toLowerCase().includes('sistema'),
+          );
           if (sysSupp) {
             this.systemSupplierId = sysSupp._id;
           }
@@ -246,7 +257,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
             this.defaultSupplierId = this.suppliersList[0]._id;
           }
         }
-      }
+      },
     });
   }
 
@@ -257,8 +268,9 @@ export class NewsaleComponent implements OnInit, OnDestroy {
   }
 
   loadCategories(): void {
-    this.categoryService.getCompanyCategories(this.companyId!)
-      .pipe(map(r => r.categories!))
+    this.categoryService
+      .getCompanyCategories(this.companyId!)
+      .pipe(map((r) => r.categories!))
       .subscribe((data: Category[]) => {
         this.categories = data;
         if (this.categories.length > 0) {
@@ -270,25 +282,46 @@ export class NewsaleComponent implements OnInit, OnDestroy {
 
   loadItems(): void {
     if (!this.selectedCategory && !this.search) {
-      this.items = [];
-      this.totalPages = 1;
+      this.inventoryService
+        .getInventoryByCategory('', '', this.currentPage)
+        .subscribe({
+          next: (data) => {
+            this.items = (data.items || []).filter(
+              (item: any) => item.stock > 0 || (item.product && item.product.isComposite),
+            );
+            this.totalPages = data.totalPages || 1;
+          },
+          error: (error) => {
+            console.error('Error fetching items:', error);
+            this.items = [];
+            this.totalPages = 1;
+          },
+        });
       return;
     }
-  
-    this.inventoryService.getInventoryByCategory(this.selectedCategory, this.search, this.currentPage)
-      .pipe(map(r => { console.log('ItemResp: ', r); return r; }))
+
+    this.inventoryService
+      .getInventoryByCategory(this.selectedCategory, this.search, this.currentPage)
+      .pipe(
+        map((r) => {
+          this.logger.log('ItemResp: ', r);
+          return r;
+        }),
+      )
       .subscribe({
         next: (data) => {
-          this.items = (data.items || []).filter((item: any) => item.stock > 0 || (item.product && item.product.isComposite));
+          this.items = (data.items || []).filter(
+            (item: any) => item.stock > 0 || (item.product && item.product.isComposite),
+          );
           this.totalPages = data.totalPages || 1;
         },
         error: (error) => {
           console.error('Error fetching items:', error);
           this.items = [];
           this.totalPages = 1;
-        }
+        },
       });
-  } 
+  }
 
   searchItems(): void {
     this.currentPage = 1;
@@ -333,7 +366,10 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     entry.quantity += 1;
     const basePrice = entry.item.sellingPrice || entry.item.costPrice || 0;
     const sizeModifier = entry.sizeModifier || 0;
-    const modificationsPrice = this.calculateModificationsPrice(entry.exclusiveModification, entry.nonExclusiveModifications);
+    const modificationsPrice = this.calculateModificationsPrice(
+      entry.exclusiveModification,
+      entry.nonExclusiveModifications,
+    );
     entry.total = (basePrice + sizeModifier + modificationsPrice) * entry.quantity;
     this.calculateTotal();
   }
@@ -343,7 +379,10 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       entry.quantity -= 1;
       const basePrice = entry.item.sellingPrice || entry.item.costPrice || 0;
       const sizeModifier = entry.sizeModifier || 0;
-      const modificationsPrice = this.calculateModificationsPrice(entry.exclusiveModification, entry.nonExclusiveModifications);
+      const modificationsPrice = this.calculateModificationsPrice(
+        entry.exclusiveModification,
+        entry.nonExclusiveModifications,
+      );
       entry.total = (basePrice + sizeModifier + modificationsPrice) * entry.quantity;
       this.calculateTotal();
     } else {
@@ -371,18 +410,22 @@ export class NewsaleComponent implements OnInit, OnDestroy {
         toast: true,
         position: 'top-end',
         timer: 4000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
       return;
     }
 
-    const existingItem = this.cart.find(p =>
-      p.item.product?._id === item.product?._id &&
-      this.areVariationsEqual(p, this.selectedExclusiveModification, this.selectedNonExclusiveModifications)
+    const existingItem = this.cart.find(
+      (p) =>
+        p.item.product?._id === item.product?._id &&
+        this.areVariationsEqual(p, this.selectedExclusiveModification, this.selectedNonExclusiveModifications),
     );
 
     const itemPrice = item.sellingPrice || item.costPrice || 0;
-    const modificationsPrice = this.calculateModificationsPrice(this.selectedExclusiveModification, this.selectedNonExclusiveModifications);
+    const modificationsPrice = this.calculateModificationsPrice(
+      this.selectedExclusiveModification,
+      this.selectedNonExclusiveModifications,
+    );
 
     if (existingItem) {
       existingItem.quantity += quantity;
@@ -394,7 +437,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
         total: (itemPrice + modificationsPrice) * quantity,
         exclusiveModification: this.selectedExclusiveModification,
         nonExclusiveModifications: [...this.selectedNonExclusiveModifications],
-        product: (item.product as any)?._id
+        product: (item.product as any)?._id,
       });
     }
     this.calculateTotal();
@@ -411,15 +454,24 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const existingItem = this.cart.find(p =>
-      p.item._id === this.selectedItem._id &&
-      p.sizeName === (this.selectedSize?.name || null) &&
-      this.areVariationsEqual(p, this.selectedExclusiveModification, this.selectedNonExclusiveModifications, this.selectedItemNotes)
+    const existingItem = this.cart.find(
+      (p) =>
+        p.item._id === this.selectedItem._id &&
+        p.sizeName === (this.selectedSize?.name || null) &&
+        this.areVariationsEqual(
+          p,
+          this.selectedExclusiveModification,
+          this.selectedNonExclusiveModifications,
+          this.selectedItemNotes,
+        ),
     );
 
     const basePrice = this.selectedItem.sellingPrice || this.selectedItem.costPrice || 0;
     const sizeModifier = this.selectedSize?.priceModifier || 0;
-    const itemPriceWithModifications = basePrice + sizeModifier + this.calculateModificationsPrice(this.selectedExclusiveModification, this.selectedNonExclusiveModifications);
+    const itemPriceWithModifications =
+      basePrice +
+      sizeModifier +
+      this.calculateModificationsPrice(this.selectedExclusiveModification, this.selectedNonExclusiveModifications);
 
     if (existingItem) {
       existingItem.quantity += this.selectedQuantity;
@@ -434,7 +486,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
         kitchenNotes: this.selectedItemNotes,
         product: this.selectedItem._id,
         sizeName: this.selectedSize?.name || null,
-        sizeModifier: sizeModifier
+        sizeModifier: sizeModifier,
       });
     }
 
@@ -449,7 +501,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     if (exclusive) {
       price += exclusive.extraPrice;
     }
-    nonExclusive.forEach(mod => {
+    nonExclusive.forEach((mod) => {
       price += mod.extraPrice;
     });
     return price;
@@ -459,7 +511,9 @@ export class NewsaleComponent implements OnInit, OnDestroy {
 
   areVariationsEqual(cartItem: any, exclusive: any | null, nonExclusive: any[], notes: string = ''): boolean {
     const sameExclusive = cartItem.exclusiveModification?._id === exclusive?._id;
-    const sameNonExclusive = JSON.stringify((cartItem.nonExclusiveModifications || []).map((mod: any) => mod._id).sort()) === JSON.stringify(nonExclusive.map(mod => mod._id).sort());
+    const sameNonExclusive =
+      JSON.stringify((cartItem.nonExclusiveModifications || []).map((mod: any) => mod._id).sort()) ===
+      JSON.stringify(nonExclusive.map((mod) => mod._id).sort());
     const sameNotes = (cartItem.kitchenNotes || '') === notes;
     return sameExclusive && sameNonExclusive && sameNotes;
   }
@@ -479,7 +533,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
   loadModifications(item: any): void {
     this.selectedItem = item;
     this.selectedItemNotes = '';
-    
+
     // Cargar tamaños si es compuesto y tiene receta con tamaños
     this.availableSizes = [];
     this.selectedSize = null;
@@ -505,11 +559,13 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       this.availableExclusiveModifications.push(this.selectedExclusiveModification);
     }
     this.selectedExclusiveModification = modification;
-    this.availableExclusiveModifications = this.availableExclusiveModifications.filter((mod: any) => mod._id !== modification._id);
+    this.availableExclusiveModifications = this.availableExclusiveModifications.filter(
+      (mod: any) => mod._id !== modification._id,
+    );
   }
 
   addNonExclusiveModification(modification: any): void {
-    const index = this.availableNonExclusiveModifications.findIndex(mod => mod._id === modification._id);
+    const index = this.availableNonExclusiveModifications.findIndex((mod) => mod._id === modification._id);
     if (index !== -1) {
       this.availableNonExclusiveModifications.splice(index, 1);
       this.selectedNonExclusiveModifications.push(modification);
@@ -517,7 +573,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
   }
 
   removeNonExclusiveModification(modification: any): void {
-    const index = this.selectedNonExclusiveModifications.findIndex(mod => mod._id === modification._id);
+    const index = this.selectedNonExclusiveModifications.findIndex((mod) => mod._id === modification._id);
     if (index !== -1) {
       this.selectedNonExclusiveModifications.splice(index, 1);
       this.availableNonExclusiveModifications.push(modification);
@@ -602,7 +658,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       paymentMethod: 'cash',
       receivedAmount: 0,
       paymentReference: '',
-      change: '$0.00'
+      change: '$0.00',
     });
   }
 
@@ -618,12 +674,16 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       discount: this.discount,
       paymentMethod: this.confirmSaleForm.value.paymentMethod,
       paymentReference: this.confirmSaleForm.value.paymentReference,
-      receivedAmount: this.confirmSaleForm.value.paymentMethod === 'cash' ? this.confirmSaleForm.value.receivedAmount : 0,
+      receivedAmount:
+        this.confirmSaleForm.value.paymentMethod === 'cash' ? this.confirmSaleForm.value.receivedAmount : 0,
       change: this.change,
       customerId: this.selectedCustomer ? this.selectedCustomer._id : undefined,
       promotionId: this.appliedPromotion ? this.appliedPromotion._id : undefined,
-      pointsRedeemed: this.selectedCustomer && this.redeemPointsChecked ? Math.floor(this.pointsDiscount / (this.branchSettings.pointsRedeemRate || 0.10)) : 0,
-      productsSold: this.cart.map(entry => ({
+      pointsRedeemed:
+        this.selectedCustomer && this.redeemPointsChecked
+          ? Math.floor(this.pointsDiscount / (this.branchSettings.pointsRedeemRate || 0.1))
+          : 0,
+      productsSold: this.cart.map((entry) => ({
         product: entry.item.product?._id || entry.item._id,
         productName: entry.item.product?.name || entry.item.name,
         quantity: entry.quantity,
@@ -634,9 +694,9 @@ export class NewsaleComponent implements OnInit, OnDestroy {
         modifications: [
           ...(entry.exclusiveModification ? [entry.exclusiveModification] : []),
           ...(entry.nonExclusiveModifications || []),
-          ...(entry.kitchenNotes ? [{ name: entry.kitchenNotes, extraPrice: 0, price: 0 }] : [])
-        ]
-      }))
+          ...(entry.kitchenNotes ? [{ name: entry.kitchenNotes, extraPrice: 0, price: 0 }] : []),
+        ],
+      })),
     };
 
     const proceedWithSaleCreation = () => {
@@ -644,8 +704,9 @@ export class NewsaleComponent implements OnInit, OnDestroy {
         const paymentData = {
           paymentMethod: this.confirmSaleForm.value.paymentMethod,
           paymentReference: saleData.paymentReference,
-          receivedAmount: this.confirmSaleForm.value.paymentMethod === 'cash' ? this.confirmSaleForm.value.receivedAmount : 0,
-          change: this.change
+          receivedAmount:
+            this.confirmSaleForm.value.paymentMethod === 'cash' ? this.confirmSaleForm.value.receivedAmount : 0,
+          change: this.change,
         };
 
         this.pendingOrderService.payAndClosePendingOrder(this.activePendingOrderId, paymentData).subscribe({
@@ -659,13 +720,13 @@ export class NewsaleComponent implements OnInit, OnDestroy {
                 title: 'Abono Registrado',
                 text: 'Pago parcial registrado correctamente.',
                 timer: 2000,
-                showConfirmButton: false
+                showConfirmButton: false,
               });
               this.loadPendingOrders();
               return;
             }
 
-            console.log('Orden pendiente liquidada con éxito', response);
+            this.logger.log('Orden pendiente liquidada con éxito', response);
             const saleObj = response.sale || response;
             this.generarTicket({ ...saleData, _id: saleObj._id, date: saleObj.date });
             this.generarComanda(saleObj._id);
@@ -679,7 +740,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
               title: 'Venta Completada',
               text: 'El ticket pendiente ha sido cobrado con éxito.',
               timer: 2000,
-              showConfirmButton: false
+              showConfirmButton: false,
             });
 
             this.resetPOSState();
@@ -691,16 +752,16 @@ export class NewsaleComponent implements OnInit, OnDestroy {
               icon: 'error',
               title: 'Error de Cobro',
               text: error.error?.error || error.error?.message || 'Ocurrió un error al liquidar el ticket.',
-              confirmButtonColor: '#d33'
+              confirmButtonColor: '#d33',
             });
-          }
+          },
         });
         return;
       }
 
       this.saleService.createSale(saleData).subscribe({
         next: (response: any) => {
-          console.log('Venta creada con éxito', response);
+          this.logger.log('Venta creada con éxito', response);
           this.generarTicket({ ...saleData, _id: response._id, date: response.date });
           this.generarComanda(response._id);
 
@@ -713,7 +774,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
             title: 'Venta Completada',
             text: 'La venta ha sido registrada con éxito.',
             timer: 2000,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
 
           this.resetPOSState();
@@ -724,7 +785,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
               title: 'Límite de Efectivo Excedido',
               text: 'Has superado el límite de seguridad en caja. Por favor, realiza un retiro parcial a la brevedad.',
               confirmButtonText: 'Entendido',
-              confirmButtonColor: '#f8bb86'
+              confirmButtonColor: '#f8bb86',
             });
           }
         },
@@ -734,35 +795,37 @@ export class NewsaleComponent implements OnInit, OnDestroy {
             icon: 'error',
             title: 'Error de Cobro',
             text: error.error?.error || error.error?.message || 'Ocurrió un error al procesar el cobro.',
-            confirmButtonColor: '#d33'
+            confirmButtonColor: '#d33',
           });
-        }
+        },
       });
     };
 
     if (this.confirmSaleForm.value.paymentMethod === 'credit') {
       let paymentSub: Subscription;
-      
+
       const chargeAmount = Math.max(0, this.total - this.discount);
 
       import('sweetalert2').then((Swal) => {
-        Swal.default.fire({
-          title: 'Cobrando en Terminal...',
-          text: `Por favor inserte la tarjeta y cobre $${chargeAmount.toFixed(2)}`,
-          showCancelButton: true,
-          cancelButtonText: 'Cancelar Operación',
-          allowOutsideClick: false,
-          didOpen: () => Swal.default.showLoading(),
-        }).then((result) => {
-          if (result.isDismissed) {
-            if (paymentSub) {
-              paymentSub.unsubscribe();
+        Swal.default
+          .fire({
+            title: 'Cobrando en Terminal...',
+            text: `Por favor inserte la tarjeta y cobre $${chargeAmount.toFixed(2)}`,
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar Operación',
+            allowOutsideClick: false,
+            didOpen: () => Swal.default.showLoading(),
+          })
+          .then((result) => {
+            if (result.isDismissed) {
+              if (paymentSub) {
+                paymentSub.unsubscribe();
+              }
+              Swal.default.fire('Cancelado', 'Operación cancelada por el cajero', 'info');
             }
-            Swal.default.fire('Cancelado', 'Operación cancelada por el cajero', 'info');
-          }
-        });
+          });
 
-        paymentSub = this.hardwareConnector.chargePayment(chargeAmount).subscribe(res => {
+        paymentSub = this.hardwareConnector.chargePayment(chargeAmount).subscribe((res) => {
           if (res.status === 'approved') {
             saleData.paymentReference = res.reference;
             Swal.default.close();
@@ -787,7 +850,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
             this.pendingOrders = res.pendingOrders;
           }
         },
-        error: (err) => console.error('Error al cargar órdenes pendientes', err)
+        error: (err) => console.error('Error al cargar órdenes pendientes', err),
       });
     }
   }
@@ -804,14 +867,18 @@ export class NewsaleComponent implements OnInit, OnDestroy {
   saveAsPendingOrder(): void {
     const branchId = this.authService.branch?._id || this.authService.branch || '';
     const companyId = this.companyId || '';
-    
+
     // Obtener caja abierta
     this.cashRegisterService.hasOpenCashRegister(this.authService.idUsuario).subscribe((hasOpen) => {
       if (!hasOpen) {
-        Swal.fire({ icon: 'error', title: 'Caja Cerrada', text: 'Debes abrir una caja de cobro para registrar tickets.' });
+        Swal.fire({
+          icon: 'error',
+          title: 'Caja Cerrada',
+          text: 'Debes abrir una caja de cobro para registrar tickets.',
+        });
         return;
       }
-      
+
       this.cashRegisterService.getOpenCashRegister(this.authService.idUsuario).subscribe((registerRes: any) => {
         const cashRegisterId = registerRes?.cashRegister?._id || registerRes?._id;
         if (!cashRegisterId) {
@@ -824,22 +891,31 @@ export class NewsaleComponent implements OnInit, OnDestroy {
           clientName: this.clientName,
           type: this.serviceType,
           status: 'pending',
-          inRestaurantDetails: this.serviceType === 'dine_in' ? {
-            guestsCount: this.guestsCount,
-            tableId: this.tableNumber
-          } : undefined,
-          driveThruDetails: this.serviceType === 'drive_thru' ? {
-            carDescription: this.carDescription,
-            licensePlate: this.licensePlate,
-            lane: this.laneNumber
-          } : undefined,
-          deliveryDetails: this.serviceType === 'delivery' ? {
-            platform: this.deliveryPlatform,
-            orderId: this.deliveryOrderId,
-            courierName: this.deliveryCourierName,
-            notes: this.deliveryNotes
-          } : undefined,
-          productsSold: this.cart.map(entry => ({
+          inRestaurantDetails:
+            this.serviceType === 'dine_in'
+              ? {
+                  guestsCount: this.guestsCount,
+                  tableId: this.tableNumber,
+                }
+              : undefined,
+          driveThruDetails:
+            this.serviceType === 'drive_thru'
+              ? {
+                  carDescription: this.carDescription,
+                  licensePlate: this.licensePlate,
+                  lane: this.laneNumber,
+                }
+              : undefined,
+          deliveryDetails:
+            this.serviceType === 'delivery'
+              ? {
+                  platform: this.deliveryPlatform,
+                  orderId: this.deliveryOrderId,
+                  courierName: this.deliveryCourierName,
+                  notes: this.deliveryNotes,
+                }
+              : undefined,
+          productsSold: this.cart.map((entry) => ({
             product: entry.item.product?._id || entry.item._id,
             productName: entry.item.product?.name || entry.item.name,
             quantity: entry.quantity,
@@ -850,8 +926,8 @@ export class NewsaleComponent implements OnInit, OnDestroy {
             modifications: [
               ...(entry.exclusiveModification ? [entry.exclusiveModification] : []),
               ...(entry.nonExclusiveModifications || []),
-              ...(entry.kitchenNotes ? [{ name: entry.kitchenNotes, extraPrice: 0, price: 0 }] : [])
-            ]
+              ...(entry.kitchenNotes ? [{ name: entry.kitchenNotes, extraPrice: 0, price: 0 }] : []),
+            ],
           })),
           total: this.total,
           discount: this.discount,
@@ -860,18 +936,18 @@ export class NewsaleComponent implements OnInit, OnDestroy {
           cashRegister: cashRegisterId,
           customerId: this.selectedCustomer ? this.selectedCustomer._id : undefined,
           promotionId: this.appliedPromotion ? this.appliedPromotion._id : undefined,
-          waiter: this.authService.usuario.id || this.authService.idUsuario
+          waiter: this.authService.usuario.id || this.authService.idUsuario,
         };
 
         if (this.activePendingOrderId) {
           // Filtrar ítems nuevos
-          const newItems = this.cart.filter(entry => !entry.isExisting);
+          const newItems = this.cart.filter((entry) => !entry.isExisting);
           if (newItems.length === 0) {
             Swal.fire({ icon: 'info', title: 'Sin cambios', text: 'No se agregaron productos nuevos.' });
             return;
           }
 
-          const newProductsSold = newItems.map(entry => ({
+          const newProductsSold = newItems.map((entry) => ({
             product: entry.item.product?._id || entry.item._id,
             productName: entry.item.product?.name || entry.item.name,
             quantity: entry.quantity,
@@ -881,37 +957,59 @@ export class NewsaleComponent implements OnInit, OnDestroy {
             sizeName: entry.sizeName,
             modifications: [
               ...(entry.exclusiveModification ? [entry.exclusiveModification] : []),
-              ...(entry.nonExclusiveModifications || [])
-            ]
+              ...(entry.nonExclusiveModifications || []),
+            ],
           }));
 
           const additionalTotal = newItems.reduce((acc, entry) => acc + entry.total, 0);
 
-          this.pendingOrderService.addItemsToPendingOrder(this.activePendingOrderId, { newProductsSold, additionalTotal }).subscribe({
-            next: () => {
-              Swal.fire({ icon: 'success', title: 'Ítems Agregados', text: 'Nuevos productos enviados a cocina.', timer: 1500, showConfirmButton: false });
-              this.resetPOSState();
-              this.loadPendingOrders();
-              this.closePendingOrderModal();
-            },
-            error: (err) => {
-              console.error(err);
-              Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'No se pudieron agregar los ítems.' });
-            }
-          });
+          this.pendingOrderService
+            .addItemsToPendingOrder(this.activePendingOrderId, { newProductsSold, additionalTotal })
+            .subscribe({
+              next: () => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Ítems Agregados',
+                  text: 'Nuevos productos enviados a cocina.',
+                  timer: 1500,
+                  showConfirmButton: false,
+                });
+                this.resetPOSState();
+                this.loadPendingOrders();
+                this.closePendingOrderModal();
+              },
+              error: (err) => {
+                console.error(err);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: err.error?.message || 'No se pudieron agregar los ítems.',
+                });
+              },
+            });
         } else {
           // Crear nueva orden
           this.pendingOrderService.createPendingOrder(orderData).subscribe({
             next: () => {
-              Swal.fire({ icon: 'success', title: 'Orden Guardada', text: 'Comanda abierta con éxito.', timer: 1500, showConfirmButton: false });
+              Swal.fire({
+                icon: 'success',
+                title: 'Orden Guardada',
+                text: 'Comanda abierta con éxito.',
+                timer: 1500,
+                showConfirmButton: false,
+              });
               this.resetPOSState();
               this.loadPendingOrders();
               this.closePendingOrderModal();
             },
             error: (err) => {
               console.error(err);
-              Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'No se pudo guardar la comanda.' });
-            }
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.error?.message || 'No se pudo guardar la comanda.',
+              });
+            },
           });
         }
       });
@@ -928,7 +1026,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
         confirmButtonText: 'Sí, cargar comanda',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#000000',
-        cancelButtonColor: '#d33'
+        cancelButtonColor: '#d33',
       }).then((result) => {
         if (result.isConfirmed) {
           this.performLoadPendingOrder(order);
@@ -946,7 +1044,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     this.clientName = order.clientName || '';
     this.serviceType = order.type || 'dine_in';
     this.activeTab = 'catalog'; // Auto switch back to catalog to see products
-    
+
     if (order.inRestaurantDetails) {
       this.guestsCount = order.inRestaurantDetails.guestsCount || 1;
     }
@@ -974,36 +1072,40 @@ export class NewsaleComponent implements OnInit, OnDestroy {
           _id: productObj._id || prod.product || '',
           product: {
             _id: productObj._id || prod.product || '',
-            name: productObj.name || prod.productName || ''
+            name: productObj.name || prod.productName || '',
           },
           sellingPrice: prod.unitPrice,
           costPrice: prod.unitPrice,
-          name: productObj.name || prod.productName || ''
+          name: productObj.name || prod.productName || '',
         },
         quantity: prod.quantity,
         total: prod.subtotal,
         exclusiveModification: prod.modifications?.find((m: any) => m.isExclusive),
         nonExclusiveModifications: prod.modifications?.filter((m: any) => !m.isExclusive) || [],
         product: productObj._id || prod.product || '',
-        isExisting: true
+        isExisting: true,
       };
     });
 
     this.calculateTotal();
     this.recalculateTotals();
     this.checkoutMode = false;
-    
+
     Swal.fire({
       icon: 'info',
       title: 'Comanda Cargada',
       text: `Mesa/Cliente: ${this.clientName || this.tableNumber || 'Sin Nombre'}. Ya puedes editarla o cobrarla.`,
       timer: 1500,
-      showConfirmButton: false
+      showConfirmButton: false,
     });
   }
 
   cancelActivePendingOrder(): void {
     if (!this.activePendingOrderId) return;
+    
+    const branchSetting = this.authService.branch?.posSettings?.requirePinForRisks;
+    const requirePinForRisks = branchSetting !== undefined ? branchSetting : (this.authService.company?.posSettings?.requirePinForRisks ?? true);
+
     Swal.fire({
       title: '¿Cancelar Comanda?',
       text: '¿Estás seguro de que deseas eliminar o cancelar este ticket abierto?',
@@ -1012,17 +1114,82 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Sí, cancelar comanda',
       cancelButtonText: 'Mantener comanda',
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#000000'
+      cancelButtonColor: '#000000',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.pendingOrderService.cancelPendingOrder(this.activePendingOrderId!).subscribe({
-          next: () => {
-            Swal.fire({ icon: 'success', title: 'Comanda Cancelada', text: 'El ticket abierto fue cancelado.', timer: 1500, showConfirmButton: false });
-            this.resetPOSState();
-            this.loadPendingOrders();
+        if (requirePinForRisks) {
+          this.promptForManagerAuthToCancel();
+        } else {
+          this.executeCancelOrder();
+        }
+      }
+    });
+  }
+
+  promptForManagerAuthToCancel() {
+    Swal.fire({
+      title: 'Autorización Gerencial',
+      html: `
+        <div class="mb-3 text-start">
+          <p class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> La cancelación de comandas enviadas a cocina requiere autorización gerencial.</p>
+        </div>
+        <input id="swal-username" class="swal2-input" placeholder="Usuario o Email Gerencial">
+        <input id="swal-password" class="swal2-input" type="password" placeholder="Contraseña">
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Autorizar Cancelación',
+      cancelButtonText: 'Abortar',
+      confirmButtonColor: '#d33',
+      preConfirm: () => {
+        const username = (document.getElementById('swal-username') as HTMLInputElement).value;
+        const password = (document.getElementById('swal-password') as HTMLInputElement).value;
+        if (!username || !password) {
+          Swal.showValidationMessage('Ingresa usuario y contraseña');
+        }
+        return { username, password };
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const credentials = result.value;
+        Swal.fire({ title: 'Validando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        this.authService.validateAdmin({
+          username: credentials.username,
+          password: credentials.password,
+          companyId: this.companyId || ''
+        }).subscribe({
+          next: (res: any) => {
+            if (res.ok) {
+              this.executeCancelOrder(credentials.username);
+            }
           },
-          error: (err) => console.error(err)
+          error: (err) => {
+            Swal.fire('Denegado', err.error?.msg || 'Credenciales inválidas', 'error').then(() => {
+              this.promptForManagerAuthToCancel();
+            });
+          }
         });
+      }
+    });
+  }
+
+  executeCancelOrder(authorizedBy?: string) {
+    // If authorizedBy is passed, we could theoretically log it, but for now we just proceed with the cancellation API call.
+    this.pendingOrderService.cancelPendingOrder(this.activePendingOrderId!).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Comanda Cancelada',
+          text: authorizedBy ? 'Cancelación autorizada por ' + authorizedBy + '.' : 'El ticket abierto fue cancelado.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        this.resetPOSState();
+        this.loadPendingOrders();
+      },
+      error: (err) => {
+        console.error(err);
+        Swal.fire('Error', 'No se pudo cancelar la orden.', 'error');
       }
     });
   }
@@ -1041,7 +1208,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.customerService.searchCustomers(this.companyId || '', term.trim()).subscribe(resp => {
+    this.customerService.searchCustomers(this.companyId || '', term.trim()).subscribe((resp) => {
       if (resp.ok) {
         this.searchResultsCustomers = resp.customers;
       }
@@ -1076,31 +1243,33 @@ export class NewsaleComponent implements OnInit, OnDestroy {
 
     const branchId = this.authService.branch?._id || this.authService.branch || '';
 
-    this.promotionService.validateDiscountCode(this.companyId || '', this.couponCode.trim(), this.total, branchId).subscribe({
-      next: (resp) => {
-        if (resp.ok && resp.promotion) {
-          this.appliedPromotion = resp.promotion;
-          this.couponCode = '';
-          this.recalculateTotals();
+    this.promotionService
+      .validateDiscountCode(this.companyId || '', this.couponCode.trim(), this.total, branchId)
+      .subscribe({
+        next: (resp) => {
+          if (resp.ok && resp.promotion) {
+            this.appliedPromotion = resp.promotion;
+            this.couponCode = '';
+            this.recalculateTotals();
+            Swal.fire({
+              icon: 'success',
+              title: 'Cupón Aplicado',
+              text: `Código ${resp.promotion.code} aplicado con éxito.`,
+              timer: 1500,
+              showConfirmButton: false,
+            });
+          }
+        },
+        error: (err) => {
+          console.error(err);
           Swal.fire({
-            icon: 'success',
-            title: 'Cupón Aplicado',
-            text: `Código ${resp.promotion.code} aplicado con éxito.`,
-            timer: 1500,
-            showConfirmButton: false
+            icon: 'error',
+            title: 'Cupón Inválido',
+            text: err.error?.message || 'El cupón ingresado no es válido.',
+            confirmButtonColor: '#d33',
           });
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Cupón Inválido',
-          text: err.error?.message || 'El cupón ingresado no es válido.',
-          confirmButtonColor: '#d33'
-        });
-      }
-    });
+        },
+      });
   }
 
   removeCoupon(): void {
@@ -1114,7 +1283,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     let couponDisc = 0;
     if (this.appliedPromotion) {
       const targetCats = this.appliedPromotion.targetCategories || [];
-      
+
       const matchesCategory = (prodSold: any) => {
         if (!targetCats || targetCats.length === 0) {
           return true;
@@ -1153,7 +1322,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     const netForLoyalty = Math.max(0, this.total - this.couponDiscount);
     if (this.selectedCustomer && this.redeemPointsChecked) {
       const maxAllowedDiscount = netForLoyalty * ((this.branchSettings.maxRedemptionPercentage || 100) / 100);
-      const potentialDiscount = this.selectedCustomer.loyaltyPoints * (this.branchSettings.pointsRedeemRate || 0.10);
+      const potentialDiscount = this.selectedCustomer.loyaltyPoints * (this.branchSettings.pointsRedeemRate || 0.1);
       this.pointsDiscount = Math.min(potentialDiscount, maxAllowedDiscount);
     } else {
       this.pointsDiscount = 0;
@@ -1179,7 +1348,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
     this.registerForm.reset({
       name: '',
       phone: '',
-      email: ''
+      email: '',
     });
     this.showQuickRegister = true;
   }
@@ -1205,7 +1374,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
             title: 'Cliente Registrado',
             text: `${resp.customer.name} ha sido seleccionado para la compra.`,
             timer: 1500,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
         }
       },
@@ -1215,9 +1384,9 @@ export class NewsaleComponent implements OnInit, OnDestroy {
           icon: 'error',
           title: 'Error al Registrar',
           text: err.error?.message || 'No se pudo crear el cliente.',
-          confirmButtonColor: '#d33'
+          confirmButtonColor: '#d33',
         });
-      }
+      },
     });
   }
 
@@ -1283,16 +1452,24 @@ Hora: ${new Date(saleData.date || new Date()).toLocaleTimeString()}
 ----------------------------------------
 CANT   PRODUCTO               PRECIO
 ----------------------------------------
-${saleData.productsSold.map((product: any) => `
-${String(product.quantity).padEnd(5)} ${this.shortenText(product.productName, 15).padEnd(15)} $${(product.subtotal).toFixed(2).padStart(8)}
+${saleData.productsSold
+  .map(
+    (product: any) => `
+${String(product.quantity).padEnd(5)} ${this.shortenText(product.productName, 15).padEnd(15)} $${product.subtotal.toFixed(2).padStart(8)}
 ${product.modifications && product.modifications.length > 0 ? `     * ${this.shortenText(product.modifications.map((mod: any) => `${mod.name}`).join(', '), 30)}` : ''}
-`).join('')}
+`,
+  )
+  .join('')}
 ----------------------------------------
 TOTAL:                      $${saleData.total.toFixed(2).padStart(8)}
 DESCUENTO:                  $${saleData.discount.toFixed(2).padStart(8)}
 ----------------------------------------
-${saleData.paymentMethod === 'cash' ? `MONTO RECIBIDO:         $${Number(saleData.receivedAmount).toFixed(2).padStart(8)}
-CAMBIO:                   $${saleData.change.toFixed(2).padStart(8)}` : `REFERENCIA PAGO:       ${saleData.paymentReference || 'N/A'}`}
+${
+  saleData.paymentMethod === 'cash'
+    ? `MONTO RECIBIDO:         $${Number(saleData.receivedAmount).toFixed(2).padStart(8)}
+CAMBIO:                   $${saleData.change.toFixed(2).padStart(8)}`
+    : `REFERENCIA PAGO:       ${saleData.paymentReference || 'N/A'}`
+}
 ========================================
        ¡Gracias por su preferencia!
 ========================================
@@ -1301,11 +1478,11 @@ CAMBIO:                   $${saleData.change.toFixed(2).padStart(8)}` : `REFEREN
     const printer = this.receiptPrinterService.getDefaultPrinter('ticket');
     if (printer) {
       this.receiptPrinterService.printTicket(printer.name, content, printer.paperSize).subscribe({
-        next: (response) => console.log('Ticket enviado a la impresora', response),
-        error: (error) => console.error('Error de ticketera', error)
+        next: (response) => this.logger.log('Ticket enviado a la impresora', response),
+        error: (error) => console.error('Error de ticketera', error),
       });
     } else {
-      console.log('Impresión Simulada (Ticket):\n', content);
+      this.logger.log('Impresión Simulada (Ticket):\n', content);
     }
   }
 
@@ -1320,11 +1497,15 @@ Hora: ${new Date().toLocaleTimeString()}
 ----------------------------------------
 CANT   PRODUCTO
 ----------------------------------------
-${this.cart.map((entry: any) => `
+${this.cart
+  .map(
+    (entry: any) => `
 ${String(entry.quantity).padEnd(5)} ${this.shortenText(entry.item.product?.name || entry.item.name, 25)}
 ${entry.exclusiveModification ? `     * Mod: ${this.shortenText(entry.exclusiveModification.name, 15)}` : ''}
 ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 ? `     * Extras: ${entry.nonExclusiveModifications.map((mod: any) => `${this.shortenText(mod.name, 15)}`).join(', ')}` : ''}
-`).join('')}
+`,
+  )
+  .join('')}
 ----------------------------------------
 ========================================
     `;
@@ -1332,11 +1513,11 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
     const printer = this.receiptPrinterService.getDefaultPrinter('comanda');
     if (printer) {
       this.receiptPrinterService.printTicket(printer.name, content, printer.paperSize).subscribe({
-        next: (response) => console.log('Comanda enviada a la impresora', response),
-        error: (error) => console.error('Error de comandera', error)
+        next: (response) => this.logger.log('Comanda enviada a la impresora', response),
+        error: (error) => console.error('Error de comandera', error),
       });
     } else {
-      console.log('Impresión Simulada (Comanda):\n', content);
+      this.logger.log('Impresión Simulada (Comanda):\n', content);
     }
   }
 
@@ -1373,29 +1554,42 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
 
   getPlatformBorderColor(platform: string): string {
     switch (platform) {
-      case 'uber_eats': return '#10b981';
-      case 'rappi': return '#ff6b35';
-      case 'didi_food': return '#fc3d21';
-      default: return '#6366f1';
+      case 'uber_eats':
+        return '#10b981';
+      case 'rappi':
+        return '#ff6b35';
+      case 'didi_food':
+        return '#fc3d21';
+      default:
+        return '#6366f1';
     }
   }
 
   getPlatformIconColor(platform: string): string {
     switch (platform) {
-      case 'uber_eats': return '#10b981';
-      case 'rappi': return '#ff6b35';
-      case 'didi_food': return '#fc3d21';
-      default: return '#6366f1';
+      case 'uber_eats':
+        return '#10b981';
+      case 'rappi':
+        return '#ff6b35';
+      case 'didi_food':
+        return '#fc3d21';
+      default:
+        return '#6366f1';
     }
   }
 
   getPlatformName(platform: string): string {
     switch (platform) {
-      case 'uber_eats': return 'Uber Eats';
-      case 'rappi': return 'Rappi';
-      case 'didi_food': return 'DiDi Food';
-      case 'phone_order': return 'Teléfono';
-      default: return 'Reparto';
+      case 'uber_eats':
+        return 'Uber Eats';
+      case 'rappi':
+        return 'Rappi';
+      case 'didi_food':
+        return 'DiDi Food';
+      case 'phone_order':
+        return 'Teléfono';
+      default:
+        return 'Reparto';
     }
   }
 
@@ -1407,7 +1601,7 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
           title: 'Entrega Confirmada',
           text: 'Se ha registrado la entrega del pedido.',
           timer: 1500,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         this.loadPendingOrders();
       },
@@ -1416,9 +1610,9 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'No se pudo registrar la entrega del pedido.'
+          text: 'No se pudo registrar la entrega del pedido.',
         });
-      }
+      },
     });
   }
 
@@ -1432,13 +1626,13 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
   quickRestockComposite(item: any) {
     const productId = item.product?._id || item.product;
     const branchId = this.authService.branch?._id || this.authService.branch;
-    
+
     if (!productId || !branchId) return;
 
     Swal.fire({
       title: 'Consultando Insumos...',
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     this.inventoryService.getRecipeStockDetails(productId, branchId).subscribe({
@@ -1446,7 +1640,7 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
         if (resp.ok && resp.ingredients) {
           Swal.close();
           const missingIngredients = resp.ingredients.filter((i: any) => i.currentStock <= 0);
-          
+
           if (missingIngredients.length === 0) {
             Swal.fire('Todo en orden', 'Este producto tiene insumos suficientes.', 'info');
             return;
@@ -1456,36 +1650,56 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
               <label class="form-label fw-bold text-secondary small mb-1">Producto a Recargar</label>
               <div class="p-2 bg-light rounded border text-dark fw-bold">${item.product?.name || item.name}</div>
             </div>
-            <p class="small text-muted text-start mb-3">Estás realizando una <b>Recarga en Corto (Ajuste por Cajero)</b>. Ingresa la cantidad de caja chica de cada insumo agotado.</p>
+            <div class="alert alert-warning bg-warning-soft text-warning border-0 p-2 mb-3 small">
+              <i class="bi bi-info-circle-fill me-1"></i> Este ajuste sumará stock inmediato, pero quedará sujeto a revisión del gerente (Auditoría).
+            </div>
+            <div class="mb-3 text-start">
+              <label class="form-label fw-bold text-secondary small mb-1">Justificación del Ajuste *</label>
+              <textarea id="swal-restock-reason" class="form-control form-control-sm shadow-sm" rows="2" placeholder="Ej. Comprado en OXXO por emergencia, sobrante de caja, etc." required></textarea>
+            </div>
             <div class="table-responsive text-start">
-              <table class="table table-sm align-middle">
+              <table class="table table-sm align-middle mb-0">
                 <thead>
                   <tr class="fs-8 text-muted uppercase">
                     <th>Insumo</th>
-                    <th width="100">Stock</th>
-                    <th width="120">Añadir</th>
+                    <th width="80" class="text-center">Stock</th>
+                    <th width="140" class="text-center">Añadir</th>
                   </tr>
                 </thead>
                 <tbody>`;
 
           missingIngredients.forEach((ing: any, i: number) => {
             formHtml += `<tr>
-                <td class="fw-bold fs-7">${ing.name} <br><small class="text-muted fw-normal">(${ing.measurementUnit})</small></td>
-                <td class="text-danger fw-bold font-monospace">${ing.currentStock}</td>
-                <td><input type="number" id="quick-restock-qty-${i}" class="form-control form-control-sm text-center fw-bold" min="0" value="0"></td>
+                <td class="fw-bold fs-7 lh-sm">${ing.name} <br><small class="text-muted fw-normal">(${ing.measurementUnit})</small></td>
+                <td class="text-danger fw-bold font-monospace text-center">${ing.currentStock}</td>
+                <td>
+                  <div class="d-flex align-items-center justify-content-center gap-0 bg-light px-1 py-1 rounded-pill border border-light-subtle mb-1">
+                    <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-0" style="width: 45px; font-size: 0.75rem; font-weight: 600;" placeholder="Cjs" oninput="let p=this.value; let u=this.nextElementSibling.nextElementSibling.value; if(p&&u) document.getElementById('quick-restock-qty-${i}').value=p*u;">
+                    <span class="text-muted fw-bold mx-1" style="font-size: 0.7rem;">✕</span>
+                    <input type="number" class="form-control form-control-sm text-center border-0 bg-transparent px-0" style="width: 55px; font-size: 0.75rem; font-weight: 600;" placeholder="Cant" oninput="let u=this.value; let p=this.previousElementSibling.previousElementSibling.value; if(p&&u) document.getElementById('quick-restock-qty-${i}').value=p*u;">
+                  </div>
+                  <input type="number" id="quick-restock-qty-${i}" class="form-control form-control-sm text-center fw-bold text-primary shadow-sm w-100" min="0" value="0">
+                </td>
               </tr>`;
           });
 
           formHtml += `</tbody></table></div>`;
 
           Swal.fire({
-            title: 'Recarga Exprés de Insumos',
+            title: 'Ajuste Operativo de Insumos',
             html: formHtml,
             showCancelButton: true,
-            confirmButtonText: 'Confirmar Recarga',
+            confirmButtonText: 'Confirmar Ajuste',
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#0f172a',
             preConfirm: () => {
+              const reasonInput = document.getElementById('swal-restock-reason') as HTMLTextAreaElement;
+              const reason = reasonInput.value.trim();
+              if (!reason) {
+                Swal.showValidationMessage('Debes ingresar una justificación para el ajuste.');
+                return false;
+              }
+
               const itemsToRestock: any[] = [];
               missingIngredients.forEach((ing: any, i: number) => {
                 const qtyInput = document.getElementById(`quick-restock-qty-${i}`) as HTMLInputElement;
@@ -1495,7 +1709,7 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
                     type: 'RawMaterial',
                     itemRef: ing.rawMaterialId,
                     quantity: qty,
-                    costPrice: 0 // Ajuste rápido sin costo reflejado
+                    costPrice: 0,
                   });
                 }
               });
@@ -1504,23 +1718,27 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
                 Swal.showValidationMessage('No ingresaste cantidades para recargar.');
                 return false;
               }
-              return itemsToRestock;
-            }
+              return { items: itemsToRestock, reason };
+            },
           }).then((result) => {
             if (result.isConfirmed && result.value) {
-              const itemsToRestock = result.value;
-              this.processMultipleRestock(itemsToRestock, item.product?.name || item.name, this.companyId!, branchId);
+              const itemsToRestock = result.value.items;
+              const reason = result.value.reason;
+              this.processMultipleRestock(itemsToRestock, item.product?.name || item.name, this.companyId!, branchId, reason);
             }
           });
         }
       },
-      error: () => Swal.fire('Error', 'No se pudieron consultar los insumos.', 'error')
+      error: () => Swal.fire('Error', 'No se pudieron consultar los insumos.', 'error'),
     });
   }
 
-  processMultipleRestock(itemsToRestock: any[], productName: string, companyId: string, branchId: string) {
+  processMultipleRestock(itemsToRestock: any[], productName: string, companyId: string, branchId: string, reason: string = '') {
     const userName = this.authService.usuario?.name || this.authService.usuario?.username || 'Cajero';
-    const targetSupplierId = this.systemSupplierId || this.defaultSupplierId || (this.suppliersList.length > 0 ? this.suppliersList[0]._id : undefined);
+    const targetSupplierId =
+      this.systemSupplierId ||
+      this.defaultSupplierId ||
+      (this.suppliersList.length > 0 ? this.suppliersList[0]._id : undefined);
 
     if (!targetSupplierId) {
       Swal.fire('Error', 'No hay un proveedor de sistema configurado en la sucursal.', 'error');
@@ -1530,7 +1748,7 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
     Swal.fire({
       title: 'Procesando recarga...',
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     const restockData = {
@@ -1540,29 +1758,30 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
       expectedDate: new Date(),
       itemsSummary: `Ajuste Rápido POS de ${itemsToRestock.length} insumo(s) para ${productName}`,
       status: 'pending',
-      notes: `Reabastecimiento directo exprés registrado por el cajero ${userName} (Recarga en Corto).`,
+      notes: reason ? `Ajuste reportado por el cajero ${userName}. Motivo: "${reason}"` : `Reabastecimiento directo exprés registrado por el cajero ${userName} (Recarga en Corto).`,
       isRecurring: false,
       recurrence: 'none',
-      items: itemsToRestock
+      requiresAudit: true,
+      items: itemsToRestock,
     };
 
     this.supplierService.createRestockSchedule(restockData).subscribe({
       next: (createResp: any) => {
         if (createResp.ok && createResp.restock?._id) {
-          this.supplierService.updateRestockStatus(createResp.restock._id, { status: 'completed' }).subscribe({
+          this.supplierService.updateRestockStatus(createResp.restock._id, { status: 'pending_audit' }).subscribe({
             next: (updateResp) => {
               if (updateResp.ok) {
-                Swal.fire('¡Éxito!', 'Los insumos han sido reabastecidos correctamente.', 'success');
+                Swal.fire('¡Éxito!', 'Los insumos se han ajustado correctamente. El ajuste pasará a auditoría operativa.', 'success');
                 this.loadItems();
               } else {
                 Swal.fire('Error', 'No se pudo completar el ajuste de stock.', 'error');
               }
             },
-            error: () => Swal.fire('Error', 'Error completando el stock', 'error')
+            error: () => Swal.fire('Error', 'Error completando el stock', 'error'),
           });
         }
       },
-      error: () => Swal.fire('Error', 'No se pudo generar el reabastecimiento en el servidor.', 'error')
+      error: () => Swal.fire('Error', 'No se pudo generar el reabastecimiento en el servidor.', 'error'),
     });
   }
 
@@ -1581,7 +1800,7 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
             return expStr <= todayStr;
           });
         }
-      }
+      },
     });
   }
 
@@ -1619,13 +1838,13 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
             this.inspectDelivery(r);
           });
         });
-      }
+      },
     });
   }
 
   inspectDelivery(restock: any) {
     const sName = typeof restock.supplier === 'object' ? restock.supplier.name : 'Proveedor';
-    
+
     let itemsToInspect: any[] = [];
     if (restock.items && restock.items.length > 0) {
       itemsToInspect = restock.items;
@@ -1698,21 +1917,22 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
           }
           auditedItems.push({
             type: itemsToInspect[i].type || 'Product',
-            itemRef: typeof itemsToInspect[i].itemRef === 'object' ? itemsToInspect[i].itemRef._id : itemsToInspect[i].itemRef,
+            itemRef:
+              typeof itemsToInspect[i].itemRef === 'object' ? itemsToInspect[i].itemRef._id : itemsToInspect[i].itemRef,
             quantity: qty,
-            costPrice: itemsToInspect[i].costPrice || 0
+            costPrice: itemsToInspect[i].costPrice || 0,
           });
         }
         const payFromRegInput = document.getElementById('pay-from-register') as HTMLInputElement;
         return { items: auditedItems, payFromRegister: payFromRegInput.checked };
-      }
+      },
     }).then((result) => {
       if (result.isConfirmed && result.value) {
         Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const payload = {
           status: 'completed',
           payFromRegister: result.value.payFromRegister,
-          items: result.value.items
+          items: result.value.items,
         };
         this.supplierService.updateRestockStatus(restock._id, payload).subscribe({
           next: (resp: any) => {
@@ -1723,10 +1943,9 @@ ${entry.nonExclusiveModifications && entry.nonExclusiveModifications.length > 0 
           },
           error: (err) => {
             Swal.fire('Error', err.error?.message || 'No se pudo completar la recepción', 'error');
-          }
+          },
         });
       }
     });
   }
-
 }

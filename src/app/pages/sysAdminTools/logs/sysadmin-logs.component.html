@@ -4,7 +4,9 @@
       <h1 class="h3 fw-bold text-dark font-monospace mb-1">
         <i class="bi bi-bug me-2 text-danger"></i> Auditoría de Logs (System Errors)
       </h1>
-      <p class="text-muted font-monospace mb-0" style="font-size: 0.85rem;">Consola de diagnóstico y trazabilidad de fallos a nivel de servidor.</p>
+      <p class="text-muted font-monospace mb-0" style="font-size: 0.85rem">
+        Consola de diagnóstico y trazabilidad de fallos a nivel de servidor.
+      </p>
     </div>
   </div>
 
@@ -13,16 +15,26 @@
     <div class="card-body p-4">
       <div class="row g-2">
         <div class="col-md-3">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">EMPRESA / INQUILINO</label>
-          <select class="form-select font-monospace" [(ngModel)]="filters.companyId" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">EMPRESA / INQUILINO</label>
+          <select
+            class="form-select font-monospace"
+            [(ngModel)]="filters.companyId"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          >
             <option value="">Todas las empresas</option>
             <option *ngFor="let company of companies" [value]="company._id">{{ company.name }}</option>
           </select>
         </div>
-        
+
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">MÉTODO HTTP</label>
-          <select class="form-select font-monospace" [(ngModel)]="filters.method" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">MÉTODO HTTP</label>
+          <select
+            class="form-select font-monospace"
+            [(ngModel)]="filters.method"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          >
             <option value="">Todos</option>
             <option value="GET">GET</option>
             <option value="POST">POST</option>
@@ -32,8 +44,13 @@
         </div>
 
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">STATUS HTTP</label>
-          <select class="form-select font-monospace" [(ngModel)]="filters.status" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">STATUS HTTP</label>
+          <select
+            class="form-select font-monospace"
+            [(ngModel)]="filters.status"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          >
             <option value="">Todos</option>
             <option value="500">500 (Internal Server Error)</option>
             <option value="404">404 (Not Found)</option>
@@ -44,17 +61,34 @@
         </div>
 
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">FECHA INICIO</label>
-          <input type="date" class="form-control font-monospace" [(ngModel)]="filters.startDate" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">FECHA INICIO</label>
+          <input
+            type="date"
+            class="form-control font-monospace"
+            [(ngModel)]="filters.startDate"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          />
         </div>
 
         <div class="col-md-2">
-          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem;">FECHA FIN</label>
-          <input type="date" class="form-control font-monospace" [(ngModel)]="filters.endDate" (change)="onFilterChange()" style="font-size: 0.85rem;">
+          <label class="form-label font-monospace text-muted" style="font-size: 0.75rem">FECHA FIN</label>
+          <input
+            type="date"
+            class="form-control font-monospace"
+            [(ngModel)]="filters.endDate"
+            (change)="onFilterChange()"
+            style="font-size: 0.85rem"
+          />
         </div>
 
         <div class="col-md-1 d-flex align-items-end">
-          <button class="btn btn-light w-100 font-monospace text-muted border px-1" (click)="clearFilters()" style="font-size: 0.75rem;" title="Limpiar filtros">
+          <button
+            class="btn btn-light w-100 font-monospace text-muted border px-1"
+            (click)="clearFilters()"
+            style="font-size: 0.75rem"
+            title="Limpiar filtros"
+          >
             <i class="bi bi-x-circle d-block d-md-none me-1"></i> <span class="d-none d-md-inline">Limpiar</span>
           </button>
         </div>
@@ -68,16 +102,16 @@
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead class="bg-light">
-            <tr class="font-monospace text-muted" style="font-size: 0.75rem;">
-              <th class="ps-4 py-3" style="width: 15%;">TIMESTAMP</th>
-              <th style="width: 15%;">INQUILINO</th>
-              <th style="width: 25%;">ENDPOINT (RUTA)</th>
-              <th style="width: 10%;">STATUS</th>
-              <th style="width: 25%;">MENSAJE DE ERROR</th>
-              <th style="width: 10%;" class="text-center pe-4">ACCIÓN</th>
+            <tr class="font-monospace text-muted" style="font-size: 0.75rem">
+              <th class="ps-4 py-3" style="width: 15%">TIMESTAMP</th>
+              <th style="width: 15%">INQUILINO</th>
+              <th style="width: 25%">ENDPOINT (RUTA)</th>
+              <th style="width: 10%">STATUS</th>
+              <th style="width: 25%">MENSAJE DE ERROR</th>
+              <th style="width: 10%" class="text-center pe-4">ACCIÓN</th>
             </tr>
           </thead>
-          <tbody class="font-monospace" style="font-size: 0.85rem;">
+          <tbody class="font-monospace" style="font-size: 0.85rem">
             <!-- Loading -->
             <tr *ngIf="loading">
               <td colspan="6" class="text-center py-5">
@@ -99,42 +133,53 @@
             <!-- Data Rows -->
             <ng-container *ngIf="!loading">
               <tr *ngFor="let log of logs" class="border-bottom border-light">
-                <td class="ps-4 text-muted" style="font-size: 0.75rem;">{{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-                <td>
-                  <div class="fw-bold text-dark">{{ log.companyId?.name || 'Sistema Core' }}</div>
-                  <div class="text-muted" style="font-size: 0.65rem;">ID: {{ log.companyId?._id || 'N/A' }}</div>
+                <td class="ps-4 text-muted" style="font-size: 0.75rem">
+                  {{ log.timestamp | date: 'dd/MM/yyyy HH:mm:ss' }}
                 </td>
                 <td>
-                  <span class="badge border px-1 py-1 me-2" 
+                  <div class="fw-bold text-dark">{{ log.companyId?.name || 'Sistema Core' }}</div>
+                  <div class="text-muted" style="font-size: 0.65rem">ID: {{ log.companyId?._id || 'N/A' }}</div>
+                </td>
+                <td>
+                  <span
+                    class="badge border px-1 py-1 me-2"
                     [ngClass]="{
                       'border-primary text-primary': log.method === 'GET',
                       'border-success text-success': log.method === 'POST',
                       'border-warning text-warning': log.method === 'PUT',
                       'border-danger text-danger': log.method === 'DELETE',
-                      'border-secondary text-secondary': !log.method
-                    }">
+                      'border-secondary text-secondary': !log.method,
+                    }"
+                  >
                     {{ log.method || 'SYS' }}
                   </span>
                   <span class="text-dark">{{ log.route || 'Internal Task' }}</span>
                 </td>
                 <td>
-                  <span class="badge rounded-pill" 
-                        [ngClass]="{
-                          'bg-danger': log.status >= 500,
-                          'bg-warning text-dark': log.status >= 400 && log.status < 500,
-                          'bg-secondary': !log.status
-                        }">
+                  <span
+                    class="badge rounded-pill"
+                    [ngClass]="{
+                      'bg-danger': log.status >= 500,
+                      'bg-warning text-dark': log.status >= 400 && log.status < 500,
+                      'bg-secondary': !log.status,
+                    }"
+                  >
                     {{ log.status || 'N/A' }}
                   </span>
                 </td>
                 <td>
-                  <div class="text-danger fw-bold text-truncate" style="max-width: 250px;" [title]="log.errorMessage">
+                  <div class="text-danger fw-bold text-truncate" style="max-width: 250px" [title]="log.errorMessage">
                     {{ log.errorMessage }}
                   </div>
                 </td>
                 <td class="text-center pe-4">
-                  <button class="btn btn-sm btn-outline-dark py-1 px-2 font-monospace" style="font-size: 0.75rem;" 
-                          data-bs-toggle="modal" data-bs-target="#inspectLogModal" (click)="openLogModal(log)">
+                  <button
+                    class="btn btn-sm btn-outline-dark py-1 px-2 font-monospace"
+                    style="font-size: 0.75rem"
+                    data-bs-toggle="modal"
+                    data-bs-target="#inspectLogModal"
+                    (click)="openLogModal(log)"
+                  >
                     <i class="bi bi-terminal"></i> Debug
                   </button>
                 </td>
@@ -144,31 +189,42 @@
         </table>
       </div>
     </div>
-    
+
     <!-- Paginación -->
-    <div class="card-footer bg-white border-top border-light py-3 d-flex justify-content-between align-items-center font-monospace" *ngIf="totalPages > 0">
-      <div class="text-muted" style="font-size: 0.8rem;">
-        Mostrando página <strong>{{ page }}</strong> de <strong>{{ totalPages }}</strong> 
+    <div
+      class="card-footer bg-white border-top border-light py-3 d-flex justify-content-between align-items-center font-monospace"
+      *ngIf="totalPages > 0"
+    >
+      <div class="text-muted" style="font-size: 0.8rem">
+        Mostrando página <strong>{{ page }}</strong> de <strong>{{ totalPages }}</strong>
         <span class="mx-2">&bull;</span> {{ total }} resultados totales
       </div>
       <div>
-        <button class="btn btn-sm btn-outline-secondary me-2" [disabled]="page === 1 || loading" (click)="changePage(page - 1)">
+        <button
+          class="btn btn-sm btn-outline-secondary me-2"
+          [disabled]="page === 1 || loading"
+          (click)="changePage(page - 1)"
+        >
           <i class="bi bi-chevron-left"></i> Anterior
         </button>
-        <button class="btn btn-sm btn-outline-secondary" [disabled]="page === totalPages || loading" (click)="changePage(page + 1)">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          [disabled]="page === totalPages || loading"
+          (click)="changePage(page + 1)"
+        >
           Siguiente <i class="bi bi-chevron-right"></i>
         </button>
       </div>
     </div>
   </div>
-
 </div>
 
 <!-- Modal Inspect Log -->
 <div class="modal fade" id="inspectLogModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content border-0 shadow-lg" style="background-color: #1e1e1e;"> <!-- Dark theme para Logs -->
-      <div class="modal-header border-bottom border-secondary px-4 py-3" style="background-color: #252526;">
+    <div class="modal-content border-0 shadow-lg" style="background-color: #1e1e1e">
+      <!-- Dark theme para Logs -->
+      <div class="modal-header border-bottom border-secondary px-4 py-3" style="background-color: #252526">
         <div>
           <h5 class="modal-title fw-bold font-monospace d-flex align-items-center gap-2 text-white mb-1">
             <i class="bi bi-bug text-danger"></i> CONSOLA DE INSPECCIÓN (CRASH DUMP)
@@ -177,26 +233,27 @@
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      
-      <div class="modal-body p-0" style="background-color: #1e1e1e;">
+
+      <div class="modal-body p-0" style="background-color: #1e1e1e">
         <div class="container-fluid p-4" *ngIf="selectedLog">
-          
           <div class="row g-4 mb-4">
             <!-- Metadatos del Error -->
             <div class="col-md-6">
-              <div class="card h-100 border-secondary" style="background-color: #252526;">
-                <div class="card-body font-monospace text-light" style="font-size: 0.85rem;">
+              <div class="card h-100 border-secondary" style="background-color: #252526">
+                <div class="card-body font-monospace text-light" style="font-size: 0.85rem">
                   <div class="mb-3">
-                    <span class="text-secondary d-block" style="font-size: 0.7rem;">TIMESTAMP</span>
-                    <strong class="text-info">{{ selectedLog.timestamp | date:'yyyy-MM-dd HH:mm:ss.SSS' }}</strong>
+                    <span class="text-secondary d-block" style="font-size: 0.7rem">TIMESTAMP</span>
+                    <strong class="text-info">{{ selectedLog.timestamp | date: 'yyyy-MM-dd HH:mm:ss.SSS' }}</strong>
                   </div>
                   <div class="mb-3">
-                    <span class="text-secondary d-block" style="font-size: 0.7rem;">INQUILINO (COMPANY)</span>
-                    <strong class="text-warning">{{ selectedLog.companyId?.name || 'SISTEMA CORE (Sin inquilino)' }}</strong>
-                    <div class="text-secondary" style="font-size: 0.65rem;">{{ selectedLog.companyId?._id }}</div>
+                    <span class="text-secondary d-block" style="font-size: 0.7rem">INQUILINO (COMPANY)</span>
+                    <strong class="text-warning">{{
+                      selectedLog.companyId?.name || 'SISTEMA CORE (Sin inquilino)'
+                    }}</strong>
+                    <div class="text-secondary" style="font-size: 0.65rem">{{ selectedLog.companyId?._id }}</div>
                   </div>
                   <div>
-                    <span class="text-secondary d-block" style="font-size: 0.7rem;">STATUS CODE</span>
+                    <span class="text-secondary d-block" style="font-size: 0.7rem">STATUS CODE</span>
                     <span class="badge" [ngClass]="selectedLog.status >= 500 ? 'bg-danger' : 'bg-warning text-dark'">
                       {{ selectedLog.status || 'NO-HTTP' }}
                     </span>
@@ -207,14 +264,15 @@
 
             <!-- Datos de Request -->
             <div class="col-md-6">
-              <div class="card h-100 border-secondary" style="background-color: #252526;">
-                <div class="card-body font-monospace text-light" style="font-size: 0.85rem;">
+              <div class="card h-100 border-secondary" style="background-color: #252526">
+                <div class="card-body font-monospace text-light" style="font-size: 0.85rem">
                   <div class="mb-3">
-                    <span class="text-secondary d-block" style="font-size: 0.7rem;">ENDPOINT / ROUTE</span>
-                    <strong class="text-success">{{ selectedLog.method || 'SYS' }}</strong> <span class="ms-2 text-white">{{ selectedLog.route || 'Internal Task / Background' }}</span>
+                    <span class="text-secondary d-block" style="font-size: 0.7rem">ENDPOINT / ROUTE</span>
+                    <strong class="text-success">{{ selectedLog.method || 'SYS' }}</strong>
+                    <span class="ms-2 text-white">{{ selectedLog.route || 'Internal Task / Background' }}</span>
                   </div>
                   <div class="mb-3">
-                    <span class="text-secondary d-block" style="font-size: 0.7rem;">ERROR MESSAGE (EXCEPTION)</span>
+                    <span class="text-secondary d-block" style="font-size: 0.7rem">ERROR MESSAGE (EXCEPTION)</span>
                     <div class="text-danger fw-bold border-start border-danger border-3 ps-2 mt-1">
                       {{ selectedLog.errorMessage }}
                     </div>
@@ -225,32 +283,50 @@
           </div>
 
           <!-- Stack Trace -->
-          <div class="card border-secondary mb-4" style="background-color: #252526;">
-            <div class="card-header border-bottom border-secondary d-flex justify-content-between align-items-center py-2">
-              <span class="text-secondary font-monospace" style="font-size: 0.75rem;"><i class="bi bi-code-slash me-1"></i> STACK TRACE</span>
+          <div class="card border-secondary mb-4" style="background-color: #252526">
+            <div
+              class="card-header border-bottom border-secondary d-flex justify-content-between align-items-center py-2"
+            >
+              <span class="text-secondary font-monospace" style="font-size: 0.75rem"
+                ><i class="bi bi-code-slash me-1"></i> STACK TRACE</span
+              >
             </div>
             <div class="card-body p-0">
-              <pre class="m-0 p-3 text-warning font-monospace" style="font-size: 0.75rem; max-height: 400px; overflow-y: auto; white-space: pre-wrap;">{{ selectedLog.stackTrace || 'No stack trace available for this event.' }}</pre>
+              <pre
+                class="m-0 p-3 text-warning font-monospace"
+                style="font-size: 0.75rem; max-height: 400px; overflow-y: auto; white-space: pre-wrap"
+                >{{ selectedLog.stackTrace || 'No stack trace available for this event.' }}</pre
+              >
             </div>
           </div>
 
           <!-- Raw Data Accordion -->
-          <div class="accordion border border-secondary rounded" id="accordionLogRaw" style="background-color: #252526;">
+          <div class="accordion border border-secondary rounded" id="accordionLogRaw" style="background-color: #252526">
             <div class="accordion-item border-0 bg-transparent">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed text-white font-monospace py-3" style="background-color: #2d2d30; box-shadow: none; font-size: 0.85rem;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLogRaw">
+                <button
+                  class="accordion-button collapsed text-white font-monospace py-3"
+                  style="background-color: #2d2d30; box-shadow: none; font-size: 0.85rem"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseLogRaw"
+                >
                   <i class="bi bi-braces text-info me-2"></i> RAW JSON PAYLOAD
                 </button>
               </h2>
               <div id="collapseLogRaw" class="accordion-collapse collapse" data-bs-parent="#accordionLogRaw">
-                <div class="accordion-body p-0" style="background-color: #1e1e1e;">
-                  <pre class="m-0 p-4 text-success font-monospace" style="font-size: 0.75rem; max-height: 500px; overflow-y: auto;">{{ selectedLog | json }}</pre>
+                <div class="accordion-body p-0" style="background-color: #1e1e1e">
+                  <pre
+                    class="m-0 p-4 text-success font-monospace"
+                    style="font-size: 0.75rem; max-height: 500px; overflow-y: auto"
+                    >{{ selectedLog | json }}</pre
+                  >
                 </div>
               </div>
             </div>
           </div>
-
-        </div> <!-- End Contenido -->
+        </div>
+        <!-- End Contenido -->
       </div>
     </div>
   </div>

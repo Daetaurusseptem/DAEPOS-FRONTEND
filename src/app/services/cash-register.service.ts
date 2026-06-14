@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 const baseUrl = environment.apiUrl;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CashRegisterService {
   private url = `${baseUrl}/cash-registers`;
@@ -15,7 +15,7 @@ export class CashRegisterService {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-  ) { }
+  ) {}
 
   // --- Physical Registers ---
   getPhysicalRegisters(companyId: string, branchId?: string) {
@@ -28,7 +28,7 @@ export class CashRegisterService {
 
   // --- Cash Register Sessions (Shifts) ---
   hasOpenCashRegister(userId: string) {
-    return this.http.get<boolean>(`${this.url}/has-open/${userId}`);
+    return this.http.get<boolean>(`${this.url}/has-open/${userId}`, this.authService.headers);
   }
 
   openCashRegister(user: string, physicalRegister: string, initialAmount: number) {
@@ -36,12 +36,32 @@ export class CashRegisterService {
     return this.http.post<any>(`${this.url}/open`, data, this.authService.headers);
   }
 
-  addExpense(id: string, amount: number, reason: string, type: 'withdrawal' | 'expense' = 'expense', depositReference: string = '') {
-    return this.http.post<any>(`${this.url}/expense/${id}`, { amount, reason, type, depositReference }, this.authService.headers);
+  addExpense(
+    id: string,
+    amount: number,
+    reason: string,
+    type: 'withdrawal' | 'expense' = 'expense',
+    depositReference: string = '',
+  ) {
+    return this.http.post<any>(
+      `${this.url}/expense/${id}`,
+      { amount, reason, type, depositReference },
+      this.authService.headers,
+    );
   }
 
-  closeCashRegister(id: string, actualAmount: number, notes: string = '', remanenteFloatAmount: number = 0, depositWithdrawalAmount: number = 0) {
-    return this.http.post<any>(`${this.url}/close/${id}`, { actualAmount, notes, remanenteFloatAmount, depositWithdrawalAmount }, this.authService.headers);
+  closeCashRegister(
+    id: string,
+    actualAmount: number,
+    notes: string = '',
+    remanenteFloatAmount: number = 0,
+    depositWithdrawalAmount: number = 0,
+  ) {
+    return this.http.post<any>(
+      `${this.url}/close/${id}`,
+      { actualAmount, notes, remanenteFloatAmount, depositWithdrawalAmount },
+      this.authService.headers,
+    );
   }
 
   registerCorteX(cajaId: string, user: string, expectedAmount: number) {
@@ -49,11 +69,15 @@ export class CashRegisterService {
   }
 
   verifyDeposit(cajaId: string, expenseId: string, auditStatus: 'verified' | 'rejected') {
-    return this.http.patch<any>(`${this.url}/${cajaId}/expenses/${expenseId}/verify`, { auditStatus }, this.authService.headers);
+    return this.http.patch<any>(
+      `${this.url}/${cajaId}/expenses/${expenseId}/verify`,
+      { auditStatus },
+      this.authService.headers,
+    );
   }
 
   getOpenCashRegister(userId: string) {
-    return this.http.get<any>(`${this.url}/open/${userId}`);
+    return this.http.get<any>(`${this.url}/open/${userId}`, this.authService.headers);
   }
 
   getOpenCashRegisterWithSales(userId: string) {
@@ -76,7 +100,7 @@ export class CashRegisterService {
     let queryParams = '';
     const keys = Object.keys(filters);
     if (keys.length > 0) {
-      queryParams = '?' + keys.map(key => `${key}=${encodeURIComponent(filters[key])}`).join('&');
+      queryParams = '?' + keys.map((key) => `${key}=${encodeURIComponent(filters[key])}`).join('&');
     }
     return this.http.get<any>(`${this.url}/user/${userId}/history${queryParams}`, this.authService.headers);
   }
@@ -90,7 +114,7 @@ export class CashRegisterService {
     let queryParams = '';
     const keys = Object.keys(filters);
     if (keys.length > 0) {
-      queryParams = '?' + keys.map(key => `${key}=${encodeURIComponent(filters[key])}`).join('&');
+      queryParams = '?' + keys.map((key) => `${key}=${encodeURIComponent(filters[key])}`).join('&');
     }
     return this.http.get<any>(`${this.url}/history/branch/${branchId}${queryParams}`, this.authService.headers);
   }

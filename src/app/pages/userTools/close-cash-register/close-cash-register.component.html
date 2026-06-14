@@ -11,7 +11,6 @@
   </div>
 
   <div *ngIf="cashRegister" class="design-card">
-    
     <!-- Header -->
     <div class="design-header">
       <div>
@@ -19,17 +18,18 @@
         <h1 class="design-title">Cerrar Caja</h1>
       </div>
       <div class="text-muted fs-7">
-        <span>Estación: <strong class="text-dark">{{ cashRegister.physicalRegister?.name || 'Estación' }}</strong></span>
+        <span
+          >Estación: <strong class="text-dark">{{ cashRegister.physicalRegister?.name || 'Estación' }}</strong></span
+        >
       </div>
     </div>
 
     <div class="row g-4">
-      
       <!-- Balance Report Panel -->
       <div class="col-12 col-lg-6">
         <div class="design-card-ghost h-100">
           <h3 class="design-subtitle mb-4">Resumen de Ventas</h3>
-          
+
           <div class="design-list">
             <div class="design-list-item">
               <span class="item-label text-muted">Fondo Inicial (+)</span>
@@ -37,58 +37,68 @@
             </div>
             <div class="design-list-item">
               <span class="item-label text-muted">Ventas en Efectivo (+)</span>
-              <strong class="item-value font-mono" style="color: #10c22b;">+ {{ cashSales | currency }}</strong>
+              <strong class="item-value font-mono" style="color: #10c22b" *ngIf="!isBlindClosure">+ {{ cashSales | currency }}</strong>
+              <strong class="item-value font-mono text-muted" *ngIf="isBlindClosure"><i class="bi bi-eye-slash"></i> Oculto</strong>
             </div>
             <div class="design-list-item">
               <span class="item-label text-muted">Gastos / Retiros (–)</span>
-              <strong class="item-value font-mono" style="color: #c22b10;">- {{ totalExpenses | currency }}</strong>
+              <strong class="item-value font-mono" style="color: #c22b10">- {{ totalExpenses | currency }}</strong>
             </div>
             <div class="design-list-item total">
               <span class="item-label">TOTAL ESPERADO EN CAJA</span>
-              <strong class="item-value font-mono">{{ cashRegister.expectedAmount | currency }}</strong>
+              <strong class="item-value font-mono" *ngIf="!isBlindClosure">{{ cashRegister.expectedAmount | currency }}</strong>
+              <strong class="item-value font-mono text-muted" *ngIf="isBlindClosure"><i class="bi bi-eye-slash"></i> (Cierre Ciego)</strong>
             </div>
           </div>
 
           <h4 class="design-subtitle mt-4 mb-3">Otros métodos de pago</h4>
-          <div class="design-list-item" style="border: none; padding: 0; background: transparent; margin-bottom: 8px;">
+          <div class="design-list-item" style="border: none; padding: 0; background: transparent; margin-bottom: 8px">
             <span class="text-muted fs-7">Ventas con Tarjeta de Crédito</span>
-            <span class="font-mono fs-7 fw-semibold text-dark">{{ creditSales | currency }}</span>
+            <span class="font-mono fs-7 fw-semibold text-dark" *ngIf="!isBlindClosure">{{ creditSales | currency }}</span>
+            <span class="font-mono fs-7 text-muted" *ngIf="isBlindClosure"><i class="bi bi-eye-slash"></i> Oculto</span>
           </div>
-          <div class="design-list-item" style="border: none; padding: 0; background: transparent;">
+          <div class="design-list-item" style="border: none; padding: 0; background: transparent">
             <span class="text-muted fs-7">Ventas con Tarjeta de Débito</span>
-            <span class="font-mono fs-7 fw-semibold text-dark">{{ debitSales | currency }}</span>
+            <span class="font-mono fs-7 fw-semibold text-dark" *ngIf="!isBlindClosure">{{ debitSales | currency }}</span>
+            <span class="font-mono fs-7 text-muted" *ngIf="isBlindClosure"><i class="bi bi-eye-slash"></i> Oculto</span>
           </div>
         </div>
       </div>
 
       <!-- Count & Closure Form -->
       <div class="col-12 col-lg-6">
-        <form [formGroup]="closeCashRegisterForm" (ngSubmit)="closeCashRegister()" class="d-flex flex-column h-100 justify-content-between">
+        <form
+          [formGroup]="closeCashRegisterForm"
+          (ngSubmit)="closeCashRegister()"
+          class="d-flex flex-column h-100 justify-content-between"
+        >
           <div>
             <h3 class="design-subtitle mb-4">Datos de Cierre</h3>
-            
+
             <!-- Efectivo Físico Contado -->
             <div class="mb-3">
               <label for="finalAmount" class="design-label">Efectivo Físico Contado ($)</label>
-              <input 
-                type="number" 
-                id="finalAmount" 
-                formControlName="finalAmount" 
+              <input
+                type="number"
+                id="finalAmount"
+                formControlName="finalAmount"
                 class="design-input font-mono"
                 min="0"
-                placeholder="0.00">
+                placeholder="0.00"
+              />
             </div>
 
             <!-- Fondo Remanente dejado en caja -->
             <div class="mb-3">
               <label for="remanenteFloatAmount" class="design-label">Fondo que se Queda en Caja (Cambio) ($)</label>
-              <input 
-                type="number" 
-                id="remanenteFloatAmount" 
-                formControlName="remanenteFloatAmount" 
+              <input
+                type="number"
+                id="remanenteFloatAmount"
+                formControlName="remanenteFloatAmount"
                 class="design-input font-mono"
                 min="0"
-                placeholder="1000.00">
+                placeholder="1000.00"
+              />
             </div>
 
             <!-- Retirado para Bóveda (Auto-calculado) -->
@@ -96,19 +106,22 @@
               <label class="design-label">Retirado para Depósito (Bóveda) ($)</label>
               <div class="design-input d-flex justify-content-between align-items-center bg-light">
                 <span class="text-muted fs-7">Monto Neto a Depositar:</span>
-                <strong class="text-dark font-mono">{{ closeCashRegisterForm.get('depositWithdrawalAmount')?.value | currency }}</strong>
+                <strong class="text-dark font-mono">{{
+                  closeCashRegisterForm.get('depositWithdrawalAmount')?.value | currency
+                }}</strong>
               </div>
             </div>
 
             <!-- Observaciones / Notas -->
             <div class="mb-4">
               <label for="notes" class="design-label">Notas / Observaciones</label>
-              <textarea 
-                id="notes" 
-                formControlName="notes" 
-                class="design-textarea" 
-                rows="3" 
-                placeholder="Escribe alguna anotación..."></textarea>
+              <textarea
+                id="notes"
+                formControlName="notes"
+                class="design-textarea"
+                rows="3"
+                placeholder="Escribe alguna anotación..."
+              ></textarea>
             </div>
           </div>
 
@@ -118,7 +131,6 @@
           </button>
         </form>
       </div>
-
     </div>
   </div>
 </div>

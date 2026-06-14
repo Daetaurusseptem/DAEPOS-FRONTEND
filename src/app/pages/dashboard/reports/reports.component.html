@@ -8,13 +8,28 @@
     <div class="header-actions">
       <!-- Segmented View Toggle (Style macOS/iOS) for Report Type Selection -->
       <div class="segmented-control">
-        <button type="button" class="segmented-btn" [class.active]="reportType === 'commercial'" (click)="setReportType('commercial')">
+        <button
+          type="button"
+          class="segmented-btn"
+          [class.active]="reportType === 'commercial'"
+          (click)="setReportType('commercial')"
+        >
           Comercial
         </button>
-        <button type="button" class="segmented-btn" [class.active]="reportType === 'inventory'" (click)="setReportType('inventory')">
+        <button
+          type="button"
+          class="segmented-btn"
+          [class.active]="reportType === 'inventory'"
+          (click)="setReportType('inventory')"
+        >
           Inventario
         </button>
-        <button type="button" class="segmented-btn" [class.active]="reportType === 'audit'" (click)="setReportType('audit')">
+        <button
+          type="button"
+          class="segmented-btn"
+          [class.active]="reportType === 'audit'"
+          (click)="setReportType('audit')"
+        >
           Auditoría
         </button>
       </div>
@@ -23,7 +38,6 @@
 
   <!-- Rejilla de Tarjetas KPI (Executive Summary if toggled) -->
   <div class="kpi-grid" *ngIf="includeSummary && !loading">
-    
     <!-- Commercial Summary Cards -->
     <ng-container *ngIf="reportType === 'commercial'">
       <!-- Total Ingresos -->
@@ -38,7 +52,7 @@
         </div>
         <div class="kpi-glow"></div>
       </div>
-      
+
       <!-- Costos Ventas -->
       <div class="kpi-card glass-card accent-secondary" *ngIf="includeMargins">
         <div class="kpi-card-inner">
@@ -57,7 +71,7 @@
         <div class="kpi-card-inner">
           <div class="kpi-info">
             <span class="kpi-label">Ganancia Neta Est.</span>
-            <h3 class="kpi-value font-mono">{{ (getCommercialRevenue() - getCommercialCost()) | currency }}</h3>
+            <h3 class="kpi-value font-mono">{{ getCommercialRevenue() - getCommercialCost() | currency }}</h3>
             <span class="kpi-context">Margen bruto est. 48%</span>
           </div>
           <div class="kpi-icon-wrap"><i class="bi bi-graph-up-arrow"></i></div>
@@ -156,7 +170,6 @@
         <div class="kpi-glow"></div>
       </div>
     </ng-container>
-
   </div>
 
   <!-- Rejilla Secundaria: Controles de Búsqueda y Navegación -->
@@ -168,7 +181,11 @@
           <label class="field-label">Sucursal</label>
           <div class="field-input-wrap">
             <i class="bi bi-shop field-icon"></i>
-            <select formControlName="branchId" (change)="onBranchChange($event)" class="field-input select-premium-field">
+            <select
+              formControlName="branchId"
+              (change)="onBranchChange($event)"
+              class="field-input select-premium-field"
+            >
               <option *ngFor="let b of branches" [value]="b._id">{{ b.name }}</option>
             </select>
           </div>
@@ -200,31 +217,31 @@
       <!-- Configuración Modular Inline de Secciones -->
       <div class="modular-switches-inline">
         <label class="checkbox-container-premium">
-          <input type="checkbox" [(ngModel)]="includeSummary" [ngModelOptions]="{standalone: true}">
+          <input type="checkbox" [(ngModel)]="includeSummary" [ngModelOptions]="{ standalone: true }" />
           <span class="checkmark-premium"></span>
           Resumen KPI
         </label>
 
         <label class="checkbox-container-premium">
-          <input type="checkbox" [(ngModel)]="includeDetails" [ngModelOptions]="{standalone: true}">
+          <input type="checkbox" [(ngModel)]="includeDetails" [ngModelOptions]="{ standalone: true }" />
           <span class="checkmark-premium"></span>
           Detalle de Filas
         </label>
 
         <label class="checkbox-container-premium" *ngIf="reportType === 'commercial'">
-          <input type="checkbox" [(ngModel)]="includeMargins" [ngModelOptions]="{standalone: true}">
+          <input type="checkbox" [(ngModel)]="includeMargins" [ngModelOptions]="{ standalone: true }" />
           <span class="checkmark-premium"></span>
           Margen y Costos
         </label>
 
         <label class="checkbox-container-premium" *ngIf="reportType === 'inventory'">
-          <input type="checkbox" [(ngModel)]="includeLowStock" [ngModelOptions]="{standalone: true}">
+          <input type="checkbox" [(ngModel)]="includeLowStock" [ngModelOptions]="{ standalone: true }" />
           <span class="checkmark-premium"></span>
           Stock Crítico
         </label>
 
         <label class="checkbox-container-premium" *ngIf="reportType === 'audit'">
-          <input type="checkbox" [(ngModel)]="includeDiscrepancies" [ngModelOptions]="{standalone: true}">
+          <input type="checkbox" [(ngModel)]="includeDiscrepancies" [ngModelOptions]="{ standalone: true }" />
           <span class="checkmark-premium"></span>
           Diferencias
         </label>
@@ -234,7 +251,6 @@
 
   <!-- Rejilla Principal: Vista Previa y Auditoría -->
   <div class="analytics-layout-grid">
-    
     <!-- Panel Izquierdo: Módulo de Validación y Firmas de Negocio -->
     <div class="chart-section glass-card audit-verification-section">
       <div class="section-header-clean">
@@ -254,7 +270,7 @@
           </div>
           <div class="audit-meta-item">
             <span class="meta-label">Fecha y Hora</span>
-            <span class="meta-value">{{ currentDate | date:'dd/MM/yyyy HH:mm' }}</span>
+            <span class="meta-value">{{ currentDate | date: 'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="audit-meta-item">
             <span class="meta-label">Código Transacción</span>
@@ -262,12 +278,16 @@
           </div>
         </div>
 
-        <hr class="audit-separator">
+        <hr class="audit-separator" />
 
         <!-- Comentario / Notas de Gestión -->
         <div class="audit-notes-field">
           <label class="field-label">Anotaciones y Observaciones del Reporte</label>
-          <textarea [(ngModel)]="reportNotes" class="audit-textarea" placeholder="Escribe aquí observaciones sobre conciliación, análisis de mermas o comentarios para el PDF final..."></textarea>
+          <textarea
+            [(ngModel)]="reportNotes"
+            class="audit-textarea"
+            placeholder="Escribe aquí observaciones sobre conciliación, análisis de mermas o comentarios para el PDF final..."
+          ></textarea>
         </div>
 
         <div class="print-signatures-preview">
@@ -294,7 +314,6 @@
       </div>
 
       <div class="table-container-premium" *ngIf="includeDetails && !loading">
-        
         <!-- Commercial Table -->
         <table class="table-premium" *ngIf="reportType === 'commercial'">
           <thead>
@@ -313,7 +332,10 @@
                 <span class="badge-pill-premium badge-primary">{{ item.totalQuantity | number }}</span>
               </td>
               <td class="text-right font-mono text-highlight" *ngIf="includeMargins">
-                {{ (item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60))) | currency }}
+                {{
+                  item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60))
+                    | currency
+                }}
               </td>
             </tr>
             <tr *ngIf="commercialData.length === 0">
@@ -337,7 +359,9 @@
               <td class="col-num font-mono">{{ i + 1 }}</td>
               <td class="col-name">{{ item.name || item._id }}</td>
               <td class="text-right font-mono">
-                <span class="badge-pill-premium badge-secondary">{{ item.totalStock | number }} {{ item.measurement === 'unit' ? 'u' : item.measurement }}</span>
+                <span class="badge-pill-premium badge-secondary"
+                  >{{ item.totalStock | number }} {{ item.measurement === 'unit' ? 'u' : item.measurement }}</span
+                >
               </td>
               <td class="text-right font-mono" *ngIf="includeLowStock">
                 <span [class.text-danger]="item.totalStock < 3000" [class.text-success]="item.totalStock >= 3000">
@@ -366,10 +390,17 @@
               <td class="col-num font-mono">{{ i + 1 }}</td>
               <td class="col-name">{{ item.user?.name || 'Cajero Demo' }}</td>
               <td class="text-right font-mono text-highlight">{{ item.actualAmount | currency }}</td>
-              <td class="text-right font-mono" *ngIf="includeDiscrepancies"
-                  [class.text-danger]="(item.actualAmount - item.expectedAmount) !== 0"
-                  [class.text-success]="(item.actualAmount - item.expectedAmount) === 0">
-                {{ (item.actualAmount - item.expectedAmount) === 0 ? '0.00' : (item.actualAmount - item.expectedAmount | currency) }}
+              <td
+                class="text-right font-mono"
+                *ngIf="includeDiscrepancies"
+                [class.text-danger]="item.actualAmount - item.expectedAmount !== 0"
+                [class.text-success]="item.actualAmount - item.expectedAmount === 0"
+              >
+                {{
+                  item.actualAmount - item.expectedAmount === 0
+                    ? '0.00'
+                    : (item.actualAmount - item.expectedAmount | currency)
+                }}
               </td>
             </tr>
             <tr *ngIf="auditData.length === 0">
@@ -377,17 +408,13 @@
             </tr>
           </tbody>
         </table>
-
       </div>
 
       <div class="py-5 text-center text-muted" *ngIf="!includeDetails && !loading">
         Detalle desactivado en la estructura modular
       </div>
-
     </div>
-
   </div>
-
 </div>
 
 <!-- Dedicated Print Document Layout (Ultra Cohesive Contabilidad PDF Style) -->
@@ -404,7 +431,7 @@
   <!-- Summary Section (KPIs) -->
   <div class="print-section" *ngIf="includeSummary">
     <h3 class="print-section-title">RESUMEN EJECUTIVO</h3>
-    
+
     <!-- Commercial Summary -->
     <table class="print-summary-table" *ngIf="reportType === 'commercial'">
       <tr>
@@ -415,7 +442,7 @@
       </tr>
       <tr>
         <td *ngIf="includeMargins"><strong>Ganancia Neta Est.:</strong></td>
-        <td *ngIf="includeMargins">{{ (getCommercialRevenue() - getCommercialCost()) | currency }}</td>
+        <td *ngIf="includeMargins">{{ getCommercialRevenue() - getCommercialCost() | currency }}</td>
         <td><strong>Ticket Promedio (AOV):</strong></td>
         <td>{{ getAOV() | currency }}</td>
       </tr>
@@ -457,7 +484,7 @@
   <!-- Detailed Table Section -->
   <div class="print-section" *ngIf="includeDetails">
     <h3 class="print-section-title">DESGLOSE DETALLADO</h3>
-    
+
     <!-- Commercial Table -->
     <table class="print-data-table" *ngIf="reportType === 'commercial'">
       <thead>
@@ -474,8 +501,14 @@
           <td>{{ i + 1 }}</td>
           <td>{{ item.product?.name || 'Desconocido' }}</td>
           <td class="text-right">{{ item.totalQuantity }}</td>
-          <td class="text-right" *ngIf="includeMargins">{{ (item.totalQuantity * (item.product?.costPrice || 60)) | currency }}</td>
-          <td class="text-right" *ngIf="includeMargins">{{ (item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60))) | currency }}</td>
+          <td class="text-right" *ngIf="includeMargins">
+            {{ item.totalQuantity * (item.product?.costPrice || 60) | currency }}
+          </td>
+          <td class="text-right" *ngIf="includeMargins">
+            {{
+              item.totalQuantity * ((item.product?.sellingPrice || 120) - (item.product?.costPrice || 60)) | currency
+            }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -494,8 +527,12 @@
         <tr *ngFor="let item of inventoryData; let i = index">
           <td>{{ i + 1 }}</td>
           <td>{{ item.name || item._id }}</td>
-          <td class="text-right">{{ item.totalStock | number }} {{ item.measurement === 'unit' ? 'u' : item.measurement }}</td>
-          <td class="text-right" *ngIf="includeLowStock">{{ item.totalStock < 3000 ? 'ALERTA REORDEN' : 'ESTABLE' }}</td>
+          <td class="text-right">
+            {{ item.totalStock | number }} {{ item.measurement === 'unit' ? 'u' : item.measurement }}
+          </td>
+          <td class="text-right" *ngIf="includeLowStock">
+            {{ item.totalStock < 3000 ? 'ALERTA REORDEN' : 'ESTABLE' }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -517,7 +554,9 @@
           <td>{{ item.user?.name || 'Cajero Demo' }}</td>
           <td class="text-right">{{ item.expectedAmount | currency }}</td>
           <td class="text-right">{{ item.actualAmount | currency }}</td>
-          <td class="text-right" *ngIf="includeDiscrepancies">{{ (item.actualAmount - item.expectedAmount) | currency }}</td>
+          <td class="text-right" *ngIf="includeDiscrepancies">
+            {{ item.actualAmount - item.expectedAmount | currency }}
+          </td>
         </tr>
       </tbody>
     </table>

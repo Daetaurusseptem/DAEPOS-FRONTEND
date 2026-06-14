@@ -1,21 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReceiptPrinterService {
-  private apiUrl = 'http://localhost:5000'; // Ajusta esta URL según tu configuración
+  private apiUrl = environment.hardwareConnectorUrl;
   private printersKey = 'printers';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   printTicket(printerName: string, content: string, paperSize: string): Observable<any> {
     const payload = {
       printer_name: printerName,
       content: content,
-      paper_size: paperSize
+      paper_size: paperSize,
     };
 
     return this.http.post(`${this.apiUrl}/print`, payload);
@@ -32,12 +33,12 @@ export class ReceiptPrinterService {
 
   getDefaultPrinter(type: 'ticket' | 'comanda'): any | null {
     const printers = this.getPrinters();
-    return printers.find(printer => printer.default && printer.type === type) || null;
+    return printers.find((printer) => printer.default && printer.type === type) || null;
   }
 
   setDefaultPrinter(name: string, type: 'ticket' | 'comanda') {
     const printers = this.getPrinters();
-    printers.forEach(printer => {
+    printers.forEach((printer) => {
       if (printer.name === name && printer.type === type) {
         printer.default = true;
       } else if (printer.type === type) {

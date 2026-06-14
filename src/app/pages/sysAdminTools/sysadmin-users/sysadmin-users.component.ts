@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-sysadmin-users',
   templateUrl: './sysadmin-users.component.html',
-  styleUrls: ['./sysadmin-users.component.css']
+  styleUrls: ['./sysadmin-users.component.css'],
 })
 export class SysadminUsersComponent implements OnInit {
   loading: boolean = true;
@@ -32,7 +32,7 @@ export class SysadminUsersComponent implements OnInit {
         error: (err) => {
           console.error(err);
           this.loading = false;
-        }
+        },
       });
     } else {
       // Endpoint para sysadmins no existe aún, agregaremos una lógica similar.
@@ -44,7 +44,7 @@ export class SysadminUsersComponent implements OnInit {
         error: (err) => {
           console.error(err);
           this.loading = false;
-        }
+        },
       });
     }
   }
@@ -57,14 +57,16 @@ export class SysadminUsersComponent implements OnInit {
   softBlockUser(user: any) {
     const isActivating = user.active === false;
     const actionText = isActivating ? 'Reactivar' : 'Bloquear';
-    
+
     Swal.fire({
       title: `¿${actionText} Usuario?`,
-      text: isActivating ? 'El usuario volverá a tener acceso al sistema.' : 'El usuario perderá acceso a la plataforma (Soft Block).',
+      text: isActivating
+        ? 'El usuario volverá a tener acceso al sistema.'
+        : 'El usuario perderá acceso a la plataforma (Soft Block).',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: `Sí, ${actionText}`,
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         // Asumimos un endpoint para toggle block
@@ -73,7 +75,7 @@ export class SysadminUsersComponent implements OnInit {
             Swal.fire('Éxito', `Usuario ${isActivating ? 'reactivado' : 'bloqueado'}`, 'success');
             this.loadUsers();
           },
-          error: () => Swal.fire('Error', 'No se pudo completar la acción', 'error')
+          error: () => Swal.fire('Error', 'No se pudo completar la acción', 'error'),
         });
       }
     });

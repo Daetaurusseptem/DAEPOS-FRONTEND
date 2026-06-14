@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, of, timeout } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 export interface PrintRequest {
   content: string;
@@ -20,12 +21,12 @@ export interface PaymentResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HardwareConnectorService {
-  private localUrl = 'http://127.0.0.1:5000';
+  private localUrl = environment.hardwareConnectorUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Envía un comando de impresión al Local Connector (Python).
@@ -35,10 +36,10 @@ export class HardwareConnectorService {
     const payload: PrintRequest = { content, printer_type: 'receipt' };
     return this.http.post(`${this.localUrl}/print`, payload).pipe(
       timeout(10000), // 10 segundos de timeout para impresión
-      catchError(error => {
+      catchError((error) => {
         console.error('Error al conectar con la impresora local:', error);
         return of({ status: 'error', message: 'No se pudo conectar al Hardware Connector' });
-      })
+      }),
     );
   }
 
@@ -50,10 +51,10 @@ export class HardwareConnectorService {
     const payload: PaymentRequest = { amount, currency: 'MXN' };
     return this.http.post<PaymentResponse>(`${this.localUrl}/payment/charge`, payload).pipe(
       timeout(60000), // 60 segundos de espera para que el cliente pase la tarjeta
-      catchError(error => {
+      catchError((error) => {
         console.error('Error al conectar con la TPV local:', error);
         return of({ status: 'error', message: 'Tiempo de espera agotado o error de conexión' });
-      })
+      }),
     );
   }
 
@@ -63,10 +64,10 @@ export class HardwareConnectorService {
   openCashDrawer(): Observable<any> {
     return this.http.post(`${this.localUrl}/open-drawer`, {}).pipe(
       timeout(5000), // 5 segundos de timeout
-      catchError(error => {
+      catchError((error) => {
         console.error('Error al intentar abrir el cajón de dinero:', error);
         return of({ status: 'error', message: 'No se pudo conectar al Hardware Connector' });
-      })
+      }),
     );
   }
 }

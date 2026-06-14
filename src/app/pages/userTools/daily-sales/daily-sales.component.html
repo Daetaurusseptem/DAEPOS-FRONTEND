@@ -9,10 +9,13 @@
         <h2 class="design-title">Turno Actual</h2>
         <span class="design-badge-success">Abierto</span>
       </div>
-      
+
       <div>
         <!-- Alerta de Límite de Efectivo -->
-        <div *ngIf="openCashRegisterWithSales.expectedAmount > 5000" class="design-alert-danger animate__animated animate__pulse animate__infinite">
+        <div
+          *ngIf="openCashRegisterWithSales.expectedAmount > 5000"
+          class="design-alert-danger animate__animated animate__pulse animate__infinite"
+        >
           <i class="bi bi-exclamation-triangle-fill fs-5"></i>
           <span>
             <strong>Atención:</strong> El efectivo en caja supera el límite permitido. Realice un retiro de seguridad.
@@ -27,7 +30,9 @@
             </div>
             <div class="text-end">
               <p class="summary-label mb-1">Caja Física</p>
-              <h5 class="fw-semibold fs-6 m-0">{{ openCashRegisterWithSales.physicalRegister?.name || 'No asignada' }}</h5>
+              <h5 class="fw-semibold fs-6 m-0">
+                {{ openCashRegisterWithSales.physicalRegister?.name || 'No asignada' }}
+              </h5>
             </div>
           </div>
         </div>
@@ -51,16 +56,12 @@
         <div class="design-header mb-3 border-0 pb-0">
           <h3 class="design-title">Ventas del Turno</h3>
           <div class="d-flex gap-2">
-            <button (click)="addExpenseUI()" class="btn-ghost-action">
-              Retirar Efectivo
-            </button>
-            <button (click)="generarPDF()" class="btn-ghost-action">
-              Corte X (Parcial)
-            </button>
+            <button (click)="addExpenseUI()" class="btn-ghost-action">Retirar Efectivo</button>
+            <button (click)="generarPDF()" class="btn-ghost-action">Corte X (Parcial)</button>
           </div>
         </div>
 
-        <div *ngIf="openCashRegisterWithSales.sales.length > 0; else noSalesYet" style="overflow-x: auto;">
+        <div *ngIf="openCashRegisterWithSales.sales.length > 0; else noSalesYet" style="overflow-x: auto">
           <table class="design-table">
             <thead>
               <tr>
@@ -72,7 +73,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let sale of openCashRegisterWithSales.sales">
-                <td class="font-mono">{{ sale.date | date:'shortTime' }}</td>
+                <td class="font-mono">{{ sale.date | date: 'shortTime' }}</td>
                 <td class="font-mono">{{ sale.total | currency }}</td>
                 <td>
                   <span class="design-badge-ghost">
@@ -88,7 +89,7 @@
             </tbody>
           </table>
         </div>
-        
+
         <ng-template #noSalesYet>
           <div class="design-card-ghost text-center py-5 mb-4">
             <p class="text-muted m-0">Aún no hay ventas registradas en este turno.</p>
@@ -100,7 +101,7 @@
           <h3 class="design-title">Salidas de Efectivo</h3>
         </div>
 
-        <div *ngIf="openCashRegisterWithSales.expenses.length > 0; else noExpensesYet" style="overflow-x: auto;">
+        <div *ngIf="openCashRegisterWithSales.expenses?.length > 0; else noExpensesYet" style="overflow-x: auto">
           <table class="design-table">
             <thead>
               <tr>
@@ -114,7 +115,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let exp of openCashRegisterWithSales.expenses">
-                <td class="font-mono">{{ exp.timestamp | date:'shortTime' }}</td>
+                <td class="font-mono">{{ exp.timestamp | date: 'shortTime' }}</td>
                 <td>
                   <span [ngClass]="exp.type === 'withdrawal' ? 'design-badge-danger' : 'design-badge-ghost'">
                     {{ exp.type === 'withdrawal' ? 'Retiro Seguridad' : 'Gasto Operación' }}
@@ -129,11 +130,17 @@
                 <td class="text-muted fs-7">{{ exp.reason }}</td>
                 <td>
                   <span *ngIf="exp.type === 'withdrawal'" class="design-badge-ghost">
-                    {{ exp.auditStatus === 'pending' ? 'Pendiente' : exp.auditStatus === 'verified' ? 'Conciliado' : 'Rechazado' }}
+                    {{
+                      exp.auditStatus === 'pending'
+                        ? 'Pendiente'
+                        : exp.auditStatus === 'verified'
+                          ? 'Conciliado'
+                          : 'Rechazado'
+                    }}
                   </span>
                   <span *ngIf="exp.type !== 'withdrawal'" class="text-muted fs-7">N/A</span>
                 </td>
-                <td class="text-end font-mono" style="color: #c22b10;">- {{ exp.amount | currency }}</td>
+                <td class="text-end font-mono" style="color: #c22b10">- {{ exp.amount | currency }}</td>
               </tr>
             </tbody>
           </table>
@@ -145,8 +152,8 @@
           </div>
         </ng-template>
 
-        <div class="mt-5 pt-4 border-top" style="border-color: #e5e5e5 !important;">
-          <button (click)="closeShift()" class="btn-primary-action w-100 py-3" style="font-size: 16px;">
+        <div class="mt-5 pt-4 border-top" style="border-color: #e5e5e5 !important">
+          <button (click)="closeShift()" class="btn-primary-action w-100 py-3" style="font-size: 16px">
             Finalizar Turno (Corte Z)
           </button>
         </div>
@@ -158,9 +165,7 @@
     <div class="design-card text-center py-5 mt-4">
       <h2 class="design-title mb-2">No hay turno activo</h2>
       <p class="text-muted fs-7 mb-4">Debes abrir una caja para comenzar a registrar ventas.</p>
-      <button class="btn-primary-action" routerLink="/dashboard/user" style="width: auto;">
-        Ir a Apertura de Caja
-      </button>
+      <button class="btn-primary-action" routerLink="/dashboard/user" style="width: auto">Ir a Apertura de Caja</button>
     </div>
   </ng-template>
 </div>

@@ -51,7 +51,7 @@ import { ManualPaymentsComponent } from './manual-payments/manual-payments.compo
     SysadminUsersComponent,
     TiersComponent,
     GlobalSettingsComponent,
-    ManualPaymentsComponent
+    ManualPaymentsComponent,
   ],
   imports: [
     CommonModule,
@@ -61,7 +61,7 @@ import { ManualPaymentsComponent } from './manual-payments/manual-payments.compo
     NgSelectModule,
     ComponentsModule,
     AdminToolsModule,
-    NgxPaginationModule
-  ]
+    NgxPaginationModule,
+  ],
 })
-export class SysAdmintoolsModule { }
+export class SysAdmintoolsModule {}

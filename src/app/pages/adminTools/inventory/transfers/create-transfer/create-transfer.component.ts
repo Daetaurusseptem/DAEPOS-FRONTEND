@@ -6,12 +6,13 @@ import { BranchService } from 'src/app/services/branch.service';
 import { ProductService } from 'src/app/services/product.service';
 import { StockTransferService } from 'src/app/services/stock-transfer.service';
 import { InventoryService } from 'src/app/services/inventory.service';
+import { LoggerService } from 'src/app/services/logger.service';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-stock-transfer',
   templateUrl: './create-transfer.component.html',
-  styleUrls: ['./create-transfer.component.css']
+  styleUrls: ['./create-transfer.component.css'],
 })
 export class CreateStockTransferComponent implements OnInit {
   companyId!: string;
@@ -19,13 +20,13 @@ export class CreateStockTransferComponent implements OnInit {
   products: any[] = [];
   availableStock: number = 0;
   loadingStock: boolean = false;
-  
+
   transfer = {
     product: '',
     fromBranch: '',
     toBranch: '',
     quantity: 0,
-    notes: ''
+    notes: '',
   };
 
   submitting = false;
@@ -36,8 +37,9 @@ export class CreateStockTransferComponent implements OnInit {
     private productService: ProductService,
     private transferService: StockTransferService,
     private inventoryService: InventoryService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private logger: LoggerService,
+  ) {}
 
   ngOnInit(): void {
     this.companyId = (this.authService.companyId || this.authService.company?._id) as string;
@@ -51,20 +53,18 @@ export class CreateStockTransferComponent implements OnInit {
   checkStock() {
     if (this.transfer.product && this.transfer.fromBranch) {
       this.loadingStock = true;
-      this.inventoryService.getStockByProductAndBranch(
-        this.transfer.product, 
-        this.transfer.fromBranch, 
-        this.companyId
-      ).subscribe({
-        next: (resp: any) => {
-          this.availableStock = resp.stock || 0;
-          this.loadingStock = false;
-        },
-        error: () => {
-          this.availableStock = 0;
-          this.loadingStock = false;
-        }
-      });
+      this.inventoryService
+        .getStockByProductAndBranch(this.transfer.product, this.transfer.fromBranch, this.companyId)
+        .subscribe({
+          next: (resp: any) => {
+            this.availableStock = resp.stock || 0;
+            this.loadingStock = false;
+          },
+          error: () => {
+            this.availableStock = 0;
+            this.loadingStock = false;
+          },
+        });
     }
   }
 
@@ -73,16 +73,16 @@ export class CreateStockTransferComponent implements OnInit {
     this.branchService.getBranchesByCompany(this.companyId).subscribe({
       next: (resp: any) => {
         if (resp.ok) this.branches = resp.branches;
-      }
+      },
     });
 
     // Cargar Productos
     this.productService.getCompanyProducts(this.companyId).subscribe({
       next: (resp: any) => {
-        console.log('Productos cargados:', resp);
+        this.logger.log('Productos cargados:', resp);
         if (resp.ok) this.products = resp.products || [];
       },
-      error: (err: any) => console.error('Error cargando productos:', err)
+      error: (err: any) => console.error('Error cargando productos:', err),
     });
   }
 
@@ -101,7 +101,7 @@ export class CreateStockTransferComponent implements OnInit {
     const payload = {
       ...this.transfer,
       company: this.companyId,
-      createdBy: this.authService.idUsuario
+      createdBy: this.authService.idUsuario,
     };
 
     this.transferService.createTransfer(payload).subscribe({
@@ -115,7 +115,7 @@ export class CreateStockTransferComponent implements OnInit {
       error: (err: any) => {
         this.submitting = false;
         Swal.fire('Error', err.error.message || 'Error al procesar el traspaso', 'error');
-      }
+      },
     });
   }
 }

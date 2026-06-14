@@ -8,17 +8,16 @@ import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-raw-material-list',
   templateUrl: './raw-material-list.component.html',
-  styleUrls: ['./raw-material-list.component.css']
+  styleUrls: ['./raw-material-list.component.css'],
 })
 export class RawMaterialListComponent implements OnInit {
-
   rawMaterials: RawMaterial[] = [];
 
   constructor(
     private rawMaterialsService: RawMaterialsService,
     private authService: AuthService,
-    private router: Router
-  ) { }
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.loadRawMaterials();
@@ -28,15 +27,16 @@ export class RawMaterialListComponent implements OnInit {
     const companyId = this.authService.companyId || this.authService.company?._id;
     if (!companyId) return;
 
-    this.rawMaterialsService.getCompanyRawMaterials(companyId)
-      .pipe(map(resp => resp.rawMaterials || []))
+    this.rawMaterialsService
+      .getCompanyRawMaterials(companyId)
+      .pipe(map((resp) => resp.rawMaterials || []))
       .subscribe({
         next: (items) => {
           this.rawMaterials = items;
         },
         error: (err) => {
           console.error('Error loading raw materials:', err);
-        }
+        },
       });
   }
 
@@ -57,26 +57,18 @@ export class RawMaterialListComponent implements OnInit {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.rawMaterialsService.deleteRawMaterial(id).subscribe({
           next: () => {
-            this.rawMaterials = this.rawMaterials.filter(item => item._id !== id);
-            Swal.fire(
-              '¡Eliminado!',
-              'El insumo maestro ha sido eliminado.',
-              'success'
-            );
+            this.rawMaterials = this.rawMaterials.filter((item) => item._id !== id);
+            Swal.fire('¡Eliminado!', 'El insumo maestro ha sido eliminado.', 'success');
           },
           error: (error) => {
             console.error('Error eliminando material', error);
-            Swal.fire(
-              'Error',
-              'Hubo un problema al eliminar el insumo.',
-              'error'
-            );
-          }
+            Swal.fire('Error', 'Hubo un problema al eliminar el insumo.', 'error');
+          },
         });
       }
     });

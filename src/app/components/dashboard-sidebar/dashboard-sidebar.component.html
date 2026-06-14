@@ -1,12 +1,13 @@
 <div class="sidebar-container" [class.collapsed]="isCollapsed">
-  
   <!-- Logo y Título -->
   <div class="sidebar-header">
     <a class="logo" title="DaePoint">
-      <img [src]="isCollapsed ? 'assets/svg/DAEPOS_LOGO_solo.svg' : 'assets/svg/DAEPOS_LOGO_WITH_TEXT.svg'" 
-           alt="DaePoint Logo" 
-           class="brand-logo"
-           [class.with-text]="!isCollapsed">
+      <img
+        [src]="isCollapsed ? 'assets/svg/DAEPOS_LOGO_solo.svg' : 'assets/svg/DAEPOS_LOGO_WITH_TEXT.svg'"
+        alt="DaePoint Logo"
+        class="brand-logo"
+        [class.with-text]="!isCollapsed"
+      />
     </a>
   </div>
 
@@ -21,9 +22,9 @@
     <div class="sidebar-section" *ngFor="let menuItem of menuItems">
       <!-- Título Informativo (Solo visible si NO está colapsado) -->
       <div class="sidebar-section-title" *ngIf="!isCollapsed">
-        {{menuItem.title}}
+        {{ menuItem.title }}
       </div>
-      
+
       <!-- Separador visual si está colapsado -->
       <div class="sidebar-separator" *ngIf="isCollapsed"></div>
 
@@ -31,7 +32,7 @@
         <li *ngFor="let item of menuItem.submenu">
           <a [routerLink]="item.url" routerLinkActive="active" class="sidebar-link" [title]="item.title">
             <i [class]="item.icon"></i>
-            <span class="ms-2" *ngIf="!isCollapsed">{{item.title}}</span>
+            <span class="ms-2" *ngIf="!isCollapsed">{{ item.title }}</span>
           </a>
         </li>
       </ul>
@@ -45,5 +46,4 @@
       <span *ngIf="!isCollapsed">LOGOUT</span>
     </a>
   </div>
-  
 </div>

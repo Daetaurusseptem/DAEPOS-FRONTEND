@@ -7,18 +7,17 @@ import { AuthService } from './auth.service';
 import { Recipe } from '../interfaces/models.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RecipesService {
-
   private urlRecipes = `${environment.apiUrl}/recipes`;
 
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-  ) { }
+  ) {}
 
-  createRecipe(recipeData: any, companyId:string): Observable<any> {
+  createRecipe(recipeData: any, companyId: string): Observable<any> {
     return this.http.post<any>(`${this.urlRecipes}/${companyId}`, recipeData);
   }
 
@@ -41,8 +40,6 @@ export class RecipesService {
     return this.http.get<InventoryResponse>(`${this.urlRecipes}/${companyId}`, this.authService.headers);
   }
 
-
-
   deleteRecipe(id: string) {
     return this.http.delete<InventoryResponse>(`${this.urlRecipes}/${id}`, this.authService.headers);
   }
@@ -50,6 +47,4 @@ export class RecipesService {
   updateRecipe(id: string, recipe: Recipe) {
     return this.http.put<InventoryResponse>(`${this.urlRecipes}/update/${id}`, recipe, this.authService.headers);
   }
-
-
 }

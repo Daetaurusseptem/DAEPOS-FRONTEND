@@ -7,10 +7,28 @@
       <div class="row">
         <div class="col-md-4 text-center">
           <div class="image-wrapper p-3 border rounded-4 bg-light mb-3">
-            <img *ngIf="!product.img" src="assets/img/product_placeholder.png" alt="Sin imagen" (click)="abrirModal(product,'productos')" class="img-fluid cursor-pointer" style="max-height: 200px;">
-            <img *ngIf="product.img" [src]="product.img" alt="Imagen del producto" (click)="abrirModal(product,'productos')" class="img-fluid rounded cursor-pointer" style="max-height: 200px;">
+            <img
+              *ngIf="!product.img"
+              src="assets/img/product_placeholder.png"
+              alt="Sin imagen"
+              (click)="abrirModal(product, 'productos')"
+              class="img-fluid cursor-pointer"
+              style="max-height: 200px"
+            />
+            <img
+              *ngIf="product.img"
+              [src]="product.img"
+              alt="Imagen del producto"
+              (click)="abrirModal(product, 'productos')"
+              class="img-fluid rounded cursor-pointer"
+              style="max-height: 200px"
+            />
           </div>
-          <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-4" (click)="abrirModal(product,'productos')">
+          <button
+            type="button"
+            class="btn btn-outline-dark btn-sm rounded-pill px-4"
+            (click)="abrirModal(product, 'productos')"
+          >
             <i class="bi bi-camera me-2"></i>Cambiar Imagen
           </button>
         </div>
@@ -18,33 +36,45 @@
           <!-- Navegación por Pestañas -->
           <ul class="nav nav-tabs mb-4 border-0">
             <li class="nav-item">
-              <a class="nav-link cursor-pointer px-0 me-4" [class.active]="activeTab === 'catalog'" (click)="setTab('catalog')">
+              <a
+                class="nav-link cursor-pointer px-0 me-4"
+                [class.active]="activeTab === 'catalog'"
+                (click)="setTab('catalog')"
+              >
                 Información General
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link cursor-pointer px-0" [class.active]="activeTab === 'inventory'" (click)="setTab('inventory')">
+              <a
+                class="nav-link cursor-pointer px-0"
+                [class.active]="activeTab === 'inventory'"
+                (click)="setTab('inventory')"
+              >
                 Inventario y Precios
               </a>
             </li>
           </ul>
 
           <form [formGroup]="productForm" (ngSubmit)="updateProduct()">
-            
             <!-- PESTAÑA: CATÁLOGO -->
             <div *ngIf="activeTab === 'catalog'" class="animate__animated animate__fadeIn">
               <div class="mb-3">
                 <label for="name" class="form-label">Nombre del producto</label>
-                <input type="text" class="form-control rounded-3" id="name" formControlName="name">
+                <input type="text" class="form-control rounded-3" id="name" formControlName="name" />
               </div>
               <div class="mb-3">
                 <label for="description" class="form-label">Descripción</label>
-                <textarea class="form-control rounded-3" id="description" formControlName="description" rows="3"></textarea>
+                <textarea
+                  class="form-control rounded-3"
+                  id="description"
+                  formControlName="description"
+                  rows="3"
+                ></textarea>
               </div>
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="brand" class="form-label">Marca</label>
-                  <input type="text" class="form-control rounded-3" id="brand" formControlName="brand">
+                  <input type="text" class="form-control rounded-3" id="brand" formControlName="brand" />
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="supplier" class="form-label">Proveedor</label>
@@ -56,19 +86,30 @@
               </div>
               <div class="mb-3">
                 <label for="categories" class="form-label">Categorías</label>
-                <ng-select [items]="Categories" bindLabel="name" bindValue="_id" formControlName="categories" [multiple]="true" class="rounded-3">
+                <ng-select
+                  [items]="Categories"
+                  bindLabel="name"
+                  bindValue="_id"
+                  formControlName="categories"
+                  [multiple]="true"
+                  class="rounded-3"
+                >
                 </ng-select>
               </div>
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label for="isComposite" class="form-label">¿Es un producto compuesto? <i class="bi bi-lock-fill ms-1 small text-muted" title="Inmutable"></i></label>
+                  <label for="isComposite" class="form-label"
+                    >¿Es un producto compuesto? <i class="bi bi-lock-fill ms-1 small text-muted" title="Inmutable"></i
+                  ></label>
                   <select class="form-select rounded-3 bg-light" id="isComposite" formControlName="isComposite">
                     <option [value]="false">No</option>
                     <option [value]="true">Sí</option>
                   </select>
                 </div>
                 <div class="col-md-6 mb-3" *ngIf="isComposite">
-                  <label for="recipe" class="form-label">Receta vinculada <i class="bi bi-lock-fill ms-1 small text-muted" title="Inmutable"></i></label>
+                  <label for="recipe" class="form-label"
+                    >Receta vinculada <i class="bi bi-lock-fill ms-1 small text-muted" title="Inmutable"></i
+                  ></label>
                   <select class="form-select rounded-3 bg-light" id="recipe" formControlName="recipe">
                     <option value="" disabled>Seleccione una receta</option>
                     <option *ngFor="let recipe of recipes" [value]="recipe._id">{{ recipe.name }}</option>
@@ -79,14 +120,18 @@
 
             <!-- PESTAÑA: INVENTARIO -->
             <div *ngIf="activeTab === 'inventory'" class="animate__animated animate__fadeIn">
-              
               <!-- MODO CORPORATIVO: COMPARTIDO DE TODAS LAS SUCURSALES (Para Dueño / Sysadmin) -->
               <div *ngIf="isCompanyAdmin">
-                <div class="alert alert-info border-start border-info border-3 py-3 mb-4 rounded-3 d-flex align-items-center shadow-sm">
+                <div
+                  class="alert alert-info border-start border-info border-3 py-3 mb-4 rounded-3 d-flex align-items-center shadow-sm"
+                >
                   <i class="bi bi-building-gear fs-4 me-3 text-info"></i>
                   <div>
                     <strong class="d-block mb-1">Vista de Control Corporativo (Multi-sucursal)</strong>
-                    <span class="small text-secondary">Estás visualizando las existencias y precios del catálogo unificado en cada una de tus sucursales activas.</span>
+                    <span class="small text-secondary"
+                      >Estás visualizando las existencias y precios del catálogo unificado en cada una de tus sucursales
+                      activas.</span
+                    >
                   </div>
                 </div>
 
@@ -108,7 +153,9 @@
                           <i class="bi bi-shop me-2 text-primary"></i> {{ item.branch?.name || 'Matriz / Desconocido' }}
                         </td>
                         <td>
-                          <code class="font-mono text-secondary small bg-light px-2 py-1 rounded">{{ item.barCode || 'N/A' }}</code>
+                          <code class="font-mono text-secondary small bg-light px-2 py-1 rounded">{{
+                            item.barCode || 'N/A'
+                          }}</code>
                         </td>
                         <td class="text-center text-secondary small">
                           <span class="badge bg-light text-dark border px-2 py-1 text-uppercase">
@@ -143,13 +190,19 @@
                 <div class="row align-items-end">
                   <div class="col-md-8 mb-3">
                     <label for="barCode" class="form-label">Código de Barras</label>
-                    <input type="text" class="form-control rounded-3" id="barCode" formControlName="barCode">
+                    <input type="text" class="form-control rounded-3" id="barCode" formControlName="barCode" />
                   </div>
                   <div class="col-md-4 mb-3">
                     <label for="stock" class="form-label d-flex justify-content-between">
-                      Stock Actual <i class="bi bi-lock-fill small text-muted" title="Inmutable (Ajustar vía movimientos)"></i>
+                      Stock Actual
+                      <i class="bi bi-lock-fill small text-muted" title="Inmutable (Ajustar vía movimientos)"></i>
                     </label>
-                    <input type="number" class="form-control rounded-3 fw-bold bg-light" id="stock" formControlName="stock">
+                    <input
+                      type="number"
+                      class="form-control rounded-3 fw-bold bg-light"
+                      id="stock"
+                      formControlName="stock"
+                    />
                   </div>
                 </div>
 
@@ -158,14 +211,24 @@
                     <label for="costPrice" class="form-label">Precio de Costo</label>
                     <div class="input-group">
                       <span class="input-group-text bg-white border-end-0">$</span>
-                      <input type="number" class="form-control border-start-0 ps-0" id="costPrice" formControlName="costPrice">
+                      <input
+                        type="number"
+                        class="form-control border-start-0 ps-0"
+                        id="costPrice"
+                        formControlName="costPrice"
+                      />
                     </div>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="sellingPrice" class="form-label">Precio de Venta</label>
                     <div class="input-group">
                       <span class="input-group-text bg-white border-end-0 text-dark fw-bold">$</span>
-                      <input type="number" class="form-control border-start-0 ps-0 fw-bold" id="sellingPrice" formControlName="sellingPrice">
+                      <input
+                        type="number"
+                        class="form-control border-start-0 ps-0 fw-bold"
+                        id="sellingPrice"
+                        formControlName="sellingPrice"
+                      />
                     </div>
                   </div>
                 </div>
@@ -187,18 +250,31 @@
                   <div class="row">
                     <div class="col-md-6 mb-0">
                       <label for="receivedDate" class="form-label small">Fecha de Recepción</label>
-                      <input type="date" class="form-control form-control-sm border-0 bg-white" id="receivedDate" formControlName="receivedDate">
+                      <input
+                        type="date"
+                        class="form-control form-control-sm border-0 bg-white"
+                        id="receivedDate"
+                        formControlName="receivedDate"
+                      />
                     </div>
                     <div class="col-md-6 mb-0">
                       <label for="expirationDate" class="form-label small">Fecha de Expiración</label>
-                      <input type="date" class="form-control form-control-sm border-0 bg-white" id="expirationDate" formControlName="expirationDate">
+                      <input
+                        type="date"
+                        class="form-control form-control-sm border-0 bg-white"
+                        id="expirationDate"
+                        formControlName="expirationDate"
+                      />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div *ngIf="productForm.invalid && productForm.touched" class="alert alert-danger mt-3 py-2 small border-0 shadow-sm">
+            <div
+              *ngIf="productForm.invalid && productForm.touched"
+              class="alert alert-danger mt-3 py-2 small border-0 shadow-sm"
+            >
               <i class="bi bi-exclamation-triangle me-2"></i> Verifica los campos requeridos.
             </div>
 

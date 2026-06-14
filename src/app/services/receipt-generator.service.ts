@@ -1,21 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { LoggerService } from './logger.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReceiptGeneratorService {
-  private apiUrl = 'http://localhost:5000'; // Ajusta esta URL según tu configuración
+  private apiUrl = environment.hardwareConnectorUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private logger: LoggerService) {}
 
   printTicket(printerName: string, content: string): Observable<any> {
     const payload = {
       printer_name: printerName,
-      content: content
+      content: content,
     };
-    console.log(payload);
+    this.logger.log(payload);
     return this.http.post(`${this.apiUrl}/print_ticket`, payload);
   }
 

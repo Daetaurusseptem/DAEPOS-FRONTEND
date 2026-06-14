@@ -1,9 +1,9 @@
-<div class="fondo-modal-imagen animate__animated animate__fadeIn animate__faster"
-     [class.oculto]="modalService.ocultarModal">
-
+<div
+  class="fondo-modal-imagen animate__animated animate__fadeIn animate__faster"
+  [class.oculto]="modalService.ocultarModal"
+>
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content animate__animated animate__zoomIn animate__faster">
-      
       <div class="modal-header d-flex justify-content-between align-items-center">
         <h4 class="modal-title m-0">Actualizar Imagen</h4>
         <button type="button" class="btn-close shadow-none" (click)="cerrarModal()" aria-label="Close"></button>
@@ -11,27 +11,28 @@
 
       <div class="modal-body text-center">
         <p class="text-muted small mb-4">Seleccione una fotografía para el registro</p>
-        
+
         <div class="mb-4">
-          <img *ngIf="!imgTemp" [src]="modalService.img" class="img-avatar">
-          <img *ngIf="imgTemp" [src]="imgTemp" class="img-avatar">
+          <img *ngIf="!imgTemp" [src]="modalService.img" class="img-avatar" />
+          <img *ngIf="imgTemp" [src]="imgTemp" class="img-avatar" />
         </div>
 
         <div class="input-group">
-          <input type="file" class="form-control form-control-sm" id="uploadFile"
-                 (change)="cambiarImagen($any($event).target.files[0])">
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            id="uploadFile"
+            (change)="cambiarImagen($any($event).target.files[0])"
+          />
         </div>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-light flex-grow-1" (click)="cerrarModal()">
-          Cancelar
-        </button>
+        <button type="button" class="btn btn-light flex-grow-1" (click)="cerrarModal()">Cancelar</button>
         <button type="button" class="btn btn-primary flex-grow-1 shadow-sm" (click)="subirImagen()">
           Actualizar Foto
         </button>
       </div>
-
     </div>
   </div>
 </div>

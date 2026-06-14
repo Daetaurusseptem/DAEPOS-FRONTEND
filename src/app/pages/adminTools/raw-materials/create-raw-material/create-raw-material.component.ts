@@ -7,23 +7,22 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-create-raw-material',
   templateUrl: './create-raw-material.component.html',
-  styleUrls: ['./create-raw-material.component.css']
+  styleUrls: ['./create-raw-material.component.css'],
 })
 export class CreateRawMaterialComponent implements OnInit {
   newMaterial: RawMaterial = {
     name: '',
     description: '',
-    measurementUnit: 'g'
+    measurementUnit: 'g',
   };
 
   constructor(
     private rawMaterialsService: RawMaterialsService,
     private authService: AuthService,
     private router: Router,
-  ) { }
+  ) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   addRawMaterial() {
     const companyId = this.authService.companyId || this.authService.company?._id;
@@ -35,25 +34,24 @@ export class CreateRawMaterialComponent implements OnInit {
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, añadir',
-      cancelButtonText: 'Cancelar'
-    }).then(result => {
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
       if (result.isConfirmed) {
-        this.rawMaterialsService.createRawMaterial(this.newMaterial, companyId)
-          .subscribe({
-            next: (resp) => {
-              if (resp.ok) {
-                Swal.fire('¡Éxito!', 'Insumo maestro añadido correctamente', 'success').then(() => {
-                  this.router.navigate(['dashboard/admin/raw-materials']);
-                });
-              } else {
-                Swal.fire('Error', resp.message || 'No se pudo añadir el material', 'error');
-              }
-            },
-            error: (error) => {
-              console.error('Error al añadir material:', error);
-              Swal.fire('Error', 'No se pudo añadir el material', 'error');
+        this.rawMaterialsService.createRawMaterial(this.newMaterial, companyId).subscribe({
+          next: (resp) => {
+            if (resp.ok) {
+              Swal.fire('¡Éxito!', 'Insumo maestro añadido correctamente', 'success').then(() => {
+                this.router.navigate(['dashboard/admin/raw-materials']);
+              });
+            } else {
+              Swal.fire('Error', resp.message || 'No se pudo añadir el material', 'error');
             }
-          });
+          },
+          error: (error) => {
+            console.error('Error al añadir material:', error);
+            Swal.fire('Error', 'No se pudo añadir el material', 'error');
+          },
+        });
       }
     });
   }

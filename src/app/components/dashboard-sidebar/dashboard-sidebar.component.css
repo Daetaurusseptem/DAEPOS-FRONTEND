@@ -31,7 +31,6 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-
 .logo {
   display: flex;
   align-items: center;
@@ -43,10 +42,11 @@
   font-weight: 600;
   transition: opacity 0.3s ease;
   width: 100%;
-  letter-spacing: -0.0250em;
+  letter-spacing: -0.025em;
 }
 
-.logo i, .brand-logo {
+.logo i,
+.brand-logo {
   width: 42px;
   height: 42px;
   object-fit: contain;

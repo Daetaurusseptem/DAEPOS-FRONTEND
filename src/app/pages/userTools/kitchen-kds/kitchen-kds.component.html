@@ -6,20 +6,25 @@
       <h1>PANTALLA DE COCINA (KDS)</h1>
       <span class="badge-branch">{{ authService.branch?.name || 'Sucursal' }}</span>
     </div>
-    
+
     <div class="header-right">
       <div class="kds-stats">
         <span class="stat-badge"><i class="fas fa-fire"></i> {{ activeOrders.length }} Activas</span>
         <span class="stat-badge success"><i class="fas fa-check"></i> {{ completedRecentOrders.length }} Listas</span>
       </div>
-      
+
       <!-- Controles de Diseño -->
-      <div class="btn-group" role="group" style="align-items: center; background-color: transparent;">
+      <div class="btn-group" role="group" style="align-items: center; background-color: transparent">
         <button class="btn-theme" (click)="zoomOut()" [disabled]="currentZoomValue <= zoomLevels[0]" title="Alejar">
           <span class="fw-bold fs-5">-</span>
         </button>
-        <span class="fw-bold text-center" style="min-width: 48px; font-size: 0.9rem;">{{ currentZoomValue }}%</span>
-        <button class="btn-theme" (click)="zoomIn()" [disabled]="currentZoomValue >= zoomLevels[zoomLevels.length - 1]" title="Acercar">
+        <span class="fw-bold text-center" style="min-width: 48px; font-size: 0.9rem">{{ currentZoomValue }}%</span>
+        <button
+          class="btn-theme"
+          (click)="zoomIn()"
+          [disabled]="currentZoomValue >= zoomLevels[zoomLevels.length - 1]"
+          title="Acercar"
+        >
           <span class="fw-bold fs-5">+</span>
         </button>
       </div>
@@ -37,27 +42,38 @@
         <span *ngIf="currentTheme === 'blue-dark'"><i class="fas fa-tint me-1"></i> Azul</span>
         <span *ngIf="currentTheme === 'terminal'"><i class="fas fa-terminal me-1"></i> Terminal</span>
       </button>
-      
-      <button class="btn-fullscreen ms-2" (click)="toggleFullscreen()" [title]="isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'">
+
+      <button
+        class="btn-fullscreen ms-2"
+        (click)="toggleFullscreen()"
+        [title]="isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'"
+      >
         <span *ngIf="!isFullscreen"><i class="fas fa-expand me-1"></i> Pantalla Completa</span>
         <span *ngIf="isFullscreen"><i class="fas fa-compress me-1"></i> Ventana</span>
       </button>
-      <button class="btn-logout ms-2" (click)="logout()">
-        <i class="fas fa-sign-out-alt"></i> Salir
-      </button>
+      <button class="btn-logout ms-2" (click)="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
     </div>
   </header>
 
   <!-- Área Principal de Comandas -->
   <main class="kds-workspace">
     <!-- Panel de Alertas de Insumos -->
-    <div class="kds-alert-panel bg-danger text-white p-3 rounded shadow mb-4 d-flex align-items-start animate__animated animate__fadeInDown" *ngIf="depletedCompositeProducts.length > 0">
+    <div
+      class="kds-alert-panel bg-danger text-white p-3 rounded shadow mb-4 d-flex align-items-start animate__animated animate__fadeInDown"
+      *ngIf="depletedCompositeProducts.length > 0"
+    >
       <i class="fas fa-exclamation-triangle fs-3 me-3 mt-1"></i>
       <div>
         <h5 class="fw-bold mb-1">¡ALERTA DE INSUMOS! (Stock Teórico Agotado)</h5>
-        <p class="mb-2 small">Los siguientes productos compuestos no pueden ser preparados debido a falta de ingredientes:</p>
+        <p class="mb-2 small">
+          Los siguientes productos compuestos no pueden ser preparados debido a falta de ingredientes:
+        </p>
         <div class="d-flex flex-wrap gap-2">
-          <span class="badge bg-white text-danger px-3 py-2 fw-bold shadow-sm" style="font-size: 0.9rem; border-radius: 6px;" *ngFor="let item of depletedCompositeProducts">
+          <span
+            class="badge bg-white text-danger px-3 py-2 fw-bold shadow-sm"
+            style="font-size: 0.9rem; border-radius: 6px"
+            *ngFor="let item of depletedCompositeProducts"
+          >
             <i class="fas fa-ban me-1"></i> {{ item.product?.name || item.name }}
           </span>
         </div>
@@ -67,17 +83,19 @@
     <!-- Grid de Comandas Activas -->
     <div class="kds-grid" [ngClass]="'layout-' + currentLayout" *ngIf="activeOrders.length > 0; else emptyState">
       <div class="kds-card" *ngFor="let order of activeOrders" [ngClass]="getOrderAgeAlertClass(order.date)">
-        
         <!-- Cabecera de la Tarjeta (Tipo de Servicio / Delivery App) -->
         <div class="card-header" [ngClass]="getPlatformClass(order)">
           <div class="service-info">
             <span class="service-type">{{ getServiceTypeLabel(order) }}</span>
             <span class="order-number">#{{ order._id.substring(order._id.length - 4).toUpperCase() }}</span>
-            <span *ngIf="order.paymentStatus === 'paid'" class="badge bg-success ms-2 p-1 fw-bold" style="font-size: 0.65rem; border-radius: 4px; border: 1px solid white;">PAGADO</span>
+            <span
+              *ngIf="order.paymentStatus === 'paid'"
+              class="badge bg-success ms-2 p-1 fw-bold"
+              style="font-size: 0.65rem; border-radius: 4px; border: 1px solid white"
+              >PAGADO</span
+            >
           </div>
-          <div class="order-timer">
-            <i class="far fa-clock"></i> {{ getOrderAge(order.date) }} min
-          </div>
+          <div class="order-timer"><i class="far fa-clock"></i> {{ getOrderAge(order.date) }} min</div>
         </div>
 
         <!-- Cuerpo de la Tarjeta (Productos e Indicaciones Especiales) -->
@@ -85,8 +103,12 @@
           <!-- Detalle de Cliente / Mesero -->
           <div class="waiter-meta">
             <span *ngIf="order.waiter"><i class="far fa-user"></i> Mesero: {{ order.waiter.name }}</span>
-            <span *ngIf="order.clientName && order.type !== 'take_away'"><i class="far fa-id-card"></i> {{ order.clientName }}</span>
-            <span *ngIf="order.driveThruDetails?.carDescription"><i class="fas fa-car"></i> {{ order.driveThruDetails.carDescription }}</span>
+            <span *ngIf="order.clientName && order.type !== 'take_away'"
+              ><i class="far fa-id-card"></i> {{ order.clientName }}</span
+            >
+            <span *ngIf="order.driveThruDetails?.carDescription"
+              ><i class="fas fa-car"></i> {{ order.driveThruDetails.carDescription }}</span
+            >
           </div>
 
           <!-- Lista de Platillos a Preparar -->
@@ -96,14 +118,17 @@
                 <span class="item-qty">{{ prod.quantity }}x</span>
                 <span class="item-name">{{ prod.product?.name || prod.productName }}</span>
                 <span *ngIf="prod.sizeName" class="badge-size ms-2">{{ prod.sizeName }}</span>
-                <span *ngIf="prod.status === 'pending_kitchen'" class="badge bg-warning text-dark ms-2 p-1" style="font-size: 0.6rem; border-radius: 4px;">+NUEVO</span>
+                <span
+                  *ngIf="prod.status === 'pending_kitchen'"
+                  class="badge bg-warning text-dark ms-2 p-1"
+                  style="font-size: 0.6rem; border-radius: 4px"
+                  >+NUEVO</span
+                >
               </div>
-              
+
               <!-- Modificaciones y Notas del Platillo -->
               <div class="item-modifications" *ngIf="prod.modifications && prod.modifications.length > 0">
-                <div class="mod-pill" *ngFor="let mod of prod.modifications">
-                  • {{ mod.name }}
-                </div>
+                <div class="mod-pill" *ngFor="let mod of prod.modifications">• {{ mod.name }}</div>
               </div>
             </div>
           </div>
@@ -135,7 +160,9 @@
     </div>
     <div class="recent-list">
       <div class="recent-pill" *ngFor="let order of completedRecentOrders.slice(0, 10)">
-        <span class="pill-title">{{ getServiceTypeLabel(order) }} (#{{ order._id.substring(order._id.length - 4).toUpperCase() }})</span>
+        <span class="pill-title"
+          >{{ getServiceTypeLabel(order) }} (#{{ order._id.substring(order._id.length - 4).toUpperCase() }})</span
+        >
         <button class="btn-undo" (click)="recallOrder(order._id)" title="Regresar a cocina">
           <i class="fas fa-undo"></i> Recuperar
         </button>

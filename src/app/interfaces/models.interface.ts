@@ -1,6 +1,6 @@
 // Interfaces for Angular based on Mongoose models
 
-import { Provider } from "@angular/core";
+import { Provider } from '@angular/core';
 
 export type UserRole = 'admin' | 'user' | 'sysadmin' | 'companyAdmin' | 'kitchen';
 
@@ -72,20 +72,24 @@ export interface Company {
   currentPeriodEnd?: Date | string;
   manualOverride?: boolean;
   planType?: string;
-  planId?: string | { _id: string, name: string };
+  planId?: string | { _id: string; name: string };
   customLimitsOverrides?: {
-      maxBranches?: number;
-      maxUsers?: number;
-      maxActiveRegisters?: number;
-      features?: string[];
+    maxBranches?: number;
+    maxUsers?: number;
+    maxActiveRegisters?: number;
+    features?: string[];
   };
   currentLimits?: {
-      maxBranches?: number;
-      maxUsers?: number;
-      maxActiveRegisters?: number;
-      features?: string[];
+    maxBranches?: number;
+    maxUsers?: number;
+    maxActiveRegisters?: number;
+    features?: string[];
   };
   snapshotExpirationDate?: Date | string;
+  posSettings?: {
+    blindClosure: boolean;
+    requirePinForRisks: boolean;
+  };
 }
 
 export interface Suscription {
@@ -225,61 +229,65 @@ export interface DashboardSummary {
 }
 
 export interface Branch {
-    _id?: string;
-    company: string | Company;
-    name: string;
-    address: string;
-    tel?: string;
-    email?: string;
-    manager?: string | User;
-    saleType?: 'retail' | 'hospitality';
-    loyaltySettings?: {
-        enabled: boolean;
-        identifierType: 'phone' | 'physical_card' | 'both';
-        pointsEarnRate: number;
-        pointsRedeemRate: number;
-        maxRedemptionPercentage: number;
-    };
-    kitchenSettings?: {
-        enableKitchenModule: boolean;
-        bypassKitchenDoubleCheck: boolean;
-    };
-    shiftSettings?: {
-        maxShiftDurationHours: number;
-    };
-    createdAt?: Date;
-    isActive?: boolean;
-    enableVirtualKeyboard?: boolean;
+  _id?: string;
+  company: string | Company;
+  name: string;
+  address: string;
+  tel?: string;
+  email?: string;
+  manager?: string | User;
+  saleType?: 'retail' | 'hospitality';
+  loyaltySettings?: {
+    enabled: boolean;
+    identifierType: 'phone' | 'physical_card' | 'both';
+    pointsEarnRate: number;
+    pointsRedeemRate: number;
+    maxRedemptionPercentage: number;
+  };
+  kitchenSettings?: {
+    enableKitchenModule: boolean;
+    bypassKitchenDoubleCheck: boolean;
+  };
+  shiftSettings?: {
+    maxShiftDurationHours: number;
+  };
+  posSettings?: {
+    blindClosure: boolean;
+    requirePinForRisks: boolean;
+  };
+  createdAt?: Date;
+  isActive?: boolean;
+  enableVirtualKeyboard?: boolean;
 }
 
 export interface Customer {
-    _id?: string;
-    company: string;
-    name: string;
-    email?: string;
-    phone?: string;
-    cardNumber?: string;
-    loyaltyPoints: number;
-    tier: 'bronze' | 'silver' | 'gold';
-    totalSpent: number;
-    salesCount: number;
-    isActive: boolean;
-    createdAt?: Date;
+  _id?: string;
+  company: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  cardNumber?: string;
+  loyaltyPoints: number;
+  tier: 'bronze' | 'silver' | 'gold';
+  totalSpent: number;
+  salesCount: number;
+  isActive: boolean;
+  createdAt?: Date;
 }
 
 export interface Promotion {
-    _id?: string;
-    company: string;
-    code: string;
-    description: string;
-    type: 'percentage' | 'fixed_amount';
-    value: number;
-    minPurchaseAmount: number;
-    startDate: Date | string;
-    endDate: Date | string;
-    isActive: boolean;
-    usageLimit?: number;
-    usageCount?: number;
-    targetBranches?: string[] | any[];
-    targetCategories?: string[] | any[];
+  _id?: string;
+  company: string;
+  code: string;
+  description: string;
+  type: 'percentage' | 'fixed_amount';
+  value: number;
+  minPurchaseAmount: number;
+  startDate: Date | string;
+  endDate: Date | string;
+  isActive: boolean;
+  usageLimit?: number;
+  usageCount?: number;
+  targetBranches?: string[] | any[];
+  targetCategories?: string[] | any[];
 }

@@ -40,6 +40,7 @@ import { CustomersListComponent } from './customers/customers-list.component';
 import { PromotionsListComponent } from './promotions/promotions-list.component';
 import { LiveRegistersComponent } from './live-registers/live-registers.component';
 import { CajasHistorialComponent } from './cajas-historial/cajas-historial.component';
+import { PendingVerificationsComponent } from './audits/pending-verifications/pending-verifications.component';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { CajasHistorialComponent } from './cajas-historial/cajas-historial.compo
     CustomersListComponent,
     PromotionsListComponent,
     LiveRegistersComponent,
-    CajasHistorialComponent
+    CajasHistorialComponent,
+    PendingVerificationsComponent,
   ],
   exports: [
     InventoryStockListComponent,
@@ -90,7 +92,7 @@ import { CajasHistorialComponent } from './cajas-historial/cajas-historial.compo
     CustomersListComponent,
     PromotionsListComponent,
     LiveRegistersComponent,
-    CajasHistorialComponent
+    CajasHistorialComponent,
   ],
   imports: [
     CommonModule,
@@ -100,7 +102,7 @@ import { CajasHistorialComponent } from './cajas-historial/cajas-historial.compo
     ComponentsModule,
     NgxPaginationModule,
     NgSelectModule,
-    NgChartsModule
-  ]
+    NgChartsModule,
+  ],
 })
-export class AdminToolsModule { }
+export class AdminToolsModule {}

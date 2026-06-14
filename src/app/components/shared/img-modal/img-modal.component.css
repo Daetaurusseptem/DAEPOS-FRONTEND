@@ -55,7 +55,7 @@
 }
 
 /* Input de archivo estilizado */
-input[type="file"] {
+input[type='file'] {
   font-size: 0.9rem;
   color: var(--text-muted);
 }

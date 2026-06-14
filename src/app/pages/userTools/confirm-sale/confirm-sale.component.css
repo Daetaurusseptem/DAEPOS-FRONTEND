@@ -4,7 +4,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 0 15px 40px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .card {
@@ -34,7 +34,8 @@
   color: var(--text-main);
 }
 
-h5, h6 {
+h5,
+h6 {
   color: var(--text-main) !important;
   font-weight: 700;
 }
@@ -69,7 +70,8 @@ h5, h6 {
 }
 
 /* CRM Loyalty & Promo Containers - Clean Ash Gray */
-.loyalty-container, .promo-container {
+.loyalty-container,
+.promo-container {
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md);
   padding: 18px;
@@ -77,7 +79,8 @@ h5, h6 {
   background-color: var(--bg-ghost) !important;
 }
 
-.coupon-input, .search-input {
+.coupon-input,
+.search-input {
   background-color: #ffffff !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-main) !important;
@@ -87,9 +90,10 @@ h5, h6 {
   transition: var(--transition);
 }
 
-.coupon-input:focus, .search-input:focus {
+.coupon-input:focus,
+.search-input:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
   outline: none;
 }
 
@@ -105,7 +109,8 @@ h5, h6 {
 }
 
 /* Selected Loyalty Customer */
-.selected-customer-pill, .applied-coupon {
+.selected-customer-pill,
+.applied-coupon {
   background-color: #ffffff !important;
   padding: 12px 16px !important;
   border: 1px solid var(--border-color) !important;
@@ -140,7 +145,7 @@ h5, h6 {
 
 .premium-input:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
   outline: none;
 }
 
@@ -156,7 +161,7 @@ h5, h6 {
 
 .premium-select:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Rounded Pill */

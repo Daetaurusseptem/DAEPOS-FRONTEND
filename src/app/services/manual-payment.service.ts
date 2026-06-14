@@ -4,13 +4,16 @@ import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ManualPaymentService {
   private url = environment.apiUrl + '/manual-payments';
   private sysAdminUrl = environment.apiUrl + '/sysadmin';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+  ) {}
 
   // Rutas CEO
   createPayment(amount: number, planRequested?: string) {

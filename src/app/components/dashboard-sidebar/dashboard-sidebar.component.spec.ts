@@ -8,7 +8,7 @@ describe('DashboardSidebarComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DashboardSidebarComponent]
+      declarations: [DashboardSidebarComponent],
     });
     fixture = TestBed.createComponent(DashboardSidebarComponent);
     component = fixture.componentInstance;

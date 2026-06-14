@@ -6,10 +6,9 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-create-company',
   templateUrl: './create-company.component.html',
-  styleUrls: ['./create-company.component.css']
+  styleUrls: ['./create-company.component.css'],
 })
 export class CreateCompanyComponent implements OnInit {
-  
   onboardingData = {
     companyName: '',
     companyAddress: '',
@@ -23,19 +22,19 @@ export class CreateCompanyComponent implements OnInit {
     email: '',
     password: '',
     name: '',
-    planId: ''
+    planId: '',
   };
-  
+
   plans: any[] = [];
   submittingOnboarding: boolean = false;
 
   constructor(
     private sysadminService: SysadminService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
-    this.sysadminService.getPlans().subscribe(resp => {
+    this.sysadminService.getPlans().subscribe((resp) => {
       if (resp.ok) {
         this.plans = resp.plans;
       }
@@ -52,7 +51,7 @@ export class CreateCompanyComponent implements OnInit {
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
-      }
+      },
     });
 
     // Copiar la dirección de la empresa a la sucursal si está vacía
@@ -69,7 +68,7 @@ export class CreateCompanyComponent implements OnInit {
           title: '¡Onboarding Completado!',
           text: `La empresa "${resp.company.name}" ha sido creada exitosamente.`,
           icon: 'success',
-          confirmButtonColor: '#000'
+          confirmButtonColor: '#000',
         }).then(() => {
           this.router.navigate(['/dashboard/sysadmin/companies']);
         });
@@ -80,10 +79,10 @@ export class CreateCompanyComponent implements OnInit {
           title: 'Error en onboarding',
           text: err.error?.msg || 'Ocurrió un error inesperado durante el onboarding.',
           icon: 'error',
-          confirmButtonColor: '#000'
+          confirmButtonColor: '#000',
         });
         this.submittingOnboarding = false;
-      }
+      },
     });
   }
 }

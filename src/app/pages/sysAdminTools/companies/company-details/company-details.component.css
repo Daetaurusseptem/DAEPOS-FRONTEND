@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 .bento-container {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   background-color: #ffffff;
   min-height: 100vh;
   padding: 2rem;
@@ -19,7 +19,9 @@
 }
 
 .bento-card:hover {
-  box-shadow: oklab(0.145 -0.00000143796 0.00000340492 / 0.2) 0px 0px 0px 1px, 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow:
+    oklab(0.145 -0.00000143796 0.00000340492 / 0.2) 0px 0px 0px 1px,
+    0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .bento-title {
@@ -194,6 +196,6 @@
 }
 
 .font-mono {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
 }

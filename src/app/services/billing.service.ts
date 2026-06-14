@@ -6,21 +6,16 @@ import { AuthService } from './auth.service';
 const urlSubs = `${environment.apiUrl}/subs`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BillingService {
-
   constructor(
     private http: HttpClient,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   createCheckoutSession(priceId: string) {
-    return this.http.post<any>(
-      `${urlSubs}/create-checkout-session`, 
-      { priceId }, 
-      this.authService.headers
-    );
+    return this.http.post<any>(`${urlSubs}/create-checkout-session`, { priceId }, this.authService.headers);
   }
 
   createPortalSession() {

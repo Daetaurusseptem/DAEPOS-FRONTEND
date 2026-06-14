@@ -5,7 +5,7 @@ import { StockTransferService } from 'src/app/services/stock-transfer.service';
 @Component({
   selector: 'app-stock-transfer-list',
   templateUrl: './stock-transfer-list.component.html',
-  styleUrls: ['./stock-transfer-list.component.css']
+  styleUrls: ['./stock-transfer-list.component.css'],
 })
 export class StockTransferListComponent implements OnInit {
   transfers: any[] = [];
@@ -14,8 +14,8 @@ export class StockTransferListComponent implements OnInit {
 
   constructor(
     private transferService: StockTransferService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.companyId = (this.authService.companyId || this.authService.company?._id) as string;
@@ -36,7 +36,7 @@ export class StockTransferListComponent implements OnInit {
       error: (err: any) => {
         this.loading = false;
         console.error('Error cargando traspasos:', err);
-      }
+      },
     });
   }
 }

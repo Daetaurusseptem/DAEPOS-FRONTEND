@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-bulk-import',
   templateUrl: './bulk-import.component.html',
-  styleUrls: ['./bulk-import.component.css']
+  styleUrls: ['./bulk-import.component.css'],
 })
 export class BulkImportComponent {
   @Input() companyId!: string;
@@ -20,11 +20,11 @@ export class BulkImportComponent {
   isDragging = false;
   isProcessing = false;
   autoCreateCategories = true;
-  supplierId = ''; 
+  supplierId = '';
 
   constructor(
     private productService: ProductService,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
   ) {}
 
   ngOnInit() {
@@ -32,7 +32,7 @@ export class BulkImportComponent {
   }
 
   loadSuppliers() {
-    this.supplierService.getCompanySuppliers(this.companyId).subscribe(res => {
+    this.supplierService.getCompanySuppliers(this.companyId).subscribe((res) => {
       this.suppliers = res.suppliers || [];
       if (this.suppliers.length > 0) {
         this.supplierId = this.suppliers[0]._id as string; // Seleccionamos el primero por defecto
@@ -77,7 +77,7 @@ export class BulkImportComponent {
         if (result.errors.length > 0) {
           Swal.fire('Atención', 'Hubo problemas leyendo algunas filas del CSV', 'warning');
         }
-        
+
         // Mapeamos los datos a la estructura que espera nuestro backend
         this.parsedData = result.data.map((row: any) => ({
           barCode: row['SKU_Codigo'],
@@ -87,11 +87,11 @@ export class BulkImportComponent {
           costPrice: parseFloat(row['Precio_Compra']) || 0,
           sellingPrice: parseFloat(row['Precio_Venta']) || 0,
           stock: parseInt(row['Stock_Actual']) || 0,
-          measurement: row['Unidad_Medida'] || 'unit'
+          measurement: row['Unidad_Medida'] || 'unit',
         }));
 
         this.validateData();
-      }
+      },
     });
   }
 
@@ -113,15 +113,15 @@ export class BulkImportComponent {
         Precio_Compra: '10.50',
         Precio_Venta: '15.00',
         Stock_Actual: '50',
-        Unidad_Medida: 'unit'
-      }
+        Unidad_Medida: 'unit',
+      },
     ];
-    
+
     const csv = Papa.unparse(templateData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', 'plantilla_productos.csv');
     link.style.visibility = 'hidden';
@@ -140,7 +140,7 @@ export class BulkImportComponent {
     const payload = {
       items: this.parsedData,
       autoCreateCategories: this.autoCreateCategories,
-      supplierId: this.supplierId
+      supplierId: this.supplierId,
     };
 
     this.productService.bulkUploadProducts(this.companyId, payload).subscribe({
@@ -152,7 +152,7 @@ export class BulkImportComponent {
       error: (err) => {
         this.isProcessing = false;
         Swal.fire('Error', err.error?.msg || 'Error en la carga masiva', 'error');
-      }
+      },
     });
   }
 

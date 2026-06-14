@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 @Component({
   selector: 'tabs-menu',
   templateUrl: './tabs-menu.component.html',
-  styleUrls: ['./tabs-menu.component.css']
+  styleUrls: ['./tabs-menu.component.css'],
 })
 export class TabsMenuComponent implements OnInit {
   @Input() items: any[] = [];

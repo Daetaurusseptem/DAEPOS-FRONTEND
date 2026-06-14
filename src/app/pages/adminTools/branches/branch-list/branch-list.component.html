@@ -54,26 +54,40 @@
               </td>
               <td>
                 <div class="d-flex align-items-center" *ngIf="branch.manager">
-                  <div class="avatar-sm bg-primary-soft text-primary rounded-circle me-2 d-flex align-items-center justify-content-center small fw-bold">
-                    {{ $any(branch.manager).name | slice:0:1 }}
+                  <div
+                    class="avatar-sm bg-primary-soft text-primary rounded-circle me-2 d-flex align-items-center justify-content-center small fw-bold"
+                  >
+                    {{ $any(branch.manager).name | slice: 0 : 1 }}
                   </div>
                   <span class="small">{{ $any(branch.manager).name }}</span>
                 </div>
                 <span class="badge bg-ghost text-muted rounded-pill" *ngIf="!branch.manager">Sin asignar</span>
               </td>
               <td>
-                <span class="badge rounded-pill" [ngClass]="branch.saleType === 'retail' ? 'bg-info-soft text-info' : 'bg-warning-soft text-warning'">
+                <span
+                  class="badge rounded-pill"
+                  [ngClass]="branch.saleType === 'retail' ? 'bg-info-soft text-info' : 'bg-warning-soft text-warning'"
+                >
                   {{ branch.saleType === 'retail' ? 'Retail' : 'Hospitality' }}
                 </span>
               </td>
               <td class="text-center">
                 <div class="form-check form-switch d-inline-block">
-                  <input class="form-check-input pointer" type="checkbox" role="switch" [checked]="branch.isActive" (change)="toggleStatus(branch)">
+                  <input
+                    class="form-check-input pointer"
+                    type="checkbox"
+                    role="switch"
+                    [checked]="branch.isActive"
+                    (change)="toggleStatus(branch)"
+                  />
                 </div>
               </td>
               <td class="px-4 text-end">
                 <div class="d-flex justify-content-end gap-2">
-                  <button [routerLink]="['/dashboard/admin/branches/edit', branch._id]" class="btn btn-ghost-dark btn-sm rounded-circle">
+                  <button
+                    [routerLink]="['/dashboard/admin/branches/edit', branch._id]"
+                    class="btn btn-ghost-dark btn-sm rounded-circle"
+                  >
                     <i class="bi bi-pencil-square"></i>
                   </button>
                   <button (click)="deleteBranch(branch)" class="btn btn-ghost-danger btn-sm rounded-circle">

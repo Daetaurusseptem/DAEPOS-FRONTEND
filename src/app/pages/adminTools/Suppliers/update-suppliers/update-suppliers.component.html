@@ -1,44 +1,73 @@
 <div class="container mt-4">
-    <div class="card shadow">
-      <div class="card-header bg-primary text-white">
-        <h2 class="mb-0">Editar Proveedor</h2>
-      </div>
-      <div class="card-body">
-        <form [formGroup]="supplierForm" (ngSubmit)="updateSupplier()">
-          <div class="mb-3">
-            <label for="name" class="form-label">Nombre del Proveedor</label>
-            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Introduce el nombre del proveedor">
-          </div>
-          <div class="mb-3">
-            <label for="description" class="form-label">Descripción</label>
-            <textarea class="form-control" id="description" formControlName="description" rows="3" placeholder="Introduce la descripción del proveedor"></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="phone" class="form-label">Teléfono</label>
-            <input type="tel" class="form-control" id="phone" formControlName="phone" placeholder="Introduce el teléfono del proveedor">
-          </div>
-          <div class="mb-3">
-            <label for="address" class="form-label">Dirección</label>
-            <input type="text" class="form-control" id="address" formControlName="address" placeholder="Introduce la dirección del proveedor">
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" formControlName="email" placeholder="Introduce el correo electrónico del proveedor">
-          </div>
-          <div *ngIf="supplierForm.invalid" class="alert alert-danger">
-            <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0">Nombre inválido</p>
-            <p *ngIf="campoNoValidoDatosUsuario('description')" class="mb-0">Descripción inválida</p>
-            <p *ngIf="campoNoValidoDatosUsuario('address')" class="mb-0">Dirección inválida</p>
-            <p *ngIf="campoNoValidoDatosUsuario('phone')" class="mb-0">Teléfono inválido</p>
-            <p *ngIf="campoNoValidoDatosUsuario('email')" class="mb-0">Correo electrónico inválido</p>
-          </div>
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Editar Proveedor</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="supplierForm" (ngSubmit)="updateSupplier()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre del Proveedor</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            placeholder="Introduce el nombre del proveedor"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Descripción</label>
+          <textarea
+            class="form-control"
+            id="description"
+            formControlName="description"
+            rows="3"
+            placeholder="Introduce la descripción del proveedor"
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Teléfono</label>
+          <input
+            type="tel"
+            class="form-control"
+            id="phone"
+            formControlName="phone"
+            placeholder="Introduce el teléfono del proveedor"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Dirección</label>
+          <input
+            type="text"
+            class="form-control"
+            id="address"
+            formControlName="address"
+            placeholder="Introduce la dirección del proveedor"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            formControlName="email"
+            placeholder="Introduce el correo electrónico del proveedor"
+          />
+        </div>
+        <div *ngIf="supplierForm.invalid" class="alert alert-danger">
+          <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0">Nombre inválido</p>
+          <p *ngIf="campoNoValidoDatosUsuario('description')" class="mb-0">Descripción inválida</p>
+          <p *ngIf="campoNoValidoDatosUsuario('address')" class="mb-0">Dirección inválida</p>
+          <p *ngIf="campoNoValidoDatosUsuario('phone')" class="mb-0">Teléfono inválido</p>
+          <p *ngIf="campoNoValidoDatosUsuario('email')" class="mb-0">Correo electrónico inválido</p>
+        </div>
 
-          <div class="d-flex justify-content-between">
-            <app-back-button></app-back-button>
-            <button type="submit" class="btn btn-primary" [disabled]="!supplierForm.valid">Guardar Cambios</button>
-          </div>
-        </form>
-      </div>
+        <div class="d-flex justify-content-between">
+          <app-back-button></app-back-button>
+          <button type="submit" class="btn btn-primary" [disabled]="!supplierForm.valid">Guardar Cambios</button>
+        </div>
+      </form>
     </div>
   </div>
-  
+</div>

@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-branch-form',
   templateUrl: './branch-form.component.html',
-  styleUrls: ['./branch-form.component.css']
+  styleUrls: ['./branch-form.component.css'],
 })
 export class BranchFormComponent implements OnInit {
   branchForm!: FormGroup;
@@ -25,8 +25,8 @@ export class BranchFormComponent implements OnInit {
     private authService: AuthService,
     private userService: UsersService,
     private router: Router,
-    private route: ActivatedRoute
-  ) { }
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -52,12 +52,16 @@ export class BranchFormComponent implements OnInit {
         enabled: [true],
         identifierType: ['phone', Validators.required],
         pointsEarnRate: [10, [Validators.required, Validators.min(0.01)]],
-        pointsRedeemRate: [0.10, [Validators.required, Validators.min(0.001)]],
-        maxRedemptionPercentage: [100, [Validators.required, Validators.min(1), Validators.max(100)]]
+        pointsRedeemRate: [0.1, [Validators.required, Validators.min(0.001)]],
+        maxRedemptionPercentage: [100, [Validators.required, Validators.min(1), Validators.max(100)]],
       }),
       shiftSettings: this.fb.group({
-        maxShiftDurationHours: [12, [Validators.required, Validators.min(1), Validators.max(24)]]
-      })
+        maxShiftDurationHours: [12, [Validators.required, Validators.min(1), Validators.max(24)]],
+      }),
+      posSettings: this.fb.group({
+        blindClosure: [true],
+        requirePinForRisks: [true],
+      }),
     });
   }
 
@@ -69,7 +73,7 @@ export class BranchFormComponent implements OnInit {
         if (resp && resp.users) {
           this.admins = resp.users.filter((u: any) => u.role === 'admin');
         }
-      }
+      },
     });
   }
 
@@ -83,26 +87,34 @@ export class BranchFormComponent implements OnInit {
           address: branch.address,
           tel: branch.tel,
           email: branch.email,
-          manager: branch.manager ? (typeof branch.manager === 'object' ? (branch.manager as any)._id : branch.manager) : '',
+          manager: branch.manager
+            ? typeof branch.manager === 'object'
+              ? (branch.manager as any)._id
+              : branch.manager
+            : '',
           saleType: branch.saleType,
           isActive: branch.isActive,
           loyaltySettings: branch.loyaltySettings || {
             enabled: true,
             identifierType: 'phone',
             pointsEarnRate: 10,
-            pointsRedeemRate: 0.10,
-            maxRedemptionPercentage: 100
+            pointsRedeemRate: 0.1,
+            maxRedemptionPercentage: 100,
           },
           shiftSettings: branch.shiftSettings || {
-            maxShiftDurationHours: 12
-          }
+            maxShiftDurationHours: 12,
+          },
+          posSettings: branch.posSettings || {
+            blindClosure: true,
+            requirePinForRisks: true,
+          },
         });
         this.isLoading = false;
       },
       error: () => {
         Swal.fire('Error', 'No se pudo cargar la sucursal', 'error');
         this.router.navigate(['/dashboard/admin/branches']);
-      }
+      },
     });
   }
 
@@ -114,7 +126,7 @@ export class BranchFormComponent implements OnInit {
 
     const branchData: Branch = {
       ...this.branchForm.value,
-      company: this.authService.company?._id || ''
+      company: this.authService.company?._id || '',
     };
 
     if (this.isEdit) {
@@ -125,7 +137,7 @@ export class BranchFormComponent implements OnInit {
         },
         error: (err) => {
           Swal.fire('Error', 'No se pudo actualizar la sucursal', 'error');
-        }
+        },
       });
     } else {
       this.branchService.createBranch(branchData).subscribe({
@@ -135,7 +147,7 @@ export class BranchFormComponent implements OnInit {
         },
         error: (err) => {
           Swal.fire('Error', 'No se pudo crear la sucursal', 'error');
-        }
+        },
       });
     }
   }

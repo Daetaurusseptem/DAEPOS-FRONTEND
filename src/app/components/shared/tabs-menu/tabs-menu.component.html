@@ -1,9 +1,11 @@
 <div class="tabs-container animate__animated animate__fadeInUp">
-  <div *ngFor="let itemList of items" 
-       class="tab-item" 
-       [class.active]="tabSelected === itemList.name"
-       (click)="changeTab(itemList.name)">
+  <div
+    *ngFor="let itemList of items"
+    class="tab-item"
+    [class.active]="tabSelected === itemList.name"
+    (click)="changeTab(itemList.name)"
+  >
     <i [class]="itemList.icon"></i>
-    <span>{{itemList.name}}</span>
+    <span>{{ itemList.name }}</span>
   </div>
 </div>
