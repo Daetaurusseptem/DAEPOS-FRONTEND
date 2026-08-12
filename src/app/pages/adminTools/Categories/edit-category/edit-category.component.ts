@@ -24,8 +24,9 @@ export class EditCategoryComponent {
   ) {}
 
   categoryForm: FormGroup = this.fb.group({
-    name: ['', Validators.required], // Inicializa con un string vacío o datos existentes
+    name: ['', Validators.required],
     description: ['', Validators.required],
+    isOperational: [false],
   });
 
   ngOnInit() {
@@ -45,6 +46,7 @@ export class EditCategoryComponent {
         this.categoryForm.setValue({
           name: category!.name,
           description: category!.description,
+          isOperational: category!.isOperational || false,
         });
         this.logger.log(this.categoryForm.value);
       });

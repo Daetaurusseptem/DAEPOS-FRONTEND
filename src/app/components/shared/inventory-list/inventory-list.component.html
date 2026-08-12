@@ -35,6 +35,13 @@
             >
               Por Verificar
             </span>
+            <span
+              class="badge rounded-pill bg-info text-dark border border-info-subtle small fw-semibold px-2 py-0.5"
+              *ngIf="item?.isSellable === false"
+              style="font-size: 0.7rem"
+            >
+              <i class="bi bi-tools me-1"></i>Uso Interno
+            </span>
           </div>
         </td>
         <td>

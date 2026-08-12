@@ -39,6 +39,7 @@ export class UpdateProductComponent implements OnInit {
     brand: ['', Validators.required],
     supplier: ['', Validators.required],
     isComposite: [false, Validators.required],
+    isSellable: [true],
     recipe: [''],
     // Inventario
     barCode: [''],
@@ -122,6 +123,7 @@ export class UpdateProductComponent implements OnInit {
           brand: this.product.brand,
           supplier: typeof this.product.supplier === 'object' ? this.product.supplier._id : this.product.supplier,
           isComposite: this.product.isComposite,
+          isSellable: this.product.isSellable !== undefined ? this.product.isSellable : true,
           recipe: this.product.recipe || '',
           // Datos de Inventario
           barCode: this.inventoryItem?.barCode || '',

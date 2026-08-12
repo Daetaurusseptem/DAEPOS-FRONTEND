@@ -106,6 +106,7 @@ export interface Category {
   companyId?: string;
   name?: string;
   description?: string;
+  isOperational?: boolean;
   createdAt?: Date;
 }
 
@@ -138,6 +139,7 @@ export interface Product {
   description?: string;
   brand?: string;
   isComposite: boolean;
+  isSellable?: boolean;
   recipe?: string;
   status?: 'active' | 'pending_verification';
 }

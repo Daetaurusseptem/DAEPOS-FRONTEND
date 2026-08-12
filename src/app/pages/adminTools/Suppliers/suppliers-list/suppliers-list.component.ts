@@ -22,7 +22,7 @@ export class SuppliersListComponent implements OnInit {
     private authService: AuthService,
     private logger: LoggerService,
   ) {
-    this.companyId = this.authService.companyId!;
+    this.companyId = this.authService.companyId || this.authService.company?._id || '';
   }
 
   ngOnInit(): void {
@@ -30,12 +30,19 @@ export class SuppliersListComponent implements OnInit {
   }
 
   crearSupplier() {
-    this.router.navigateByUrl(`/dashboard/admin/suppliers/new/${this.authService.companyId}`);
+    const cid = this.authService.companyId || this.authService.company?._id || this.companyId;
+    this.router.navigateByUrl(`/dashboard/admin/suppliers/new/${cid}`);
   }
 
   getSuppliers() {
+    const cid = this.authService.companyId || this.authService.company?._id || this.companyId;
+    if (!cid) {
+      console.error('No companyId found');
+      return;
+    }
+    this.companyId = cid;
     this.suppliersService
-      .getCompanySuppliers(this.authService.companyId)
+      .getCompanySuppliers(cid)
       .pipe(
         map((i) => {
           this.logger.log('sups', i);

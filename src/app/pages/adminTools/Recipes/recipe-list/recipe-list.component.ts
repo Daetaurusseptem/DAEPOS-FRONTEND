@@ -36,7 +36,7 @@ export class RecipeListComponent implements OnInit {
     const companyId = this.authService.companyId || this.authService.company?._id;
     if (!companyId) return;
 
-    this.inventoryService.getInventory(companyId, '', 'raw_material').subscribe({
+    this.inventoryService.getInventory(companyId, '', 'all').subscribe({
       next: (invResp: any) => {
         const invItems = invResp.items || [];
 
@@ -45,7 +45,14 @@ export class RecipeListComponent implements OnInit {
             const loadedRecipes = resp.recipes || [];
 
             // Populate cost prices dynamically for all ingredients in all sizes of each recipe
+            // And also find the associated selling price from the inventory items
             loadedRecipes.forEach((recipe: any) => {
+              const associatedItem = invItems.find((inv: any) => 
+                inv.product && inv.product.recipe && 
+                (inv.product.recipe._id === recipe._id || inv.product.recipe === recipe._id)
+              );
+              recipe.baseSellingPrice = associatedItem?.sellingPrice || 0;
+
               if (recipe.sizes && recipe.sizes.length > 0) {
                 recipe.sizes.forEach((size: any) => {
                   if (size.ingredients) {
@@ -127,6 +134,13 @@ export class RecipeListComponent implements OnInit {
       const cost = ri.ingredient?.costPrice || 0;
       return sum + ri.quantity * cost;
     }, 0);
+  }
+
+  getSelectedSizeSellingPrice(): number {
+    if (!this.selectedRecipe || !this.selectedSize) return 0;
+    const basePrice = this.selectedRecipe.baseSellingPrice || 0;
+    const modifier = this.selectedSize.priceModifier || 0;
+    return basePrice + modifier;
   }
 
   createRecipe(): void {

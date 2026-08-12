@@ -239,10 +239,42 @@ export class PendingVerificationsComponent implements OnInit {
         itemName: item.itemRef?.name || 'Insumo',
         quantity: item.quantity,
         oldCostPrice: item.costPrice,
-        newCostPrice: item.costPrice || 0
+        newCostPrice: item.costPrice || 0,
+        isCustomPrice: false
       }))
     };
     this.showResolveAuditModal = true;
+    
+    // Si ya trae un proveedor, cargar sus precios pactados
+    if (this.auditResolutionData.supplierId) {
+      this.onSupplierChange();
+    }
+  }
+
+  onSupplierChange() {
+    if (!this.auditResolutionData.supplierId) return;
+
+    this.supplierService.getSupplierAgreements(this.companyId, this.auditResolutionData.supplierId).subscribe({
+      next: (res: any) => {
+        if (res.ok && res.agreements) {
+          const agreements = res.agreements;
+          // Actualizar los precios sugeridos en base a los acuerdos
+          this.auditResolutionData.items.forEach((item: any) => {
+            const matchedAgreement = agreements.find(
+              (ag: any) => ag.product?._id === item.itemRef || ag.product === item.itemRef
+            );
+            if (matchedAgreement) {
+              item.newCostPrice = matchedAgreement.agreedCost;
+              item.isCustomPrice = false;
+            }
+          });
+        }
+      }
+    });
+  }
+
+  onPriceChange(item: any) {
+    item.isCustomPrice = true;
   }
 
   closeResolveAuditModal() {

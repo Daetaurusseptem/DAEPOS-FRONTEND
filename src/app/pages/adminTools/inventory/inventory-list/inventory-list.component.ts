@@ -26,7 +26,7 @@ export class InventoryStockListComponent implements OnInit {
   branches: Branch[] = [];
   selectedBranchId: string = '';
   userRole!: UserRole;
-  itemType: 'product' | 'raw_material' = 'product';
+  itemType: 'product' | 'raw_material' | 'operational' = 'product';
   selectedSupplierId: string = '';
   defaultSupplierId: string = '';
   systemSupplierId: string = '';
@@ -183,7 +183,7 @@ export class InventoryStockListComponent implements OnInit {
     });
   }
 
-  setItemType(type: 'product' | 'raw_material'): void {
+  setItemType(type: 'product' | 'raw_material' | 'operational'): void {
     this.itemType = type;
     this.currentPage = 1;
     this.loadItems();
@@ -886,7 +886,7 @@ export class InventoryStockListComponent implements OnInit {
     return this.allCompanyProducts
       .filter(
         (p) =>
-          (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText)),
+          !p.isComposite && ((p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText))),
       )
       .slice(0, 50);
   }

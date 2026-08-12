@@ -269,7 +269,7 @@ export class NewsaleComponent implements OnInit, OnDestroy {
 
   loadCategories(): void {
     this.categoryService
-      .getCompanyCategories(this.companyId!)
+      .getCompanyCategories(this.companyId!, true)
       .pipe(map((r) => r.categories!))
       .subscribe((data: Category[]) => {
         this.categories = data;

@@ -610,12 +610,12 @@ export class CentralizedDeliveriesComponent implements OnInit {
 
   getFilteredProductsForDropdown(idx: number): any[] {
     const text = this.restockItemsList[idx].searchText || '';
-    if (!text) return this.suppliedProducts.slice(0, 50); // limit to 50 for performance
+    if (!text) return this.suppliedProducts.filter((p) => !p.isComposite).slice(0, 50); // limit to 50 for performance
     const lowerText = text.toLowerCase();
     return this.suppliedProducts
       .filter(
         (p) =>
-          (p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText)),
+          !p.isComposite && ((p.name || '').toLowerCase().includes(lowerText) || (p.brand && p.brand.toLowerCase().includes(lowerText))),
       )
       .slice(0, 50);
   }

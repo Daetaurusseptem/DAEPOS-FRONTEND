@@ -7,6 +7,8 @@ import { InventoryService } from 'src/app/services/inventory.service';
 import { BranchService } from 'src/app/services/branch.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { RawMaterialsService } from 'src/app/services/raw-materials.service';
+import { forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -20,8 +22,8 @@ export class SupplierDetailsComponent implements OnInit {
   supplier!: Supplier;
 
   // Lists
-  products: Product[] = [];
-  suppliedProducts: Product[] = [];
+  products: any[] = [];
+  suppliedProducts: any[] = [];
   suppliedInventory: InventoryItem[] = [];
   branches: Branch[] = [];
   categories: Category[] = [];
@@ -34,6 +36,42 @@ export class SupplierDetailsComponent implements OnInit {
 
   // Navigation Tabs
   activeTab: 'catalog' | 'stock' | 'deliveries' = 'catalog';
+
+  // Catalog Pagination & Search
+  catalogSearchText: string = '';
+  catalogCurrentPage: number = 1;
+  catalogItemsPerPage: number = 20;
+  catalogItemsPerPageOptions: number[] = [10, 20, 50];
+
+  get paginatedSuppliedProducts(): any[] {
+    let filtered = this.suppliedProducts;
+    if (this.catalogSearchText) {
+      const term = this.catalogSearchText.toLowerCase();
+      filtered = filtered.filter(p => p.name?.toLowerCase().includes(term) || p.brand?.toLowerCase().includes(term));
+    }
+    const startIndex = (this.catalogCurrentPage - 1) * this.catalogItemsPerPage;
+    return filtered.slice(startIndex, startIndex + Number(this.catalogItemsPerPage));
+  }
+
+  get catalogTotalPages(): number {
+    let filtered = this.suppliedProducts;
+    if (this.catalogSearchText) {
+      const term = this.catalogSearchText.toLowerCase();
+      filtered = filtered.filter(p => p.name?.toLowerCase().includes(term) || p.brand?.toLowerCase().includes(term));
+    }
+    return Math.ceil(filtered.length / this.catalogItemsPerPage) || 1;
+  }
+
+  changeCatalogPage(delta: number) {
+    const newPage = this.catalogCurrentPage + delta;
+    if (newPage >= 1 && newPage <= this.catalogTotalPages) {
+      this.catalogCurrentPage = newPage;
+    }
+  }
+
+  onCatalogFiltersChange() {
+    this.catalogCurrentPage = 1;
+  }
 
   // Permission & Role Check
   canVerifyRestock: boolean = false;
@@ -87,6 +125,7 @@ export class SupplierDetailsComponent implements OnInit {
     private branchService: BranchService,
     private categoryService: CategoryService,
     private authService: AuthService,
+    private rawMaterialsService: RawMaterialsService
   ) {}
 
   ngOnInit(): void {
@@ -144,15 +183,28 @@ export class SupplierDetailsComponent implements OnInit {
   }
 
   loadDataAndCalculateKPIs() {
-    // 1. Cargar productos de la compañía
-    this.productService.searchProductCompany('', 1, 1000, this.companyId).subscribe({
-      next: (resp: any) => {
-        const allProducts: Product[] = resp.products || [];
-        // Filtrar productos suministrados por este proveedor
-        this.suppliedProducts = allProducts.filter((p) => {
-          const sId = typeof p.supplier === 'object' ? (p.supplier as any)?._id : p.supplier;
+    // 1. Cargar productos y materias primas de la compañía
+    forkJoin({
+      prods: this.productService.searchProductCompany('', 1, 1000, this.companyId),
+      raws: this.rawMaterialsService.getCompanyRawMaterials(this.companyId),
+    }).subscribe({
+      next: (res: any) => {
+        const allProducts = res.prods.products || [];
+        const allMaterials = res.raws.materials || [];
+        
+        // Unificar y mapear tipo
+        const combined = [
+          ...allProducts.map((p: any) => ({ ...p, itemType: 'product' })),
+          ...allMaterials.map((m: any) => ({ ...m, itemType: 'raw' }))
+        ];
+
+        // Filtrar productos/insumos suministrados por este proveedor y excluir compuestos
+        this.suppliedProducts = combined.filter((item: any) => {
+          if (item.isComposite) return false;
+          const sId = typeof item.supplier === 'object' ? (item.supplier as any)?._id : item.supplier;
           return sId === this.supplierId;
         });
+        
         this.catalogCount = this.suppliedProducts.length;
       },
     });

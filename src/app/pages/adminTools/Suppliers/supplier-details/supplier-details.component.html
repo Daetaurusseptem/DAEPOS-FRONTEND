@@ -120,9 +120,18 @@
   <div class="tab-content bg-white border border-light-subtle rounded-4 p-4 shadow-sm">
     <!-- Tab 1: Catálogo de Productos -->
     <div *ngIf="activeTab === 'catalog'">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0">Catálogo de Productos Suministrados</h5>
-        <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5" routerLink="/dashboard/admin/product/new">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
+        <h5 class="fw-bold mb-0 d-none d-md-block">Catálogo Suministrado</h5>
+        <div class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0">
+          <div class="input-group input-group-sm" style="max-width: 250px;">
+            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar producto..." [(ngModel)]="catalogSearchText" (input)="onCatalogFiltersChange()">
+          </div>
+          <select class="form-select form-select-sm w-auto" [(ngModel)]="catalogItemsPerPage" (change)="onCatalogFiltersChange()">
+            <option *ngFor="let opt of catalogItemsPerPageOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+        <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5 ms-md-auto" routerLink="/dashboard/admin/product/new">
           <i class="bi bi-plus-circle me-1"></i> Agregar Producto
         </button>
       </div>
@@ -143,14 +152,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of suppliedProducts">
+            <tr *ngFor="let p of paginatedSuppliedProducts">
               <td>
                 <div class="fw-semibold text-dark">{{ p.name }}</div>
               </td>
-              <td>{{ p.brand }}</td>
+              <td>{{ p.brand || '--' }}</td>
               <td>
-                <span class="badge rounded-2 bg-light text-secondary border border-light-subtle px-2 py-1 small">
-                  {{ p.isComposite ? 'Compuesto' : 'Simple' }}
+                <span class="badge rounded-2 border border-light-subtle px-2 py-1 small"
+                      [class.bg-light]="p.itemType === 'product'"
+                      [class.text-secondary]="p.itemType === 'product'"
+                      [class.bg-primary-soft]="p.itemType === 'raw'"
+                      [class.text-primary]="p.itemType === 'raw'"
+                      [style.background-color]="p.itemType === 'raw' ? '#e7f1ff' : ''">
+                  {{ p.itemType === 'raw' ? 'Insumo (Raw Material)' : 'Producto Final' }}
                 </span>
               </td>
               <td class="text-end">
@@ -167,16 +181,36 @@
             </tr>
           </tbody>
         </table>
+
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light-subtle" *ngIf="catalogTotalPages > 1 || catalogCurrentPage > 1">
+          <span class="text-muted small">Página {{ catalogCurrentPage }} de {{ catalogTotalPages }}</span>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="catalogCurrentPage === 1" (click)="changeCatalogPage(-1)">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="catalogCurrentPage === catalogTotalPages" (click)="changeCatalogPage(1)">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Tab 2: Inventario Activo por Sede -->
     <div *ngIf="activeTab === 'stock'">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0">Existencias Físicas en Almacén</h5>
+        <h5 class="fw-bold mb-0">Trazabilidad de Stock en Sede</h5>
         <button class="btn btn-dark btn-sm rounded-pill px-3 py-1.5" routerLink="/dashboard/admin/inventory/new">
           <i class="bi bi-plus-circle me-1"></i> Registrar Entrada de Stock
         </button>
+      </div>
+
+      <div class="alert alert-light border border-light-subtle d-flex align-items-start gap-2 mb-4 rounded-3">
+        <i class="bi bi-info-circle text-primary fs-5 mt-0"></i>
+        <small class="text-muted">
+          Esta pestaña muestra el <strong>inventario físico real</strong> que fue ingresado al sistema a nombre de este proveedor.
+          Mantiene el costo exacto por lote y sirve como historial de compras (independientemente de si el artículo pertenece o no a su catálogo oficial).
+        </small>
       </div>
 
       <div *ngIf="suppliedInventory.length === 0" class="text-center py-5 text-muted opacity-50">

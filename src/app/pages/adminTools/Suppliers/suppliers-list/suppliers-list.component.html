@@ -43,13 +43,13 @@
               <div class="supplier-name">{{ supplier.name || 'No Especificado' }}</div>
             </td>
             <td class="text-muted small">
-              {{ supplier.description || 'Sin descripción' | slice: 0 : 80
-              }}{{ (supplier.description.length || 0) > 80 ? '...' : '' }}
+              {{ (supplier.description || 'Sin descripción') | slice: 0 : 80
+              }}{{ (supplier.description?.length || 0) > 80 ? '...' : '' }}
             </td>
             <td>
               <span class="phone-badge">
                 <i class="bi bi-telephone-fill me-1"></i>
-                {{ supplier.contactInfo.phone }}
+                {{ supplier.contactInfo?.phone || 'No especificado' }}
               </span>
             </td>
             <td>

@@ -20,7 +20,7 @@ export class InventoryService {
   getInventory(
     companyId: string,
     search: string = '',
-    type: 'all' | 'product' | 'raw_material' = 'all',
+    type: 'all' | 'product' | 'raw_material' | 'operational' = 'all',
     branchId?: string,
     supplierId?: string,
   ): Observable<InventoryResponse> {

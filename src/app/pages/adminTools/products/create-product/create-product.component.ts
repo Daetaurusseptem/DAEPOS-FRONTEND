@@ -54,6 +54,7 @@ export class CreateProductComponent implements OnInit {
       supplier: [''],
       categories: [[], Validators.required],
       isComposite: [false, Validators.required],
+      isSellable: [true],
       recipe: [''],
       // Campos de Inventario Unificados
       barCode: [''],

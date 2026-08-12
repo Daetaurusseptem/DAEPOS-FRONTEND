@@ -24,8 +24,9 @@ export class CategoryService {
   getNumberOfCompanyCategories() {
     return this.http.get<InventoryResponse>(`${urlCategories}/number`, this.authService.headers);
   }
-  getCompanyCategories(id: string) {
-    return this.http.get<InventoryResponse>(`${urlCategories}/company/${id}`, this.authService.headers);
+  getCompanyCategories(id: string, isForPos: boolean = false) {
+    const url = isForPos ? `${urlCategories}/company/${id}?pos=true` : `${urlCategories}/company/${id}`;
+    return this.http.get<InventoryResponse>(url, this.authService.headers);
   }
 
   getCompanyCategoriesPaginated(id: string, page: number) {

@@ -25,6 +25,13 @@
             placeholder="Describe la categoría"
           ></textarea>
         </div>
+        <div class="mb-4">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="isOperational" formControlName="isOperational">
+            <label class="form-check-label fw-bold text-primary" for="isOperational">Categoría Operativa (Interna)</label>
+            <div class="form-text mt-0">Actívalo si es una categoría de insumos operativos que <b>NO</b> debe mostrarse al cajero (ej. Limpieza).</div>
+          </div>
+        </div>
         <div *ngIf="categoryForm.invalid" class="alert alert-danger">
           <p *ngIf="campoNoValidoDatosUsuario('name')" class="mb-0">Nombre inválido</p>
           <p *ngIf="campoNoValidoDatosUsuario('description')" class="mb-0">Descripción inválida</p>

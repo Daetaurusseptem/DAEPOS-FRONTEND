@@ -149,13 +149,25 @@
       </div>
     </div>
 
-    <!-- Footer Modal con Resumen de Costo -->
+    <!-- Footer Modal con Resumen de Costo y Precio -->
     <div class="modal-footer-premium p-3 bg-light d-flex justify-content-between align-items-center border-top">
-      <div>
-        <span class="text-muted d-block fs-8 uppercase"
-          >Costo Estimado Producción ({{ selectedSize?.name | titlecase }})</span
-        >
-        <span class="fs-4 fw-bold text-success font-mono">{{ getSelectedSizeTotalCost() | currency }}</span>
+      <div class="d-flex flex-column flex-md-row gap-4">
+        <div>
+          <span class="text-muted d-block fs-8 uppercase"
+            >Costo Estimado Producción ({{ selectedSize?.name | titlecase }})</span
+          >
+          <span class="fs-4 fw-bold text-success font-mono">{{ getSelectedSizeTotalCost() | currency }}</span>
+        </div>
+        <div *ngIf="selectedRecipe?.baseSellingPrice > 0">
+          <span class="text-muted d-block fs-8 uppercase"
+            >Precio de Venta Real ({{ selectedSize?.name | titlecase }})</span
+          >
+          <span class="fs-4 fw-bold text-dark font-mono">{{ getSelectedSizeSellingPrice() | currency }}</span>
+        </div>
+        <div *ngIf="!selectedRecipe?.baseSellingPrice">
+          <span class="text-muted d-block fs-8 uppercase">Precio de Venta Real</span>
+          <span class="fs-6 fw-semibold text-warning font-mono">No asignado a un producto</span>
+        </div>
       </div>
       <button class="btn btn-dark fw-bold" (click)="closeRecipeModal()">Entendido</button>
     </div>
